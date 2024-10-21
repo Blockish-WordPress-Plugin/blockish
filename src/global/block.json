@@ -1,0 +1,24 @@
+{
+	"attributes": {
+		"blockClass": {
+			"type": "string"
+		},
+		"styles": {
+			"type": "string"
+		},
+		"padding": {
+			"type": "object"
+		},
+		"margin": {
+			"type": "object"
+		},
+		"globalStyles": {
+			"type": "object"
+		},
+		"preview": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"editorScript": "file:./index.js"
+}
