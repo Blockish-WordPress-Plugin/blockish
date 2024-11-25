@@ -9,6 +9,7 @@ import BoilerplateToggleGroup from "./toggle-group";
 import BoilerplateTab from "./tab";
 import BoilerplateConditionalWrapper from "./conditional-wrapper";
 import BoilerplateResponsive from "./responsive";
+import BoilerplateTextareaControl from "./textarea-control";
 
 if(window?.boilerplateBlocks?.screen) {
     window.boilerplateBlocks.components = {
@@ -21,6 +22,7 @@ if(window?.boilerplateBlocks?.screen) {
         BoilerplateToggleGroup,
         BoilerplateTab,
         BoilerplateConditionalWrapper,
-        BoilerplateResponsive
+        BoilerplateResponsive,
+        BoilerplateTextareaControl
     }
 }
