@@ -1,0 +1,13 @@
+.boilerplate-blocks-textarea-control {
+    .components-textarea-control__input {
+        border: 1px solid var(--border-color-primary);
+        border-radius: 6px;
+        padding: 8px 12px;
+   
+        &:focus {
+            border-color: var(--border-color-primary);
+            box-shadow: var(--focus-box-shadow);
+            outline: transparent solid 2px;
+        }
+    }
+}
