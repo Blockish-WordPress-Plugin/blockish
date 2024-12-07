@@ -5,7 +5,7 @@ const BoilerplateTextareaControl = ({ label = 'Textarea', value, onChange, ...pr
     return (
         <div className="boilerplate-blocks-control boilerplate-blocks-textarea-control">
             <TextareaControl
-                __nextHasNoMarginBottom
+                __nextHasNoMarginBottom={true}
                 label={ label }
                 value={ value }
                 onChange={ onChange }

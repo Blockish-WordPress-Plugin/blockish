@@ -10,7 +10,7 @@ const BoilerplateToggleGroup = ({ label = '', value, onChange, options = [], ite
                 label={label}
                 value={value}
                 isBlock
-                __nextHasNoMarginBottom
+                __nextHasNoMarginBottom={true}
                 onChange={onChange}
                 isDeselectable={true}
                 {...props}

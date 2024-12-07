@@ -56,7 +56,16 @@ class Utilities
                 if (strpos($value, $placeholder) !== false) {
                     switch ($placeholder) {
                         case '{{VALUE}}':
-                            $value = str_replace($placeholder, $attribute ?? '', $value);
+                            $attribute_value = '';
+                            if ($attribute && (is_string($attribute) || is_numeric($attribute))) {
+                                $attribute_value = $attribute;
+                            }
+
+                            if ($attribute && is_array($attribute) && !empty($attribute['value']) && is_string($attribute['value'])) {
+                                $attribute_value = $attribute['value'];
+                            }
+                            
+                            $value = str_replace($placeholder, $attribute_value, $value);
                             break;
                         case '{{TOP}}':
                             $value = str_replace($placeholder, $attribute['top'] ?? '', $value);
