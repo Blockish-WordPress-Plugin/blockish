@@ -3,11 +3,11 @@ import { applyFilters } from '@wordpress/hooks';
 import clsx from 'clsx';
 import { useMemo } from '@wordpress/element';
 
-const BoilerplateBlocksWrapperProps = createHigherOrderComponent(
+const BlockishBlocksWrapperProps = createHigherOrderComponent(
     (BlockListBlock) => (props) => {
         const { attributes, name, clientId } = props;
 
-        if (name?.includes('boilerplate-blocks/')) {
+        if (name?.includes('blockish/')) {
             const hash = useMemo(() => {
                 return clientId?.slice(-6);
             }, [clientId]);
@@ -19,13 +19,13 @@ const BoilerplateBlocksWrapperProps = createHigherOrderComponent(
                 )
             }
 
-            const wrapperProps = applyFilters('boilerplateBlocks.blockWrapper.attributes', globalWrapperProps, attributes);
+            const wrapperProps = applyFilters('blockish.blockWrapper.attributes', globalWrapperProps, attributes);
             return <BlockListBlock {...props} wrapperProps={wrapperProps} />
         }
         return (
             <BlockListBlock {...props} />
         )
     },
-    'BoilerplateBlocksWrapperProps'
+    'BlockishBlocksWrapperProps'
 );
-export default BoilerplateBlocksWrapperProps
+export default BlockishBlocksWrapperProps

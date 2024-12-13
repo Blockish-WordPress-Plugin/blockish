@@ -13,8 +13,8 @@ import useDeviceList from "./use-device-list";
 import useDeviceType from "./use-device-type";
 import useGenerateStyles from "./use-generate-style";
 
-if( window?.boilerplateBlocks?.screen ){
-    window.boilerplateBlocks.helpers = {
+if( window?.blockish?.screen ){
+    window.blockish.helpers = {
         generateStyles,
         useGenerateStyles,
         getSpacingValue,

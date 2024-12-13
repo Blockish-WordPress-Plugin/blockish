@@ -1,9 +1,9 @@
 import Select from "react-select";
 
-const BoilerplateSelectControl = ({ label = 'Select', value, onChange, options=[], ...props }) => {
+const BlockishSelectControl = ({ label = 'Select', value, onChange, options=[], ...props }) => {
 
     return (
-        <div className="boilerplate-blocks-control boilerplate-blocks-select-control">
+        <div className="blockish-control blockish-select-control">
 			<label>{label}</label>
 			<Select
 				value={value}
@@ -25,4 +25,4 @@ const BoilerplateSelectControl = ({ label = 'Select', value, onChange, options=[
     );
 }
 
-export default BoilerplateSelectControl
+export default BlockishSelectControl

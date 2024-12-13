@@ -1,10 +1,10 @@
 import { __experimentalSpacingSizesControl as SpacingSizesControl } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-const BoilerplateSpacingSizes = ({ label, value, onChange, ...props }) => {
+const BlockishSpacingSizes = ({ label, value, onChange, ...props }) => {
     return (
-        <div className="boilerplate-blocks-spacing-sizes-control boilerplate-blocks-control">
+        <div className="blockish-spacing-sizes-control blockish-control">
             <SpacingSizesControl 
-                label={label || __('Spacing', 'boilerplate-blocks')}
+                label={label || __('Spacing', 'blockish')}
                 values={value}
                 onChange={onChange}
                 {...props}
@@ -12,4 +12,4 @@ const BoilerplateSpacingSizes = ({ label, value, onChange, ...props }) => {
         </div>
     )
 };
-export default BoilerplateSpacingSizes;
+export default BlockishSpacingSizes;

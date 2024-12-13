@@ -1,8 +1,8 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, memo } from '@wordpress/element';
 
-const BoilerplateControl = ({ type = "TextControl", slug, label = "", value: userDefinedValue, onChange: userDefinedOnChange, selectors = {}, ...props }) => {
-    const Component = window?.boilerplateBlocks?.components[type];
+const BlockishControl = ({ type = "TextControl", slug, label = "", value: userDefinedValue, onChange: userDefinedOnChange, selectors = {}, ...props }) => {
+    const Component = window?.blockish?.components[type];
 
     const { value, clientId } = useSelect((select) => {
         const { getSelectedBlock } = select('core/block-editor');
@@ -21,7 +21,7 @@ const BoilerplateControl = ({ type = "TextControl", slug, label = "", value: use
     }, [clientId])
 
     if (!Component) {
-        console.error(`Boilerplate: Unknown control type: ${type}`);
+        console.error(`Found unknown control type: ${type}`);
         return null;
     }
 
@@ -42,4 +42,4 @@ const BoilerplateControl = ({ type = "TextControl", slug, label = "", value: use
         />
     );
 };
-export default memo(BoilerplateControl);
+export default memo(BlockishControl);

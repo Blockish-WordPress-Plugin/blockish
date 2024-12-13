@@ -1,8 +1,8 @@
 import { memo, useMemo } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
 
-const BoilerplateStyleTag = ({ attributes, hash, name }) => {
-    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue } = window.boilerplateBlocks.helpers;
+const BlockishStyleTag = ({ attributes, hash, name }) => {
+    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue } = window.blockish.helpers;
 
     const deviceList = useDeviceList();
     const schemaAttributes = getBlockType(name)?.attributes || {}; // Fallback to empty object to avoid errors
@@ -50,4 +50,4 @@ const BoilerplateStyleTag = ({ attributes, hash, name }) => {
     );
 };
 
-export default memo(BoilerplateStyleTag);
+export default memo(BlockishStyleTag);

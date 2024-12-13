@@ -1,11 +1,11 @@
 {
-    "name": "bdthemes/boilerplate-blocks",
+    "name": "bdthemes/blockish",
     "description": "Starter plugin for bdthemes",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "autoload": {
         "psr-4": {
-            "BoilerplateBlocks\\": "includes/"
+            "Blockish\\": "includes/"
         }
     },
     "authors": [

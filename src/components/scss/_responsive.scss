@@ -1,6 +1,6 @@
 $primary-color: #007cba;
 
-.boilerplate-responsive-dropdown {
+.blockish-responsive-dropdown {
     position: relative;
 
     &-menu {
@@ -34,7 +34,7 @@ $primary-color: #007cba;
     }
 }
 
-.boilerplate-responsive-dropdown-popover {
+.blockish-responsive-dropdown-popover {
     .components-popover__content {
         padding: 0px !important;
 

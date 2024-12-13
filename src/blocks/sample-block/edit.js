@@ -17,7 +17,7 @@ export default function Edit({ attributes, setAttributes, advancedControls }) {
 					tagName={attributes?.tag}
 					value={attributes?.content}
 					onChange={(value) => setAttributes({ content: value })}
-					placeholder={__('Heading...', 'boilerplate-blocks')}
+					placeholder={__('Heading...', 'blockish')}
 				/>
 			</div>
 		</>

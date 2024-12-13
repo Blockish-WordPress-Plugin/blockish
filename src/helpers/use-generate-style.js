@@ -1,7 +1,7 @@
 import { useMemo } from '@wordpress/element';
 
 const useGenerateStyles = (wrapper, generateStyleObject) => {
-    const { generateStyles } = window.boilerplateBlocks.helpers;
+    const { generateStyles } = window.blockish.helpers;
 
     return useMemo(() => {
         // Call the provided callback to get the style object

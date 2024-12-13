@@ -1,13 +1,13 @@
 import { FontSizePicker } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-const BoilerplateFontSizePicker = ({ value, onChange, label, ...props }) => {
+const BlockishFontSizePicker = ({ value, onChange, label, ...props }) => {
     return (
-        <div className="boilerplate-blocks-fontsize-picker-control boilerplate-blocks-control">
+        <div className="blockish-fontsize-picker-control blockish-control">
             <FontSizePicker
                 value={value}
                 onChange={onChange}
-                label={label || __('Font Size', 'boilerplate-blocks')}
+                label={label || __('Font Size', 'blockish')}
                 withSlider
                 withReset
                 units={['px', 'em', 'rem']}
@@ -17,4 +17,4 @@ const BoilerplateFontSizePicker = ({ value, onChange, label, ...props }) => {
     );
 };
 
-export default BoilerplateFontSizePicker;
+export default BlockishFontSizePicker;

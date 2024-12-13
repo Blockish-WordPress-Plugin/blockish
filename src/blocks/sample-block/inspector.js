@@ -3,14 +3,14 @@ import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 const Inspector = ({ advancedControls }) => {
     const {
-        BoilerplateControl,
-        BoilerplateResponsiveControl,
-    } = window?.boilerplateBlocks?.controls;
+        BlockishControl,
+        BlockishResponsiveControl,
+    } = window?.blockish?.controls;
 
     return (
         <InspectorControls>
-            <BoilerplateControl
-                type="BoilerplateTab"
+            <BlockishControl
+                type="BlockishTab"
                 tabs={[
                     {
                         name: 'content',
@@ -30,23 +30,23 @@ const Inspector = ({ advancedControls }) => {
                     <>
                         {
                             tabName === 'content' && (
-                                <BoilerplateControl type="BoilerplatePanelBody" title={__('Content', 'boilerplate-blocks')}>
-                                    <BoilerplateControl
-                                        type="BoilerplateTextareaControl"
-                                        label={__('Content', 'boilerplate-blocks')}
+                                <BlockishControl type="BlockishPanelBody" title={__('Content', 'blockish')}>
+                                    <BlockishControl
+                                        type="BlockishTextareaControl"
+                                        label={__('Content', 'blockish')}
                                         slug="content"
                                     />
-                                    <BoilerplateControl
-                                        type="BoilerplateRangeControl"
-                                        label={__('Opacity', 'boilerplate-blocks')}
+                                    <BlockishControl
+                                        type="BlockishRangeControl"
+                                        label={__('Opacity', 'blockish')}
                                         slug="opacity"
                                         min={0}
                                         max={1}
                                         step={0.1}
                                     />
-                                    <BoilerplateControl
-                                        type="BoilerplateSelectControl"
-                                        label={__('Overflow', 'boilerplate-blocks')}
+                                    <BlockishControl
+                                        type="BlockishSelectControl"
+                                        label={__('Overflow', 'blockish')}
                                         options={[
                                             {
                                                 label: 'Visible',
@@ -59,9 +59,9 @@ const Inspector = ({ advancedControls }) => {
                                         ]}
                                         slug="overflow"
                                     />
-                                    <BoilerplateControl
+                                    <BlockishControl
                                         type="SelectControl"
-                                        label={__('Tag', 'boilerplate-blocks')}
+                                        label={__('Tag', 'blockish')}
                                         slug="tag"
                                         options={[
                                             {
@@ -93,11 +93,12 @@ const Inspector = ({ advancedControls }) => {
                                                 value: 'p'
                                             }
                                         ]}
+                                        __nextHasNoMarginBottom={true}
                                     />
-                                    <BoilerplateResponsiveControl
-                                        type="BoilerplateToggleGroup"
+                                    <BlockishResponsiveControl
+                                        type="BlockishToggleGroup"
                                         slug="alignment"
-                                        label={__('Alignment', 'boilerplate-blocks')}
+                                        label={__('Alignment', 'blockish')}
                                         options={[
                                             {
                                                 label: 'Left',
@@ -113,23 +114,23 @@ const Inspector = ({ advancedControls }) => {
                                             }
                                         ]}
                                     />
-                                </BoilerplateControl>
+                                </BlockishControl>
                             )
                         }
                         {
                             tabName === 'style' && (
-                                <BoilerplateControl type="BoilerplatePanelBody" title={__('Style', 'boilerplate-blocks')}>
-                                    <BoilerplateControl
-                                        type="BoilerplateColor"
+                                <BlockishControl type="BlockishPanelBody" title={__('Style', 'blockish')}>
+                                    <BlockishControl
+                                        type="BlockishColor"
                                         slug="textColor"
-                                        label={__('Text Color', 'boilerplate-blocks')}
+                                        label={__('Text Color', 'blockish')}
                                     />
-                                    <BoilerplateControl
-                                        type="BoilerplateFontSizePicker"
+                                    <BlockishControl
+                                        type="BlockishFontSizePicker"
                                         slug="fontSize"
-                                        label={__('Font Size', 'boilerplate-blocks')}
+                                        label={__('Font Size', 'blockish')}
                                     />
-                                </BoilerplateControl>
+                                </BlockishControl>
                             )
                         }
                          {
@@ -139,7 +140,7 @@ const Inspector = ({ advancedControls }) => {
                         }
                     </>
                 )}
-            </BoilerplateControl>
+            </BlockishControl>
         </InspectorControls>
     )
 }

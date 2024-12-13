@@ -3,4 +3,4 @@ const AfterTabContent = ({ children }) => {
     return children;
 }
 
-export default withFilters('boilerplate.tabs.after-tab')(AfterTabContent)
+export default withFilters('blockish.tabs.after-tab')(AfterTabContent)

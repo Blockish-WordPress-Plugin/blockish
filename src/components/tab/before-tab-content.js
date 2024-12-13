@@ -3,4 +3,4 @@ const BeforeTabContent = ({children}) => {
     return children;
 }
 
-export default withFilters('boilerplate.tabs.before-tab')(BeforeTabContent);
+export default withFilters('blockish.tabs.before-tab')(BeforeTabContent);

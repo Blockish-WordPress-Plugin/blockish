@@ -1,5 +1,5 @@
 <?php
-namespace BoilerplateBlocks\Traits;
+namespace Blockish\Traits;
 
 trait SingletonTrait {
 
@@ -23,8 +23,8 @@ trait SingletonTrait {
     protected function __construct() {}
 
     // Prevent cloning
-    final private function __clone() {}
+    private function __clone() {}
 
     // Ensure wakeup method is public for deserialization
-    final public function __wakeup() {}
+    public function __wakeup() {}
 }

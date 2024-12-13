@@ -1,7 +1,7 @@
 import { RangeControl } from '@wordpress/components';
-const BoilerplateRangeControl = ({ label = 'Range', value, onChange, ...props }) => {
+const BlockishRangeControl = ({ label = 'Range', value, onChange, ...props }) => {
     return (
-        <div className="boilerplate-blocks-control boilerplate-blocks-range-control">
+        <div className="blockish-control blockish-range-control">
             <RangeControl
                 __nextHasNoMarginBottom={true}
                 label={label}
@@ -13,4 +13,4 @@ const BoilerplateRangeControl = ({ label = 'Range', value, onChange, ...props })
     )
 }
 
-export default BoilerplateRangeControl;
+export default BlockishRangeControl;

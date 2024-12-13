@@ -1,9 +1,9 @@
-import BoilerplateControl from './control';
-import BoilerplateResponsiveControl from './responsive-control';
+import BlockishControl from './control';
+import BlockishResponsiveControl from './responsive-control';
 
-if (window?.boilerplateBlocks?.screen) {
-    window.boilerplateBlocks.controls = {
-        BoilerplateControl,
-        BoilerplateResponsiveControl
+if (window?.blockish?.screen) {
+    window.blockish.controls = {
+        BlockishControl,
+        BlockishResponsiveControl
     }
 }

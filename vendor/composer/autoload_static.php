@@ -9,12 +9,12 @@ class ComposerStaticInit316c2fa1531900b186b470a207f227ba
     public static $prefixLengthsPsr4 = array (
         'B' => 
         array (
-            'BoilerplateBlocks\\' => 18,
+            'Blockish\\' => 9,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'BoilerplateBlocks\\' => 
+        'Blockish\\' => 
         array (
             0 => __DIR__ . '/../..' . '/includes',
         ),

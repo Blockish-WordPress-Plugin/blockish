@@ -1,5 +1,5 @@
 <?php
-namespace BoilerplateBlocks\Config;
+namespace Blockish\Config;
 
 defined('ABSPATH') || exit;
 
@@ -70,7 +70,7 @@ abstract class ConfigList {
      */
     private function set_active_list() {
         // Retrieve the stored configuration from the database.
-        $database_list = get_option( 'boilerplate_blocks_' . $this->type . '_list', array() );
+        $database_list = get_option( 'blockish_' . $this->type . '_list', array() );
 
         foreach ( $this->list as $key => $item ) {
             // Skip inactive items.
@@ -95,7 +95,7 @@ abstract class ConfigList {
      * @return void
      */
     private function sync_list_with_options() {
-        $saved_list = get_option( 'boilerplate_blocks_' . $this->type . '_list', array() );
+        $saved_list = get_option( 'blockish_' . $this->type . '_list', array() );
         $updated_list = $this->list;
 
         // Iterate through the list and sync it with the saved option.
@@ -112,7 +112,7 @@ abstract class ConfigList {
         }
 
         // Save the updated list back to the options table.
-        update_option( 'boilerplate_blocks_' . $this->type . '_list', $saved_list );
+        update_option( 'blockish_' . $this->type . '_list', $saved_list );
     }
 
     /**
@@ -122,7 +122,7 @@ abstract class ConfigList {
      * @return void
      */
     public function save_list_to_options() {
-        update_option( 'boilerplate_blocks_' . $this->type . '_list', $this->list );
+        update_option( 'blockish_' . $this->type . '_list', $this->list );
     }
 
     /**
@@ -132,7 +132,7 @@ abstract class ConfigList {
      * @return void
      */
     public function load_list_from_options() {
-        $this->list = get_option( 'boilerplate_blocks_' . $this->type . '_list', array() );
+        $this->list = get_option( 'blockish_' . $this->type . '_list', array() );
         $this->set_active_list(); // Update the active list after loading.
     }
 

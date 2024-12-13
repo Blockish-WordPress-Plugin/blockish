@@ -1,6 +1,6 @@
 <?php
 
-namespace BoilerplateBlocks\Core;
+namespace Blockish\Core;
 
 defined('ABSPATH') || exit;
 
@@ -28,7 +28,7 @@ class Utilities
 
         global $wp_filesystem;
 
-        $block_metadata_path = BOILERPLATE_BLOCKS_PLUGIN_DIR . '/build/blocks/' . $block_name . '/block.json';
+        $block_metadata_path = BLOCKISH_DIR . '/build/blocks/' . $block_name . '/block.json';
 
         if (!is_readable($block_metadata_path)) {
             return false;
@@ -52,7 +52,7 @@ class Utilities
     public static function replace_css_placeholders($value, $attribute)
     {
         if (!empty($attribute)) {
-            foreach (BOILERPLATE_RESERVED_PLACEHOLDERS as $placeholder) {
+            foreach (BLOCKISH_RESERVED_PLACEHOLDERS as $placeholder) {
                 if (strpos($value, $placeholder) !== false) {
                     switch ($placeholder) {
                         case '{{VALUE}}':

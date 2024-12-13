@@ -3,16 +3,16 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 
-const BoilerplateInteractions = createHigherOrderComponent(
+const BlockishInteractions = createHigherOrderComponent(
     (TabContent) => (props) => {
-        if(props?.blockName?.includes('boilerplate-blocks') && props?.tabName === 'advanced') {
-            const { BoilerplatePanelBody } = window?.boilerplateBlocks?.components;
+        if(props?.blockName?.includes('blockish') && props?.tabName === 'advanced') {
+            const { BlockishPanelBody } = window?.blockish?.components;
             return (
                 <TabContent {...props}>
                     {props.children}
-                    <BoilerplatePanelBody title={__('Test', 'boilerplate-blocks')} >
+                    <BlockishPanelBody title={__('Test', 'blockish')} >
                         <h4>Bangdsfjsdj</h4>
-                    </BoilerplatePanelBody>
+                    </BlockishPanelBody>
                 </TabContent>
             )
         }
@@ -21,11 +21,11 @@ const BoilerplateInteractions = createHigherOrderComponent(
             <TabContent {...props} />
         )
     },
-    'BoilerplateInteractions'
+    'BlockishInteractions'
 );
 
 addFilter(
-    'boilerplate.tabs.after-tab',
-    'boilerplate/interactions/controls',
-    BoilerplateInteractions
+    'blockish.tabs.after-tab',
+    'blockish/interactions/controls',
+    BlockishInteractions
 );

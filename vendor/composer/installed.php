@@ -1,6 +1,6 @@
 <?php return array(
     'root' => array(
-        'name' => 'bdthemes/boilerplate-blocks',
+        'name' => 'bdthemes/blockish',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
         'reference' => '2256d6f227384826604cd9aa84da4c29457febaa',
@@ -10,7 +10,7 @@
         'dev' => true,
     ),
     'versions' => array(
-        'bdthemes/boilerplate-blocks' => array(
+        'bdthemes/blockish' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
             'reference' => '2256d6f227384826604cd9aa84da4c29457febaa',

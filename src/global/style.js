@@ -1,5 +1,5 @@
 const useStyle = (attributes = {}) => {
-    const { useGenerateStyles, getSpacingValue } = window.boilerplateBlocks.helpers;
+    const { useGenerateStyles, getSpacingValue } = window.blockish.helpers;
     const wrapper = `.${attributes?.blockClass}`;
     return useGenerateStyles(wrapper, () => {
         return {

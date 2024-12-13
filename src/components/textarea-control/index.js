@@ -1,9 +1,9 @@
 import { TextareaControl } from '@wordpress/components';
 
-const BoilerplateTextareaControl = ({ label = 'Textarea', value, onChange, ...props }) => {
+const BlockishTextareaControl = ({ label = 'Textarea', value, onChange, ...props }) => {
 
     return (
-        <div className="boilerplate-blocks-control boilerplate-blocks-textarea-control">
+        <div className="blockish-control blockish-textarea-control">
             <TextareaControl
                 __nextHasNoMarginBottom={true}
                 label={ label }
@@ -15,4 +15,4 @@ const BoilerplateTextareaControl = ({ label = 'Textarea', value, onChange, ...pr
     );
 }
 
-export default BoilerplateTextareaControl
+export default BlockishTextareaControl

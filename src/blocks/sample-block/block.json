@@ -1,9 +1,9 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "boilerplate-blocks/sample-block",
+	"name": "blockish/sample-block",
 	"version": "0.1.0",
-	"title": "Boilerplate Blocks",
+	"title": "Sample Block",
 	"category": "widgets",
 	"icon": "smiley",
 	"description": "Example block scaffolded with Create Block tool.",
@@ -58,7 +58,7 @@
 			"full"
 		]
 	},
-	"textdomain": "boilerplate-blocks",
+	"textdomain": "blockish",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",

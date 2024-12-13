@@ -1,21 +1,21 @@
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu } from '@wordpress/components';
 import { useRef, memo } from '@wordpress/element';
-const BoilerplateResponsive = ({ children }) => {
+const BlockishResponsive = ({ children }) => {
 
-    const { useDeviceList, setDeviceType, useDeviceType } = window.boilerplateBlocks.helpers;
+    const { useDeviceList, setDeviceType, useDeviceType } = window.blockish.helpers;
     const responsiveRef = useRef();
     const deviceList = useDeviceList();
     const deviceType = useDeviceType();
     const deviceIcon = deviceList.find((device) => device.slug === deviceType)?.icon;
 
     return (
-        <div className='boilerplate-responsive-dropdown' ref={responsiveRef}>
+        <div className='blockish-responsive-dropdown' ref={responsiveRef}>
             <DropdownMenu
                 icon={deviceIcon}
-                label={__("Select a device", "boilerplate-blocks")}
-                className='boilerplate-responsive-dropdown-menu'
-                popoverProps={{ className: 'boilerplate-responsive-dropdown-popover' }}
+                label={__("Select a device", "blockish")}
+                className='blockish-responsive-dropdown-menu'
+                popoverProps={{ className: 'blockish-responsive-dropdown-popover' }}
                 controls={
                     deviceList.map((device) => {
                         return {
@@ -33,4 +33,4 @@ const BoilerplateResponsive = ({ children }) => {
     )
 }
 
-export default memo(BoilerplateResponsive);
+export default memo(BlockishResponsive);

@@ -1,5 +1,5 @@
 const replaceCssPlaceholders = (value, attribute) => {
-    const { reservedPlaceholder } = window.boilerplateBlocks.helpers;
+    const { reservedPlaceholder } = window.blockish.helpers;
     reservedPlaceholder.forEach(placeholder => {
         if (value.includes(placeholder)) {
             switch (placeholder) {

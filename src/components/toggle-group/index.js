@@ -3,9 +3,9 @@ import {
     __experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 
-const BoilerplateToggleGroup = ({ label = '', value, onChange, options = [], itemProps = {}, ...props }) => {
+const BlockishToggleGroup = ({ label = '', value, onChange, options = [], itemProps = {}, ...props }) => {
     return (
-        <div className="boilerplate-toggle-group">
+        <div className="blockish-toggle-group">
             <ToggleGroupControl
                 label={label}
                 value={value}
@@ -30,4 +30,4 @@ const BoilerplateToggleGroup = ({ label = '', value, onChange, options = [], ite
     );
 }
 
-export default BoilerplateToggleGroup;
+export default BlockishToggleGroup;

@@ -1,10 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { PanelColorSettings, __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
 
-const BoilerplateColor = ({ label, value, onChange, alpha, labelBlock = 'inline', isGradient = false, ...props }) => {
+const BlockishColor = ({ label, value, onChange, alpha, labelBlock = 'inline', isGradient = false, ...props }) => {
     return (
         <>
-            <div className="boilerplate-blocks-color-control boilerplate-blocks-control">
+            <div className="blockish-color-control blockish-control">
                 {
                     isGradient ? (
                         <PanelColorGradientSettings
@@ -40,4 +40,4 @@ const BoilerplateColor = ({ label, value, onChange, alpha, labelBlock = 'inline'
     );
 }
 
-export default BoilerplateColor;
+export default BlockishColor;

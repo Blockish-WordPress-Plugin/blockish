@@ -6,7 +6,7 @@ import BeforeTabContent from './before-tab-content';
 import AfterTabContent from './after-tab-content';
 
 /**
- * BoilerplateTab Component
+ * BlockishTab Component
  * 
  * Renders a tab panel that conditionally displays additional content 
  * based on the selected block and tab type. It integrates `BeforeTabContent` 
@@ -17,7 +17,7 @@ import AfterTabContent from './after-tab-content';
  * @param {Function} children - Render prop function to display tab content.
  * @param {Object} props - Additional props for the TabPanel component.
  */
-const BoilerplateTab = ({ tabs = [], type = 'normal', children, ...props }) => {
+const BlockishTab = ({ tabs = [], type = 'normal', children, ...props }) => {
     const { getSelectedBlock } = select(blockEditorStore);
 
     // Get the selected block's details (name, clientId)
@@ -27,8 +27,8 @@ const BoilerplateTab = ({ tabs = [], type = 'normal', children, ...props }) => {
 
     return (
         <TabPanel
-            className={clsx('boilerplate-tab', { [`boilerplate-tab-${type}`]: type })}
-            activeClass="boilerplate-tab-active"
+            className={clsx('blockish-tab', { [`blockish-tab-${type}`]: type })}
+            activeClass="blockish-tab-active"
             tabs={tabs}
             {...props}
         >
@@ -52,4 +52,4 @@ const BoilerplateTab = ({ tabs = [], type = 'normal', children, ...props }) => {
     );
 };
 
-export default BoilerplateTab;
+export default BlockishTab;

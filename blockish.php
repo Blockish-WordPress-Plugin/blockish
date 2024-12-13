@@ -1,20 +1,20 @@
 <?php
 /**
- * Plugin Name:       Boilerplate Blocks
- * Description:       Starter plugin for bdthemes.
- * Requires at least: 6.6
+ * Plugin Name:       Blockish
+ * Description:       Best block plugin ever
+ * Requires at least: 6.7
  * Requires PHP:      7.2
  * Version:           0.1.0
- * Author:            bdthemes
- * Author URI:        https://bdthemes.com
+ * Author:            Mijanur Rahman
+ * Author URI:        https://mijanurrahman.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       boilerplate-blocks
+ * Text Domain:       blockish
  */
 
-use BoilerplateBlocks\Core\Blocks;
-use BoilerplateBlocks\Core\Enqueue;
-use BoilerplateBlocks\Core\ExtenSions;
+use Blockish\Core\Blocks;
+use Blockish\Core\Enqueue;
+use Blockish\Core\ExtenSions;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,10 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Main BoilerplateBlocks Class.
+ * Main Blockish Class.
  * Implements the singleton pattern to ensure only one instance is running.
  */
-final class BoilerplateBlocks {
+final class Blockish {
     
     /**
      * Plugin version.
@@ -37,7 +37,7 @@ final class BoilerplateBlocks {
     /**
      * Holds the instance of this class.
      *
-     * @var BoilerplateBlocks|null
+     * @var Blockish|null
      */
     private static $instance = null;
 
@@ -53,7 +53,7 @@ final class BoilerplateBlocks {
         register_activation_hook( __FILE__, array( $this, 'activated_plugin' ) );
 
         // Load autoloader (vendor/autoload.php).
-        require_once BOILERPLATE_BLOCKS_PLUGIN_DIR . 'vendor/autoload.php';
+        require_once BLOCKISH_DIR . 'vendor/autoload.php';
 
         // Initialize plugin hooks.
         add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
@@ -65,15 +65,15 @@ final class BoilerplateBlocks {
      * @return void
      */
     public function define_constants() {
-        define( 'BOILERPLATE_BLOCKS_PLUGIN_VERSION', self::VERSION );
-        define( 'BOILERPLATE_BLOCKS_PLUGIN_NAME', 'Boilerplate Blocks' );
-        define( 'BOILERPLATE_BLOCKS_PLUGIN_URL', trailingslashit( plugin_dir_url( __FILE__ ) ) );
-        define( 'BOILERPLATE_BLOCKS_PLUGIN_DIR', trailingslashit( plugin_dir_path( __FILE__ ) ) );
-        define( 'BOILERPLATE_BLOCKS_INCLUDES_DIR', BOILERPLATE_BLOCKS_PLUGIN_DIR . 'includes/' );
-        define( 'BOILERPLATE_BLOCKS_STYLES_DIR', BOILERPLATE_BLOCKS_PLUGIN_DIR . 'build/styles/' );
-        define( 'BOILERPLATE_BLOCKS_BLOCKS_DIR', BOILERPLATE_BLOCKS_PLUGIN_DIR . 'build/blocks/' );
-        define( 'BOILERPLATE_BLOCKS_EXTENSIONS_DIR', BOILERPLATE_BLOCKS_PLUGIN_DIR . 'build/extensions/' );
-        define( 'BOILERPLATE_RESERVED_PLACEHOLDERS', [
+        define( 'BLOCKISH_VERSION', self::VERSION );
+        define( 'BLOCKISH_NAME', '' );
+        define( 'BLOCKISH_URL', trailingslashit( plugin_dir_url( __FILE__ ) ) );
+        define( 'BLOCKISH_DIR', trailingslashit( plugin_dir_path( __FILE__ ) ) );
+        define( 'BLOCKISH_INCLUDES_DIR', BLOCKISH_DIR . 'includes/' );
+        define( 'BLOCKISH_STYLES_DIR', BLOCKISH_DIR . 'build/styles/' );
+        define( 'BLOCKISH_BLOCKS_DIR', BLOCKISH_DIR . 'build/blocks/' );
+        define( 'BLOCKISH_EXTENSIONS_DIR', BLOCKISH_DIR . 'build/extensions/' );
+        define( 'BLOCKISH_RESERVED_PLACEHOLDERS', [
             '{{VALUE}}',
             '{{TOP}}',
             '{{BOTTOM}}',
@@ -90,11 +90,11 @@ final class BoilerplateBlocks {
      */
     public function activated_plugin() {
         // Update plugin version in the options table.
-        update_option( 'boilerplate_blocks_version', BOILERPLATE_BLOCKS_PLUGIN_VERSION );
+        update_option( 'blockish_version', BLOCKISH_VERSION );
 
         // Set installed time if it doesn't exist.
-        if ( ! get_option( 'boilerplate_blocks_installed_time' ) ) {
-            add_option( 'boilerplate_blocks_installed_time', time() );
+        if ( ! get_option( 'blockish_installed_time' ) ) {
+            add_option( 'blockish_installed_time', time() );
         }
     }
 
@@ -105,17 +105,15 @@ final class BoilerplateBlocks {
      * @return void
      */
     public function plugins_loaded() {
-        // Load plugin textdomain for translations.
-        load_plugin_textdomain( 'boilerplate-blocks', false, BOILERPLATE_BLOCKS_PLUGIN_DIR . 'languages/' );
 
         // Add a custom class to the admin body tag.
         add_filter( 'admin_body_class', function( $classes ) {
-            return $classes . ' boilerplate-blocks';
+            return $classes . ' blockish';
         });
 
         // Add custom classes to the front-end body tag.
         add_filter( 'body_class', function( $classes ) {
-            return array_merge( $classes, array( 'boilerplate-blocks', 'boilerplate-blocks-frontend' ) );
+            return array_merge( $classes, array( 'blockish', 'blockish-frontend' ) );
         });
 
         add_action( 'admin_enqueue_scripts', [$this, 'admin_enqueue_scripts'] );
@@ -127,7 +125,7 @@ final class BoilerplateBlocks {
     }
 
     public function admin_enqueue_scripts($screen) {
-        wp_localize_script( 'wp-block-editor', 'boilerplateBlocks', [
+        wp_localize_script( 'wp-block-editor', 'blockish', [
             'ajaxurl' => admin_url( 'admin-ajax.php' ),
             'screen' => $screen
         ]);
@@ -136,7 +134,7 @@ final class BoilerplateBlocks {
     /**
      * Ensures that only one instance of the plugin is running.
      *
-     * @return BoilerplateBlocks
+     * @return Blockish
      */
     public static function instance() {
         if ( is_null( self::$instance ) ) {
@@ -157,11 +155,11 @@ final class BoilerplateBlocks {
 }
 
 /**
- * Kickstart the BoilerplateBlocks plugin.
+ * Kickstart the Blockish plugin.
  *
- * @return BoilerplateBlocks
+ * @return Blockish
  */
-function boilerplate_blocks() {
-    return BoilerplateBlocks::instance();
+function blockish() {
+    return Blockish::instance();
 }
-boilerplate_blocks();
+blockish();

@@ -1,9 +1,9 @@
 <?php
-namespace BoilerplateBlocks\Core;
+namespace Blockish\Core;
 
 defined('ABSPATH') || exit;
 
-use BoilerplateBlocks\Traits\SingletonTrait;
+use Blockish\Traits\SingletonTrait;
 
 class Enqueue {
 
@@ -26,33 +26,33 @@ class Enqueue {
      */
     public function enqueue_block_editor_assets() {
         $this->register_and_enqueue_script(
-            'boilerplate-blocks-components',
-            BOILERPLATE_BLOCKS_PLUGIN_URL . 'build/components/index.js',
-            BOILERPLATE_BLOCKS_PLUGIN_DIR . 'build/components/index.asset.php'
+            'blockish-components',
+            BLOCKISH_URL . 'build/components/index.js',
+            BLOCKISH_DIR . 'build/components/index.asset.php'
         );
 
         $this->register_and_enqueue_style(
-            'boilerplate-blocks-components',
-            BOILERPLATE_BLOCKS_PLUGIN_URL . 'build/components/index.css',
-            BOILERPLATE_BLOCKS_PLUGIN_VERSION
+            'blockish-components',
+            BLOCKISH_URL . 'build/components/index.css',
+            BLOCKISH_VERSION
         );
 
         $this->register_and_enqueue_script(
-            'boilerplate-blocks-controls',
-            BOILERPLATE_BLOCKS_PLUGIN_URL . 'build/controls/index.js',
-            BOILERPLATE_BLOCKS_PLUGIN_DIR . 'build/controls/index.asset.php'
+            'blockish-controls',
+            BLOCKISH_URL . 'build/controls/index.js',
+            BLOCKISH_DIR . 'build/controls/index.asset.php'
         );
 
         $this->register_and_enqueue_script(
-            'boilerplate-blocks-helpers',
-            BOILERPLATE_BLOCKS_PLUGIN_URL . 'build/helpers/index.js',
-            BOILERPLATE_BLOCKS_PLUGIN_DIR . 'build/helpers/index.asset.php'
+            'blockish-helpers',
+            BLOCKISH_URL . 'build/helpers/index.js',
+            BLOCKISH_DIR . 'build/helpers/index.asset.php'
         );
 
         $this->register_and_enqueue_script(
-            'boilerplate-blocks-global',
-            BOILERPLATE_BLOCKS_PLUGIN_URL . 'build/global/index.js',
-            BOILERPLATE_BLOCKS_PLUGIN_DIR . 'build/global/index.asset.php'
+            'blockish-global',
+            BLOCKISH_URL . 'build/global/index.js',
+            BLOCKISH_DIR . 'build/global/index.asset.php'
         );
     }
 
@@ -62,9 +62,9 @@ class Enqueue {
      */
     public function enqueue_block_assets() {
         $this->register_and_enqueue_style(
-            'boilerplate-blocks-global',
-            BOILERPLATE_BLOCKS_PLUGIN_URL . 'build/global/style-index.css',
-            BOILERPLATE_BLOCKS_PLUGIN_VERSION
+            'blockish-global',
+            BLOCKISH_URL . 'build/global/style-index.css',
+            BLOCKISH_VERSION
         );
     }
 

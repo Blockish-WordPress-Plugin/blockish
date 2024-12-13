@@ -1,17 +1,17 @@
 <?php
 
-namespace BoilerplateBlocks\Core;
+namespace Blockish\Core;
 
-use BoilerplateBlocks\Config\ExtensionList;
+use Blockish\Config\ExtensionList;
 
 defined('ABSPATH') || exit;
 
 class Extensions
 {
-    use \BoilerplateBlocks\Traits\SingletonTrait;
+    use \Blockish\Traits\SingletonTrait;
 
-    public $scripts_handles = ['boilerplate-editorscript', 'boilerplate-script', 'boilerplate-viewscript'];
-    public $styles_handles = ['boilerplate-editorstyle', 'boilerplate-style', 'boilerplate-viewstyle'];
+    public $scripts_handles = ['blockish-editorscript', 'blockish-script', 'blockish-viewscript'];
+    public $styles_handles = ['blockish-editorstyle', 'blockish-style', 'blockish-viewstyle'];
 
     /**
      * Constructor.
@@ -20,7 +20,7 @@ class Extensions
     private function __construct()
     {
         add_action('enqueue_block_assets', [$this, 'register_extension_assets']);
-        add_filter('render_block_data', [$this, 'register_boilerplate_extensions'], 10);
+        add_filter('render_block_data', [$this, 'register_blockish_extensions'], 10);
     }
 
     /**
@@ -31,7 +31,7 @@ class Extensions
     {
         $active_extensions = ExtensionList::get_instance()->get_list('active');
         foreach ($active_extensions as $slug => $extension) {
-            $path = BOILERPLATE_BLOCKS_EXTENSIONS_DIR . $slug;
+            $path = BLOCKISH_EXTENSIONS_DIR . $slug;
             if (is_readable($path)) {
                 $extension_metadata = $this->get_extensions_metadata($path);
                 if (!empty($extension_metadata)) {
@@ -58,25 +58,25 @@ class Extensions
     /**
      * Registers the active extensions from the ExtensionList.
      */
-    public function register_boilerplate_extensions($block)
+    public function register_blockish_extensions($block)
     {
         $active_extensions = ExtensionList::get_instance()->get_list('active');
-        if (isset($block['blockName']) && str_contains($block['blockName'], 'boilerplate-blocks') && !empty($active_extensions)) {
+        if (isset($block['blockName']) && str_contains($block['blockName'], 'blockish') && !empty($active_extensions)) {
             // Register the necessary assets from block.json
             foreach ($active_extensions as $slug => $extension) {
-                $path = BOILERPLATE_BLOCKS_EXTENSIONS_DIR . $slug;
+                $path = BLOCKISH_EXTENSIONS_DIR . $slug;
                 if (is_readable($path)) {
                     $extension_metadata = $this->get_extensions_metadata($path);
                     if (!empty($extension_metadata)) {
                         foreach ($this->scripts_handles as $handle) {
                             if (wp_script_is($handle, 'registered') && !str_contains($handle, 'editor')) {
                                 if (empty($extension_metadata['editorScriptData']['conditions'])) {
-                                    wp_enqueue_script('boilerplate-editorscript');
+                                    wp_enqueue_script('blockish-editorscript');
                                 } else {
                                     $data = $extension_metadata['editorScriptData'];
                                     $conditions = $data['conditions'] ?? [];
                                     if ($this->should_execute_scripts($conditions, $block)) {
-                                        wp_enqueue_script('boilerplate-editorscript');
+                                        wp_enqueue_script('blockish-editorscript');
                                     }
                                 }
                             }
@@ -220,7 +220,7 @@ class Extensions
         }
 
         // Register the script or style
-        $handle = 'boilerplate-' . sanitize_key($field_name);
+        $handle = 'blockish-' . sanitize_key($field_name);
         $asset_url = plugins_url($asset, $path . '/' . $asset);
         if ($type === 'script') {
             $extension_3rd_party_dependencies = $metadata[$field_name . 'Data']['dependencies'] ?? [];

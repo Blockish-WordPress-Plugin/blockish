@@ -2,11 +2,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, memo, useMemo } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
 
-const BoilerplateResponsiveControl = ({ type = "TextControl", slug, label = "", value: userDefinedValue, onChange: userDefinedOnChange, selectors = {}, ...props }) => {
-    const Component = window?.boilerplateBlocks?.components[type];
+const BlockishResponsiveControl = ({ type = "TextControl", slug, label = "", value: userDefinedValue, onChange: userDefinedOnChange, selectors = {}, ...props }) => {
+    const Component = window?.blockish?.components?.[type];
 
-    const { BoilerplateResponsive } = window.boilerplateBlocks.components;
-    const { useDeviceType } = window.boilerplateBlocks.helpers;
+    const { BlockishResponsive } = window.blockish.components;
+    const { useDeviceType } = window.blockish.helpers;
 
     const { value, clientId, name } = useSelect((select) => {
         const { getSelectedBlock } = select('core/block-editor');
@@ -35,12 +35,12 @@ const BoilerplateResponsiveControl = ({ type = "TextControl", slug, label = "", 
     }, [clientId])
 
     if (!Component) {
-        console.error(`Boilerplate: Unknown control type: ${type}`);
+        console.error(`Blockish: Found unknown control type: ${type}`);
         return null;
     }
 
     if (!isTypeValid) {
-        console.error(`Boilerplate: Responsive control type must be an object type, but ${attrType} given`);
+        console.error(`Blockish: Responsive control type must be an object type, but ${attrType} given`);
         return null;
     }
 
@@ -58,14 +58,14 @@ const BoilerplateResponsiveControl = ({ type = "TextControl", slug, label = "", 
     }
 
     return (
-        <BoilerplateResponsive>
+        <BlockishResponsive>
             <Component
                 label={label || "Write your label here"}
                 value={controlValue?.[device]}
                 onChange={handleChange}
                 {...props}
             />
-        </BoilerplateResponsive>
+        </BlockishResponsive>
     );
 };
-export default memo(BoilerplateResponsiveControl);
+export default memo(BlockishResponsiveControl);
