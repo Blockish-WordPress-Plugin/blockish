@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu } from '@wordpress/components';
 import { useRef, memo } from '@wordpress/element';
-const BlockishResponsive = ({ children }) => {
+const BlockishResponsive = ({ children, left }) => {
 
     const { useDeviceList, setDeviceType, useDeviceType } = window.blockish.helpers;
     const responsiveRef = useRef();
@@ -11,23 +11,24 @@ const BlockishResponsive = ({ children }) => {
 
     return (
         <div className='blockish-responsive-dropdown' ref={responsiveRef}>
-            <DropdownMenu
-                icon={deviceIcon}
-                label={__("Select a device", "blockish")}
-                className='blockish-responsive-dropdown-menu'
-                popoverProps={{ className: 'blockish-responsive-dropdown-popover' }}
-                controls={
-                    deviceList.map((device) => {
-                        return {
-                            icon: device.icon,
-                            onClick: () => {
-                                setDeviceType(device.slug);
+            <div className='blockish-responsive-dropdown-menu' style={{ '--from-left': left }}>
+                <DropdownMenu
+                    icon={deviceIcon}
+                    label={__("Select a device", "blockish")}
+                    popoverProps={{ className: 'blockish-responsive-dropdown-popover' }}
+                    controls={
+                        deviceList.map((device) => {
+                            return {
+                                icon: device.icon,
+                                onClick: () => {
+                                    setDeviceType(device.slug);
+                                }
                             }
-                        }
-                    })
-                }
-            >
-            </DropdownMenu>
+                        })
+                    }
+                >
+                </DropdownMenu>
+            </div>
             {children}
         </div>
     )

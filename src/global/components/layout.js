@@ -4,6 +4,7 @@ const Layout = ({ name }) => {
     const { BlockishControl, BlockishResponsiveControl  } = window?.blockish?.controls;
     const layoutMarginExcludes = applyFilters('blockish.advancedControl.layout.margin.exclude', new Set([]));
     const layoutPaddingExcludes = applyFilters('blockish.advancedControl.layout.padding.exclude', new Set([]));
+
     return (
         <BlockishControl type='BlockishPanelBody' title={__('Layout', 'blockish')}>
             {
@@ -12,6 +13,7 @@ const Layout = ({ name }) => {
                         type='BlockishSpacingSizes'
                         label={__('Padding', 'blockish')}
                         slug='padding'
+                        left="52px"
                     />
                 )
             }
@@ -21,6 +23,7 @@ const Layout = ({ name }) => {
                         type='BlockishSpacingSizes'
                         label={__('Margin', 'blockish')}
                         slug='margin'
+                        left="46px"
                     />
                 )
             }

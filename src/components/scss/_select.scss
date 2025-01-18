@@ -1,0 +1,115 @@
+.blockish-select {
+	&__input {
+		box-shadow: none !important;
+		max-width: 100%;
+		min-width: 40px;
+	}
+
+	&__menu {
+		z-index: 999999 !important;
+		max-height: 180px !important;
+		border-radius: 3px;
+		border: 1px solid #E2E3E5;
+		margin-top: 4px !important;
+		padding: 4px !important;
+		padding-right: 2px !important;
+		overflow: hidden;
+		background: #FFF;
+		box-shadow: 0px 4px 8px 0px rgba(9, 11, 15, 0.06), 0px 2px 4px -2px rgba(9, 11, 15, 0.10) !important;
+		&-list {
+			overflow-x: hidden !important;
+			overflow-y: auto !important;
+			max-height: 180px !important;
+			&::-webkit-scrollbar {
+				width: 4px;
+				height: 20px !important;
+				border-radius: 4px;
+				background-color: #fff;
+				margin-right: 4px;
+			}
+
+			//track
+			&::-webkit-scrollbar-thumb {
+				background-color: #B7BAC2;
+				border-radius: 4px;
+				cursor: pointer;
+			}
+		}
+
+		&__option {
+			cursor: pointer !important;
+			&--is-selected {
+				background-color: #F2F4F7 !important;
+				color: #111722 !important;
+			}
+		}
+	}
+
+	&__control {
+		border-radius: 3px !important;
+		min-height: 25px !important;
+		box-shadow: none;
+		padding: 0 5px;
+		cursor: pointer !important;
+		box-shadow: none !important;
+		border-color: #DADADD;
+		transition: 0.3s;
+
+		&:hover {
+			border-color: #397FE9 !important;
+		}
+
+		&:focus {
+			border-color: #397FE9 !important;
+		}
+	}
+
+	&__value-container {
+		padding: 0 !important;
+		font-size: 12px;
+	}
+
+	&__input-container {
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+
+	&__single-value {
+		margin: 0 !important;
+	}
+
+	&__indicators {
+		&-separator {
+			display: none !important;
+		}
+	}
+
+	&__dropdown-indicator {
+		padding: 0 !important;
+
+		svg {
+			width: 16px;
+			height: 16px;
+			display: block;
+		}
+	}
+
+	&__multi-value__label {
+		padding-left: 3px !important;
+	}
+
+	&__option {
+		border-radius: 3px;
+		&--is-selected {
+			background-color: #3BAAFE10 !important;
+			color: #3B67FE !important;
+		}
+	}
+}
+
+// For RTL 
+.rtl {
+	.blockish-select__value-container {
+		text-align: right;
+    }
+}

@@ -18,6 +18,28 @@
 				".{{WRAPPER}}": "margin: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
 			}
 		},
+		"minWidth": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "min-width: {{VALUE}};"
+			}
+		},
+		"maxWidth": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "max-width: {{VALUE}};"
+			}
+		},
+		"widthType": {
+			"type": "object"
+		},
+		"customWidth": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "width: {{VALUE}};"
+			}
+		},
+		
 		"preview": {
 			"type": "boolean",
 			"default": false

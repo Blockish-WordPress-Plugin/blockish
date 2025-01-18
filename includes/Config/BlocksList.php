@@ -28,8 +28,8 @@ class BlocksList extends ConfigList {
      */
     protected function set_list() {
         $this->list = array(
-            'sample-block' => array(
-                'name'    => 'Sample Block',
+            'container' => array(
+                'name'    => 'Container',
                 'package' => 'free',
                 'status'  => 'active',
             ),

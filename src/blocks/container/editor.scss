@@ -1,0 +1,46 @@
+.blockish-container {
+    &:not(.has-child-blocks) {
+        .block-list-appender {
+            &::before {
+                content: '';
+                border: 1px dashed #d3d3d3;
+                height: 100%;
+                width: 100%;
+                position: absolute;
+                left: 0;
+                top: 0;
+                right: 0;
+                bottom: 0;
+            }
+
+            .block-editor-button-block-appender {
+                box-shadow: none;
+
+                &:hover {
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+    &:not(.is-selected) {
+        > .block-list-appender:only-child {
+            pointer-events: none;
+           .block-editor-inserter {
+                opacity: 0;
+            }
+        }
+    }
+
+    .blockish-container-placeholder-close {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        cursor: pointer;
+        z-index: 4;
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+}

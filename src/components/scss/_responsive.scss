@@ -6,7 +6,7 @@ $primary-color: #007cba;
     &-menu {
         position: absolute;
         top: 0px;
-        left: 65px;
+        left: var(--from-left, 60px);
 
         .components-button {
             padding: 0px;

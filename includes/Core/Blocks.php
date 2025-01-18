@@ -20,6 +20,7 @@ class Blocks
         add_filter('render_block_data', [$this, 'collect_block_css'], 10);
         add_filter('render_block', [$this, 'add_unique_class_to_block'], 10, 2);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_block_styles']);
+        add_filter('block_categories_all', [$this, 'add_block_category'], 10, 2);
     }
 
     public function register_blocks()
@@ -153,5 +154,18 @@ class Blocks
             wp_enqueue_style('blockish-block-styles');
             wp_add_inline_style('blockish-block-styles', $this->collected_block_css);
         }
+    }
+
+    public function add_block_category($categories, $post)
+    {
+        return array_merge(
+            [
+                [
+                    'slug' => 'blockish-framework',
+                    'title' => __('Blockish Framework', 'blockish'),
+                ],
+            ],
+            $categories,
+        );
     }
 }

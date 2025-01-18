@@ -3,6 +3,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { useMemo, memo } from '@wordpress/element';
 import BlockishBlocksWrapperProps from './blocks-wrapper-props';
 import Layout from './components/layout';
+import Width from './components/width';
 import * as previews from './preview';
 
 const BlockishBlocksAdvancedControls = createHigherOrderComponent(
@@ -28,6 +29,7 @@ const BlockishBlocksAdvancedControls = createHigherOrderComponent(
                     advancedControls: (
                         <>
                             <Layout {...props} />
+                           {/*  <Width {...props} /> */}
                         </>
                     )
                 };

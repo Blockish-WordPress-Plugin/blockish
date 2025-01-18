@@ -11,7 +11,8 @@ import BlockishConditionalWrapper from "./conditional-wrapper";
 import BlockishResponsive from "./responsive";
 import BlockishRangeControl from "./range-control";
 import BlockishTextareaControl from "./textarea-control";
-import BlockishSelectControl from "./select-control";
+import BlockishSelect from "./select";
+import BlockishRangeUnit from "./range-unit";
 
 if(window?.blockish?.screen) {
     window.blockish.components = {
@@ -27,6 +28,7 @@ if(window?.blockish?.screen) {
         BlockishResponsive,
         BlockishRangeControl,
         BlockishTextareaControl,
-        BlockishSelectControl
+        BlockishSelect,
+        BlockishRangeUnit
     }
 }

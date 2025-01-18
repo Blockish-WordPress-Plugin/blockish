@@ -1,14 +1,19 @@
 import Select from "react-select";
+import { BaseControl } from '@wordpress/components';
 
-const BlockishSelectControl = ({ label = 'Select', value, onChange, options=[], ...props }) => {
+const BlockishSelect = ({ label = 'Select', value, onChange, options=[], ...props }) => {
 
     return (
         <div className="blockish-control blockish-select-control">
-			<label>{label}</label>
+			<BaseControl.VisualLabel as="legend" children={label} />
 			<Select
+				className="blockish-select"
+				classNamePrefix="blockish-select"
 				value={value}
 				onChange={onChange}
 				options={options}
+				isSearchable
+				isClearable
 				theme={(theme) => ({
 					...theme,
 					colors: {
@@ -25,4 +30,4 @@ const BlockishSelectControl = ({ label = 'Select', value, onChange, options=[], 
     );
 }
 
-export default BlockishSelectControl
+export default BlockishSelect;

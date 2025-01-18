@@ -1,5 +1,6 @@
 import { memo, useMemo } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks'; // Add WordPress hooks for filtering
 
 const BlockishStyleTag = ({ attributes, hash, name }) => {
     const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue } = window.blockish.helpers;
@@ -41,7 +42,11 @@ const BlockishStyleTag = ({ attributes, hash, name }) => {
                 }
             }
         }
-        return generateCssString(cssRules, deviceList);
+
+        // Allow external filtering of CSS rules before generating the final CSS string
+        const filteredCssRules = applyFilters('blockish.modifyCssRules', cssRules, attributes, schemaAttributes, hash, deviceList);
+
+        return generateCssString(filteredCssRules, deviceList);
 
     }, [attributes, hash, deviceList]);
 

@@ -4,6 +4,7 @@ import { select } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import BeforeTabContent from './before-tab-content';
 import AfterTabContent from './after-tab-content';
+import { useMemo } from '@wordpress/element';
 
 /**
  * BlockishTab Component
@@ -13,11 +14,11 @@ import AfterTabContent from './after-tab-content';
  * and `AfterTabContent` when the tab type is 'top-level'.
  * 
  * @param {Array} tabs - Array of tabs to be displayed in the panel.
- * @param {string} type - Tab type (default: 'normal'). Can trigger different content behavior.
+ * @param {string} tabType - Tab type (default: 'normal'). Can trigger different content behavior.
  * @param {Function} children - Render prop function to display tab content.
  * @param {Object} props - Additional props for the TabPanel component.
  */
-const BlockishTab = ({ tabs = [], type = 'normal', children, ...props }) => {
+const BlockishTab = ({ tabs = [], tabType = 'normal', children, ...props }) => {
     const { getSelectedBlock } = select(blockEditorStore);
 
     // Get the selected block's details (name, clientId)
@@ -25,17 +26,26 @@ const BlockishTab = ({ tabs = [], type = 'normal', children, ...props }) => {
     const blockName = selectedBlock?.name;
     const clientId = selectedBlock?.clientId;
 
+    const classifiedTabs = useMemo(() => {
+        return tabs.map((tab) => {
+            return {
+                ...tab,
+                className: `blockish-tab-${tab?.name}-button blockish-tab-button`,
+            };
+        })
+    }, [tabs]);
+
     return (
         <TabPanel
-            className={clsx('blockish-tab', { [`blockish-tab-${type}`]: type })}
+            className={clsx('blockish-tab', { [`blockish-tab-${tabType}`]: tabType })}
             activeClass="blockish-tab-active"
-            tabs={tabs}
+            tabs={classifiedTabs}
             {...props}
         >
             {({ name: tabName }) => (
                 <>
                     {/* Render content before tab when type is 'top-level' */}
-                    {type === 'top-level' && (
+                    {tabType === 'top-level' && (
                         <BeforeTabContent blockName={blockName} clientId={clientId} tabName={tabName} />
                     )}
 
@@ -43,7 +53,7 @@ const BlockishTab = ({ tabs = [], type = 'normal', children, ...props }) => {
                     {children({ name: tabName })}
 
                     {/* Render content after tab when type is 'top-level' */}
-                    {type === 'top-level' && (
+                    {tabType === 'top-level' && (
                         <AfterTabContent blockName={blockName} clientId={clientId} tabName={tabName} />
                     )}
                 </>

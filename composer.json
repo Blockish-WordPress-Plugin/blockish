@@ -1,6 +1,6 @@
 {
-    "name": "bdthemes/blockish",
-    "description": "Starter plugin for bdthemes",
+    "name": "noobs/blockish",
+    "description": "Best block plugin ever",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "autoload": {
@@ -10,7 +10,7 @@
     },
     "authors": [
         {
-            "name": "bdthemes"
+            "name": "noobs"
         }
     ],
     "minimum-stability": "dev",

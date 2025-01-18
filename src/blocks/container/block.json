@@ -1,0 +1,94 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/container",
+	"version": "0.1.0",
+	"title": "Container",
+	"category": "blockish-framework",
+	"icon": "smiley",
+	"description": "Example block scaffolded with Create Block tool.",
+	"example": {
+		"attributes": {
+			"preview": true
+		}
+	},
+	"attributes": {
+		"isVariationPicked": {
+			"type": "boolean",
+			"default": true
+		},
+		"tag": {
+			"type": "object",
+			"default": {
+				"label": "Div",
+				"value": "div"
+			}
+		},
+		"display": {
+			"type": "object",
+			"default": {
+				"Desktop": "flex",
+				"Tablet": "flex",
+				"Mobile": "flex"
+			}
+		},
+		"flexWrap": {
+			"type": "object"
+		},
+		"flexDirection": {
+			"type": "object"
+		},
+		"justifyContent": {
+			"type": "object",
+			"default": {
+				"Desktop": {
+					"label": "Center",
+					"value": "center"
+				},
+				"Tablet": {
+					"label": "Center",
+					"value": "center"
+				},
+				"Mobile": {
+					"label": "Center",
+					"value": "center"
+				}
+			}
+		},
+		"alignItems": {
+			"type": "object",
+			"default": {
+				"Desktop": {
+					"label": "Center",
+					"value": "center"
+				},
+				"Tablet": {
+					"label": "Center",
+					"value": "center"
+				},
+				"Mobile": {
+					"label": "Center",
+					"value": "center"
+				}
+			}
+		},
+		"columnGap": {
+			"type": "object"
+		},
+		"rowGap": {
+			"type": "object"
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js"
+}
