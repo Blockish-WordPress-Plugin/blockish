@@ -1,15 +1,18 @@
 <?php
 /**
- * Plugin Name:       Blockish
- * Description:       Best block plugin ever
- * Requires at least: 6.7
- * Requires PHP:      7.2
- * Version:           0.1.0
- * Author:            Mijanur Rahman
- * Author URI:        https://mijanurrahman.com
+ * Plugin Name:       Blockish (Cteative Ultimate Blocks)
+ * Description:       A collection of creative Gutenberg blocks to help you build beautiful websites.
+ * Requires at least: 6.1
+ * Requires PHP:      7.4
+ * Version:           1.0.0
+ * Author:            bdkoder
+ * Author URI:        https://github.com/bdkoder
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       blockish
+ * Domain Path:       /languages
+ * 
+ * @package           Blockish
  */
 
 use Blockish\Core\Blocks;
@@ -32,7 +35,7 @@ final class Blockish {
      *
      * @var string
      */
-    const VERSION = '0.1.0';
+    const VERSION = '1.0.0';
 
     /**
      * Holds the instance of this class.
