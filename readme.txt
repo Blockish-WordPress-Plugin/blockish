@@ -1,19 +1,24 @@
-=== Blockish ===
-Contributors:      The WordPress Contributors
-Tags:              block
-Tested up to:      6.7.2
-Stable tag:        0.1.0
-License:           GPL-2.0-or-later
-License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+=== Blockish (Cteative Ultimate Blocks) ===
+Contributors: bdkoder
+Donate link: https://github.com/bdkoder
+Tags: blocks, builder, designs
+Tested up to: 6.7.2
+Stable tag: 1.0.0
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Example block scaffolded with Create Block tool.
+The Blockish plugin is a collection of creative Gutenberg blocks that help you design your website with ease.
 
 == Description ==
 
-This is the long description. No limit, and you can use Markdown (as well as in the following sections).
+Get creative with the Blockish plugin. This plugin is a collection of creative Gutenberg blocks that help you design your website with ease. The plugin is designed to be lightweight and easy to use. It is perfect for bloggers, designers, developers, and anyone who wants to create beautiful websites.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+== Features ==
+
+- Easy to use
+- Lightweight
+- Creative blocks
+- Perfect for bloggers, designers, developers, and anyone who wants to create beautiful websites
 
 == Installation ==
 
@@ -22,34 +27,36 @@ This section describes how to install the plugin and get it working.
 e.g.
 
 1. Upload the plugin files to the `/wp-content/plugins/blockish` directory, or install the plugin through the WordPress plugins screen directly.
-1. Activate the plugin through the 'Plugins' screen in WordPress
-
+2. Activate the plugin through the 'Plugins' screen in WordPress & Enjoy!
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+= Is this plugin free? =
 
-An answer to that question.
+Yes, the Blockish plugin is free to use.
 
-= What about foo bar? =
+= Can I use this plugin on my client's website? =
 
-Answer to foo bar dilemma.
+Yes, you can use this plugin on your client's website.
+
+= How do I get support for this plugin? =
+
+You can get support for this plugin by creating a support ticket on the WordPress support forum.
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+1. Creative Container Block
+2. Creative Heading Block
+3. Creative Image Block
+4. Creative List Block
+5. Creative Paragraph Block
+6. Creative Quote Block
+7. Creative Separator Block
+8. Creative Spacer Block
+9. Creative Video Block
 
 == Changelog ==
 
-= 0.1.0 =
-* Release
+= 1.0.0 [19th Jan 2025] =
 
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above. This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation." Arbitrary sections will be shown below the built-in sections outlined above.
+* Initial release
