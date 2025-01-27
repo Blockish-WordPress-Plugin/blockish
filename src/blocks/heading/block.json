@@ -1,0 +1,57 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/heading",
+	"version": "0.1.0",
+	"title": "Heading",
+	"category": "blockish-framework",
+	"icon": "smiley",
+	"description": "Example block scaffolded with Create Block tool.",
+	"example": {
+		"attributes": {
+			"preview": true
+		}
+	},
+	"attributes": {
+		"content": {
+			"type": "string"
+		},
+		"tag": {
+			"type": "object",
+			"default": {
+				"label": "H2",
+				"value": "h2"
+			}
+		},
+		"textColor": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-heading-content": "color: {{VALUE}};"
+			}
+		},
+		"fontSize": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-heading-content": "font-size: {{VALUE}};"
+			}
+		},
+		"alignment": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-heading-content": "text-align: {{VALUE}};"
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js"
+}
