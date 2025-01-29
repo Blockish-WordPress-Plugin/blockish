@@ -64,20 +64,60 @@ class Utilities
                             if ($attribute && is_array($attribute) && !empty($attribute['value']) && is_string($attribute['value'])) {
                                 $attribute_value = $attribute['value'];
                             }
-                            
-                            $value = str_replace($placeholder, $attribute_value, $value);
+
+                            $value = str_replace($placeholder, $attribute_value ?? '', $value);
                             break;
+
                         case '{{TOP}}':
-                            $value = str_replace($placeholder, $attribute['top'] ?? '', $value);
+                            $top_value = '0';
+                            if ($attribute && is_array($attribute) && isset($attribute['top']) && (is_string($attribute['top']) || is_numeric($attribute['top']))) {
+                                $top_value = $attribute['top'];
+                            }
+
+                            if (!empty($top_value) && strpos($top_value, 'var:preset|spacing') !== false) {
+                                $top_value = 'var(' . str_replace(['var:', '|'], ['--wp--', '--'], $top_value) . ')';
+                            }
+
+                            $value = str_replace($placeholder, $top_value ?? '', $value);
                             break;
+
                         case '{{BOTTOM}}':
-                            $value = str_replace($placeholder, $attribute['bottom'] ?? '', $value);
+                            $bottom_value = '0';
+                            if ($attribute && is_array($attribute) && isset($attribute['bottom']) && (is_string($attribute['bottom']) || is_numeric($attribute['bottom']))) {
+                                $bottom_value = $attribute['bottom'];
+                            }
+
+                            if (!empty($bottom_value) && strpos($bottom_value, 'var:preset|spacing') !== false) {
+                                $bottom_value = 'var(' . str_replace(['var:', '|'], ['--wp--', '--'], $bottom_value) . ')';
+                            }
+
+                            $value = str_replace($placeholder, $bottom_value ?? '', $value);
                             break;
+
                         case '{{LEFT}}':
-                            $value = str_replace($placeholder, $attribute['left'] ?? '', $value);
+                            $left_value = '0';
+                            if ($attribute && is_array($attribute) && isset($attribute['left']) && (is_string($attribute['left']) || is_numeric($attribute['left']))) {
+                                $left_value = $attribute['left'];
+                            }
+
+                            if (!empty($left_value) && strpos($left_value, 'var:preset|spacing') !== false) {
+                                $left_value = 'var(' . str_replace(['var:', '|'], ['--wp--', '--'], $left_value) . ')';
+                            }
+
+                            $value = str_replace($placeholder, $left_value ?? '', $value);
                             break;
+
                         case '{{RIGHT}}':
-                            $value = str_replace($placeholder, $attribute['right'] ?? '', $value);
+                            $right_value = '0';
+                            if ($attribute && is_array($attribute) && isset($attribute['right']) && (is_string($attribute['right']) || is_numeric($attribute['right']))) {
+                                $right_value = $attribute['right'];
+                            }
+
+                            if (!empty($right_value) && strpos($right_value, 'var:preset|spacing') !== false) {
+                                $right_value = 'var(' . str_replace(['var:', '|'], ['--wp--', '--'], $right_value) . ')';
+                            }
+
+                            $value = str_replace($placeholder, $right_value ?? '', $value);
                             break;
                     }
                 }
@@ -86,6 +126,7 @@ class Utilities
 
         return $value;
     }
+
 
     public static function generate_css_string($css_rules, $breakpoints)
     {

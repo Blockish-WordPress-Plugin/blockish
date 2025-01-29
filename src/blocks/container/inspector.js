@@ -6,7 +6,8 @@ const Inspector = ({ attributes, advancedControls }) => {
         BlockishControl,
         BlockishResponsiveControl,
     } = window?.blockish?.controls;
-
+    const { useDeviceType, getResponsiveValue } = window?.blockish?.helpers;
+    const device = useDeviceType();
     return (
         <InspectorControls>
             <BlockishControl
@@ -55,103 +56,134 @@ const Inspector = ({ attributes, advancedControls }) => {
                                             left="48px"
                                             isDeselectable={false}
                                         />
-                                        <BlockishResponsiveControl
-                                            type="BlockishToggleGroup"
-                                            label={__('Flex Wrap', 'blockish')}
-                                            slug="flexWrap"
-                                            options={[
-                                                {
-                                                    label: 'Wrap',
-                                                    value: 'wrap'
-                                                },
-                                                {
-                                                    label: 'No Wrap',
-                                                    value: 'nowrap'
-                                                },
-                                                {
-                                                    label: 'Reverse',
-                                                    value: 'wrap-reverse'
-                                                }
-                                            ]}
-                                            __nextHasNoMarginBottom={true}
-                                            left="66px"
-                                        />
-                                        <BlockishResponsiveControl
-                                            type="BlockishSelect"
-                                            label={__('Justify Content', 'blockish')}
-                                            slug="justifyContent"
-                                            options={[
-                                                {
-                                                    label: 'Start',
-                                                    value: 'flex-start'
-                                                },
-                                                {
-                                                    label: 'End',
-                                                    value: 'flex-end'
-                                                },
-                                                {
-                                                    label: 'Center',
-                                                    value: 'center'
-                                                },
-                                                {
-                                                    label: 'Space Between',
-                                                    value: 'space-between'
-                                                },
-                                                {
-                                                    label: 'Space Around',
-                                                    value: 'space-around'
-                                                },
-                                                {
-                                                    label: 'Space Evenly',
-                                                    value: 'space-evenly'
-                                                },
-                                            ]}
-                                            __nextHasNoMarginBottom={true}
-                                            left="105px"
-                                        />
-                                        <BlockishResponsiveControl
-                                            type="BlockishSelect"
-                                            label={__('Align Items', 'blockish')}
-                                            slug="alignItems"
-                                            options={[
-                                                {
-                                                    label: 'Start',
-                                                    value: 'flex-start'
-                                                },
-                                                {
-                                                    label: 'End',
-                                                    value: 'flex-end'
-                                                },
-                                                {
-                                                    label: 'Center',
-                                                    value: 'center'
-                                                },
-                                                {
-                                                    label: 'Stretch',
-                                                    value: 'stretch'
-                                                }
-                                            ]}
-                                            __nextHasNoMarginBottom={true}
-                                            left="75px"
-                                        />
-                                        <BlockishResponsiveControl
-                                            type="BlockishRangeUnit"
-                                            label={__('Column Gap', 'blockish')}
-                                            slug="columnGap"
-                                            left="77px"
-                                        />
-                                        <BlockishResponsiveControl
-                                            type="BlockishRangeUnit"
-                                            label={__('Row Gap', 'blockish')}
-                                            slug="rowGap"
-                                            left="54px"
-                                        />
+                                        {
+                                            getResponsiveValue(attributes, 'display', device) === 'flex' && (
+                                                <>
+                                                    <BlockishResponsiveControl
+                                                        type="BlockishSelect"
+                                                        label={__('Direction', 'blockish')}
+                                                        slug="flexDirection"
+                                                        options={[
+                                                            {
+                                                                label: 'Row',
+                                                                value: 'row'
+                                                            },
+                                                            {
+                                                                label: 'Column',
+                                                                value: 'column'
+                                                            },
+                                                            {
+                                                                label: 'Row Reverse',
+                                                                value: 'row-reverse'
+                                                            },
+                                                            {
+                                                                label: 'Column Reverse',
+                                                                value: 'column-reverse'
+                                                            },
+                                                        ]}
+                                                        __nextHasNoMarginBottom={true}
+                                                        left="65px"
+                                                    />
+                                                    <BlockishResponsiveControl
+                                                        type="BlockishToggleGroup"
+                                                        label={__('Flex Wrap', 'blockish')}
+                                                        slug="flexWrap"
+                                                        options={[
+                                                            {
+                                                                label: 'Wrap',
+                                                                value: 'wrap'
+                                                            },
+                                                            {
+                                                                label: 'No Wrap',
+                                                                value: 'nowrap'
+                                                            },
+                                                            {
+                                                                label: 'Reverse',
+                                                                value: 'wrap-reverse'
+                                                            }
+                                                        ]}
+                                                        __nextHasNoMarginBottom={true}
+                                                        left="66px"
+                                                    />
+                                                    <BlockishResponsiveControl
+                                                        type="BlockishSelect"
+                                                        label={__('Justify Content', 'blockish')}
+                                                        slug="justifyContent"
+                                                        options={[
+                                                            {
+                                                                label: 'Start',
+                                                                value: 'flex-start'
+                                                            },
+                                                            {
+                                                                label: 'End',
+                                                                value: 'flex-end'
+                                                            },
+                                                            {
+                                                                label: 'Center',
+                                                                value: 'center'
+                                                            },
+                                                            {
+                                                                label: 'Space Between',
+                                                                value: 'space-between'
+                                                            },
+                                                            {
+                                                                label: 'Space Around',
+                                                                value: 'space-around'
+                                                            },
+                                                            {
+                                                                label: 'Space Evenly',
+                                                                value: 'space-evenly'
+                                                            },
+                                                        ]}
+                                                        __nextHasNoMarginBottom={true}
+                                                        left="105px"
+                                                    />
+                                                    <BlockishResponsiveControl
+                                                        type="BlockishSelect"
+                                                        label={__('Align Items', 'blockish')}
+                                                        slug="alignItems"
+                                                        options={[
+                                                            {
+                                                                label: 'Start',
+                                                                value: 'flex-start'
+                                                            },
+                                                            {
+                                                                label: 'End',
+                                                                value: 'flex-end'
+                                                            },
+                                                            {
+                                                                label: 'Center',
+                                                                value: 'center'
+                                                            },
+                                                            {
+                                                                label: 'Stretch',
+                                                                value: 'stretch'
+                                                            }
+                                                        ]}
+                                                        __nextHasNoMarginBottom={true}
+                                                        left="75px"
+                                                    />
+                                                    <BlockishResponsiveControl
+                                                        type="BlockishRangeUnit"
+                                                        label={__('Column Gap', 'blockish')}
+                                                        slug="columnGap"
+                                                        left="77px"
+                                                    />
+                                                    <BlockishResponsiveControl
+                                                        type="BlockishRangeUnit"
+                                                        label={__('Row Gap', 'blockish')}
+                                                        slug="rowGap"
+                                                        left="54px"
+                                                    />
+                                                </>
+                                            )
+                                        }
                                     </BlockishControl>
                                     <BlockishControl type="BlockishPanelBody" title={__('Additional', 'blockish')} initialOpen={false}>
                                         <BlockishControl
                                             type="BlockishSelect"
                                             label={__('Tag', 'blockish')}
-                                            slug="tag"
+                                            slug="tagName"
                                             options={[
                                                 {
                                                     label: 'Div',

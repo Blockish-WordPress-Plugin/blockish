@@ -91,6 +91,17 @@ class Blocks
         ]);
     }
 
+    public function get_block_default_attributes($meta_attributes)
+    {
+        $default_attributes = [];
+
+        foreach ($meta_attributes as $attribute_key => $attribute) {
+            $default_attributes[$attribute_key] = $attribute['default'] ?? '';
+        }
+
+        return $default_attributes;
+    }
+
     public function collect_block_css($block_data)
     {
         if (!empty($block_data['blockName']) && str_contains($block_data['blockName'], 'blockish')) {
@@ -98,9 +109,9 @@ class Blocks
             $name = str_replace('blockish/', '', $block_data['blockName']);
             $metadata = \Blockish\Core\Utilities::get_block_metadata($name);
             $meta_attributes = isset($metadata['attributes']) ? $metadata['attributes'] : [];
-            $attributes = $block_data['attrs'];
+            $default_attributes = $this->get_block_default_attributes($meta_attributes);
+            $attributes = wp_parse_args($block_data['attrs'], $default_attributes);
             $breakpoints = $this->get_device_list();
-
             $css_rules = array_fill_keys(array_keys($breakpoints), []);
 
             foreach ($attributes as $attribute_key => $attribute_value) {

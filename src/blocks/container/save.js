@@ -6,10 +6,11 @@ export default function Save({ attributes }) {
 	});
 
 	const innerBlockProps = useInnerBlocksProps.save(blockProps);
+	let Tag = attributes?.tagName?.value || 'div';
 
 	return (
 		<>
-			<div {...innerBlockProps}></div>
+			<Tag {...innerBlockProps}></Tag>
 		</>
 	);
 }

@@ -15,9 +15,9 @@
 	"attributes": {
 		"isVariationPicked": {
 			"type": "boolean",
-			"default": true
+			"default": false
 		},
-		"tag": {
+		"tagName": {
 			"type": "object",
 			"default": {
 				"label": "Div",
@@ -30,13 +30,28 @@
 				"Desktop": "flex",
 				"Tablet": "flex",
 				"Mobile": "flex"
+			},
+			"selectors": {
+				".{{WRAPPER}}": "display: {{VALUE}};"
 			}
 		},
 		"flexWrap": {
-			"type": "object"
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "flex-wrap: {{VALUE}};"
+			}
 		},
 		"flexDirection": {
-			"type": "object"
+			"type": "object",
+			"default": {
+				"Desktop": {
+					"label": "Column",
+					"value": "column"
+				}
+			},
+			"selectors": {
+				".{{WRAPPER}}": "flex-direction: {{VALUE}};"
+			}
 		},
 		"justifyContent": {
 			"type": "object",
@@ -53,6 +68,9 @@
 					"label": "Center",
 					"value": "center"
 				}
+			},
+			"selectors": {
+				".{{WRAPPER}}": "justify-content: {{VALUE}};"
 			}
 		},
 		"alignItems": {
@@ -70,21 +88,27 @@
 					"label": "Center",
 					"value": "center"
 				}
+			},
+			"selectors": {
+				".{{WRAPPER}}": "align-items: {{VALUE}};"
 			}
 		},
 		"columnGap": {
-			"type": "object"
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "column-gap: {{VALUE}};"
+			}
 		},
 		"rowGap": {
-			"type": "object"
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "row-gap: {{VALUE}};"
+			}
 		}
 	},
 	"supports": {
-		"html": false,
-		"align": [
-			"wide",
-			"full"
-		]
+		"html": true,
+		"anchor": true
 	},
 	"textdomain": "blockish",
 	"editorScript": "file:./index.js",
