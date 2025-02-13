@@ -1,58 +1,104 @@
 import { memo, useMemo } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
-import { applyFilters } from '@wordpress/hooks'; // Add WordPress hooks for filtering
 
 const BlockishStyleTag = ({ attributes, hash, name, additionalStyles = '' }) => {
-    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue } = window.blockish.helpers;
+    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue, generateBackgroundControlStyles } = window.blockish.helpers;
 
     const deviceList = useDeviceList();
-    const schemaAttributes = getBlockType(name)?.attributes || {}; // Fallback to empty object to avoid errors
+    const schemaAttributes = getBlockType(name)?.attributes || {};
 
-    // Memoized styles to avoid unnecessary recalculations
     const styles = useMemo(() => {
-        const cssRules = {};
+        const cssRules = Object.fromEntries(deviceList.map(device => [device.slug, {}]));
 
-        // Initialize `cssRules` for each device, including 'Desktop'
-        deviceList.forEach(device => {
-            cssRules[device.slug] = {};
-        });
-        cssRules['Desktop'] = {};
+        for (const metaKey in schemaAttributes) {
+            const metaAttribute = schemaAttributes[metaKey];
+            
+            if ((!metaAttribute?.selectors && !metaAttribute?.groupSelector) || !attributes[metaKey]) continue;
 
-        for (const key in attributes) {
-            const attributeValue = attributes[key];
-            const metaAttribute = schemaAttributes[key];
+            const attributeValue = attributes[metaKey];
+            const applyCss = (deviceSlug, value) => {
+                for (const selectorKey in metaAttribute.selectors) {
+                    const selector = replaceString(selectorKey, '{{WRAPPER}}', `bb-${hash}`);
+                    cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + replaceCssPlaceholders(metaAttribute.selectors[selectorKey], value);
+                }
 
-            if (metaAttribute && metaAttribute['selectors']) {
-                for (let selector in metaAttribute['selectors']) {
-                    const css = metaAttribute['selectors'][selector];
-                    selector = replaceString(selector, '{{WRAPPER}}', `bb-${hash}`);
+                if (metaAttribute?.groupSelector && metaAttribute?.groupSelector?.type) {
+                    const type = metaAttribute?.groupSelector?.type;
+                    switch (type) {
+                        case 'BlockishBackground':
+                            let styles = generateBackgroundControlStyles(value, deviceSlug);
+                            const selector = replaceString(metaAttribute?.groupSelector?.selector, '{{WRAPPER}}', `bb-${hash}`);
+                            cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + styles;
+                            break;
+                            
+                    }
+                }
+            };
 
-                    // Concatenate value for 'Desktop' if not responsive or single value
-                    if (typeof attributeValue !== 'object' || !isResponsiveValue(attributeValue, deviceList)) {
-                        cssRules['Desktop'][selector] = (cssRules['Desktop'][selector] || '') + replaceCssPlaceholders(css, attributeValue);
-                    } else {
-                        // Handle responsive values for specific devices
-                        for (const device of deviceList) {
-                            const deviceSlug = device.slug;
-                            if (attributeValue[deviceSlug]) {
-                                cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + replaceCssPlaceholders(css, attributeValue[deviceSlug]);
-                            }
+            if (metaAttribute.condition?.rules?.length) {
+                for (const device of deviceList) {
+                    const deviceSlug = device.slug;
+                    const processedValue = processAttributeValue(isResponsiveValue(attributeValue, deviceList) ? attributeValue[deviceSlug] : attributeValue);
+
+                    if (!processedValue) continue;
+
+                    const relation = metaAttribute.condition.relation || "AND";
+                    let allConditionsMet = relation === "AND";
+
+                    for (const rule of metaAttribute.condition.rules) {
+                        const conditionValue = attributes[rule.key];
+                        const processedConditionValue = processAttributeValue(isResponsiveValue(conditionValue, deviceList) ? conditionValue[deviceSlug] : conditionValue);
+
+                        let conditionMet = false;
+                        switch (rule.condition) {
+                            case '==':
+                                conditionMet = processedConditionValue == rule.value;
+                                break;
+                            case '!=':
+                                conditionMet = processedConditionValue != rule.value;
+                                break;
+                            case 'empty': 
+                                conditionMet = !processedConditionValue;
+                                break;
+                            case 'not_empty': 
+                                conditionMet = !!processedConditionValue;
+                                break;
                         }
+
+                        if (relation === "AND" && !conditionMet) {
+                            allConditionsMet = false;
+                            break;
+                        } else if (relation === "OR" && conditionMet) {
+                            allConditionsMet = true;
+                            break;
+                        }
+                    }
+
+                    if (allConditionsMet) {
+                        applyCss(deviceSlug, processedValue);
+                    }
+                }
+            } else {
+                if ((typeof attributeValue !== 'object' || !isResponsiveValue(attributeValue, deviceList)) && !metaAttribute?.groupSelector) {
+                    applyCss('Desktop', attributeValue);
+                } else if (metaAttribute?.groupSelector) {
+                    for (const device of deviceList) {
+                        if (attributeValue) applyCss(device?.slug, attributeValue);
+                    }
+                }else {
+                    for (const device of deviceList) {
+                        if (attributeValue[device.slug]) applyCss(device.slug, attributeValue[device.slug]);
                     }
                 }
             }
         }
 
-        // Allow external filtering of CSS rules before generating the final CSS string
-        const filteredCssRules = applyFilters('blockish.additional_styles', cssRules, attributes, schemaAttributes, hash, deviceList);
-
-        return generateCssString(filteredCssRules, deviceList);
-
+        return generateCssString(cssRules, deviceList);
     }, [attributes, hash, deviceList]);
 
-    return (
-        <style>{styles + additionalStyles}</style>
-    );
+    return <style>{styles + additionalStyles}</style>;
 };
+
+const processAttributeValue = (attr) => (typeof attr === 'object' && attr?.value) ? attr.value : attr ?? '';
 
 export default memo(BlockishStyleTag);

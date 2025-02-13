@@ -59,6 +59,7 @@ export default function Edit({ attributes, setAttributes, advancedControls, clie
 		if (hasParent) {
 			setAttributes({
 				isVariationPicked: true,
+				containerWidth: 'align-custom-width'
 			});
 		}
 	}, [hasParent]);
@@ -73,6 +74,7 @@ export default function Edit({ attributes, setAttributes, advancedControls, clie
 					attributes={attributes}
 					setAttributes={setAttributes}
 					advancedControls={advancedControls}
+					hasParent={hasParent}
 				/>
 				<Tag {...innerBlockProps}></Tag>
 			</>

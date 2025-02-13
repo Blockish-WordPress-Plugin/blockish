@@ -37,12 +37,101 @@
 			}
 		},
 		"widthType": {
-			"type": "object"
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "width: {{VALUE}};"
+			},
+			"condition": {
+				"rules": [
+					{
+						"condition": "!=",
+						"key": "widthType",
+						"value": "custom"
+					}
+				]
+			}
 		},
 		"customWidth": {
-			"type": "object"
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "width: {{VALUE}};"
+			},
+			"condition": {
+				"rules": [
+					{
+						"condition": "==",
+						"key": "widthType",
+						"value": "custom"
+					}
+				]
+			}
 		},
-		
+		"position": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "position: {{VALUE}}; width: 100%;"
+			}
+		},
+		"positionTop": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "top: {{VALUE}};"
+			},
+			"condition": {
+				"rules": [
+					{
+						"condition": "not_empty",
+						"key": "position",
+						"value": ""
+					}
+				]
+			}
+		},
+		"positionRight": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "right: {{VALUE}};"
+			},
+			"condition": {
+				"rules": [
+					{
+						"condition": "not_empty",
+						"key": "position",
+						"value": ""
+					}
+				]
+			}
+		},
+		"positionBottom": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "bottom: {{VALUE}};"
+			},
+			"condition": {
+				"rules": [
+					{
+						"condition": "not_empty",
+						"key": "position",
+						"value": ""
+					}
+				]
+			}
+		},
+		"positionLeft": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "left: {{VALUE}};"
+			},
+			"condition": {
+				"rules": [
+					{
+						"condition": "not_empty",
+						"key": "position",
+						"value": ""
+					}
+				]
+			}
+		},
 		"preview": {
 			"type": "boolean",
 			"default": false

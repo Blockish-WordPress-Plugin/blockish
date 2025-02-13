@@ -17,6 +17,69 @@ class Utilities
         WP_Filesystem();
     }
 
+    public static function generate_background_control_styles($background, $device)
+    {
+        if (empty($background) || ! is_string($background)) {
+            return '';
+        }
+
+        $json_background = json_decode($background, true);
+        if (! is_array($json_background)) {
+            return '';
+        }
+
+        $styles          = '';
+        $background_type = isset($json_background['backgroundType']) ? $json_background['backgroundType'] : 'classic';
+
+        if ('classic' === $background_type) {
+            $background_image = isset($json_background['backgroundImage'][$device]) ? $json_background['backgroundImage'][$device] : '';
+            $resolution       = isset($json_background['backgroundImageResolution'][$device]) ? $json_background['backgroundImageResolution'][$device] : '';
+
+            if (! empty($resolution)) {
+                $background_image = $resolution;
+            }
+
+            if (! empty($background_image['url'])) {
+                $styles .= 'background-image: url(' . esc_url($background_image['url']) . ');';
+            }
+
+            if (! empty($json_background['backgroundImagePosition'][$device]['value'])) {
+                $styles .= 'background-position: ' . esc_attr($json_background['backgroundImagePosition'][$device]['value']) . ';';
+            }
+
+            if (! empty($json_background['backgroundImageAttachment']['value'])) {
+                $styles .= 'background-attachment: ' . esc_attr($json_background['backgroundImageAttachment']['value']) . ';';
+            }
+
+            if (! empty($json_background['backgroundImageRepeat'][$device]['value'])) {
+                $styles .= 'background-repeat: ' . esc_attr($json_background['backgroundImageRepeat'][$device]['value']) . ';';
+            }
+
+            if (! empty($json_background['backgroundImageSize'][$device]['value'])) {
+                $styles .= 'background-size: ' . esc_attr($json_background['backgroundImageSize'][$device]['value']) . ';';
+            }
+
+            if ('Desktop' === $device && ! empty($json_background['backgroundImageBlendMode']['value'])) {
+                $styles .= 'background-blend-mode: ' . esc_attr($json_background['backgroundImageBlendMode']['value']) . ';';
+            }
+
+            if ('Desktop' === $device && ! empty($json_background['backgroundColor'])) {
+                $color = strpos($json_background['backgroundColor'], '|') !== false ? explode('|', $json_background['backgroundColor']) : $json_background['backgroundColor'];
+                $styles .= 'background-color: ' . (is_array($color) ? 'var(' . esc_attr($color[0]) . ', ' . esc_attr($color[1]) . ')' : esc_attr($color)) . ';';
+            }
+        }
+
+        if ('gradient' === $background_type && 'Desktop' === $device) {
+            $gradient = strpos($json_background['gradient'], '|') !== false ? explode('|', $json_background['gradient']) : $json_background['gradient'];
+            if (! empty($gradient)) {
+                $styles .= 'background: ' . (is_array($gradient) ? 'var(' . esc_attr($gradient[0]) . ', ' . esc_attr($gradient[1]) . ')' : esc_attr($gradient)) . ';';
+            }
+        }
+
+        return $styles;
+    }
+
+
     public static function generate_uniqueId($length)
     {
         return substr(bin2hex(random_bytes($length / 2)), 0, $length);
@@ -56,7 +119,6 @@ class Utilities
                 if (strpos($value, $placeholder) !== false) {
                     switch ($placeholder) {
                         case '{{VALUE}}':
-                            error_log( print_r( $attribute, true ) );
                             $attribute_value = '';
                             if ($attribute && (is_string($attribute) || is_numeric($attribute))) {
                                 $attribute_value = $attribute;
@@ -135,16 +197,18 @@ class Utilities
 
         foreach ($breakpoints as $breakpoint_key => $breakpoint) {
             $css_string = '';
-            if (isset($css_rules[$breakpoint_key])) {
-                foreach ($css_rules[$breakpoint_key] as $selector => $rules) {
+            $device_slug = $breakpoint['slug'];
+            $device_value = $breakpoint['value'];
+            if (isset($css_rules[$device_slug])) {
+                foreach ($css_rules[$device_slug] as $selector => $rules) {
                     $css_string .= "{$selector}{{$rules}}";
                 }
             }
 
-            if ($breakpoint_key === 'Desktop') {
+            if ($device_slug === 'Desktop') {
                 $final_css .= $css_string;
             } else {
-                $final_css .= "@media screen and (max-width: {$breakpoint}){{$css_string}}";
+                $final_css .= "@media screen and (max-width: {$device_value}){{$css_string}}";
             }
         }
 

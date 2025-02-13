@@ -1,4 +1,7 @@
 .wp-block-blockish-container {
-    width: 100%;
     min-height: var(--container-min-height, 100%);
+
+    .wp-block-blockish-container{
+        width: 100%;
+    }
 }

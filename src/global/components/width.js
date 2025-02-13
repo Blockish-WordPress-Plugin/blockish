@@ -4,9 +4,12 @@ const Width = ({ name, attributes }) => {
     const { BlockishControl, BlockishResponsiveControl  } = window?.blockish?.controls;
     const { useDeviceType } = window?.blockish?.helpers;
     const device = useDeviceType();
+    const widthExcludes = applyFilters('blockish.advancedControl.width.exclude', new Set([]));
     const minWidthExcludes = applyFilters('blockish.advancedControl.width.minWidth.exclude', new Set([]));
     const maxWidthExcludes = applyFilters('blockish.advancedControl.width.maxWidth.exclude', new Set([]));
     const customWidthExcludes = applyFilters('blockish.advancedControl.width.customWidth.exclude', new Set([]));
+
+    if (widthExcludes.has(name)) return null;
     
     return (
         <BlockishControl type='BlockishPanelBody' title={__('Width', 'blockish')} initialOpen={false}>

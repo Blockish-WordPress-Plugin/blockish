@@ -5,7 +5,7 @@ import BlockishBlocksWrapperProps from './blocks-wrapper-props';
 import Layout from './components/layout';
 import Width from './components/width';
 import * as previews from './preview';
-import useStyle from './style';
+import Position from './components/position';
 
 const BlockishBlocksAdvancedControls = createHigherOrderComponent(
     (BlockEdit) =>
@@ -23,7 +23,6 @@ const BlockishBlocksAdvancedControls = createHigherOrderComponent(
                 const hash = useMemo(() => {
                     return props?.clientId?.slice(-6);
                 }, [props?.clientId]);
-                const additionaStyles = useStyle(props?.attributes, `bb-${hash}`);
 
                 const wrappedProps = {
                     ...props,
@@ -31,12 +30,13 @@ const BlockishBlocksAdvancedControls = createHigherOrderComponent(
                         <>
                             <Layout {...props} />
                             <Width {...props} />
+                            <Position {...props} />
                         </>
                     )
                 };
                 return (
                     <>
-                        <BlockishStyleTag {...props} hash={hash} additionalStyles={additionaStyles} />
+                        <BlockishStyleTag {...props} hash={hash} />
                         <BlockEdit {...wrappedProps} />
                     </>
                 )

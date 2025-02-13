@@ -1,17 +1,19 @@
 import { InspectorControls } from '@wordpress/block-editor';
-import { memo, useState } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-const Inspector = ({ attributes, advancedControls }) => {
+import { addFilter } from '@wordpress/hooks';
+
+const Inspector = ({ attributes, advancedControls, hasParent }) => {
     const {
         BlockishControl,
         BlockishResponsiveControl,
+        BlockishGroupControl
     } = window?.blockish?.controls;
 
-    const {
-        BlockishMediaUploader
-    } = window?.blockish?.components;
-
-    const [backgroundImage, setBackgroundImage] = useState(null);
+    addFilter('blockish.advancedControl.width.exclude', 'blockish/container/exclude-width', (list) => {
+        return list.add('blockish/container');
+    });
+    console.log( attributes?.containerBorder );
     
     return (
         <InspectorControls>
@@ -39,27 +41,31 @@ const Inspector = ({ attributes, advancedControls }) => {
                             tabName === 'layout' && (
                                 <>
                                     <BlockishControl type="BlockishPanelBody" title={__('Layout', 'blockish')}>
-                                        <BlockishControl
-                                            type="BlockishToggleGroup"
-                                            label={__('Container Width', 'blockish')}
-                                            slug="containerWidth"
-                                            options={[
-                                                {
-                                                    label: 'Full Width',
-                                                    value: 'alignfull'
-                                                },
-                                                {
-                                                    label: 'Boxed',
-                                                    value: 'alignwide'
-                                                },
-                                                {
-                                                    label: 'Custom',
-                                                    value: 'align-custom-width'
-                                                }
-                                            ]}
-                                        />
                                         {
-                                            attributes?.containerWidth === 'align-custom-width' && (
+                                            !hasParent && (
+                                                <BlockishControl
+                                                    type="BlockishToggleGroup"
+                                                    label={__('Container Width', 'blockish')}
+                                                    slug="containerWidth"
+                                                    options={[
+                                                        {
+                                                            label: 'Full Width',
+                                                            value: 'alignfull'
+                                                        },
+                                                        {
+                                                            label: 'Boxed',
+                                                            value: 'alignwide'
+                                                        },
+                                                        {
+                                                            label: 'Custom',
+                                                            value: 'align-custom-width'
+                                                        }
+                                                    ]}
+                                                />
+                                            )
+                                        }
+                                        {
+                                            (attributes?.containerWidth === 'align-custom-width' || hasParent) && (
                                                 <BlockishResponsiveControl
                                                     type="BlockishRangeUnit"
                                                     label={__('Custom Width', 'blockish')}
@@ -351,23 +357,15 @@ const Inspector = ({ attributes, advancedControls }) => {
                         {
                             tabName === 'style' && (
                                 <BlockishControl type="BlockishPanelBody" title={__('Style', 'blockish')}>
-                                    {/* <BlockishControl
-                                        type="BlockishColor"
-                                        slug="textColor"
-                                        label={__('Text Color', 'blockish')}
+                                    <BlockishGroupControl
+                                        label={__('Background', 'blockish')}
+                                        type="BlockishBackground"
+                                        slug="containerBackground"
                                     />
-                                    <BlockishControl
-                                        type="BlockishFontSizePicker"
-                                        slug="fontSize"
-                                        label={__('Font Size', 'blockish')}
-                                    /> */}
-                                    <BlockishMediaUploader 
-                                        label={__('Background Image', 'blockish')}
-                                        placeholder={__('Upload Background Image', 'blockish')}
-                                        value={backgroundImage}
-                                        onChange={(image) => {
-                                            setBackgroundImage(image);
-                                        }}
+                                    <BlockishGroupControl
+                                        type="BlockishBorder"
+                                        label={__('Border', 'blockish')}
+                                        slug="containerBorder"
                                     />
                                 </BlockishControl>
                             )
