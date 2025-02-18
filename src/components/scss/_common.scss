@@ -1,3 +1,16 @@
 .blockish-control{
-    margin-bottom: calc(16px);
+    margin-bottom: calc(16px) !important;
+}
+
+.blockish-group-control {
+    > .components-tools-panel{
+        border: 1px solid #dddddd !important;
+        padding: 12px !important;
+
+        .blockish-control{
+            &:not(.blockish-background-image-section .blockish-control){
+                margin-bottom: 0 !important;
+            }
+        }
+    }
 }

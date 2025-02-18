@@ -1,4 +1,5 @@
 import blockNameCamelcase from "./block-name-camelcase";
+import generateBackgroundControlStyles from "./generate-background-control-styles";
 import generateCssString from "./generate-css-string";
 import generateStyles from "./generate-styles";
 import { getSpacingValue } from "./get-css";
@@ -12,6 +13,7 @@ import setResponsiveValue from "./set-responsive-value";
 import useDeviceList from "./use-device-list";
 import useDeviceType from "./use-device-type";
 import useGenerateStyles from "./use-generate-style";
+import useInheritResponsiveValue from "./use-inherit-responsive-value";
 
 if( window?.blockish?.screen ){
     window.blockish.helpers = {
@@ -29,5 +31,7 @@ if( window?.blockish?.screen ){
         reservedPlaceholder,
         generateCssString,
         isResponsiveValue,
+        useInheritResponsiveValue,
+        generateBackgroundControlStyles
     }
 }

@@ -86,7 +86,7 @@ export default function BlockishRangeUnit({
 
     return (
         <fieldset className="blockish-range-unit blockish-control">
-            <BaseControl.VisualLabel as="legend">
+            <BaseControl.VisualLabel as="legend" __nextHasNoMarginBottom={true}>
                 {label}
             </BaseControl.VisualLabel>
             <Flex>

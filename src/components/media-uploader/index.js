@@ -6,13 +6,12 @@ import { __ } from '@wordpress/i18n';
 import {
     Button,
     __experimentalHStack as HStack,
-    ResponsiveWrapper,
     BaseControl
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 
 const instructions = (
-    <p>
+    <p>ßß
         {__(
             'To edit the image, you need permissions to upload media.',
             'blockish'
@@ -22,11 +21,19 @@ const instructions = (
 
 const ALLOWED_MEDIA_TYPES = ['image'];
 
-const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = __('Upload Image', 'blockish'), value, onChange, allowedTypes = ALLOWED_MEDIA_TYPES }) => {
+const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = __('Upload Image', 'blockish'), value, onChange, allowedTypes = ALLOWED_MEDIA_TYPES, isInheritedValue = false }) => {
     const toggleRef = useRef();
+    const backgroundImageStyleProps = {};
+    if (value?.url) {
+        backgroundImageStyleProps.backgroundImage = `url(${value?.url})`;
+
+        if (isInheritedValue){
+            backgroundImageStyleProps.opacity = '0.5';
+        }
+    }
     return (
         <div className="blockish-control blockish-media-uploader">
-            <BaseControl label={label}>
+            <BaseControl label={label} __nextHasNoMarginBottom={true}>
                 <MediaUploadCheck fallback={instructions}>
                     <MediaUpload
                         title={label}
@@ -63,18 +70,13 @@ const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = 
                                             : `blockish-media-uploader-${value?.id}-describedby`
                                     }
                                 >
-                                    {!!value?.id && value?.url && (
-                                        <ResponsiveWrapper
-                                            naturalWidth={value?.width}
-                                            naturalHeight={value?.height}
-                                            isInline
-                                        >
-                                            <img
+                                    {backgroundImageStyleProps?.backgroundImage && (
+                                        <div className="blockish-media-uploader-image-wrapper">
+                                            <div
                                                 className="blockish-media-uploader-image"
-                                                src={value?.url}
-                                                alt={value?.alt}
-                                            />
-                                        </ResponsiveWrapper>
+                                                style={backgroundImageStyleProps}
+                                            ></div>
+                                        </div>
                                     )}
                                     {!value?.id && placeholder}
                                 </Button>

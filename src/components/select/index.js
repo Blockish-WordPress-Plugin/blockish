@@ -5,7 +5,7 @@ const BlockishSelect = ({ label = 'Select', value, onChange, options=[], ...prop
 
     return (
         <div className="blockish-control blockish-select-control">
-			<BaseControl.VisualLabel as="legend" children={label} />
+			<BaseControl.VisualLabel as="legend" children={label} __nextHasNoMarginBottom={true}/>
 			<Select
 				className="blockish-select"
 				classNamePrefix="blockish-select"

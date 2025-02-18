@@ -35,7 +35,7 @@ class Blocks
             $path = BLOCKISH_BLOCKS_DIR . $slug;
 
             if (is_readable($path)) {
-                register_block_type($path);
+                register_block_type_from_metadata($path);
             }
         }
     }
@@ -85,119 +85,192 @@ class Blocks
     public function get_device_list()
     {
         return get_option('blockish_device_list', [
-            'Desktop' => 'base',
-            'Tablet' => '1024px',
-            'Mobile' => '767px',
+            [
+                'label' => 'Desktop',
+                'value' => 'base',
+                'slug' => 'Desktop',
+            ],
+            [
+                'label' => 'Tablet',
+                'value' => '1024px',
+                'slug' => 'Tablet',
+            ],
+            [
+                'label' => 'Mobile',
+                'value' => '768px',
+                'slug' => 'Mobile',
+            ]
         ]);
     }
-
-    function generate_additional_style( $attributes, $wrapper ) {
-        if ( ! isset( $attributes['widthType'] ) || ! is_array( $attributes['widthType'] ) ) {
-            return ''; // Prevent errors if widthType is missing or not an array
-        }
-    
-        $device_list = $this->get_device_list(); // Expected to return an associative array
-        $css         = '';
-    
-        foreach ( $device_list as $device_slug => $device_value ) {
-            $width_rules = null;
-    
-            // Ensure widthType is an array before accessing keys
-            $width_type_value = isset( $attributes['widthType'][ $device_slug ]['value'] )
-                ? $attributes['widthType'][ $device_slug ]['value']
-                : null;
-    
-            if ( $width_type_value && $width_type_value !== 'custom' ) {
-                $width_rules = $width_type_value;
-            } elseif (
-                isset( $attributes['customWidth'][ $device_slug ] ) &&
-                isset( $width_type_value ) &&
-                $width_type_value === 'custom'
-            ) {
-                $width_rules = $attributes['customWidth'][ $device_slug ];
-            }
-    
-            // Only add styles if width_rules is set
-            if ( ! empty( $width_rules ) ) {
-                if ( 'Desktop' === $device_slug ) {
-                    $css .= sprintf(
-                        '.%s { width: %s; }',
-                        esc_attr( $wrapper ),
-                        esc_attr( $width_rules )
-                    );
-                } else {
-                    $css .= sprintf(
-                        '@media (max-width: %s) { .%s { width: %s; } }',
-                        esc_attr( $device_value ),
-                        esc_attr( $wrapper ),
-                        esc_attr( $width_rules )
-                    );
-                }
-            }
-        }
-    
-        return $css;
-    }
-    
-    
-    
 
     public function get_block_default_attributes($meta_attributes)
     {
         $default_attributes = [];
 
         foreach ($meta_attributes as $attribute_key => $attribute) {
-            $default_attributes[$attribute_key] = $attribute['default'] ?? '';
+            if (!empty($attribute['default'])) {
+                $default_attributes[$attribute_key] = $attribute['default'];
+            }
         }
 
         return $default_attributes;
     }
 
-    public function collect_block_css($block_data)
+    public function process_attr_value($value)
     {
-        if (!empty($block_data['blockName']) && str_contains($block_data['blockName'], 'blockish')) {
-            $this->block_class = 'bb-' . \Blockish\Core\Utilities::generate_uniqueId(6);
-            $name = str_replace('blockish/', '', $block_data['blockName']);
-            $metadata = \Blockish\Core\Utilities::get_block_metadata($name);
-            $meta_attributes = isset($metadata['attributes']) ? $metadata['attributes'] : [];
-            $default_attributes = $this->get_block_default_attributes($meta_attributes);
-            $attributes = wp_parse_args($block_data['attrs'], $default_attributes);
-            $breakpoints = $this->get_device_list();
-            $css_rules = array_fill_keys(array_keys($breakpoints), []);
+        $attribute_value = $value;
 
-            foreach ($attributes as $attribute_key => $attribute_value) {
-                $meta_attribute = $meta_attributes[$attribute_key] ?? [];
-                if (!empty($meta_attribute['selectors'])) {
-                    foreach ($meta_attribute['selectors'] as $selector => $css) {
-                        $selector = str_replace('{{WRAPPER}}', $this->block_class, $selector);
-                        if (!is_array($attribute_value)) {
-                            // Single value attributes (non-array) - add to Desktop
-                            $css_rules['Desktop'][$selector] = (isset($css_rules['Desktop'][$selector]) ? $css_rules['Desktop'][$selector] : '') . Utilities::replace_css_placeholders($css, $attribute_value);
-                        } elseif (empty(array_intersect(array_keys($attribute_value), array_keys($breakpoints)))) {
-                            // Add to Desktop if attribute keys don't match breakpoint keys
-                            $css_rules['Desktop'][$selector] = (isset($css_rules['Desktop'][$selector]) ? $css_rules['Desktop'][$selector] : '') . Utilities::replace_css_placeholders($css, $attribute_value);
-                        } else {
-                            // Breakpoint-specific values
-                            foreach ($breakpoints as $breakpoint_key => $breakpoint) {
-                                if (isset($attribute_value[$breakpoint_key])) {
-                                    $css_rules[$breakpoint_key][$selector] = (isset($css_rules[$breakpoint_key][$selector]) ? $css_rules[$breakpoint_key][$selector] : '') . Utilities::replace_css_placeholders($css, $attribute_value[$breakpoint_key]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            $final_css = Utilities::generate_css_string($css_rules, $breakpoints);
-            $additional_css = $this->generate_additional_style($block_data['attrs'], $this->block_class);
-            if (!empty($additional_css)) {
-                $final_css .= $additional_css;
-            }
-            $this->collected_block_css .= $final_css;
+        if (!empty($value['value'])) {
+            $attribute_value = $value['value'];
         }
 
-        return $block_data; // Return the block data unchanged (except for the blockClass)
+        return $attribute_value;
     }
+
+    public function is_resposive_value($attribute, $breakpoints)
+    {
+        return is_array($attribute) && array_intersect_key($attribute, array_flip(array_column($breakpoints, 'slug')));
+    }
+
+    public function collect_block_css($block_data)
+    {
+        if (empty($block_data['blockName']) || !str_contains($block_data['blockName'], 'blockish')) {
+            return $block_data;
+        }
+
+        $this->block_class = 'bb-' . \Blockish\Core\Utilities::generate_uniqueId(6);
+        $name = str_replace('blockish/', '', $block_data['blockName']);
+        $metadata = \Blockish\Core\Utilities::get_block_metadata($name);
+        $block_meta_attributes = $metadata['attributes'] ?? [];
+        $meta_attributes = array_merge($block_meta_attributes, $this->get_global_attributes());
+        $default_attributes = $this->get_block_default_attributes($meta_attributes);
+        $attributes = wp_parse_args($block_data['attrs'], $default_attributes);
+        $breakpoints = $this->get_device_list();
+        $css_rules = array_fill_keys(array_column($breakpoints, 'slug'), []);
+
+        foreach ($meta_attributes as $meta_key => $meta_attr) {
+            if ((empty($meta_attr['selectors']) && empty($meta_attr['groupSelector'])) || empty($attributes[$meta_key])) {
+                continue;
+            }
+
+            $attribute_value = $attributes[$meta_key];
+
+            // Function to apply CSS to the rules
+            $apply_css = function ($device_slug, $value) use ($meta_attr, &$css_rules) {
+                if (!empty($meta_attr['selectors'])) {
+                    foreach ($meta_attr['selectors'] as $selector => $rule) {
+                        $final_rule = Utilities::replace_css_placeholders($rule, $value);
+                        $selector = str_replace('{{WRAPPER}}', $this->block_class, $selector);
+                        $css_rules[$device_slug][$selector] = isset($css_rules[$device_slug][$selector])
+                            ? $css_rules[$device_slug][$selector] . $final_rule
+                            : $final_rule;
+                    }
+                }
+
+                if (!empty($meta_attr['groupSelector']['type'])) {
+                    $type = $meta_attr['groupSelector']['type'];
+                    $selector = str_replace('{{WRAPPER}}', $this->block_class, $meta_attr['groupSelector']['selector']);
+
+                    switch ($type) {
+                        case 'BlockishBackground':
+                            $styles = Utilities::generate_background_control_styles($value, $device_slug);
+                            $css_rules[$device_slug][$selector] = isset($css_rules[$device_slug][$selector])
+                                ? $css_rules[$device_slug][$selector] . $styles
+                                : $styles;
+                            break;
+                    }
+                }
+            };
+
+            // Check if conditions exist and evaluate them
+            if (!empty($meta_attr['condition']['rules'])) {
+                foreach ($breakpoints as $breakpoint) {
+                    $device_slug = $breakpoint['slug'];
+                    $processed_value = $this->process_attr_value(
+                        $this->is_resposive_value($attribute_value, $breakpoints)
+                            ? ($attribute_value[$device_slug] ?? null)
+                            : $attribute_value
+                    );
+
+                    if (!$processed_value) {
+                        continue;
+                    }
+
+                    $relation = $meta_attr['condition']['relation'] ?? "AND";
+                    $all_conditions_met = ($relation === "AND");
+
+                    // Evaluate each rule for conditions
+                    foreach ($meta_attr['condition']['rules'] as $rule) {
+                        $condition_value = $attributes[$rule['key']] ?? null;
+                        $processed_condition_value = $this->process_attr_value(
+                            $this->is_resposive_value($condition_value, $this->get_device_list())
+                                ? $condition_value[$device_slug] ?? null
+                                : $condition_value
+                        );
+
+                        $condition_met = false;
+                        switch ($rule['condition']) {
+                            case '==':
+                                $condition_met = ($processed_condition_value == $rule['value']);
+                                break;
+                            case '!=':
+                                $condition_met = ($processed_condition_value != $rule['value']);
+                                break;
+                            case 'empty':
+                                $condition_met = empty($processed_condition_value);
+                                break;
+                            case 'not_empty':
+                                $condition_met = !empty($processed_condition_value);
+                                break;
+                        }
+
+                        if ($relation === "AND" && !$condition_met) {
+                            $all_conditions_met = false;
+                            break;
+                        }
+                        if ($relation === "OR" && $condition_met) {
+                            $all_conditions_met = true;
+                            break;
+                        }
+                    }
+
+                    // If all conditions are met, apply the styles
+                    if ($all_conditions_met) {
+                        $apply_css($device_slug, $processed_value);
+                    }
+                }
+            } else {
+                // If no conditions, apply CSS for all breakpoints
+                if (is_array($attribute_value)) {
+                    foreach ($breakpoints as $breakpoint) {
+                        $device_slug = $breakpoint['slug'];
+                        if (!empty($attribute_value[$device_slug])) {
+                            $apply_css($device_slug, $attribute_value[$device_slug]);
+                        }
+                    }
+                } elseif (is_string($attribute_value) && !empty($meta_attr['groupSelector'])) {
+                    foreach ($breakpoints as $breakpoint) {
+                        $device_slug = $breakpoint['slug'];
+                        if (!empty($attribute_value)) {
+                            $apply_css($device_slug, $attribute_value);
+                        }
+                    }
+                } else {
+                    $apply_css('Desktop', $attribute_value);
+                }
+            }
+        }
+
+        // Generate final CSS and append
+        $final_css = Utilities::generate_css_string($css_rules, $breakpoints);
+        $this->collected_block_css .= $final_css;
+
+        return $block_data;
+    }
+
+
+
+
 
     public function add_unique_class_to_block($block_content, $block)
     {

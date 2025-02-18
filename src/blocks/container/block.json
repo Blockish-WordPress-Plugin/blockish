@@ -159,6 +159,20 @@
 			"selectors": {
 				".{{WRAPPER}}.blockish-container": "row-gap: {{VALUE}};"
 			}
+		},
+		"containerBackground": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}}"
+			}
+		},
+		"containerBorder": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}}"
+			}
 		}
 	},
 	"supports": {

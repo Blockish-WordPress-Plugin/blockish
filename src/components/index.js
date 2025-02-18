@@ -15,6 +15,9 @@ import BlockishSelect from "./select";
 import BlockishRangeUnit from "./range-unit";
 import * as blockIcons from "./icons/block-icons";
 import BlockishMediaUploader from "./media-uploader";
+import BlockishBoxControl from "./box-control";
+import BlockishBackground from "./background";
+import BlockishBorder from "./border";
 
 if(window?.blockish?.screen) {
     window.blockish.components = {
@@ -33,6 +36,9 @@ if(window?.blockish?.screen) {
         BlockishSelect,
         BlockishRangeUnit,
         blockIcons,
-        BlockishMediaUploader
+        BlockishMediaUploader,
+        BlockishBoxControl,
+        BlockishBackground,
+        BlockishBorder
     }
 }
