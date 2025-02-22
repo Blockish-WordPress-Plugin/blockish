@@ -15,10 +15,12 @@ class StyleGenerator
 
     private function __construct()
     {
-        add_filter('render_block_data', [$this, 'collect_block_css'], 10);
-        add_filter('render_block', [$this, 'add_unique_class_to_block'], 10, 2);
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_block_styles']);
         add_action('template_redirect', [$this, 'set_cache_related_data']);
+        if (!is_admin()) {
+            add_filter('render_block_data', [$this, 'collect_block_css'], 10);
+            add_filter('render_block', [$this, 'add_unique_class_to_block'], 10, 2);
+            add_action('wp_enqueue_scripts', [$this, 'enqueue_block_styles']);
+        }
         add_action('save_post', [$this, 'delete_cache_on_save']); // Fires on insert & update  
         add_action('delete_post', [$this, 'delete_cache_on_save']); // Fires when a post is permanently deleted  
         add_action('trash_post', [$this, 'delete_cache_on_save']); // Fires when moving a post to trash  
@@ -288,4 +290,3 @@ class StyleGenerator
         }
     }
 }
-
