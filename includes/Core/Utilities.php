@@ -79,6 +79,65 @@ class Utilities
         return $styles;
     }
 
+    public static function generate_border_control_styles($border, $device)
+    {
+        if (empty($border) || !is_string($border)) {
+            return '';
+        }
+
+        $json_border = json_decode($border, true);
+        if (!is_array($json_border)) {
+            return '';
+        }
+
+        $styles = '';
+
+        // Loop through each border property in the JSON object
+        foreach ($json_border as $key => $value) {
+            // Check for linked border (e.g., "border")
+            if ($key === 'width' && isset($value[$device])) {
+                $style = !empty($value['style']) ? $value['style'] : 'solid';
+                $color = !empty($value['color']) ? $value['color'] : '#000';
+                $styles .= 'border: ' . $value[$device] . ' ' . $style . ' ' . $color . ';';
+            }
+
+            // Check for unlinked borders (e.g., "top", "left", "right", "bottom")
+            elseif (in_array($key, ['top', 'left', 'right', 'bottom'], true) && isset($value['width'][$device])) {
+                $style = !empty($value['style']) ? $value['style'] : 'solid';
+                $color = !empty($value['color']) ? $value['color'] : '#000';
+                $styles .= 'border-' . $key . ': ' . $value['width'][$device] . ' ' . $style . ' ' . $color . ';';
+            }
+        }
+
+        return $styles;
+    }
+
+    public static function generate_box_shadow_control_styles($box_shadows)
+    {
+        $styles = '';
+
+        if (!empty($box_shadows)) {
+            $json_box_shadows = json_decode($box_shadows, true);
+            $shadows_string = [];
+
+            foreach ($json_box_shadows as $shadow) {
+                if ((isset($shadow['x']) || isset($shadow['y']))) {
+                    $x = isset($shadow['x']) ? $shadow['x'] : "0";
+                    $y = isset($shadow['y']) ? $shadow['y'] : "0";
+                    $blur = isset($shadow['blur']) ? $shadow['blur'] : "0";
+                    $spread = isset($shadow['spread']) ? $shadow['spread'] : "0";
+                    $color = isset($shadow['color']) ? $shadow['color'] : 'rgba(0, 0, 0, 0.2)';
+                    $inset = isset($shadow['inset']) && $shadow['inset'] ? 'inset' : '';
+                    $shadows_string[] = <<<EOT
+                    {$x} {$y} {$blur} {$spread} {$color} {$inset}
+                EOT;
+                }
+            }
+            $styles = count($shadows_string) > 0 ? 'box-shadow: ' . join(',', $shadows_string) . ';' : '';
+        }
+
+        return $styles;
+    }
 
     public static function generate_uniqueId($length)
     {
@@ -182,6 +241,58 @@ class Utilities
 
                             $value = str_replace($placeholder, $right_value ?? '', $value);
                             break;
+
+                        case '{{TOP_LEFT}}':
+                            $top_left_value = '0';
+                            if ($attribute && is_array($attribute) && isset($attribute['topLeft'])) {
+                                $top_left_value = $attribute['topLeft'];
+                            }
+
+                            if ($attribute && is_string($attribute)) {
+                                $top_left_value = $attribute;
+                            }
+
+                            $value = str_replace($placeholder, $top_left_value ?? '', $value);
+                            break;
+
+                        case '{{TOP_RIGHT}}':
+                            $top_right_value = '0';
+                            if ($attribute && is_array($attribute) && isset($attribute['topRight'])) {
+                                $top_right_value = $attribute['topRight'];
+                            }
+
+                            if ($attribute && is_string($attribute)) {
+                                $top_right_value = $attribute;
+                            }
+
+                            $value = str_replace($placeholder, $top_right_value ?? '', $value);
+                            break;
+
+                        case '{{BOTTOM_LEFT}}':
+                            $bottom_left_value = '0';
+                            if ($attribute && is_array($attribute) && isset($attribute['bottomLeft'])) {
+                                $bottom_left_value = $attribute['bottomLeft'];
+                            }
+
+                            if ($attribute && is_string($attribute)) {
+                                $bottom_left_value = $attribute;
+                            }
+
+                            $value = str_replace($placeholder, $bottom_left_value ?? '', $value);
+                            break;
+
+                        case '{{BOTTOM_RIGHT}}':
+                            $bottom_right_value = '0';
+                            if ($attribute && is_array($attribute) && isset($attribute['bottomRight'])) {
+                                $bottom_right_value = $attribute['bottomRight'];
+                            }
+
+                            if ($attribute && is_string($attribute)) {
+                                $bottom_right_value = $attribute;
+                            }
+
+                            $value = str_replace($placeholder, $bottom_right_value ?? '', $value);
+                            break;
                     }
                 }
             }
@@ -223,5 +334,58 @@ class Utilities
         $css = preg_replace('/\s*([{}|:;,])\s*/', '$1', $css);
         $css = preg_replace('/;}/', '}', $css);
         return trim($css);
+    }
+
+    public static function get_global_attributes()
+    {
+        self::get_filesystem();
+
+        global $wp_filesystem;
+
+        $global_metadata_path = BLOCKISH_DIR . '/build/global/block.json';
+
+        if (!is_readable($global_metadata_path)) {
+            return [];
+        }
+
+        $metadata = $wp_filesystem->get_contents($global_metadata_path);
+
+        if (empty($metadata)) {
+            return [];
+        }
+
+        $decoded_metadata = json_decode($metadata, true);
+
+        if (empty($decoded_metadata['attributes'])) {
+            return [];
+        }
+
+        return $decoded_metadata['attributes'];
+    }
+
+    public static function get_device_list()
+    {
+        return get_option('blockish_device_list', [
+            [
+                'label' => 'Desktop',
+                'value' => 'base',
+                'slug' => 'Desktop',
+            ],
+            [
+                'label' => 'Tablet',
+                'value' => '1024px',
+                'slug' => 'Tablet',
+            ],
+            [
+                'label' => 'Mobile',
+                'value' => '768px',
+                'slug' => 'Mobile',
+            ]
+        ]);
+    }
+
+    public static function is_resposive_value($attribute, $breakpoints)
+    {
+        return is_array($attribute) && array_intersect_key($attribute, array_flip(array_column($breakpoints, 'slug')));
     }
 }

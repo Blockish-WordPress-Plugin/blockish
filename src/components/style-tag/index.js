@@ -2,7 +2,7 @@ import { memo, useMemo } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
 
 const BlockishStyleTag = ({ attributes, hash, name, additionalStyles = '' }) => {
-    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue, generateBackgroundControlStyles } = window.blockish.helpers;
+    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue, generateBackgroundControlStyles, generateBorderControlStyles, generateBoxShadowControlStyles } = window.blockish.helpers;
 
     const deviceList = useDeviceList();
     const schemaAttributes = getBlockType(name)?.attributes || {};
@@ -24,11 +24,19 @@ const BlockishStyleTag = ({ attributes, hash, name, additionalStyles = '' }) => 
 
                 if (metaAttribute?.groupSelector && metaAttribute?.groupSelector?.type) {
                     const type = metaAttribute?.groupSelector?.type;
+                    const selector = replaceString(metaAttribute?.groupSelector?.selector, '{{WRAPPER}}', `bb-${hash}`);
                     switch (type) {
                         case 'BlockishBackground':
                             let styles = generateBackgroundControlStyles(value, deviceSlug);
-                            const selector = replaceString(metaAttribute?.groupSelector?.selector, '{{WRAPPER}}', `bb-${hash}`);
                             cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + styles;
+                            break;
+                        case 'BlockishBorder':
+                            let borderStyles = generateBorderControlStyles(value, deviceSlug);
+                            cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + borderStyles;
+                            break;
+                        case 'BlockishBoxShadow':
+                            let boxShadowStyles = generateBoxShadowControlStyles(value, deviceSlug);
+                            cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + boxShadowStyles;
                             break;
                             
                     }

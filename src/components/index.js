@@ -18,6 +18,8 @@ import BlockishMediaUploader from "./media-uploader";
 import BlockishBoxControl from "./box-control";
 import BlockishBackground from "./background";
 import BlockishBorder from "./border";
+import BlockishBorderRadius from "./border-radius";
+import BlockishBoxShadow from "./box-shadow";
 
 if(window?.blockish?.screen) {
     window.blockish.components = {
@@ -39,6 +41,8 @@ if(window?.blockish?.screen) {
         BlockishMediaUploader,
         BlockishBoxControl,
         BlockishBackground,
-        BlockishBorder
+        BlockishBorder,
+        BlockishBorderRadius,
+        BlockishBoxShadow
     }
 }

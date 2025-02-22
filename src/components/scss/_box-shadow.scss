@@ -1,0 +1,40 @@
+.blockish-box-shadow {
+    .blockish-box-shadow-add-button-wrapper,
+    .blockish-box-shadow-remove-button-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .blockish-box-shadow-add-button,
+        .blockish-box-shadow-remove-button {
+            height: 18px;
+            line-height: 1;
+            padding: 0;
+
+            &:hover,
+            &:focus {
+                color: #1677ff;
+                box-shadow: none !important;
+                outline: none !important;
+            }
+        }
+    }
+
+    .blockish-box-shadow-item-group {
+        .blockish-box-shadow-item {
+            cursor: pointer;
+            padding: 6px !important;
+            display: flex;
+            align-items: center;
+            .blockish-box-shadow-item-dropdown{
+                width: 100%;
+            }
+        }
+    }
+}
+
+.blockish-box-shadow-item-dropdown-content{
+    .blockish-box-shadow-item-dropdown-content-wrapper{
+        min-width: 280px;
+    }
+}

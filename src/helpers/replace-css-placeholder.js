@@ -63,6 +63,56 @@ const replaceCssPlaceholders = (value, attribute) => {
 
                     value = value.replace(placeholder, rightValue ?? '');
                     break;
+                case '{{TOP_LEFT}}':
+                    let topLeftValue = '0';
+                    
+                    if (attribute && typeof attribute === 'object' && attribute?.topLeft) {
+                        topLeftValue = attribute.topLeft;
+                    }
+
+                    if (attribute && typeof attribute === 'string') {
+                        topLeftValue = attribute;
+                    }
+
+                    value = value.replace(placeholder, topLeftValue ?? '');
+                    break;
+                case '{{TOP_RIGHT}}':
+                    let topRightValue = '0';
+
+                    if (attribute && typeof attribute === 'object' && attribute?.topRight ) {
+                        topRightValue = attribute.topRight;
+                    }
+
+                    if (attribute && typeof attribute === 'string') {
+                        topRightValue = attribute;
+                    }
+
+                    value = value.replace(placeholder, topRightValue ?? '');
+                    break;
+                case '{{BOTTOM_LEFT}}':
+                    let bottomLeftValue = '0';
+                    if (attribute && typeof attribute === 'object' && attribute?.bottomLeft) {
+                        bottomLeftValue = attribute.bottomLeft;
+                    }
+
+                    if (attribute && typeof attribute === 'string') {
+                        bottomLeftValue = attribute;
+                    }
+
+                    value = value.replace(placeholder, bottomLeftValue ?? '');
+                    break;
+                case '{{BOTTOM_RIGHT}}':
+                    let bottomRightValue = '0';
+                    if (attribute && typeof attribute === 'object' && attribute?.bottomRight) {
+                        bottomRightValue = attribute.bottomRight;
+                    }
+
+                    if (attribute && typeof attribute === 'string') {
+                        bottomRightValue = attribute;
+                    }
+
+                    value = value.replace(placeholder, bottomRightValue ?? '');
+                    break;
             }
         }
     });
