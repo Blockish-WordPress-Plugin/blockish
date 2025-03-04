@@ -18,6 +18,7 @@
 use Blockish\Core\Blocks;
 use Blockish\Core\Enqueue;
 use Blockish\Core\ExtenSions;
+use Blockish\Core\StyleGenerator;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -82,6 +83,10 @@ final class Blockish {
             '{{BOTTOM}}',
             '{{LEFT}}',
             '{{RIGHT}}',
+            '{{TOP_LEFT}}',
+            '{{TOP_RIGHT}}',
+            '{{BOTTOM_LEFT}}',
+            '{{BOTTOM_RIGHT}}',
         ] );
     }
 
@@ -124,7 +129,8 @@ final class Blockish {
         // Load plugin classes.
         Blocks::get_instance();
         Enqueue::get_instance();
-        ExtenSions::get_instance();
+        StyleGenerator::get_instance();
+        // ExtenSions::get_instance();
     }
 
     public function admin_enqueue_scripts($screen) {

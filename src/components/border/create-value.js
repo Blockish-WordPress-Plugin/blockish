@@ -1,33 +1,37 @@
-const createValue = (original, device) => {
-    const border = {
-        left: {},
-        right: {},
-        top: {},
-        bottom: {}
+const createValue = (original, nextValue, device) => {
+    let value = { ...nextValue };
+
+    // Helper function to merge width values without replacing the object
+    const mergeWidth = (currentWidth, newWidth, device) => {
+        let widthObj = typeof currentWidth === "object" ? { ...currentWidth } : {};
+        widthObj[device] = newWidth; // Add or update the specific device width
+        return widthObj;
+    };
+
+    // If `original` exists, parse it (since it's stored as a JSON string)
+    let parsedOriginal = {};
+    try {
+        parsedOriginal = typeof original === "string" ? JSON.parse(original) : original;
+    } catch {
+        parsedOriginal = {};
     }
 
-    if ((width in original)) {
-        for (const key in border) {
-            border[key].width = {
-                [device]: original?.width
-            }
-
-            border[key].color = original?.color || '#000000';
-            border[key].style = original?.style || 'solid';
-        }
-    }else{
-        for (const key in border) {
-            if(original?.[key].width){
-                border[key].width = {
-                    [device]: original?.[key].width
-                }
-
-                border[key].color = original?.[key].color || '#000000';
-                border[key].style = original?.[key].style || 'solid';
-            }
-        }
+    // Process linked border (`width` at the root level)
+    if (value.width) {
+        value.width = mergeWidth(parsedOriginal?.width, value.width, device);
     }
 
-    return JSON.stringify(border);
-}
+    // Process unlinked borders (`left`, `right`, etc.)
+    ["left", "right", "top", "bottom"].forEach((side) => {
+        if (value[side] && typeof value[side] === "object") {
+            value[side] = {
+                ...value[side],
+                width: mergeWidth(parsedOriginal?.[side]?.width, value[side].width, device),
+            };
+        }
+    });
+
+    return JSON.stringify(value);
+};
+
 export default createValue;

@@ -69,4 +69,24 @@
 
         }
     }
+
+    &.blockish-tab-normal {
+        .components-tab-panel__tabs{
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 16px;
+        }
+        .blockish-tab-button {
+            padding: 0;
+            color: #000000e0;
+            width: 100%;
+            justify-content: center;
+            &.blockish-tab-active {
+                color: #1677ff;
+            }
+
+            &::before {
+                display: none;
+            }
+        }
+    }
 }

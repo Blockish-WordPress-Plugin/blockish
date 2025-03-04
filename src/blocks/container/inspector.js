@@ -13,8 +13,7 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
     addFilter('blockish.advancedControl.width.exclude', 'blockish/container/exclude-width', (list) => {
         return list.add('blockish/container');
     });
-    console.log( attributes?.containerBorder );
-    
+
     return (
         <InspectorControls>
             <BlockishControl
@@ -356,18 +355,110 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                         }
                         {
                             tabName === 'style' && (
-                                <BlockishControl type="BlockishPanelBody" title={__('Style', 'blockish')}>
-                                    <BlockishGroupControl
-                                        label={__('Background', 'blockish')}
-                                        type="BlockishBackground"
-                                        slug="containerBackground"
-                                    />
-                                    <BlockishGroupControl
-                                        type="BlockishBorder"
-                                        label={__('Border', 'blockish')}
-                                        slug="containerBorder"
-                                    />
-                                </BlockishControl>
+                                <>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Background', 'blockish')}>
+                                        <BlockishControl
+                                            type="BlockishTab"
+                                            tabs={[
+                                                {
+                                                    name: 'normal',
+                                                    title: 'Normal'
+                                                },
+                                                {
+                                                    name: 'hover',
+                                                    title: 'Hover'
+                                                }
+                                            ]}
+                                        >
+                                            {
+                                                ({ name: tabName }) => {
+                                                    switch (tabName) {
+                                                        case 'normal':
+                                                            return (
+                                                                <BlockishGroupControl
+                                                                    label={__('Background', 'blockish')}
+                                                                    type="BlockishBackground"
+                                                                    slug="containerBackground"
+                                                                />
+                                                            )
+                                                        case 'hover':
+                                                            return (
+                                                                <BlockishGroupControl
+                                                                    label={__('Hover Background', 'blockish')}
+                                                                    type="BlockishBackground"
+                                                                    slug="containerHoverBackground"
+                                                                />
+                                                            )
+                                                    }
+                                                }
+                                            }
+                                        </BlockishControl>
+                                    </BlockishControl>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Border', 'blockish')}>
+                                        <BlockishControl
+                                            type="BlockishTab"
+                                            tabs={[
+                                                {
+                                                    name: 'normal',
+                                                    title: 'Normal'
+                                                },
+                                                {
+                                                    name: 'hover',
+                                                    title: 'Hover'
+                                                }
+                                            ]}
+                                        >
+                                            {
+                                                ({ name: tabName }) => {
+                                                    switch (tabName) {
+                                                        case 'normal':
+                                                            return (
+                                                                <>
+                                                                    <BlockishGroupControl
+                                                                        type="BlockishBorder"
+                                                                        label={__('Border', 'blockish')}
+                                                                        slug="containerBorder"
+                                                                    />
+                                                                    <BlockishResponsiveControl
+                                                                        type="BlockishBorderRadius"
+                                                                        label={__('Border Radius', 'blockish')}
+                                                                        slug="containerBorderRadius"
+                                                                        left="44px"
+                                                                    />
+                                                                    <BlockishGroupControl
+                                                                        type="BlockishBoxShadow"
+                                                                        label={__('Box Shadow', 'blockish')}
+                                                                        slug="containerBoxShadow"
+                                                                    />
+                                                                </>
+                                                            )
+                                                        case 'hover':
+                                                            return (
+                                                                <>
+                                                                    <BlockishGroupControl
+                                                                        type="BlockishBorder"
+                                                                        label={__('Border', 'blockish')}
+                                                                        slug="containerHoverBorder"
+                                                                    />
+                                                                    <BlockishResponsiveControl
+                                                                        type="BlockishBorderRadius"
+                                                                        label={__('Border Radius', 'blockish')}
+                                                                        slug="containerHoverBorderRadius"
+                                                                        left="44px"
+                                                                    />
+                                                                    <BlockishGroupControl
+                                                                        type="BlockishBoxShadow"
+                                                                        label={__('Box Shadow', 'blockish')}
+                                                                        slug="containerHoverBoxShadow"
+                                                                    />
+                                                                </>
+                                                            )
+                                                    }
+                                                }
+                                            }
+                                        </BlockishControl>
+                                    </BlockishControl>
+                                </>
                             )
                         }
                         {

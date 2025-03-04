@@ -38,7 +38,7 @@ const BlockishGroupControl = ({ type, label, slug, value: userDefinedValue, onCh
 
     return (
         <Component
-            label={label || "Write your label here"}
+            label={label || ''}
             value={controlValue}
             onChange={handleChange}
             {...props}

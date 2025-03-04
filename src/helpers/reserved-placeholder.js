@@ -3,5 +3,9 @@ export default [
     '{{TOP}}', 
     '{{BOTTOM}}', 
     '{{LEFT}}', 
-    '{{RIGHT}}'
+    '{{RIGHT}}',
+    '{{TOP_LEFT}}',
+    '{{TOP_RIGHT}}',
+    '{{BOTTOM_LEFT}}',
+    '{{BOTTOM_RIGHT}}',
 ];

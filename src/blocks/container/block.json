@@ -167,11 +167,51 @@
 				"selector": ".{{WRAPPER}}"
 			}
 		},
+		"containerHoverBackground": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}}:hover"
+			}
+		},
 		"containerBorder": {
 			"type": "string",
 			"groupSelector": {
 				"type": "BlockishBorder",
 				"selector": ".{{WRAPPER}}"
+			}
+		},
+		"containerHoverBorder": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}}:hover"
+			}
+		},
+		"containerBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"containerHoverBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}:hover": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"containerBoxShadow": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}}"
+			}
+		},
+		"containerHoverBoxShadow": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}}:hover"
 			}
 		}
 	},
