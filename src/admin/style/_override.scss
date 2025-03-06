@@ -1,0 +1,64 @@
+.styles-module_right__2ehri,
+.styles-module_top__vpxAd {
+    top: 32px !important;
+}
+.sky-addons {
+    .faq-row-wrapper ul {
+        list-style: inside;
+    }
+    .faq-row-wrapper ol {
+        list-style: inside;
+        list-style-type: decimal;
+    }
+    .faq-row-wrapper {
+        background: transparent;
+    }
+    .faq-row .row-content-text {
+        margin-bottom: 10px;
+    }
+}
+.dark .sky-addons .faq-row-wrapper {
+    --arrow-color: #fff !important;
+
+    .faq-title {
+        border-color: #515151 !important;
+    }
+    h2 {
+        color: #fff;
+    }
+    .row-title-text {
+        color: #fff;
+    }
+    .faq-row {
+        border-color: #515151 !important;
+    }
+
+    .faq-row .faq-row-title {
+        color: #fff !important;
+    }
+    .faq-row .row-content-text {
+        color: #fff !important;
+    }
+    .faq-row .row-content-text a {
+        color: #fff !important;
+    }
+    .faq-row .row-content-text a:hover {
+        color: #ddd !important;
+    }
+}
+
+.dark .simple-offcanvas {
+    background-color: #111827 !important;
+}
+.dark .css-13cymwt-control {
+    background-color: hsl(226.67deg 39.13% 4.51%) !important;
+    border-color: hsl(226.67deg 39.13% 4.51%) !important;
+}
+
+.react-responsive-modal-modal.sky-addons {
+    min-width: 500px;
+    max-width: 80%;
+    margin-top: 120px;
+    border-radius: 8px;
+    padding: 0;
+}

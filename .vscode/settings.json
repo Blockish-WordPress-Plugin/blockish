@@ -1,0 +1,34 @@
+{
+  "workbench.settings.editor": "json",
+  "editor.fontSize": 16,
+  "editor.formatOnPaste": true,
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.snippetSuggestions": "top",
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.suggestSelection": "first",
+  "editor.parameterHints.enabled": true,
+  "editor.inlayHints.enabled": "off",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": false,
+    "plaintext": true,
+    "markdown": true,
+    "scminput": true
+  },
+  "phpcs.standard": "../phpcs.xml",
+  "phpcbf.standard": "../phpcs.xml",
+  "phpcbf.onsave": true,
+  "php-cs-fixer.config": ".php-cs-fixer.php",
+  "php-cs-fixer.rules": "@PSR2, array_syntax"
+}

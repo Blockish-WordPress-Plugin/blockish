@@ -72,6 +72,7 @@ final class Blockish {
         define( 'BLOCKISH_VERSION', self::VERSION );
         define( 'BLOCKISH_NAME', '' );
         define( 'BLOCKISH_URL', trailingslashit( plugin_dir_url( __FILE__ ) ) );
+        define( 'BLOCKISH_ASSETS_URL', BLOCKISH_URL . 'assets/' );
         define( 'BLOCKISH_DIR', trailingslashit( plugin_dir_path( __FILE__ ) ) );
         define( 'BLOCKISH_INCLUDES_DIR', BLOCKISH_DIR . 'includes/' );
         define( 'BLOCKISH_STYLES_DIR', BLOCKISH_DIR . 'build/styles/' );
@@ -131,6 +132,10 @@ final class Blockish {
         Enqueue::get_instance();
         StyleGenerator::get_instance();
         // ExtenSions::get_instance();
+
+        if(is_admin()) {
+            new \Blockish\Admin\Admin();
+        }
     }
 
     public function admin_enqueue_scripts($screen) {

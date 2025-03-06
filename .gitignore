@@ -30,3 +30,4 @@ node_modules/
 .env
 blockish
 .DS_Store
+composer.lock
