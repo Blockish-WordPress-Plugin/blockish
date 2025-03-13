@@ -18,7 +18,9 @@
 use Blockish\Core\Blocks;
 use Blockish\Core\Enqueue;
 use Blockish\Core\ExtenSions;
+use Blockish\Core\Fonts;
 use Blockish\Core\StyleGenerator;
+use Blockish\Endpoints\EndpointsCollector;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -130,6 +132,8 @@ final class Blockish {
         Blocks::get_instance();
         Enqueue::get_instance();
         StyleGenerator::get_instance();
+        Fonts::get_instance();
+        EndpointsCollector::get_instance();
         // ExtenSions::get_instance();
     }
 

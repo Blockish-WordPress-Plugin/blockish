@@ -1,0 +1,100 @@
+.blockish-font-family-control {
+    .blockish-select-control {
+        margin-bottom: 0 !important;
+    }
+
+    .blockish-font-family-install-btn {
+        height: 14px !important;
+
+        &:focus {
+            box-shadow: none !important;
+            outline: none !important;
+        }
+    }
+}
+
+.blockish-fonts-library-list {
+    .blockish-fonts-library-item {
+        padding: 14px 12px;
+        cursor: pointer;
+
+        &:hover {
+            color: #1677ff;
+            background-color: #f5f5f5;
+        }
+    }
+}
+
+.font-library-modal {
+    max-width: 65vw !important;
+    .blockish-tab-normal {
+        .components-tab-panel__tabs {
+            position: fixed;
+            top: 70px;
+            width: 100%;
+            z-index: 9999;
+            background: #ffffff;
+            left: 0;
+        }
+
+    }
+    
+    .blockish-fonts-library-header {
+        margin-top: 70px;
+    }
+    
+    .blockish-fonts-library-footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        z-index: 9999;
+        background: #ffffff;
+        left: 0;
+        height: 70px;
+        padding: 0 32px;
+    }
+
+    .blockish-font-item {
+        margin-top: 70px;
+        .blockish-font-item-header {
+            cursor: pointer;
+            &:hover {
+                color: #1677ff;
+
+                .blockish-font-item-name {
+                    color: #1677ff;
+                }
+            }
+        }
+
+        .blockish-font-item-checkbox {
+            .components-checkbox-control__input {
+                &:hover, &:focus {
+                    outline: none !important;
+                    box-shadow: none !important;
+                }
+            }
+        }
+
+        .blockish-font-item-font-variants{
+            .blockish-font-item-checkbox{
+                .components-h-stack{
+                    align-items: center;
+                }
+
+                .components-checkbox-control__label{
+                    display: flex;
+                    align-items: center;
+                }
+            }
+        }
+    }
+}
+
+.blockish-font-modal-installed-fonts {
+    margin-top: 70px;
+
+    .blockish-font-item {
+        margin-top: 0 !important;
+    }
+}

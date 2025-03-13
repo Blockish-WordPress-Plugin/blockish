@@ -20,6 +20,7 @@ import BlockishBackground from "./background";
 import BlockishBorder from "./border";
 import BlockishBorderRadius from "./border-radius";
 import BlockishBoxShadow from "./box-shadow";
+import BlockishFontFamily from "./font-family";
 
 if(window?.blockish?.screen) {
     window.blockish.components = {
@@ -43,6 +44,7 @@ if(window?.blockish?.screen) {
         BlockishBackground,
         BlockishBorder,
         BlockishBorderRadius,
-        BlockishBoxShadow
+        BlockishBoxShadow,
+        BlockishFontFamily
     }
 }

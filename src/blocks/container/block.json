@@ -213,6 +213,12 @@
 				"type": "BlockishBoxShadow",
 				"selector": ".{{WRAPPER}}:hover"
 			}
+		},
+		"fontFamily": {
+			"type": "object"
+		},
+		"fontWeight": {
+			"type": "string"
 		}
 	},
 	"supports": {

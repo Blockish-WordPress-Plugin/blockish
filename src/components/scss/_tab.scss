@@ -1,5 +1,5 @@
 .blockish-tab {
-    &.blockish-tab-top-level {
+    &.blockish-tab-top-level, &.blockish-tab-normal  {
         .blockish-tab-button {
             padding: 2px 10px 2px 30px;
             color: #000000e0;

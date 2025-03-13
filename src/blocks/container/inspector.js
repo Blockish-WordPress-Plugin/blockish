@@ -3,12 +3,16 @@ import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 
-const Inspector = ({ attributes, advancedControls, hasParent }) => {
+const Inspector = ({ attributes, advancedControls, hasParent, setAttributes }) => {
     const {
         BlockishControl,
         BlockishResponsiveControl,
         BlockishGroupControl
     } = window?.blockish?.controls;
+
+    const {
+        BlockishFontFamily
+    } = window?.blockish?.components;
 
     addFilter('blockish.advancedControl.width.exclude', 'blockish/container/exclude-width', (list) => {
         return list.add('blockish/container');
@@ -293,6 +297,12 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                                         }
                                     </BlockishControl>
                                     <BlockishControl type="BlockishPanelBody" title={__('Additional', 'blockish')} initialOpen={false}>
+                                        <BlockishFontFamily
+                                            value={attributes.fontFamily}
+                                            onChange={(newValue) => setAttributes({ fontFamily: newValue })}
+                                            weight={attributes.fontWeight}
+                                            onWeightChange={(newWeight) => setAttributes({ fontWeight: newWeight })}
+                                        />
                                         <BlockishControl
                                             type="BlockishSelect"
                                             label={__('Tag', 'blockish')}

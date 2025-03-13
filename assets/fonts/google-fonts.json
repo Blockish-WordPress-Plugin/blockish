@@ -1,0 +1,161 @@
+{
+    "fonts": [
+        {
+            "font_family_settings": {
+                "name": "Open Sans",
+                "fontFamily": "Open Sans, sans-serif",
+                "slug": "open-sans",
+                "preview": "assets/fonts/open-sans/preview.svg",
+                "fontFace": [
+                    {
+                        "fontFamily": "Open Sans",
+                        "fontStyle": "normal",
+                        "fontWeight": "400",
+                        "src": "assets/fonts/open-sans/400.woff2",
+                        "preview": "assets/fonts/open-sans/400.svg"
+                    },
+                    {
+                        "fontFamily": "Open Sans",
+                        "fontStyle": "normal",
+                        "fontWeight": "700",
+                        "src": "assets/fonts/open-sans/700.woff2",
+                        "preview": "assets/fonts/open-sans/700.svg"
+                    }
+                ]
+            },
+            "categories": ["sans-serif"]
+        },
+        {
+            "font_family_settings": {
+                "name": "Inter",
+                "fontFamily": "Inter, sans-serif",
+                "slug": "inter",
+                "preview": "assets/fonts/inter/preview.svg",
+                "fontFace": [
+                    {
+                        "fontFamily": "Inter",
+                        "fontStyle": "normal",
+                        "fontWeight": "400",
+                        "src": "assets/fonts/inter/400.woff2",
+                        "preview": "assets/fonts/inter/400.svg"
+                    },
+                    {
+                        "fontFamily": "Inter",
+                        "fontStyle": "normal",
+                        "fontWeight": "700",
+                        "src": "assets/fonts/inter/700.woff2",
+                        "preview": "assets/fonts/inter/700.svg"
+                    }
+                ]
+            },
+            "categories": ["sans-serif"]
+        },
+        {
+            "font_family_settings": {
+                "name": "Roboto",
+                "fontFamily": "Roboto, sans-serif",
+                "slug": "roboto",
+                "preview": "assets/fonts/roboto/preview.svg",
+                "fontFace": [
+                    {
+                        "fontFamily": "Roboto",
+                        "fontStyle": "normal",
+                        "fontWeight": "400",
+                        "src": "assets/fonts/roboto/400.woff2",
+                        "preview": "assets/fonts/roboto/400.svg"
+                    },
+                    {
+                        "fontFamily": "Roboto",
+                        "fontStyle": "normal",
+                        "fontWeight": "700",
+                        "src": "assets/fonts/roboto/700.woff2",
+                        "preview": "assets/fonts/roboto/700.svg"
+                    },
+                    {
+                        "fontFamily": "Roboto",
+                        "fontStyle": "normal",
+                        "fontWeight": "900",
+                        "src": "assets/fonts/roboto/900.woff2",
+                        "preview": "assets/fonts/roboto/900.svg"
+                    }
+                ]
+            },
+            "categories": ["sans-serif"]
+        },
+        {
+            "font_family_settings": {
+                "name": "Lato",
+                "fontFamily": "Lato, sans-serif",
+                "slug": "lato",
+                "preview": "assets/fonts/lato/preview.svg",
+                "fontFace": [
+                    {
+                        "fontFamily": "Lato",
+                        "fontStyle": "normal",
+                        "fontWeight": "400",
+                        "src": "assets/fonts/lato/400.woff2",
+                        "preview": "assets/fonts/lato/400.svg"
+                    },
+                    {
+                        "fontFamily": "Lato",
+                        "fontStyle": "normal",
+                        "fontWeight": "700",
+                        "src": "assets/fonts/lato/700.woff2",
+                        "preview": "assets/fonts/lato/700.svg"
+                    }
+                ]
+            },
+            "categories": ["sans-serif"]
+        },
+        {
+            "font_family_settings": {
+                "name": "Oswald",
+                "fontFamily": "Oswald, sans-serif",
+                "slug": "oswald",
+                "preview": "assets/fonts/oswald/preview.svg",
+                "fontFace": [
+                    {
+                        "fontFamily": "Oswald",
+                        "fontStyle": "normal",
+                        "fontWeight": "400",
+                        "src": "assets/fonts/oswald/400.woff2",
+                        "preview": "assets/fonts/oswald/400.svg"
+                    },
+                    {
+                        "fontFamily": "Oswald",
+                        "fontStyle": "normal",
+                        "fontWeight": "700",
+                        "src": "assets/fonts/oswald/700.woff2",
+                        "preview": "assets/fonts/oswald/700.svg"
+                    }
+                ]
+            },
+            "categories": ["sans-serif"]
+        },
+        {
+            "font_family_settings": {
+                "name": "Poppins",
+                "fontFamily": "Poppins, sans-serif",
+                "slug": "poppins",
+                "preview": "assets/fonts/poppins/preview.svg",
+                "fontFace": [
+                    {
+                        "fontFamily": "Poppins",
+                        "fontStyle": "normal",
+                        "fontWeight": "400",
+                        "src": "assets/fonts/poppins/400.woff2",
+                        "preview": "assets/fonts/poppins/400.svg"
+                    },
+                    {
+                        "fontFamily": "Poppins",
+                        "fontStyle": "normal",
+                        "fontWeight": "700",
+                        "src": "assets/fonts/poppins/700.woff2",
+                        "preview": "assets/fonts/poppins/700.svg"
+                    }
+                ]
+            },
+            "categories": ["sans-serif"]
+        }
+    ]
+}
