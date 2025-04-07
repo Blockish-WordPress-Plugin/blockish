@@ -1,0 +1,7 @@
+.wp-block-blockish-paragraph {
+    min-height: var(--container-min-height, 100%);
+    transition: all 0.3s ease;
+    .wp-block-blockish-paragraph{
+        width: 100%;
+    }
+}

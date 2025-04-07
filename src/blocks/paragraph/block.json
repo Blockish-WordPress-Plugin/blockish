@@ -1,0 +1,231 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/paragraph",
+	"version": "0.1.0",
+	"title": "Paragraph",
+	"category": "blockish-framework",
+	"description": "Paragraph block for Gutenberg.",
+	"example": {
+		"attributes": {
+			"preview": true
+		}
+	},
+	"attributes": {
+		"isVariationPicked": {
+			"type": "boolean",
+			"default": false
+		},
+		"tagName": {
+			"type": "object",
+			"default": {
+				"label": "Div",
+				"value": "div"
+			}
+		},
+		"containerWidth": {
+			"type": "string",
+			"default": "alignfull"
+		},
+		"customWidthContainer": {
+			"type": "object",
+			"default": {
+				"Desktop": "100%",
+				"Tablet": "100%",
+				"Mobile": "100%"
+			},
+			"selectors": {
+				".{{WRAPPER}}.align-custom-width": "max-width: {{VALUE}};"
+			}
+		},
+		"containerMinHeight": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--container-min-height: {{VALUE}};"
+			}
+		},
+		"display": {
+			"type": "string",
+			"default": "flex",
+			"selectors": {
+				".{{WRAPPER}}.blockish-container": "display: {{VALUE}};"
+			}
+		},
+		"flexWrap": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.blockish-container.layout-type-flex": "flex-wrap: {{VALUE}};"
+			}
+		},
+		"flexDirection": {
+			"type": "object",
+			"default": {
+				"Desktop": {
+					"label": "Row",
+					"value": "row"
+				}
+			},
+			"selectors": {
+				".{{WRAPPER}}.blockish-container.layout-type-flex": "flex-direction: {{VALUE}};"
+			}
+		},
+		"justifyContent": {
+			"type": "object",
+			"default": {
+				"Desktop": {
+					"label": "Center",
+					"value": "center"
+				},
+				"Tablet": {
+					"label": "Center",
+					"value": "center"
+				},
+				"Mobile": {
+					"label": "Center",
+					"value": "center"
+				}
+			},
+			"selectors": {
+				".{{WRAPPER}}.blockish-container.layout-type-flex": "justify-content: {{VALUE}};"
+			}
+		},
+		"alignItems": {
+			"type": "object",
+			"default": {
+				"Desktop": {
+					"label": "Center",
+					"value": "center"
+				},
+				"Tablet": {
+					"label": "Center",
+					"value": "center"
+				},
+				"Mobile": {
+					"label": "Center",
+					"value": "center"
+				}
+			},
+			"selectors": {
+				".{{WRAPPER}}.blockish-container.layout-type-flex": "align-items: {{VALUE}};"
+			}
+		},
+		"gridLayoutType": {
+			"type": "string",
+			"default": "auto"
+		},
+		"autoGridWidth": {
+			"type": "object",
+			"default": {
+				"Desktop": "12rem"
+			},
+			"selectors": {
+				".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-auto": "grid-template-columns: repeat(auto-fill,minmax(min({{VALUE}},100%),1fr));"
+			}
+		},
+		"autoGridHeight": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-auto": "grid-auto-rows: minmax({{VALUE}}, auto);"
+			}
+		},
+		"gridColumns": {
+			"type": "object",
+			"default": {
+				"Desktop": 3,
+				"Tablet": 2,
+				"Mobile": 1
+			},
+			"selectors": {
+				".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-fixed": "grid-template-columns: repeat({{VALUE}}, minmax(0, 1fr));"
+			}
+		},
+		"gridRows": {
+			"type": "object",
+			"default": {
+				"Desktop": 1
+			},
+			"selectors": {
+				".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-fixed": "grid-template-rows: repeat({{VALUE}}, minmax(0, 1fr));"
+			}
+		},
+		"columnGap": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.blockish-container": "column-gap: {{VALUE}};"
+			}
+		},
+		"rowGap": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.blockish-container": "row-gap: {{VALUE}};"
+			}
+		},
+		"containerBackground": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}}"
+			}
+		},
+		"containerHoverBackground": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}}:hover"
+			}
+		},
+		"containerBorder": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}}"
+			}
+		},
+		"containerHoverBorder": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}}:hover"
+			}
+		},
+		"containerBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"containerHoverBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}:hover": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"containerBoxShadow": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}}"
+			}
+		},
+		"containerHoverBoxShadow": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}}:hover"
+			}
+		}
+	},
+	"supports": {
+		"html": true,
+		"anchor": true
+	},
+	"providesContext": {
+		"display": "display"
+	},
+	"usesContext": [ "display" ],
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js"
+}
