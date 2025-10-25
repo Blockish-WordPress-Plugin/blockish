@@ -13,6 +13,7 @@ const BlockishToggleGroup = ({ label = '', value, onChange, options = [], itemPr
                 __nextHasNoMarginBottom={true}
                 onChange={onChange}
                 isDeselectable={isDeselectable}
+                __next40pxDefaultSize={true}
                 {...props}
             >
                 {

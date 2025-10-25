@@ -7,6 +7,7 @@ const BlockishRangeControl = ({ label = 'Range', value, onChange, ...props }) =>
                 label={label}
                 value={value}
                 onChange={onChange}
+                __next40pxDefaultSize={true}
                 {...props}
             />
         </div>

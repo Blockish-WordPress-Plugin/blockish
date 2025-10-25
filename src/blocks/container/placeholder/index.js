@@ -19,6 +19,7 @@ const Placeholder = (props) => {
                 icon={close} 
                 className="blockish-container-placeholder-close"
                 onClick={() => removeBlock(clientId)}
+                label={__("Close", "gutenkit-blocks-addon")}
             />
             <BlockVariationPicker
                 icon={group}

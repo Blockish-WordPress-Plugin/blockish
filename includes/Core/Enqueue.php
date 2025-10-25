@@ -37,6 +37,14 @@ class Enqueue {
             BLOCKISH_VERSION
         );
 
+        wp_localize_script(
+            'blockish-components',
+            'blockishComponentsUtils',
+            array(
+                'isDev' => defined('SCRIPT_DEBUG') && SCRIPT_DEBUG
+            )
+        );
+
         $this->register_and_enqueue_script(
             'blockish-controls',
             BLOCKISH_URL . 'build/controls/index.js',
