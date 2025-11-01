@@ -1,6 +1,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, memo, useMemo } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
+import clsx from 'clsx';
 
 const BlockishResponsiveControl = ({ type = "TextControl", slug, label = "", value: userDefinedValue, onChange: userDefinedOnChange, selectors = {}, left, ...props }) => {
     const Component = window?.blockish?.components?.[type];
@@ -27,7 +28,7 @@ const BlockishResponsiveControl = ({ type = "TextControl", slug, label = "", val
             attrType: attrs?.type
         };
     }, []);
-    
+
     const device = useDeviceType();
 
     const onChange = useCallback(value => {
@@ -63,6 +64,7 @@ const BlockishResponsiveControl = ({ type = "TextControl", slug, label = "", val
                 label={label || "Write your label here"}
                 value={controlValue?.[device]}
                 onChange={handleChange}
+                __next40pxDefaultSize={true}
                 {...props}
             />
         </BlockishResponsive>

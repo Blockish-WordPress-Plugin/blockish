@@ -1,0 +1,19 @@
+.blockish-dropdown {
+    width: 100%;
+
+    button {
+        width: inherit;
+
+        svg{
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+.blockish-dropdown-content{
+    .components-popover__content{
+        min-width: 280px;
+        max-width: 350px;
+    }
+}

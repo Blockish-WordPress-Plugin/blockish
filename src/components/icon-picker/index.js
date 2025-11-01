@@ -140,6 +140,7 @@ const BlockishIconPicker = ({ label, value, onChange }) => {
                                 }}
                                 className="blockish-icon-picker-insert-btn"
                                 aria-label={__('insert icon and Close icon library', 'blockish')}
+                                disabled={!selectedIcon}
                             >
                                 {__('Insert', 'blockish')}
                             </Button>

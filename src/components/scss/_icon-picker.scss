@@ -260,11 +260,11 @@
                     color: #fff !important;
                 }
 
-                /* &.active {
-                    background: #000000;
-                    border-color: #000000;
-                    cursor: pointer;
-                } */
+                &[disabled] {
+                    opacity: .5;
+                    pointer-events: none;
+                    cursor: not-allowed;
+                }
             }
         }
     }

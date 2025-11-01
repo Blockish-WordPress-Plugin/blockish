@@ -1,19 +1,77 @@
-.blockish-link-control{
-    .block-editor-link-control__field{
-        padding: 0 !important;
-        margin: 0 !important;
-    }
+.blockish-link {
+    position: relative;
 
-    .block-editor-link-control{
-        min-width: 0 !important;
+    .blockish-link-settings-button {
+        min-width: 0;
+        min-height: 0;
+        border: 1px solid #333;
+        padding: 0;
+        height: 40px;
+        border-left: 0;
+        border-radius: 0;
 
-        .block-editor-url-input{
-            min-width: 0 !important;
+        &:focus {
+            outline: none !important;
+            box-shadow: none !important;
         }
 
-        .block-editor-link-control__search-results-wrapper{
-            margin-block-start: 20px !important;
-            background-color: #f4f4f4 !important;
+        span {
+            transition: transform .5s ease;
+            transform: rotate(0deg);
+        }
+
+        &.is-active {
+            span {
+                transition: transform .5s ease;
+                transform: rotate(360deg);
+            }
+        }
+    }
+
+    .blockish-link-input-wrapper {
+        position: relative;
+
+        .blockish-link-spinner {
+            position: absolute;
+            right: -3px;
+            top: 3px;
+        }
+
+        .blockish-link-input {
+            margin-bottom: 0;
+
+            &:focus {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+
+    .blockish-link-suggestions {
+        position: absolute;
+        background: #f7f7f7;
+        z-index: 9999;
+        width: 100%;
+        transform: translateY(-15px);
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+
+        .blockish-link-suggestion{
+            width: 100%;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #e7e7e7;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+    }
+
+    .blockish-link-settings{
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out;
+        &.is-opened{
+            max-height: 250px;
+            transition: max-height 0.4s ease-in;
         }
     }
 }

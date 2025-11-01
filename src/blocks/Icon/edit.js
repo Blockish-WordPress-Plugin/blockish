@@ -4,14 +4,19 @@ import './editor.scss';
 import Inspector from './inspector';
 
 export default function Edit({ attributes, advancedControls }) {
-	const { BlockishIcon } = window.blockish.helpers;
-	const blockProps = useBlockProps();
+	const { BlockishIcon, getLinkProps } = window.blockish.helpers;
+	const linkAttributes = getLinkProps(attributes.link);
+	const Tag = linkAttributes?.href ? 'a' : 'div';
+	const blockProps = useBlockProps({
+		className: 'blockish-icon',
+		...linkAttributes
+	});
 	return (
 		<>
 			<Inspector attributes={attributes} advancedControls={advancedControls} />
-			<div {...blockProps}>
-				<BlockishIcon icon={attributes.icon} width={24} height={24} />
-			</div>
+			<Tag {...blockProps}>
+				<BlockishIcon icon={attributes.icon} width={24} height={24} fill="currentColor" />
+			</Tag>
 		</>
 	)
 }

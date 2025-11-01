@@ -26,6 +26,35 @@
 		},
 		"link": {
 			"type": "object"
+		},
+		"alignment": {
+			"type": "object",
+			"default": {
+				"Desktop": "center",
+				"Tablet": "center",
+				"Mobile": "center"
+			},
+			"selectors": {
+				".{{WRAPPER}}": "text-align: {{VALUE}};"
+			}
+		},
+		"size": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} svg": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"color": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} svg": "fill: {{VALUE}};"
+			}
+		},
+		"hoverColor": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} svg:hover": "fill: {{VALUE}};"
+			}
 		}
 	},
 	"supports": {

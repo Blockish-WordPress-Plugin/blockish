@@ -51,6 +51,15 @@ const BlockishBackground = ({ value, onChange, label = __('Background', 'blockis
                     <ToolsPanel
                         label={__('Background Controls', 'blockish')}
                         resetAll={() => onChange('')}
+                        __experimentalFirstVisibleItemClass="first"
+                        __experimentalLastVisibleItemClass="last"
+                        dropdownMenuProps={{
+                            popoverProps: {
+                                placement: 'left-center',
+                                shift: true,
+                                offset: 230
+                            }
+                        }}
                     >
                         <ToolsPanelItem
                             label={__('Color', 'blockish')}

@@ -1,4 +1,4 @@
-import { TextControl, Button, CheckboxControl, Spinner, BaseControl } from '@wordpress/components';
+import { TextControl, Button, CheckboxControl, Spinner, BaseControl, Flex, FlexItem, FlexBlock } from '@wordpress/components';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import apifetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 const BlockishLink = ({ value, onChange, label, help = '' }) => {
     const [searchInput, setSearchInput] = useState(value?.url || '')
     const [searchResultSuggestion, setSearchResultSuggestion] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     let urlObject = {
         ...value,
         url: value?.url || '',
@@ -109,23 +109,27 @@ const BlockishLink = ({ value, onChange, label, help = '' }) => {
 
     return (
         <div className="blockish-control blockish-link" ref={blockishLinkRef}>
-            <BaseControl label={label || __('Link', 'blockish')} help={help}>
-                <div className="blockish-link-input-wrapper">
-                    <TextControl
-                        __nextHasNoMarginBottom
-                        placeholder="https://www.example.com"
-                        type='url'
-                        className='blockish-link-input'
-                        id='blockish-link-input'
-                        autoComplete='off'
-                        onChange={handleSearchInput}
-                        help={help}
-                        disabled={isDisabled}
-                        value={searchInput || value?.url || ''}
-                    />
-                    <Button className="blockish-link-settings-button" icon={'admin-generic'} onClick={handleSettingsButton} />
-                    {isLoading ? <Spinner className='blockish-link-spinner' /> : null}
-                </div>
+            <BaseControl label={label || __('Link', 'blockish')} help={help} __nextHasNoMarginBottom>
+                <Flex gap={0}>
+                    <FlexBlock className='blockish-link-input-wrapper'>
+                        <TextControl
+                            __next40pxDefaultSize
+                            __nextHasNoMarginBottom
+                            placeholder="https://www.example.com"
+                            type='url'
+                            className='blockish-link-input'
+                            id='blockish-link-input'
+                            autoComplete='off'
+                            onChange={handleSearchInput}
+                            help={help}
+                            value={searchInput || value?.url || ''}
+                        />
+                        {isLoading ? <Spinner className='blockish-link-spinner' /> : null}
+                    </FlexBlock>
+                    <FlexItem>
+                        <Button className="blockish-link-settings-button" icon={'admin-generic'} onClick={handleSettingsButton} />
+                    </FlexItem>
+                </Flex>
             </BaseControl>
             {
                 searchResultSuggestion.length && searchInput && searchInput.length > 1 ? (
@@ -171,6 +175,7 @@ const BlockishLink = ({ value, onChange, label, help = '' }) => {
                 />
                 <TextControl
                     __nextHasNoMarginBottom
+                    __next40pxDefaultSize
                     className='blockish-link-settings-custom-attributes'
                     label={__('Custom Attributes', 'blockish')}
                     value={urlObject?.customAttributes}

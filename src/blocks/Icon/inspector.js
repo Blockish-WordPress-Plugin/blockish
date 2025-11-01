@@ -35,16 +35,27 @@ const Inspector = ({ attributes, advancedControls }) => {
                         {
                             tabName === 'content' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Icon', 'blockish')}>
-                                        <BlockishControl 
-                                            type="BlockishIconPicker" 
+                                    <BlockishControl type="BlockishPanelBody" title={__('Icon', 'blockish')} initialOpen={true}>
+                                        <BlockishControl
+                                            type="BlockishIconPicker"
                                             label={__('Icon', 'blockish')}
                                             slug="icon"
                                         />
-                                        <BlockishControl 
-                                            type="BlockishLink" 
+                                        <BlockishControl
+                                            type="BlockishLink"
                                             label={__('Link', 'blockish')}
                                             slug="link"
+                                        />
+                                        <BlockishResponsiveControl
+                                            type="BlockishToggleGroup"
+                                            label={__('Alignment', 'blockish')}
+                                            slug="alignment"
+                                            left="65px"
+                                            options={[
+                                                { value: 'left', label: __('Left', 'blockish') },
+                                                { value: 'center', label: __('Center', 'blockish') },
+                                                { value: 'right', label: __('Right', 'blockish') },
+                                            ]}
                                         />
                                     </BlockishControl>
                                 </>
@@ -53,8 +64,68 @@ const Inspector = ({ attributes, advancedControls }) => {
                         {
                             tabName === 'style' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Background', 'blockish')}>
-                                        
+                                    <BlockishControl type="BlockishPanelBody" title={__('Icon', 'blockish')} initialOpen={true}>
+                                        <BlockishResponsiveControl
+                                            type="BlockishRangeUnit"
+                                            label={__('Size', 'blockish')}
+                                            slug="size"
+                                            left="25px"
+                                            units={{
+                                                "px": {
+                                                    min: 0,
+                                                    max: 200
+                                                },
+                                                "rem": {
+                                                    min: 0,
+                                                    max: 50
+                                                },
+                                                "em": {
+                                                    min: 0,
+                                                    max: 50
+                                                },
+                                            }}
+                                        />
+
+                                        <BlockishControl
+                                            type="BlockishTab"
+                                            tabs={[
+                                                {
+                                                    name: 'icon-normal',
+                                                    title: 'Normal'
+                                                },
+                                                {
+                                                    name: 'icon-hover',
+                                                    title: 'Hover'
+                                                }
+                                            ]}
+                                        >
+                                            {({ name }) => (
+                                                <>
+                                                    {
+                                                        name === 'icon-normal' && (
+                                                            <>
+                                                                <BlockishControl
+                                                                    type="BlockishColor"
+                                                                    label={__('Color', 'blockish')}
+                                                                    slug="color"
+                                                                />
+                                                            </>
+                                                        )
+                                                    }
+                                                    {
+                                                        name === 'icon-hover' && (
+                                                            <>
+                                                                <BlockishControl
+                                                                    type="BlockishColor"
+                                                                    label={__('Hover Color', 'blockish')}
+                                                                    slug="hoverColor"
+                                                                />
+                                                            </>
+                                                        )
+                                                    }
+                                                </>
+                                            )}
+                                        </BlockishControl>
                                     </BlockishControl>
                                 </>
                             )

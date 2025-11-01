@@ -6,14 +6,19 @@ const replaceCssPlaceholders = (value, attribute) => {
                 case '{{VALUE}}':
                     let attrbuteValue = '';
                     if (attribute && (typeof attribute === 'string' || typeof attribute === 'number')) {
-                        attrbuteValue = attribute;
+                        if(typeof attribute === 'string' && attribute?.includes('--wp--preset--')) {
+                            let value = attribute.split('|');
+                            attrbuteValue = value.length > 1 ? `var(${value[0]}, ${value[1]})` : attribute;
+                        } else {
+                            attrbuteValue = attribute;
+                        }
                     }
 
                     if (attribute && typeof attribute === 'object' && attribute?.value && typeof attribute.value === 'string') {
                         attrbuteValue = attribute.value;
                     }
 
-                    value = value.replace(placeholder, attrbuteValue ?? '');
+                    value = value.replaceAll(placeholder, attrbuteValue ?? '');
                     break;
                 case '{{TOP}}':
                     let topValue = '0';

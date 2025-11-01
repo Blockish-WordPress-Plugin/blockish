@@ -39,7 +39,7 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                         {
                             tabName === 'layout' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Layout', 'blockish')}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Layout', 'blockish')} initialOpen={true}>
                                         {
                                             !hasParent && (
                                                 <BlockishControl
@@ -356,7 +356,7 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                         {
                             tabName === 'style' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Background', 'blockish')}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Background', 'blockish')} initialOpen={true}>
                                         <BlockishControl
                                             type="BlockishTab"
                                             tabs={[
