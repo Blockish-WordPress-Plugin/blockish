@@ -238,12 +238,14 @@
             left: 0;
             padding: 15px 0;
             position: absolute;
-            text-align: right;
             width: 100%;
             z-index: 999999;
             padding: 16px 0 !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
 
-            .blockish-icon-picker-insert-btn {
+            .blockish-icon-picker-footer-btn {
                 background: #0a0a0a;
                 border: 1px solid #0a0a0a;
                 border-radius: 4px;

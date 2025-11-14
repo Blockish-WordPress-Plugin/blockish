@@ -1,6 +1,6 @@
 import { BaseControl, Button, Modal } from '@wordpress/components';
 import clsx from 'clsx';
-import { trash } from '@wordpress/icons';
+import { trash, upload } from '@wordpress/icons';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useProgressiveJSON } from './use-progressive-fethcher';
@@ -103,11 +103,6 @@ const BlockishIconPicker = ({ label, value, onChange }) => {
                         >
                             {__('Icon Library', 'blockish')}
                         </Button>
-                        <Button
-                            aria-label={__('Upload your own SVG icon', 'blockish')}
-                        >
-                            {__('Upload SVG', 'blockish')}
-                        </Button>
                     </div>
                 </div>
             </BaseControl>
@@ -138,7 +133,21 @@ const BlockishIconPicker = ({ label, value, onChange }) => {
                                     setSearch('');
                                     setOpenLibrary(false);
                                 }}
-                                className="blockish-icon-picker-insert-btn"
+                                className="blockish-icon-picker-footer-btn"
+                                aria-label={__('Upload icon and Close icon library', 'blockish')}
+                                icon={upload}
+                            >
+                                {__('Upload', 'blockish')}
+                            </Button>
+
+                            <Button
+                                onClick={() => {
+                                    onChange(selectedIcon?.icon);
+                                    setCategory('all');
+                                    setSearch('');
+                                    setOpenLibrary(false);
+                                }}
+                                className="blockish-icon-picker-footer-btn"
                                 aria-label={__('insert icon and Close icon library', 'blockish')}
                                 disabled={!selectedIcon}
                             >
