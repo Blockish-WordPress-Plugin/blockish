@@ -40,10 +40,17 @@ class Blocks
             return $metadata;
         }
 
-        $global_attributes = Utilities::get_global_attributes();
+        $global_metadata = Utilities::get_global_metadata();
 
-        if (!empty($global_attributes)) {
-            $metadata['attributes'] = array_merge($metadata['attributes'], $global_attributes);
+        if (!empty($global_metadata['attributes'])) {
+            $metadata['attributes'] = array_merge($metadata['attributes'], $global_metadata['attributes']);
+        }
+        
+        if (!empty($global_metadata['usesContext'])) {
+            if (!isset($metadata['usesContext'])) {
+                $metadata['usesContext'] = [];
+            }
+            $metadata['usesContext'] = array_unique(array_merge($metadata['usesContext'], $global_metadata['usesContext']));
         }
 
         return $metadata;

@@ -180,7 +180,12 @@ class Utilities
                         case '{{VALUE}}':
                             $attribute_value = '';
                             if ($attribute && (is_string($attribute) || is_numeric($attribute))) {
-                                $attribute_value = $attribute;
+                                if (strpos($attribute, '--wp--preset--') !== false) {
+                                    $css_var = explode('|', $attribute);
+                                    $attribute_value = count($css_var) > 1 ? 'var(' . $css_var[0] . ', ' . $css_var[1] . ')' : $attribute;
+                                } else {
+                                    $attribute_value = $attribute;
+                                }
                             }
 
                             if ($attribute && is_array($attribute) && !empty($attribute['value']) && is_string($attribute['value'])) {
@@ -336,7 +341,7 @@ class Utilities
         return trim($css);
     }
 
-    public static function get_global_attributes()
+    public static function get_global_metadata()
     {
         self::get_filesystem();
 
@@ -356,11 +361,7 @@ class Utilities
 
         $decoded_metadata = json_decode($metadata, true);
 
-        if (empty($decoded_metadata['attributes'])) {
-            return [];
-        }
-
-        return $decoded_metadata['attributes'];
+        return empty($decoded_metadata) ? [] : $decoded_metadata;
     }
 
     public static function get_device_list()

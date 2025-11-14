@@ -16,6 +16,9 @@ import useDeviceType from "./use-device-type";
 import useGenerateStyles from "./use-generate-style";
 import useInheritResponsiveValue from "./use-inherit-responsive-value";
 import generateBoxShadowControlStyles from "./generate-box-shadow-control-styles";
+import useScrollIntoView from "./use-scroll-into-view";
+import BlockishIcon from "./icon";
+import getLinkProps from "./get-link-props";
 
 if( window?.blockish?.screen ){
     window.blockish.helpers = {
@@ -36,6 +39,9 @@ if( window?.blockish?.screen ){
         useInheritResponsiveValue,
         generateBackgroundControlStyles,
         generateBorderControlStyles,
-        generateBoxShadowControlStyles
+        generateBoxShadowControlStyles,
+        useScrollIntoView,
+        BlockishIcon,
+        getLinkProps,
     }
 }

@@ -33,6 +33,11 @@ class BlocksList extends ConfigList {
                 'package' => 'free',
                 'status'  => 'active',
             ),
+            'icon' => array(
+                'name'    => 'Icon',
+                'package' => 'free',
+                'status'  => 'active',
+            ),
         );
     }
 }

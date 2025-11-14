@@ -1,4 +1,5 @@
 import { PanelBody } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * BlockishPanelBody Component
@@ -12,9 +13,9 @@ import { PanelBody } from '@wordpress/components';
  */
 const BlockishPanelBody = ({ title = 'Blockish Panel Body', children, ...props }) => {
     return (
-        <PanelBody title={title} {...props}>
+        <PanelBody title={title} initialOpen={props?.initialOpen || false} {...props}>
             <div className="blockish-panel-body-content">
-                {children ? children : <p>Add your content here.</p>}
+                {children ? children : <p>{__( 'Add your content here.', 'blockish' )}</p>}
             </div>
         </PanelBody>
     );

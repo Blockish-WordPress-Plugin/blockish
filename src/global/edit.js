@@ -6,12 +6,12 @@ import Layout from './components/layout';
 import Width from './components/width';
 import * as previews from './preview';
 import Position from './components/position';
+import Flex from './components/flex';
 
 const BlockishBlocksAdvancedControls = createHigherOrderComponent(
     (BlockEdit) =>
         memo((props) => {
             if (props?.name?.includes('blockish/')) {
-
                 // Preview mode
                 if (props?.attributes?.preview) {
                     const { blockNameCamelcase } = window?.blockish?.helpers;
@@ -31,6 +31,11 @@ const BlockishBlocksAdvancedControls = createHigherOrderComponent(
                             <Layout {...props} />
                             <Width {...props} />
                             <Position {...props} />
+                            {
+                                props?.context?.hasOwnProperty('display') && props?.context?.display === 'flex' && (
+                                    <Flex {...props} />
+                                )
+                            }
                         </>
                     )
                 };

@@ -138,7 +138,8 @@ class StyleGenerator
         $name = str_replace('blockish/', '', $block_data['blockName']);
         $metadata = \Blockish\Core\Utilities::get_block_metadata($name);
         $block_meta_attributes = $metadata['attributes'] ?? [];
-        $meta_attributes = array_merge($block_meta_attributes, Utilities::get_global_attributes());
+        $global_meta_attributes = Utilities::get_global_metadata()['attributes'] ?? [];
+        $meta_attributes = array_merge($block_meta_attributes, $global_meta_attributes);
         $default_attributes = $this->get_block_default_attributes($meta_attributes);
         $attributes = wp_parse_args($block_data['attrs'], $default_attributes);
         $breakpoints = Utilities::get_device_list();

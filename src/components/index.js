@@ -20,6 +20,10 @@ import BlockishBackground from "./background";
 import BlockishBorder from "./border";
 import BlockishBorderRadius from "./border-radius";
 import BlockishBoxShadow from "./box-shadow";
+import BlockishIconPicker from "./icon-picker";
+import BlockishLink from "./link";
+import BlockishNumber from "./number";
+import BlockishDropdown from "./dropdown";
 
 if(window?.blockish?.screen) {
     window.blockish.components = {
@@ -43,6 +47,10 @@ if(window?.blockish?.screen) {
         BlockishBackground,
         BlockishBorder,
         BlockishBorderRadius,
-        BlockishBoxShadow
+        BlockishBoxShadow,
+        BlockishIconPicker,
+        BlockishLink,
+        BlockishNumber,
+        BlockishDropdown
     }
 }

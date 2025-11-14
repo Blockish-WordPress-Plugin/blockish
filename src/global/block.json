@@ -132,10 +132,65 @@
 				]
 			}
 		},
+		"alignSelf": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "align-self: {{VALUE}};"
+			}
+		},
+		"flexOrder": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "order: {{VALUE}};"
+			},
+			"condition": {
+				"rules": [
+					{
+						"condition": "!=",
+						"key": "flexOrder",
+						"value": "custom"
+					}
+				]
+			}
+		},
+		"flexCustomOrder": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "order: {{VALUE}};"
+			},
+			"condition": {
+				"rules": [
+					{
+						"condition": "==",
+						"key": "flexOrder",
+						"value": "custom"
+					}
+				]
+			}
+		},
+		"flexGrow": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "flex-grow: {{VALUE}};"
+			}
+		},
+		"flexShrink": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "flex-shrink: {{VALUE}};"
+			}
+		},
+		"transformRotation": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}.wp-block": "transform: rotate({{VALUE}}deg);"
+			}
+		},
 		"preview": {
 			"type": "boolean",
 			"default": false
 		}
 	},
+	"usesContext": [ "display" ],
 	"editorScript": "file:./index.js"
 }
