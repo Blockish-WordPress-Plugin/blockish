@@ -30,7 +30,7 @@ class StyleGenerator
         add_action('trash_post', [$this, 'delete_cache_on_save']); // Fires when moving a post to trash  
         add_action('untrash_post', [$this, 'delete_cache_on_save']); // Fires when restoring from trash  
         add_action('delete_attachment', [$this, 'delete_cache_on_save']); // Fires when an attachment is permanently deleted  
-        add_action('update_option_permalink_structure', [$this, 'delete_cache_on_save']); // Fires when permalink structure changes  
+        add_action('update_option_permalink_structure', [$this, 'delete_cache_on_save']); // Fires when permalink structure changes
     }
 
     public function delete_cache_on_save($post_id)

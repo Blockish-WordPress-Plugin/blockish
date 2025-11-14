@@ -16,10 +16,10 @@
 		"make-pot": "npx @wp-blocks/make-pot --exclude=node_modules,build,vendor,assets,src"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^30.10.0"
+		"@wordpress/scripts": "^30.26.0"
 	},
 	"dependencies": {
-		"@wordpress/icons": "^10.17.0",
+		"@wordpress/icons": "^11.0.0",
 		"clsx": "^2.1.1",
 		"react-select": "^5.8.3"
 	}

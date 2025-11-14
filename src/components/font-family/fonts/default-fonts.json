@@ -1,0 +1,774 @@
+[
+    {
+        "label": "DM Sans",
+        "value": "DM Sans",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Inter",
+        "value": "Inter",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "100",
+                "value": "100"
+            },
+            {
+                "label": "200",
+                "value": "200"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Space Mono",
+        "value": "Space Mono",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Space Grotesk",
+        "value": "Space Grotesk",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Work Sans",
+        "value": "Work Sans",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "100",
+                "value": "100"
+            },
+            {
+                "label": "200",
+                "value": "200"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Syne",
+        "value": "Syne",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Libre Franklin",
+        "value": "Libre Franklin",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "100",
+                "value": "100"
+            },
+            {
+                "label": "200",
+                "value": "200"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Cormorant",
+        "value": "Cormorant",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Fira Sans",
+        "value": "Fira Sans",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "100",
+                "value": "100"
+            },
+            {
+                "label": "200",
+                "value": "200"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Eczar",
+        "value": "Eczar",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Alegreya Sans",
+        "value": "Alegreya Sans",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "100",
+                "value": "100"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Source Sans Pro",
+        "value": "Source Sans Pro",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "200",
+                "value": "200"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Source Serif Pro",
+        "value": "Source Serif Pro",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "200",
+                "value": "200"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Roboto",
+        "value": "Roboto",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "100",
+                "value": "100"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Inknut Antiqua",
+        "value": "Inknut Antiqua",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Poppins",
+        "value": "Poppins",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "100",
+                "value": "100"
+            },
+            {
+                "label": "200",
+                "value": "200"
+            },
+            {
+                "label": "300",
+                "value": "300"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Archivo",
+        "value": "Archivo",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    },
+    {
+        "label": "Playfair Display",
+        "value": "Playfair Display",
+        "variants": [
+            {
+                "label": "Default",
+                "value": "normal"
+            },
+            {
+                "label": "400",
+                "value": "400"
+            },
+            {
+                "label": "500",
+                "value": "500"
+            },
+            {
+                "label": "600",
+                "value": "600"
+            },
+            {
+                "label": "700",
+                "value": "700"
+            },
+            {
+                "label": "800",
+                "value": "800"
+            },
+            {
+                "label": "900",
+                "value": "900"
+            },
+            {
+                "label": "Initial",
+                "value": "initial"
+            },
+            {
+                "label": "Inherit",
+                "value": "inherit"
+            }
+        ]
+    }
+]
