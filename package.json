@@ -21,6 +21,7 @@
 	"dependencies": {
 		"@wordpress/icons": "^11.0.0",
 		"clsx": "^2.1.1",
+		"html-react-parser": "^5.2.10",
 		"react-select": "^5.8.3"
 	}
 }

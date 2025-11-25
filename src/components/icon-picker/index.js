@@ -1,15 +1,47 @@
-import { BaseControl, Button, Modal } from '@wordpress/components';
+import { BaseControl, Button, Modal, FormFileUpload } from '@wordpress/components';
 import clsx from 'clsx';
 import { trash, upload } from '@wordpress/icons';
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useProgressiveJSON } from './use-progressive-fethcher';
 import ModalBody from './modal-body';
+import { useCustomSVGIcons } from './use-custom-svg-icons';
+import parse from "html-react-parser";
+import cleanMarkup from './clean-markup';
 
 const BlockishIconPicker = ({ label, value, onChange }) => {
     const [openLibrary, setOpenLibrary] = useState(false);
     const [category, setCategory] = useState('all');
     const [search, setSearch] = useState('');
+    const { createNotice } = useDispatch(noticesStore);
+
+    // Debounced values
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [debouncedCategory, setDebouncedCategory] = useState('all');
+
+    const {
+        icons: customIcons = [],
+        createIcon,
+        deleteIcon,
+    } = useCustomSVGIcons();
+
+    // Debounce: search
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 300);
+        return () => clearTimeout(timeout);
+    }, [search]);
+
+    // Debounce: category
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setDebouncedCategory(category);
+        }, 200);
+        return () => clearTimeout(timeout);
+    }, [category]);
 
     const solidIcons = useProgressiveJSON(
         new URL('./font-awesome/solid.json', import.meta.url).href,
@@ -28,64 +60,108 @@ const BlockishIconPicker = ({ label, value, onChange }) => {
     );
 
     const icons = useMemo(() => {
-        const allIcons = [...solidIcons, ...regularIcons, ...brandIcons];
+        const allIcons = [...customIcons, ...solidIcons, ...regularIcons, ...brandIcons];
 
         return allIcons.filter((icon) => {
-            // Check search against label and terms
             const matchesSearch =
-                !search ||
-                icon.label.toLowerCase().includes(search.toLowerCase()) ||
+                !debouncedSearch ||
+                icon.label.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
                 icon.terms?.some((term) =>
-                    term.toLowerCase().includes(search.toLowerCase())
+                    term.toLowerCase().includes(debouncedSearch.toLowerCase())
                 );
 
-            // Check category
             const matchesCategory =
-                category === 'all' || icon.category === category;
+                debouncedCategory === 'all' || icon.category === debouncedCategory;
 
             return matchesSearch && matchesCategory;
         });
-    }, [solidIcons, regularIcons, brandIcons, search, category]);
+    }, [
+        solidIcons,
+        regularIcons,
+        brandIcons,
+        debouncedSearch,
+        debouncedCategory,
+        customIcons
+    ]);
 
     const [selectedIcon, setSelectedIcon] = useState();
 
+    const uploadFile = async (e) => {
+        const file = e.target.files[0];
+        try {
+            const response = await createIcon(file);
+            createNotice(
+                'success',
+                response.message,
+                {
+                    type: 'snackbar',
+                    isDismissible: true,
+                    explicitDismiss: true
+                }
+            );
+
+            setCategory('custom');
+            setSelectedIcon(response.data);
+        } catch (err) {
+            createNotice(
+                'error',
+                __('Icon upload failed', 'blockish'),
+                {
+                    type: 'snackbar',
+                    isDismissible: true,
+                    explicitDismiss: true
+                }
+            );
+        }
+
+    };
+
     return (
         <div className="blockish-icon-picker blockish-control">
-            <BaseControl
-                label={label}
-                __nextHasNoMarginBottom={true}
-            >
+            <BaseControl label={label} __nextHasNoMarginBottom={true}>
                 <div
                     className="blockish-icon-picker-preview"
                     role="group"
                     aria-labelledby="blockish-icon-picker-group-label"
                 >
-                    <span id="blockish-icon-picker-group-label" className="screen-reader-text">
+                    <span
+                        id="blockish-icon-picker-group-label"
+                        className="screen-reader-text"
+                    >
                         {__('Icon selection controls', 'blockish')}
                     </span>
-                    {
-                        !!value && (
-                            <Button
-                                className="blockish-icon-picker-preview-remove"
-                                aria-label={__('Remove selected icon', 'blockish')}
-                                onClick={() => {
-                                    onChange(null);
-                                }}
-                                icon={trash}
-                            />
-                        )
-                    }
-                    <div className={clsx('blockish-icon-picker-preview-icon', { 'has-preview-icon': !!value })}>
+                    {!!value && (
+                        <Button
+                            className="blockish-icon-picker-preview-remove"
+                            aria-label={__('Remove selected icon', 'blockish')}
+                            onClick={() => {
+                                onChange(null);
+                            }}
+                            icon={trash}
+                        />
+                    )}
+                    <div
+                        className={clsx(
+                            'blockish-icon-picker-preview-icon',
+                            { 'has-preview-icon': !!value }
+                        )}
+                    >
                         <Button
                             className="blockish-icon-picker-preview-icon-button"
                             aria-label={__('Preview current icon', 'blockish')}
                         >
+                            {!!value?.path && value?.viewBox != 'custom' && (
+                                <svg
+                                    viewBox={value?.viewBox?.join(' ')}
+                                    height={value?.viewBox?.[3]}
+                                    width={value?.viewBox?.[2]}
+                                >
+                                    <path d={value?.path} />
+                                </svg>
+                            )}
+
                             {
-                                !!value?.path && (
-                                    <svg viewBox={value?.viewBox?.join(' ')} height={value?.viewBox?.[3]} width={value?.viewBox?.[2]}>
-                                        <path d={value?.path} />
-                                    </svg>
-                                )
+                                !!value?.path && value?.viewBox == 'custom' && parse(cleanMarkup(value?.svg))
                             }
                         </Button>
                     </div>
@@ -106,57 +182,57 @@ const BlockishIconPicker = ({ label, value, onChange }) => {
                     </div>
                 </div>
             </BaseControl>
-            {
-                openLibrary && (
-                    <Modal
-                        onRequestClose={() => setOpenLibrary(false)}
-                        size='fill'
-                        className="blockish-icon-picker-modal"
-                        overlayClassName="blockish-icon-picker-modal-overlay"
-                        title={__('Icon Library', 'blockish')}
-                    >
-                        <ModalBody
-                            icons={icons}
-                            selectedIcon={selectedIcon}
-                            category={category}
-                            setCategory={setCategory}
-                            search={search}
-                            setSearch={setSearch}
-                            setSelectedIcon={setSelectedIcon}
-                            value={value}
-                        />
-                        <div className="blockish-icon-picker-modal-footer">
-                            <Button
-                                onClick={() => {
-                                    onChange(selectedIcon?.icon);
-                                    setCategory('all');
-                                    setSearch('');
-                                    setOpenLibrary(false);
-                                }}
-                                className="blockish-icon-picker-footer-btn"
-                                aria-label={__('Upload icon and Close icon library', 'blockish')}
-                                icon={upload}
-                            >
-                                {__('Upload', 'blockish')}
-                            </Button>
 
-                            <Button
-                                onClick={() => {
-                                    onChange(selectedIcon?.icon);
-                                    setCategory('all');
-                                    setSearch('');
-                                    setOpenLibrary(false);
-                                }}
-                                className="blockish-icon-picker-footer-btn"
-                                aria-label={__('insert icon and Close icon library', 'blockish')}
-                                disabled={!selectedIcon}
-                            >
-                                {__('Insert', 'blockish')}
-                            </Button>
-                        </div>
-                    </Modal>
-                )
-            }
+            {openLibrary && (
+                <Modal
+                    onRequestClose={() => setOpenLibrary(false)}
+                    size="fill"
+                    className="blockish-icon-picker-modal"
+                    overlayClassName="blockish-icon-picker-modal-overlay"
+                    title={__('Icon Library', 'blockish')}
+                >
+                    <ModalBody
+                        icons={icons}
+                        selectedIcon={selectedIcon}
+                        category={category}
+                        setCategory={setCategory}
+                        search={search}
+                        setSearch={setSearch}
+                        setSelectedIcon={setSelectedIcon}
+                        value={value}
+                        deleteIcon={deleteIcon}
+                        createIcon={createIcon}
+                    />
+
+                    <div className="blockish-icon-picker-modal-footer">
+                        <FormFileUpload
+                            __next40pxDefaultSize
+                            icon={upload}
+                            accept="image/svg+xml"
+                            className='blockish-icon-picker-footer-btn'
+                            onChange={(value) => {
+                                uploadFile(value);
+                            }}
+                        >
+                            {__('Upload', 'blockish')}
+                        </FormFileUpload>
+
+                        <Button
+                            onClick={() => {
+                                onChange(selectedIcon?.icon);
+                                setCategory('all');
+                                setSearch('');
+                                setOpenLibrary(false);
+                            }}
+                            className="blockish-icon-picker-footer-btn"
+                            aria-label={__('insert icon and Close icon library', 'blockish')}
+                            disabled={!selectedIcon}
+                        >
+                            {__('Insert', 'blockish')}
+                        </Button>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 };

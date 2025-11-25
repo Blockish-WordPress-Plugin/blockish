@@ -19,6 +19,7 @@ use Blockish\Core\Blocks;
 use Blockish\Core\Enqueue;
 use Blockish\Core\ExtenSions;
 use Blockish\Core\StyleGenerator;
+use Blockish\Routes\SVGUploaderV1;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -130,6 +131,7 @@ final class Blockish {
         Blocks::get_instance();
         Enqueue::get_instance();
         StyleGenerator::get_instance();
+        SVGUploaderV1::get_instance();
         // ExtenSions::get_instance();
     }
 
