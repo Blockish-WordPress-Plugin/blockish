@@ -2,7 +2,7 @@ import { memo, useMemo } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
 
 const BlockishStyleTag = ({ attributes, hash, name, additionalStyles = '' }) => {
-    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue, generateBackgroundControlStyles, generateBorderControlStyles, generateBoxShadowControlStyles } = window.blockish.helpers;
+    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue, generateBackgroundControlStyles, generateBorderControlStyles, generateBoxShadowControlStyles, generateTypographyControlStyles } = window.blockish.helpers;
 
     const deviceList = useDeviceList();
     const schemaAttributes = getBlockType(name)?.attributes || {};
@@ -37,6 +37,10 @@ const BlockishStyleTag = ({ attributes, hash, name, additionalStyles = '' }) => 
                         case 'BlockishBoxShadow':
                             let boxShadowStyles = generateBoxShadowControlStyles(value, deviceSlug);
                             cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + boxShadowStyles;
+                            break;
+                        case 'BlockishTypography':
+                            let typographyStyles = generateTypographyControlStyles(value, deviceSlug);
+                            cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + typographyStyles;
                             break;
                             
                     }

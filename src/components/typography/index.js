@@ -227,49 +227,4 @@ const BlockishTypography = ({
 	);
 };
 
-// Helper function to generate CSS from typography values
-BlockishTypography.generateCSS = (typography, selector = '') => {
-	if (!typography) return '';
-
-	const styles = [];
-
-	if (typography.fontFamily?.value) {
-		styles.push(`font-family: ${typography.fontFamily.value};`);
-	}
-
-	if (typography.fontSize) {
-		styles.push(`font-size: ${typography.fontSize};`);
-	}
-
-	if (typography.fontWeight && typography.fontWeight !== 'normal') {
-		styles.push(`font-weight: ${typography.fontWeight};`);
-	}
-
-	if (typography.lineHeight) {
-		styles.push(`line-height: ${typography.lineHeight};`);
-	}
-
-	if (typography.letterSpacing) {
-		styles.push(`letter-spacing: ${typography.letterSpacing};`);
-	}
-
-	if (typography.textTransform && typography.textTransform !== 'none') {
-		styles.push(`text-transform: ${typography.textTransform};`);
-	}
-
-	if (typography.textDecoration && typography.textDecoration !== 'none') {
-		styles.push(`text-decoration: ${typography.textDecoration};`);
-	}
-
-	if (typography.textAlign) {
-		styles.push(`text-align: ${typography.textAlign};`);
-	}
-
-	if (styles.length === 0) return '';
-
-	return selector
-		? `${selector} {\n\t${styles.join('\n\t')}\n}`
-		: styles.join('\n');
-};
-
 export default memo(BlockishTypography);

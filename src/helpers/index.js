@@ -19,6 +19,7 @@ import generateBoxShadowControlStyles from "./generate-box-shadow-control-styles
 import useScrollIntoView from "./use-scroll-into-view";
 import BlockishIcon from "./icon";
 import getLinkProps from "./get-link-props";
+import generateTypographyControlStyles from './generate-typography-control-styles';
 
 if( window?.blockish?.screen ){
     window.blockish.helpers = {
@@ -40,6 +41,7 @@ if( window?.blockish?.screen ){
         generateBackgroundControlStyles,
         generateBorderControlStyles,
         generateBoxShadowControlStyles,
+        generateTypographyControlStyles,
         useScrollIntoView,
         BlockishIcon,
         getLinkProps,
