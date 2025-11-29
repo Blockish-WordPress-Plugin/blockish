@@ -36,6 +36,11 @@ const Inspector = ({ attributes, advancedControls }) => {
                             tabName === 'content' && (
                                 <>
                                     <BlockishControl type="BlockishPanelBody" title={__('Icon', 'blockish')} initialOpen={true}>
+                                        <BlockishGroupControl
+                                            type="BlockishTypography"
+                                            label={__('Typography', 'blockish')}
+                                            slug="text"
+                                        />
                                         <BlockishControl
                                             type="BlockishIconPicker"
                                             label={__('Icon', 'blockish')}
