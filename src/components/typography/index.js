@@ -9,8 +9,6 @@ import { Button, BaseControl, __experimentalVStack as VStack } from '@wordpress/
  * Internal dependencies
  */
 import fontWeights from './font-weights';
-import textTransforms from './text-transforms';
-import textDecorations from './text-decorations';
 
 const UNITS = {
 	fontSize: {
@@ -72,6 +70,7 @@ const BlockishTypography = ({
 		fontSize: value?.fontSize,
 		lineHeight: value?.lineHeight,
 		fontWeight: value?.fontWeight,
+		fontStyle: value?.fontStyle,
 		textTransform: value?.textTransform,
 		textDecoration: value?.textDecoration,
 		letterSpacing: value?.letterSpacing,
@@ -200,17 +199,55 @@ const BlockishTypography = ({
 							</div>
 						)}
 
-						{!excludeControlsSet.has('textDecoration') && (
-							<div className="blockish-typography-text-decoration">
-								<BlockishSelect
-									label={__('Text Decoration', 'blockish')}
-									value={textDecorations?.find((item) => item.value === value?.textDecoration)}
-									onChange={(newValue) => handleChange('textDecoration', newValue?.value)}
-									options={textDecorations}
-									isClearable={false}
-								/>
-							</div>
-						)}
+						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+							{!excludeControlsSet.has('fontStyle') && (
+								<div className="blockish-typography-font-style">
+									<BlockishToggleGroup
+										label={__('Style', 'blockish')}
+										value={value?.fontStyle}
+										onChange={(newValue) => handleChange('fontStyle', newValue)}
+										options={[
+											{
+												label: '—',
+												value: 'normal'
+											},
+											{
+												label: '/',
+												value: 'italic'
+											},
+											{
+												label: '< >',
+												value: 'oblique'
+											},
+										]}
+									/>
+								</div>
+							)}
+
+							{!excludeControlsSet.has('textDecoration') && (
+								<div className="blockish-typography-text-decoration">
+									<BlockishToggleGroup
+										label={__('Decoration', 'blockish')}
+										value={value?.textDecoration}
+										onChange={(newValue) => handleChange('textDecoration', newValue)}
+										options={[
+											{
+												label: '—',
+												value: 'none'
+											},
+											{
+												label: 'U',
+												value: 'underline'
+											},
+											{
+												label: 'S',
+												value: 'line-through'
+											},
+										]}
+									/>
+								</div>
+							)}
+						</div>
 					</VStack>
 				</div>
 			</BlockishDropdown>
@@ -247,6 +284,11 @@ BlockishTypography.generateCSS = (typography, selector = '') => {
 	// Font Weight
 	if (typography?.fontWeight && typography?.fontWeight !== 'normal') {
 		styles.push(`font-weight: ${typography?.fontWeight};`);
+	}
+
+	// Font Style
+	if (typography?.fontStyle && typography?.fontStyle !== 'normal') {
+		styles.push(`font-style: ${typography?.fontStyle};`);
 	}
 
 	// Line Height
