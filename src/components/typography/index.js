@@ -3,7 +3,16 @@
  */
 import { __ } from '@wordpress/i18n';
 import { memo, useMemo } from '@wordpress/element';
-import { Button, BaseControl, __experimentalVStack as VStack } from '@wordpress/components';
+import { 
+	Button, 
+	BaseControl, 
+	__experimentalHStack as HStack, 	
+	__experimentalVStack as VStack
+ } from '@wordpress/components';
+import { 
+	LineHeightControl,
+	__experimentalUnitControl as UnitControl
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,15 +25,6 @@ const UNITS = {
 		em: { min: 0, max: 10, step: 0.1 },
 		rem: { min: 0, max: 10, step: 0.1 }
 	},
-	lineHeight: {
-		px: { min: 0, max: 100, step: 1 },
-		em: { min: 0, max: 10, step: 0.1 },
-		rem: { min: 0, max: 10, step: 0.1 }
-	},
-	letterSpacing: {
-		px: { min: -10, max: 10, step: 0.1 },
-		em: { min: -1, max: 1, step: 0.01 }
-	}
 }
 
 const BlockishTypography = ({
@@ -141,42 +141,56 @@ const BlockishTypography = ({
 								<BlockishRangeUnit
 									label={__('Font Size', 'blockish')}
 									value={value?.fontSize}
-									onChange={(newValue) => handleChange('fontSize', newValue)}
+									onChange={(value) => handleChange('fontSize', value)}
 									units={units?.fontSize}
 								/>
 							</div>
 						)}
 
+						<HStack>
+							{!excludeControlsSet.has('lineHeight') && (
+								<div className="blockish-typography-line-height">
+									<LineHeightControl
+										__next40pxDefaultSize
+										__unstableInputWidth="100%"
+										value={value?.lineHeight}
+										onChange={(value) => handleChange('lineHeight', value)}
+										units={units?.lineHeight}
+									/>
+								</div>
+							)}
 
-
-						{!excludeControlsSet.has('lineHeight') && (
-							<div className="blockish-typography-line-height">
-								<BlockishRangeUnit
-									label={__('Line Height', 'blockish')}
-									value={value?.lineHeight}
-									onChange={(newValue) => handleChange('lineHeight', newValue)}
-									units={units?.lineHeight}
-								/>
-							</div>
-						)}
-
-						{!excludeControlsSet.has('letterSpacing') && (
-							<div className="blockish-typography-letter-spacing">
-								<BlockishRangeUnit
-									label={__('Letter Spacing', 'blockish')}
-									value={value?.letterSpacing}
-									onChange={(newValue) => handleChange('letterSpacing', newValue)}
-									units={units?.letterSpacing}
-								/>
-							</div>
-						)}
+							{!excludeControlsSet.has('letterSpacing') && (
+								<div className="blockish-typography-letter-spacing">
+									<UnitControl
+										label={__('Letter Spacing', 'blockish')}
+										value={value?.letterSpacing}
+										onChange={(value) => handleChange('letterSpacing', value)}
+										units={[
+											{
+												value: 'px',
+												label: 'px',
+											},
+											{
+												value: 'em',
+												label: 'em',
+											},
+											{
+												value: 'rem',
+												label: 'rem',
+											}	
+										]}
+									/>	
+								</div>
+							)}
+						</HStack>
 
 						{!excludeControlsSet.has('textTransform') && (
 							<div className="blockish-typography-text-transform">
 								<BlockishToggleGroup
 									label={__('Transform', 'blockish')}
 									value={value?.textTransform}
-									onChange={(newValue) => handleChange('textTransform', newValue)}	
+									onChange={(value) => handleChange('textTransform', value)}	
 									options={[
 										{
 											label: '—',
@@ -199,13 +213,13 @@ const BlockishTypography = ({
 							</div>
 						)}
 
-						<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+						<HStack>
 							{!excludeControlsSet.has('fontStyle') && (
 								<div className="blockish-typography-font-style">
 									<BlockishToggleGroup
 										label={__('Style', 'blockish')}
 										value={value?.fontStyle}
-										onChange={(newValue) => handleChange('fontStyle', newValue)}
+										onChange={(value) => handleChange('fontStyle', value)}
 										options={[
 											{
 												label: '—',
@@ -229,7 +243,7 @@ const BlockishTypography = ({
 									<BlockishToggleGroup
 										label={__('Decoration', 'blockish')}
 										value={value?.textDecoration}
-										onChange={(newValue) => handleChange('textDecoration', newValue)}
+										onChange={(value) => handleChange('textDecoration', value)}
 										options={[
 											{
 												label: '—',
@@ -247,7 +261,7 @@ const BlockishTypography = ({
 									/>
 								</div>
 							)}
-						</div>
+						</HStack>
 					</VStack>
 				</div>
 			</BlockishDropdown>

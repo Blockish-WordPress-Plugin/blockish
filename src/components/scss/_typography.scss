@@ -9,7 +9,6 @@
 		cursor: pointer;
 		min-height: 40px;
 		text-align: center;
-		overflow: hidden;
 
 		&:hover {
 			border-color: inherit;
@@ -57,6 +56,7 @@
 			outline: none;
 			box-shadow: none;
 			background: #f0f0f0;
+			overflow: hidden;
 
 			&:hover {
 				border-color: inherit;
@@ -93,8 +93,10 @@
 		.blockish-typography-letter-spacing,
 		.blockish-typography-text-transform,
 		.blockish-typography-text-decoration,
+		.blockish-typography-font-style,
 		.blockish-typography-text-align {
 			margin-bottom: 0;
+			width: 100%;
 		}
 
 		.blockish-typography-text-align {
@@ -229,5 +231,21 @@
 
 	.blockish__typography-font-weight {
 		width: 40%;
+	}
+}
+
+.blockish-typography-text-decoration,
+.blockish-typography-font-style,
+.block-editor-line-height-control,
+.blockish-typography-letter-spacing {
+	margin-bottom: 0;
+	width: 100%;
+}
+
+.blockish-typography-letter-spacing {
+
+	.components-input-control__input {
+		height: 40px !important;
+		width: 100% !important;
 	}
 }
