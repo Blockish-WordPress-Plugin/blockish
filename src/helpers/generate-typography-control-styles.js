@@ -7,37 +7,9 @@
  * @param {string} deviceSlug - Device slug (Desktop, Tablet, Mobile) - currently unused but kept for API consistency
  * @returns {string} CSS string with typography properties
  */
-const generateTypographyControlStyles = (value, deviceSlug = 'Desktop') => {
-    if (!value) return '';
-
-    let typography;
-    
-    // Handle both string (JSON) and object values
-    if (typeof value === 'string') {
-        try {
-            typography = JSON.parse(value);
-        } catch (error) {
-            console.error('Error parsing typography value:', error);
-            return '';
-        }
-    } else if (typeof value === 'object') {
-        typography = value;
-    } else {
-        return '';
-    }
-
+const generateTypographyControlStyles = (typography, deviceSlug = 'Desktop') => {
     if (!typography || typeof typography !== 'object') return '';
 
-    // Use for CSS generation
-    const BlockishTypography = window?.blockish?.components?.BlockishTypography;
-    
-    if (BlockishTypography?.generateCSS) {
-        // Generate CSS without selector (just the properties)
-        return BlockishTypography.generateCSS(typography, '').replace(/\n/g, ' ').trim();
-    }
-
-    // Fallback implementation if component method is not available
-    // This should rarely happen, but provides resilience
     const styles = [];
 
     if (typography.fontFamily?.value) {
