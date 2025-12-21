@@ -4,7 +4,7 @@
  * Description:       A collection of creative Gutenberg blocks to help you build beautiful websites.
  * Requires at least: 6.1
  * Requires PHP:      7.4
- * Version:           1.0.0
+ * Version:           1.0.3
  * Author:            bdkoder
  * Author URI:        https://github.com/bdkoder
  * License:           GPL-2.0-or-later
@@ -37,7 +37,7 @@ final class Blockish {
      *
      * @var string
      */
-    const VERSION = '1.0.0';
+    const VERSION = '1.0.3';
 
     /**
      * Holds the instance of this class.

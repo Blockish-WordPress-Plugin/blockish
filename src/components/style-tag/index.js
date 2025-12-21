@@ -41,6 +41,9 @@ const BlockishStyleTag = ({ attributes, hash, name, additionalStyles = '' }) => 
                         case 'BlockishTypography':
                             let typographyStyles = generateTypographyControlStyles(value, deviceSlug);
                             cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + typographyStyles;
+                        case 'BlockishTextShadow':
+                            let textShadowStyles = generateBoxShadowControlStyles(value, deviceSlug, 'text');
+                            cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + textShadowStyles;
                             break;
                             
                     }
