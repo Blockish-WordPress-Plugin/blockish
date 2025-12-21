@@ -2,7 +2,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-const Inspector = ({ attributes, setAttributes, advancedControls }) => {
+const Inspector = ({ advancedControls }) => {
     const {
         BlockishControl,
         BlockishResponsiveControl,

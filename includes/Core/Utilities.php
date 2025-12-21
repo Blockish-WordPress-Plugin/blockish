@@ -141,64 +141,49 @@ class Utilities
 
     public static function generate_typography_control_styles($typography, $device = 'Desktop')
     {
-        if (empty($typography)) {
-            return '';
-        }
-
-        // Handle both JSON string and array
-        $typography_data = $typography;
-        if (is_string($typography)) {
-            $typography_data = json_decode($typography, true);
-            if (!is_array($typography_data)) {
-                return '';
-            }
-        }
-
-        if (!is_array($typography_data)) {
-            return '';
-        }
+        if (empty($typography) || !is_array($typography)) return '';
 
         $styles = [];
-
         // Font Family - handle both string and object formats
-        if (!empty($typography_data['fontFamily'])) {
-            if (is_array($typography_data['fontFamily']) && !empty($typography_data['fontFamily']['value'])) {
-                $styles[] = 'font-family: ' . esc_attr($typography_data['fontFamily']['value']) . ';';
-            } elseif (is_string($typography_data['fontFamily'])) {
-                $styles[] = 'font-family: ' . esc_attr($typography_data['fontFamily']) . ';';
-            }
+        if (!empty($typography['fontFamily']['value'])) {
+            $styles[] = 'font-family: ' . $typography['fontFamily']['value'] . ';';
         }
-
-        // Font Size
-        if (!empty($typography_data['fontSize'])) {
-            $styles[] = 'font-size: ' . esc_attr($typography_data['fontSize']) . ';';
-        }
-
+        
         // Font Weight
-        if (!empty($typography_data['fontWeight']) && $typography_data['fontWeight'] !== 'normal') {
-            $styles[] = 'font-weight: ' . esc_attr($typography_data['fontWeight']) . ';';
+        if (!empty($typography['fontWeight'])) {
+            $styles[] = 'font-weight: ' . esc_attr($typography['fontWeight']) . ';';
+        }
+        
+        // Font Size
+        if (!empty($typography['fontSize'][$device])) {
+            $styles[] = 'font-size: ' . esc_attr($typography['fontSize'][$device]) . ';';
         }
 
         // Line Height
-        if (!empty($typography_data['lineHeight'])) {
-            $styles[] = 'line-height: ' . esc_attr($typography_data['lineHeight']) . ';';
+        if (!empty($typography['lineHeight'][$device])) {
+            $styles[] = 'line-height: ' . esc_attr($typography['lineHeight'][$device]) . ';';
         }
 
         // Letter Spacing
-        if (!empty($typography_data['letterSpacing'])) {
-            $styles[] = 'letter-spacing: ' . esc_attr($typography_data['letterSpacing']) . ';';
+        if (!empty($typography['letterSpacing'][$device])) {
+            $styles[] = 'letter-spacing: ' . esc_attr($typography['letterSpacing'][$device]) . ';';
         }
 
         // Text Transform
-        if (!empty($typography_data['textTransform']) && $typography_data['textTransform'] !== 'none') {
-            $styles[] = 'text-transform: ' . esc_attr($typography_data['textTransform']) . ';';
+        if (!empty($typography['textTransform'])) {
+            $styles[] = 'text-transform: ' . esc_attr($typography['textTransform']) . ';';
         }
 
         // Text Decoration
-        if (!empty($typography_data['textDecoration']) && $typography_data['textDecoration'] !== 'none') {
-            $styles[] = 'text-decoration: ' . esc_attr($typography_data['textDecoration']) . ';';
+        if (!empty($typography['textDecoration'])) {
+            $styles[] = 'text-decoration: ' . esc_attr($typography['textDecoration']) . ';';
         }
 
+        // Font Style
+        if (!empty($typography['fontStyle'])) {
+            $styles[] = 'font-style: ' . esc_attr($typography['fontStyle']) . ';';
+        }
+        
         return implode(' ', $styles);
     }
 

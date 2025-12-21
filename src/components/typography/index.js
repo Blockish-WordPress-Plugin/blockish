@@ -18,6 +18,7 @@ import {
  * Internal dependencies
  */
 import fontWeights from './font-weights';
+import getValue from './get-value';
 
 const UNITS = {
 	fontSize: {
@@ -70,14 +71,14 @@ const BlockishTypography = ({
 	};
 
 	const previewStyle = {
-		fontFamily: value?.fontFamily?.value,
-		fontSize: value?.fontSize,
-		lineHeight: value?.lineHeight,
-		fontWeight: value?.fontWeight,
-		fontStyle: value?.fontStyle,
-		textTransform: value?.textTransform,
-		textDecoration: value?.textDecoration,
-		letterSpacing: value?.letterSpacing,
+		fontFamily: getValue(value, 'fontFamily')?.value,
+		fontSize: getValue(value, 'fontSize')?.[device],
+		lineHeight: getValue(value, 'lineHeight')?.[device],
+		fontWeight: getValue(value, 'fontWeight'),
+		fontStyle: getValue(value, 'fontStyle'),
+		textTransform: getValue(value, 'textTransform'),
+		textDecoration: getValue(value, 'textDecoration'),
+		letterSpacing: getValue(value, 'letterSpacing')?.[device],
 	};
 
 	return (
@@ -142,10 +143,10 @@ const BlockishTypography = ({
 
 						{!excludeControlsSet.has('fontSize') && (
 							<div className="blockish-typography-font-size">
-								<BlockishResponsive left='46px'>
+								<BlockishResponsive left='60px'>
 									<BlockishRangeUnit
 										label={__('Font Size', 'blockish')}
-										value={value?.fontSize}
+										value={value?.fontSize?.[device]}
 										onChange={(value) => handleChange('fontSize', {
 											...value?.fontSize,
 											[device]: value
@@ -159,12 +160,15 @@ const BlockishTypography = ({
 						<HStack>
 							{!excludeControlsSet.has('lineHeight') && (
 								<div className="blockish-typography-line-height">
-									<BlockishResponsive left='46px'>
+									<BlockishResponsive left='70px'>
 										<LineHeightControl
 											__next40pxDefaultSize
 											__unstableInputWidth="100%"
-											value={value?.lineHeight}
-											onChange={(value) => handleChange('lineHeight', value)}
+											value={value?.lineHeight?.[device]}
+											onChange={(value) => handleChange('lineHeight', {
+												...value?.lineHeight,
+												[device]: value
+											})}
 											units={units?.lineHeight}
 										/>
 									</BlockishResponsive>
@@ -173,11 +177,14 @@ const BlockishTypography = ({
 
 							{!excludeControlsSet.has('letterSpacing') && (
 								<div className="blockish-typography-letter-spacing">
-									<BlockishResponsive left='46px'>
+									<BlockishResponsive left='95px'>
 										<UnitControl
 											label={__('Letter Spacing', 'blockish')}
-											value={value?.letterSpacing}
-											onChange={(value) => handleChange('letterSpacing', value)}
+											value={value?.letterSpacing?.[device]}
+											onChange={(value) => handleChange('letterSpacing', {
+												...value?.letterSpacing,
+												[device]: value
+											})}
 											units={[
 												{
 													value: 'px',
