@@ -9,8 +9,15 @@ import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import BlockishBoxShadowItem from './item';
-const BlockishBoxShadow = ({ value, onChange, label = __('Drop Shadow', 'blockish'), ...props }) => {
-    const usableBoxShadow = value ? JSON.parse(value) : [{ x: 0, y: 0, blur: 0, spread: 0, color: 'rgba(0, 0, 0, 0.2)' }];
+
+const BlockishBoxShadow = ({ value, onChange, label = __('Drop Shadow', 'blockish'), exclude = [], ...props }) => {
+    // Safely parse the value - handle empty strings and undefined
+    let usableBoxShadow;
+    try {
+        usableBoxShadow = (value && value !== '') ? JSON.parse(value) : [{ x: 0, y: 0, blur: 0, spread: 0, color: 'rgba(0, 0, 0, 0.2)' }];
+    } catch (e) {
+        usableBoxShadow = [{ x: 0, y: 0, blur: 0, spread: 0, color: 'rgba(0, 0, 0, 0.2)' }];
+    }
     return (
         <div className="blockish-box-shadow blockish-control blockish-group-control">
             <VStack className="components-tools-panel">
@@ -43,6 +50,7 @@ const BlockishBoxShadow = ({ value, onChange, label = __('Drop Shadow', 'blockis
                                             onChange={onChange}
                                             itemIndex={index}
                                             itemArray={array}
+                                            exclude={exclude}
                                         />
                                     )
                                 })

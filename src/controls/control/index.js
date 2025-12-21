@@ -1,5 +1,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, memo } from '@wordpress/element';
+import clsx from 'clsx';
 
 const BlockishControl = ({ type = "TextControl", slug, label = "", value: userDefinedValue, onChange: userDefinedOnChange, selectors = {}, ...props }) => {
     const Component = window?.blockish?.components[type];
