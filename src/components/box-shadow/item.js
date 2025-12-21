@@ -15,7 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { lineSolid, shadow } from '@wordpress/icons';
 
-const BlockishBoxShadowItem = ({ onChange, itemIndex, itemArray }) => {
+const BlockishBoxShadowItem = ({ onChange, itemIndex, itemArray, exclude = [] }) => {
     const { BlockishToggleGroup } = window.blockish.components;
     return (
         <Item as="div" className="blockish-box-shadow-item">
@@ -69,55 +69,65 @@ const BlockishBoxShadowItem = ({ onChange, itemIndex, itemArray }) => {
                                 }}
                                 clearable={false}
                             />
-                            <BlockishToggleGroup 
-                                options={[
-                                    { value: 'inset', label: __('Inset') },
-                                    { value: '', label: __('Outset') },
-                                ]}
-                                value={itemArray[itemIndex]?.inset || ''}
-                                onChange={(nextValue) => {
-                                    const newArray = [...itemArray];
-                                    newArray[itemIndex] = { ...newArray[itemIndex], inset: nextValue };
-                                    onChange(JSON.stringify(newArray));
-                                }}
-                            />
+                            {!exclude.includes('inset') && (
+                                <BlockishToggleGroup 
+                                    options={[
+                                        { value: 'inset', label: __('Inset') },
+                                        { value: '', label: __('Outset') },
+                                    ]}
+                                    value={itemArray[itemIndex]?.inset || ''}
+                                    onChange={(nextValue) => {
+                                        const newArray = [...itemArray];
+                                        newArray[itemIndex] = { ...newArray[itemIndex], inset: nextValue };
+                                        onChange(JSON.stringify(newArray));
+                                    }}
+                                />
+                            )}
                             <Grid>
-                                <UnitControl
-                                    label={__('X', 'blockish')}
-                                    value={itemArray[itemIndex]?.x}
-                                    onChange={(nextValue) => {
-                                        const newArray = [...itemArray];
-                                        newArray[itemIndex] = { ...newArray[itemIndex], x: nextValue };
-                                        onChange(JSON.stringify(newArray));
-                                    }}
-                                />
-                                <UnitControl
-                                    label={__('Y', 'blockish')}
-                                    value={itemArray[itemIndex]?.y}
-                                    onChange={(nextValue) => {
-                                        const newArray = [...itemArray];
-                                        newArray[itemIndex] = { ...newArray[itemIndex], y: nextValue };
-                                        onChange(JSON.stringify(newArray));
-                                    }}
-                                />
-                                <UnitControl
-                                    label={__('Blur', 'blockish')}
-                                    value={itemArray[itemIndex]?.blur}
-                                    onChange={(nextValue) => {
-                                        const newArray = [...itemArray];
-                                        newArray[itemIndex] = { ...newArray[itemIndex], blur: nextValue };
-                                        onChange(JSON.stringify(newArray));
-                                    }}
-                                />
-                                <UnitControl
-                                    label={__('Spread', 'blockish')}
-                                    value={itemArray[itemIndex]?.spread}
-                                    onChange={(nextValue) => {
-                                        const newArray = [...itemArray];
-                                        newArray[itemIndex] = { ...newArray[itemIndex], spread: nextValue };
-                                        onChange(JSON.stringify(newArray));
-                                    }}
-                                />
+                                {!exclude.includes('x') && (
+                                    <UnitControl
+                                        label={__('X', 'blockish')}
+                                        value={itemArray[itemIndex]?.x}
+                                        onChange={(nextValue) => {
+                                            const newArray = [...itemArray];
+                                            newArray[itemIndex] = { ...newArray[itemIndex], x: nextValue };
+                                            onChange(JSON.stringify(newArray));
+                                        }}
+                                    />
+                                )}
+                                {!exclude.includes('y') && (
+                                    <UnitControl
+                                        label={__('Y', 'blockish')}
+                                        value={itemArray[itemIndex]?.y}
+                                        onChange={(nextValue) => {
+                                            const newArray = [...itemArray];
+                                            newArray[itemIndex] = { ...newArray[itemIndex], y: nextValue };
+                                            onChange(JSON.stringify(newArray));
+                                        }}
+                                    />
+                                )}
+                                {!exclude.includes('blur') && (
+                                    <UnitControl
+                                        label={__('Blur', 'blockish')}
+                                        value={itemArray[itemIndex]?.blur}
+                                        onChange={(nextValue) => {
+                                            const newArray = [...itemArray];
+                                            newArray[itemIndex] = { ...newArray[itemIndex], blur: nextValue };
+                                            onChange(JSON.stringify(newArray));
+                                        }}
+                                    />
+                                )}
+                                {!exclude.includes('spread') && (
+                                    <UnitControl
+                                        label={__('Spread', 'blockish')}
+                                        value={itemArray[itemIndex]?.spread}
+                                        onChange={(nextValue) => {
+                                            const newArray = [...itemArray];
+                                            newArray[itemIndex] = { ...newArray[itemIndex], spread: nextValue };
+                                            onChange(JSON.stringify(newArray));
+                                        }}
+                                    />
+                                )}
                             </Grid>
                         </DropdownContentWrapper>
                     )
