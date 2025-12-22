@@ -91,6 +91,14 @@ const Border = ({ name }) => {
                                                 />
                                             )
                                         }
+                                        <BlockishControl
+                                            type="BlockishRangeControl"
+                                            label={__('Hover Transition (s)', 'blockish')}
+                                            slug="borderHoverTransition"
+                                            min="0"
+                                            max="3"
+                                            step="0.1"
+                                        />
                                     </>
                                 )
                         }

@@ -16,6 +16,7 @@ class Enqueue {
     private function __construct() {
         add_action('enqueue_block_editor_assets', array($this, 'enqueue_block_editor_assets'));
         add_action('enqueue_block_assets', array($this, 'enqueue_block_assets'));
+        add_filter('block_type_metadata', array($this, 'enqueue_global_assets'), 10);
     }
 
     /**
@@ -69,11 +70,25 @@ class Enqueue {
      * Calls the reusable method to register and enqueue the block script.
      */
     public function enqueue_block_assets() {
-        $this->register_and_enqueue_style(
+        wp_register_style(
             'blockish-global',
             BLOCKISH_URL . 'build/global/style-index.css',
+            array(),
             BLOCKISH_VERSION
         );
+    }
+
+    public function enqueue_global_assets($metadata) {
+        if (!isset($metadata['name']) || !str_contains($metadata['name'], 'blockish')) return $metadata;
+
+        if (!isset($metadata['style'])) {
+            $metadata['style'] = ['blockish-global'];
+        }elseif(is_array($metadata['style'])){
+            $metadata['style'] = array_merge($metadata['style'], array('blockish-global'));
+        }else{
+            $metadata['style'] = array('blockish-global', $metadata['style']);
+        }
+        return $metadata;
     }
 
     /**

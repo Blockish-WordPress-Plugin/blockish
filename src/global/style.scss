@@ -1,0 +1,10 @@
+.blockish,
+.block-editor-block-list__layout {
+    [class*="wp-block-blockish-"] {
+        transition:
+            border var(--blockish-border-hover-transition, 0.3s) ease-in-out,
+            box-shadow var(--blockish-border-hover-transition, 0.3s) ease-in-out,
+            border-radius var(--blockish-border-hover-transition, 0.3s) ease-in-out,
+            background var(--blockish-background-hover-transition, 0.3s) ease-in-out;
+    }
+}
