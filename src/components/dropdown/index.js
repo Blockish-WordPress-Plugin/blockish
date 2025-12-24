@@ -1,6 +1,6 @@
 import { Button, Dropdown, __experimentalHStack as HStack, __experimentalText as Text } from '@wordpress/components';
 
-const BlockishDropdown = ({ label, value, onChange, icon = null, children, ...props }) => {
+const BlockishDropdown = ({ label, icon = null, children, ...props }) => {
     return (
         <Dropdown
             className="blockish-dropdown"

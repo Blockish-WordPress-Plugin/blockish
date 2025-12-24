@@ -589,7 +589,7 @@
 		"transformTransitionDuration": {
 			"type": "number",
 			"selectors": {
-				".{{WRAPPER}}": "transition: transform {{VALUE}}s ease;"
+				".{{WRAPPER}}": "--transform-transition: {{VALUE}}s;"
 			}
 		},
 		"applyTransform": {

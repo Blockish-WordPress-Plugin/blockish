@@ -3,7 +3,7 @@ import { memo } from '@wordpress/element';
 
 const Transform = ({ attributes, setAttributes }) => {
     const { BlockishControl, BlockishResponsiveControl } = window?.blockish?.controls;
-    const { BlockishToolsPanel } = window.blockish.components;
+    const { BlockishToolsPanel, BlockishDropdown } = window.blockish.components;
 
     // Helper function to check if attribute has value (fixed to handle 0)
     const hasValue = (slug) => {
@@ -105,41 +105,48 @@ const Transform = ({ attributes, setAttributes }) => {
                                             isShownByDefault: false,
                                             children: (
                                                 <>
-                                                    <BlockishResponsiveControl
+                                                    <BlockishDropdown
                                                         label={__('Rotate', 'blockish')}
-                                                        type="RangeControl"
-                                                        slug="rotateZ"
-                                                        min={-360}
-                                                        max={360}
-                                                        step={1}
-                                                    />
+                                                    >
+                                                        <BlockishResponsiveControl
+                                                            left='44px'
+                                                            label={__('Rotate', 'blockish')}
+                                                            type="RangeControl"
+                                                            slug="rotateZ"
+                                                            min={-360}
+                                                            max={360}
+                                                            step={1}
+                                                        />
 
-                                                    <BlockishControl
-                                                        label={__('3D Rotation', 'blockish')}
-                                                        type="BlockishToggle"
-                                                        slug="rotate3D"
-                                                    />
+                                                        <BlockishControl
+                                                            label={__('3D Rotation', 'blockish')}
+                                                            type="BlockishToggle"
+                                                            slug="rotate3D"
+                                                        />
 
-                                                    {attributes?.rotate3D && (
-                                                        <>
-                                                            <BlockishResponsiveControl
-                                                                label={__('Rotate X', 'blockish')}
-                                                                type="RangeControl"
-                                                                slug="rotateX"
-                                                                min={-360}
-                                                                max={360}
-                                                                step={1}
-                                                            />
-                                                            <BlockishResponsiveControl
-                                                                label={__('Rotate Y', 'blockish')}
-                                                                type="RangeControl"
-                                                                slug="rotateY"
-                                                                min={-360}
-                                                                max={360}
-                                                                step={1}
-                                                            />
-                                                        </>
-                                                    )}
+                                                        {attributes?.rotate3D && (
+                                                            <>
+                                                                <BlockishResponsiveControl
+                                                                    label={__('Rotate X', 'blockish')}
+                                                                    left='55px'
+                                                                    type="RangeControl"
+                                                                    slug="rotateX"
+                                                                    min={-360}
+                                                                    max={360}
+                                                                    step={1}
+                                                                />
+                                                                <BlockishResponsiveControl
+                                                                    label={__('Rotate Y', 'blockish')}
+                                                                    left='55px'
+                                                                    type="RangeControl"
+                                                                    slug="rotateY"
+                                                                    min={-360}
+                                                                    max={360}
+                                                                    step={1}
+                                                                />
+                                                            </>
+                                                        )}
+                                                    </BlockishDropdown>
                                                 </>
                                             )
                                         },
@@ -157,9 +164,10 @@ const Transform = ({ attributes, setAttributes }) => {
                                             },
                                             isShownByDefault: false,
                                             children: (
-                                                <>
+                                                <BlockishDropdown label={__('Scale', 'blockish')}>
                                                     <BlockishResponsiveControl
                                                         label={__('Scale', 'blockish')}
+                                                        left='36px'
                                                         type="RangeControl"
                                                         slug="scale"
                                                         min={0.1}
@@ -177,6 +185,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                                         <>
                                                             <BlockishResponsiveControl
                                                                 label={__('Scale X', 'blockish')}
+                                                                left='48px'
                                                                 type="RangeControl"
                                                                 slug="scaleX"
                                                                 min={0.1}
@@ -185,6 +194,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                                             />
                                                             <BlockishResponsiveControl
                                                                 label={__('Scale Y', 'blockish')}
+                                                                left='48px'
                                                                 type="RangeControl"
                                                                 slug="scaleY"
                                                                 min={0.1}
@@ -193,7 +203,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                                             />
                                                         </>
                                                     )}
-                                                </>
+                                                </BlockishDropdown>
                                             )
                                         },
                                         {
@@ -210,15 +220,17 @@ const Transform = ({ attributes, setAttributes }) => {
                                             },
                                             isShownByDefault: false,
                                             children: (
-                                                <>
+                                                <BlockishDropdown label={__('Translate', 'blockish')}>
                                                     <BlockishResponsiveControl
                                                         label={__('Translate X', 'blockish')}
+                                                        left='77px'
                                                         type="RangeControl"
                                                         slug="translateX"
                                                         units={['px', '%', 'em', 'rem']}
                                                     />
                                                     <BlockishResponsiveControl
                                                         label={__('Translate Y', 'blockish')}
+                                                        left='77px'
                                                         type="RangeControl"
                                                         slug="translateY"
                                                         units={['px', '%', 'em', 'rem']}
@@ -233,12 +245,13 @@ const Transform = ({ attributes, setAttributes }) => {
                                                     {attributes?.translate3D && (
                                                         <BlockishResponsiveControl
                                                             label={__('Translate Z', 'blockish')}
+                                                            left='77px'
                                                             type="RangeControl"
                                                             slug="translateZ"
                                                             units={['px', 'em', 'rem']}
                                                         />
                                                     )}
-                                                </>
+                                                </BlockishDropdown>
                                             )
                                         },
                                         {
@@ -253,9 +266,10 @@ const Transform = ({ attributes, setAttributes }) => {
                                             },
                                             isShownByDefault: false,
                                             children: (
-                                                <>
+                                                <BlockishDropdown label={__('Skew', 'blockish')}>
                                                     <BlockishResponsiveControl
                                                         label={__('Skew X', 'blockish')}
+                                                        left='45px'
                                                         type="RangeControl"
                                                         slug="skewX"
                                                         min={-60}
@@ -264,13 +278,14 @@ const Transform = ({ attributes, setAttributes }) => {
                                                     />
                                                     <BlockishResponsiveControl
                                                         label={__('Skew Y', 'blockish')}
+                                                        left='45px'
                                                         type="RangeControl"
                                                         slug="skewY"
                                                         min={-60}
                                                         max={60}
                                                         step={1}
                                                     />
-                                                </>
+                                                </BlockishDropdown>
                                             )
                                         },
                                         {
@@ -286,7 +301,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                             },
                                             isShownByDefault: false,
                                             children: (
-                                                <>
+                                                <BlockishDropdown label={__('Transform Origin', 'blockish')}>
                                                     <BlockishControl
                                                         label={__('Transform Origin', 'blockish')}
                                                         type="SelectControl"
@@ -309,19 +324,21 @@ const Transform = ({ attributes, setAttributes }) => {
                                                         <>
                                                             <BlockishResponsiveControl
                                                                 label={__('Origin X', 'blockish')}
+                                                                left='52px'
                                                                 type="RangeControl"
                                                                 slug="transformOriginX"
                                                                 units={['px', '%', 'em', 'rem']}
                                                             />
                                                             <BlockishResponsiveControl
                                                                 label={__('Origin Y', 'blockish')}
+                                                                left='52px'
                                                                 type="RangeControl"
                                                                 slug="transformOriginY"
                                                                 units={['px', '%', 'em', 'rem']}
                                                             />
                                                         </>
                                                     )}
-                                                </>
+                                                </BlockishDropdown>
                                             )
                                         },
                                         {
@@ -331,35 +348,20 @@ const Transform = ({ attributes, setAttributes }) => {
                                             onDeselect: () => setAttributes({ perspective: undefined }),
                                             isShownByDefault: false,
                                             children: (
-                                                <BlockishResponsiveControl
-                                                    label={__('Perspective', 'blockish')}
-                                                    type="RangeControl"
-                                                    slug="perspective"
-                                                    min={0}
-                                                    max={2000}
-                                                    step={10}
-                                                    help={__('Adds depth to 3D transforms', 'blockish')}
-                                                />
+                                                <BlockishDropdown label={__('Perspective', 'blockish')}>
+                                                    <BlockishResponsiveControl
+                                                        label={__('Perspective', 'blockish')}
+                                                        left='76px'
+                                                        type="RangeControl"
+                                                        slug="perspective"
+                                                        min={0}
+                                                        max={2000}
+                                                        step={10}
+                                                        help={__('Adds depth to 3D transforms', 'blockish')}
+                                                    />
+                                                </BlockishDropdown>
                                             )
-                                        },
-                                        {
-                                            slug: 'transformTransitionDuration',
-                                            label: __('Transition Duration', 'blockish'),
-                                            hasValue: () => hasValue('transformTransitionDuration'),
-                                            onDeselect: () => setAttributes({ transformTransitionDuration: undefined }),
-                                            isShownByDefault: false,
-                                            children: (
-                                                <BlockishControl
-                                                    label={__('Transition Duration', 'blockish')}
-                                                    type="RangeControl"
-                                                    slug="transformTransitionDuration"
-                                                    min={0}
-                                                    max={5}
-                                                    step={0.1}
-                                                    help={__('Smooth animation speed (seconds)', 'blockish')}
-                                                />
-                                            )
-                                        },
+                                        }
                                     ]}
                                 />
                             </>
@@ -392,9 +394,10 @@ const Transform = ({ attributes, setAttributes }) => {
                                             },
                                             isShownByDefault: false,
                                             children: (
-                                                <>
+                                                <BlockishDropdown label={__('Rotate', 'blockish')}>
                                                     <BlockishResponsiveControl
                                                         label={__('Rotate', 'blockish')}
+                                                        left='44px'
                                                         type="RangeControl"
                                                         slug="rotateZHover"
                                                         min={-360}
@@ -412,6 +415,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                                         <>
                                                             <BlockishResponsiveControl
                                                                 label={__('Rotate X', 'blockish')}
+                                                                left='55px'
                                                                 type="RangeControl"
                                                                 slug="rotateXHover"
                                                                 min={-360}
@@ -420,6 +424,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                                             />
                                                             <BlockishResponsiveControl
                                                                 label={__('Rotate Y', 'blockish')}
+                                                                left='55px'
                                                                 type="RangeControl"
                                                                 slug="rotateYHover"
                                                                 min={-360}
@@ -428,7 +433,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                                             />
                                                         </>
                                                     )}
-                                                </>
+                                                </BlockishDropdown>
                                             )
                                         },
                                         {
@@ -445,9 +450,10 @@ const Transform = ({ attributes, setAttributes }) => {
                                             },
                                             isShownByDefault: false,
                                             children: (
-                                                <>
+                                                <BlockishDropdown label={__('Scale', 'blockish')}>
                                                     <BlockishResponsiveControl
                                                         label={__('Scale', 'blockish')}
+                                                        left='36px'
                                                         type="RangeControl"
                                                         slug="scaleHover"
                                                         min={0.1}
@@ -465,6 +471,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                                         <>
                                                             <BlockishResponsiveControl
                                                                 label={__('Scale X', 'blockish')}
+                                                                left='48px'
                                                                 type="RangeControl"
                                                                 slug="scaleXHover"
                                                                 min={0.1}
@@ -473,6 +480,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                                             />
                                                             <BlockishResponsiveControl
                                                                 label={__('Scale Y', 'blockish')}
+                                                                left='48px'
                                                                 type="RangeControl"
                                                                 slug="scaleYHover"
                                                                 min={0.1}
@@ -481,7 +489,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                                             />
                                                         </>
                                                     )}
-                                                </>
+                                                </BlockishDropdown>
                                             )
                                         },
                                         {
@@ -498,15 +506,17 @@ const Transform = ({ attributes, setAttributes }) => {
                                             },
                                             isShownByDefault: false,
                                             children: (
-                                                <>
+                                                <BlockishDropdown label={__('Translate', 'blockish')}>
                                                     <BlockishResponsiveControl
                                                         label={__('Translate X', 'blockish')}
+                                                        left='77px'
                                                         type="RangeControl"
                                                         slug="translateXHover"
                                                         units={['px', '%', 'em', 'rem']}
                                                     />
                                                     <BlockishResponsiveControl
                                                         label={__('Translate Y', 'blockish')}
+                                                        left='77px'
                                                         type="RangeControl"
                                                         slug="translateYHover"
                                                         units={['px', '%', 'em', 'rem']}
@@ -521,12 +531,13 @@ const Transform = ({ attributes, setAttributes }) => {
                                                     {attributes?.translate3DHover && (
                                                         <BlockishResponsiveControl
                                                             label={__('Translate Z', 'blockish')}
+                                                            left='77px'
                                                             type="RangeControl"
                                                             slug="translateZHover"
                                                             units={['px', 'em', 'rem']}
                                                         />
                                                     )}
-                                                </>
+                                                </BlockishDropdown>
                                             )
                                         },
                                         {
@@ -541,9 +552,10 @@ const Transform = ({ attributes, setAttributes }) => {
                                             },
                                             isShownByDefault: false,
                                             children: (
-                                                <>
+                                                <BlockishDropdown label={__('Skew', 'blockish')}>
                                                     <BlockishResponsiveControl
                                                         label={__('Skew X', 'blockish')}
+                                                        left='45px'
                                                         type="RangeControl"
                                                         slug="skewXHover"
                                                         min={-60}
@@ -552,13 +564,14 @@ const Transform = ({ attributes, setAttributes }) => {
                                                     />
                                                     <BlockishResponsiveControl
                                                         label={__('Skew Y', 'blockish')}
+                                                        left='45px'
                                                         type="RangeControl"
                                                         slug="skewYHover"
                                                         min={-60}
                                                         max={60}
                                                         step={1}
                                                     />
-                                                </>
+                                                </BlockishDropdown>
                                             )
                                         },
                                         {
@@ -574,7 +587,7 @@ const Transform = ({ attributes, setAttributes }) => {
                                             },
                                             isShownByDefault: false,
                                             children: (
-                                                <>
+                                                <BlockishDropdown label={__('Transform Origin', 'blockish')}>
                                                     <BlockishControl
                                                         label={__('Transform Origin', 'blockish')}
                                                         type="SelectControl"
@@ -597,19 +610,21 @@ const Transform = ({ attributes, setAttributes }) => {
                                                         <>
                                                             <BlockishResponsiveControl
                                                                 label={__('Origin X', 'blockish')}
+                                                                left='52px'
                                                                 type="RangeControl"
                                                                 slug="transformOriginXHover"
                                                                 units={['px', '%', 'em', 'rem']}
                                                             />
                                                             <BlockishResponsiveControl
                                                                 label={__('Origin Y', 'blockish')}
+                                                                left='52px'
                                                                 type="RangeControl"
                                                                 slug="transformOriginYHover"
                                                                 units={['px', '%', 'em', 'rem']}
                                                             />
                                                         </>
                                                     )}
-                                                </>
+                                                </BlockishDropdown>
                                             )
                                         },
                                         {
@@ -619,15 +634,38 @@ const Transform = ({ attributes, setAttributes }) => {
                                             onDeselect: () => setAttributes({ perspectiveHover: undefined }),
                                             isShownByDefault: false,
                                             children: (
-                                                <BlockishResponsiveControl
-                                                    label={__('Perspective', 'blockish')}
-                                                    type="RangeControl"
-                                                    slug="perspectiveHover"
-                                                    min={0}
-                                                    max={2000}
-                                                    step={10}
-                                                    help={__('Adds depth to 3D transforms', 'blockish')}
-                                                />
+                                                <BlockishDropdown label={__('Perspective', 'blockish')}>
+                                                    <BlockishResponsiveControl
+                                                        label={__('Perspective', 'blockish')}
+                                                        left='76px'
+                                                        type="RangeControl"
+                                                        slug="perspectiveHover"
+                                                        min={0}
+                                                        max={2000}
+                                                        step={10}
+                                                        help={__('Adds depth to 3D transforms', 'blockish')}
+                                                    />
+                                                </BlockishDropdown>
+                                            )
+                                        },
+                                        {
+                                            slug: 'transformTransitionDuration',
+                                            label: __('Transition Duration', 'blockish'),
+                                            hasValue: () => hasValue('transformTransitionDuration'),
+                                            onDeselect: () => setAttributes({ transformTransitionDuration: undefined }),
+                                            isShownByDefault: false,
+                                            children: (
+                                                <BlockishDropdown label={__('Transition Duration', 'blockish')}>
+                                                    <BlockishControl
+                                                        label={__('Transition Duration', 'blockish')}
+                                                        type="RangeControl"
+                                                        slug="transformTransitionDuration"
+                                                        min="0"
+                                                        max="3"
+                                                        step="0.1"
+                                                        help={__('Smooth animation speed (seconds)', 'blockish')}
+                                                    />
+                                                </BlockishDropdown>
                                             )
                                         },
                                     ]}
