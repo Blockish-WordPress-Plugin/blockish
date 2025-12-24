@@ -3,6 +3,7 @@
         .blockish-tab-button {
             padding: 2px 10px 2px 30px;
             color: #000000e0;
+
             &::after {
                 content: "";
                 height: 2px;
@@ -29,6 +30,7 @@
 
             &.blockish-tab-active {
                 color: #1677ff;
+
                 &::after {
                     background: #1677ff;
                     width: calc(100% + 2px);
@@ -42,25 +44,28 @@
             }
 
             &.blockish-tab-content-button {
-                &::before {  
+                &::before {
                     mask: url(../icons/pencil.svg) no-repeat 10px 85%;
                     mask-size: 14px 14px;
                 }
             }
+
             &.blockish-tab-layout-button {
-                &::before {  
+                &::before {
                     mask: url(../icons/pencil.svg) no-repeat 10px 85%;
                     mask-size: 14px 14px;
                 }
             }
+
             &.blockish-tab-style-button {
-                &::before {  
+                &::before {
                     mask: url(../icons/style.svg) no-repeat 10px 85%;
                     mask-size: 14px 14px;
                 }
             }
+
             &.blockish-tab-advanced-button {
-                &::before {  
+                &::before {
                     mask: url(../icons/advance.svg) no-repeat 10px 85%;
                     mask-size: 14px 14px;
                 }
@@ -71,15 +76,17 @@
     }
 
     &.blockish-tab-normal {
-        .components-tab-panel__tabs{
+        .components-tab-panel__tabs {
             border-bottom: 1px solid #e0e0e0;
-            margin-bottom: 16px;
+            // margin-bottom: 16px;
         }
+
         .blockish-tab-button {
             padding: 0;
             color: #000000e0;
             width: 100%;
             justify-content: center;
+
             &.blockish-tab-active {
                 color: #1677ff;
             }

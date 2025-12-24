@@ -2,27 +2,31 @@ import {
     __experimentalToolsPanel as ToolsPanel,
     __experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-const BlockishToolsPanel = ({ label, value, onChange, items = [] }) => {
-    return(
-        <ToolsPanel
-            label={label}
-            resetAll={() => onChange(undefined)}
-        >
+import { memo } from '@wordpress/element';
+
+const BlockishToolsPanel = ({
+    label,
+    items = [],
+    resetAll,
+    ...props
+}) => {
+    return (
+        <ToolsPanel label={label} resetAll={resetAll} {...props}>
             {items.map((item, index) => (
                 <ToolsPanelItem
-                    key={index}
+                    key={item?.slug || index}
                     label={item?.label}
-                    hasValue={!!item?.value}
-                    onDeselect={() => onChange({
-                        ...value,
-                        [item?.slug]: undefined
-                    })}
+                    hasValue={item?.hasValue}
+                    onDeselect={item?.onDeselect}
+                    isShownByDefault={item?.isShownByDefault}
+                    panelId={item?.panelId}
+                    {...item?.props}
                 >
                     {item?.children}
                 </ToolsPanelItem>
             ))}
         </ToolsPanel>
-    )
-}
+    );
+};
 
-export default BlockishToolsPanel;
+export default memo(BlockishToolsPanel);

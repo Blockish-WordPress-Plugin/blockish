@@ -25,8 +25,9 @@ import BlockishLink from "./link";
 import BlockishNumber from "./number";
 import BlockishDropdown from "./dropdown";
 import BlockishToolsPanel from "./tools-panel";
+import BlockishToggle from "./toggle";
 
-if(window?.blockish?.screen) {
+if (window?.blockish?.screen) {
     window.blockish.components = {
         ...window?.wp?.components,
         BlockishColor,
@@ -54,5 +55,6 @@ if(window?.blockish?.screen) {
         BlockishNumber,
         BlockishDropdown,
         BlockishToolsPanel,
+        BlockishToggle
     }
 }
