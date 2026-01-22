@@ -2,7 +2,7 @@ import { memo, useMemo } from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
 
 const BlockishStyleTag = ({ attributes, hash, name, additionalStyles = '' }) => {
-    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue, generateBackgroundControlStyles, generateBorderControlStyles, generateBoxShadowControlStyles, generateTypographyControlStyles } = window.blockish.helpers;
+    const { useDeviceList, replaceCssPlaceholders, replaceString, generateCssString, isResponsiveValue, generateBackgroundControlStyles, generateBorderControlStyles, generateShadowControlStyles, generateTypographyControlStyles, generateCSSFilters } = window.blockish.helpers;
 
     const deviceList = useDeviceList();
     const schemaAttributes = getBlockType(name)?.attributes || {};
@@ -35,17 +35,20 @@ const BlockishStyleTag = ({ attributes, hash, name, additionalStyles = '' }) => 
                             cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + borderStyles;
                             break;
                         case 'BlockishBoxShadow':
-                            let boxShadowStyles = generateBoxShadowControlStyles(value, deviceSlug);
+                            let boxShadowStyles = generateShadowControlStyles(value);
                             cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + boxShadowStyles;
                             break;
                         case 'BlockishTypography':
                             let typographyStyles = generateTypographyControlStyles(value, deviceSlug);
                             cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + typographyStyles;
                         case 'BlockishTextShadow':
-                            let textShadowStyles = generateBoxShadowControlStyles(value, deviceSlug, 'text');
+                            let textShadowStyles = generateShadowControlStyles(value, 'text');
                             cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + textShadowStyles;
                             break;
-                            
+                        case 'BlockishCSSFilters':
+                            let cssFilterStyles = generateCSSFilters(value);
+                            cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + cssFilterStyles;
+                            break;
                     }
                 }
             };

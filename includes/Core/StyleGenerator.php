@@ -182,13 +182,26 @@ class StyleGenerator
                                 : $styles;
                             break;
                         case 'BlockishBoxShadow':
-                            $styles = Utilities::generate_box_shadow_control_styles($value, $device_slug);
+                            $styles = Utilities::generate_shadow_control_styles($value, 'box');
                             $css_rules[$device_slug][$selector] = isset($css_rules[$device_slug][$selector])
                                 ? $css_rules[$device_slug][$selector] . $styles
                                 : $styles;
                             break;
+                        case 'BlockishTextShadow':
+                            $styles = Utilities::generate_shadow_control_styles($value, 'text');
+                            $css_rules[$device_slug][$selector] = isset($css_rules[$device_slug][$selector])
+                                ? $css_rules[$device_slug][$selector] . $styles
+                                : $styles;
+                            break;
+
                         case 'BlockishTypography':
                             $styles = Utilities::generate_typography_control_styles($value, $device_slug);
+                            $css_rules[$device_slug][$selector] = isset($css_rules[$device_slug][$selector])
+                                ? $css_rules[$device_slug][$selector] . $styles
+                                : $styles;
+                            break;
+                        case 'BlockishCSSFilters':
+                            $styles = Utilities::generate_css_filters($value);
                             $css_rules[$device_slug][$selector] = isset($css_rules[$device_slug][$selector])
                                 ? $css_rules[$device_slug][$selector] . $styles
                                 : $styles;

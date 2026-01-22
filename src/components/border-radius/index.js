@@ -1,12 +1,13 @@
 import { __experimentalBorderRadiusControl as BorderRadiusControl } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-const BlockishBorderRadius = ({ value, onChange }) => {
+const BlockishBorderRadius = ({ value, onChange, label, ...props }) => {
     return (
         <BorderRadiusControl
-            label={__('Border Radius', 'blockish')}
+            label={label}
             values={value}
             onChange={onChange}
+            { ...props }
         />
     );
 }

@@ -29,17 +29,22 @@ class BlocksList extends ConfigList {
     protected function set_list() {
         $this->list = array(
             'container' => array(
-                'name'    => 'Container',
+                'name'    => __('Container', 'blockish'),
                 'package' => 'free',
                 'status'  => 'active',
             ),
             'icon' => array(
-                'name'    => 'Icon',
+                'name'    => __('Icon', 'blockish'),
                 'package' => 'free',
                 'status'  => 'active',
             ),
             'heading' => array(
-                'name'    => 'Heading',
+                'name'    => __('Heading', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
+            'image' => array(
+                'name'    => __('Image', 'blockish'),
                 'package' => 'free',
                 'status'  => 'active',
             ),

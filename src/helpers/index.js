@@ -15,11 +15,12 @@ import useDeviceList from "./use-device-list";
 import useDeviceType from "./use-device-type";
 import useGenerateStyles from "./use-generate-style";
 import useInheritResponsiveValue from "./use-inherit-responsive-value";
-import generateBoxShadowControlStyles from "./generate-box-shadow-control-styles";
+import generateShadowControlStyles from "./generate-box-shadow-control-styles";
 import useScrollIntoView from "./use-scroll-into-view";
 import BlockishIcon from "./icon";
 import getLinkProps from "./get-link-props";
 import generateTypographyControlStyles from './generate-typography-control-styles';
+import generateCSSFilters from "./generate-css-filters";
 
 if( window?.blockish?.screen ){
     window.blockish.helpers = {
@@ -40,10 +41,11 @@ if( window?.blockish?.screen ){
         useInheritResponsiveValue,
         generateBackgroundControlStyles,
         generateBorderControlStyles,
-        generateBoxShadowControlStyles,
+        generateShadowControlStyles,
         generateTypographyControlStyles,
         useScrollIntoView,
         BlockishIcon,
         getLinkProps,
+        generateCSSFilters,
     }
 }

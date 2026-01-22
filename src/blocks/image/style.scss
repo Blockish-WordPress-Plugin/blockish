@@ -1,0 +1,7 @@
+.blockish-image-wrapper {
+    .blockish-image {
+        width: 100%;
+        height: auto;
+        transition: all var(--blockish-image-hover-transition, 0.3s) ease;
+    }
+}

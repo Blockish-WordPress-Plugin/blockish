@@ -108,32 +108,51 @@ class Utilities
         return $styles;
     }
 
-    public static function generate_box_shadow_control_styles($box_shadows)
+    public static function generate_shadow_control_styles($shadows, $type = 'box')
     {
-        $styles = '';
-
-        if (!empty($box_shadows)) {
-            $json_box_shadows = json_decode($box_shadows, true);
-            $shadows_string = [];
-
-            foreach ($json_box_shadows as $shadow) {
-                if ((isset($shadow['x']) || isset($shadow['y']))) {
-                    $x = isset($shadow['x']) ? $shadow['x'] : "0";
-                    $y = isset($shadow['y']) ? $shadow['y'] : "0";
-                    $blur = isset($shadow['blur']) ? $shadow['blur'] : "0";
-                    $spread = isset($shadow['spread']) ? $shadow['spread'] : "0";
-                    $color = isset($shadow['color']) ? $shadow['color'] : 'rgba(0, 0, 0, 0.2)';
-                    $inset = isset($shadow['inset']) && $shadow['inset'] ? 'inset' : '';
-                    $shadows_string[] = <<<EOT
-                    {$x} {$y} {$blur} {$spread} {$color} {$inset}
-                EOT;
-                }
-            }
-            $styles = count($shadows_string) > 0 ? 'box-shadow: ' . join(',', $shadows_string) . ';' : '';
+        if (empty($shadows)) {
+            return '';
         }
 
-        return $styles;
+        $json_shadows = json_decode($shadows, true);
+
+        if (!is_array($json_shadows)) {
+            return '';
+        }
+
+        $shadow_strings = [];
+
+        foreach ($json_shadows as $shadow) {
+            if (!isset($shadow['x']) && !isset($shadow['y'])) {
+                continue;
+            }
+
+            $x      = $shadow['x'] ?? '0';
+            $y      = $shadow['y'] ?? '0';
+            $blur   = $shadow['blur'] ?? '0';
+            $color  = $shadow['color'] ?? 'rgba(0, 0, 0, 0.2)';
+
+            if ($type === 'text') {
+                // text-shadow does NOT support spread or inset
+                $shadow_strings[] = "{$x} {$y} {$blur} {$color}";
+            } else {
+                // box-shadow
+                $spread = $shadow['spread'] ?? '0';
+                $inset  = (!empty($shadow['inset'])) ? 'inset' : '';
+
+                $shadow_strings[] = trim("{$x} {$y} {$blur} {$spread} {$color} {$inset}");
+            }
+        }
+
+        if (empty($shadow_strings)) {
+            return '';
+        }
+
+        $property = ($type === 'text') ? 'text-shadow' : 'box-shadow';
+
+        return $property . ': ' . implode(', ', $shadow_strings) . ';';
     }
+
 
     public static function generate_typography_control_styles($typography, $device = 'Desktop')
     {
@@ -146,12 +165,12 @@ class Utilities
         if (!empty($typography['fontFamily']['value'])) {
             $styles[] = 'font-family: ' . $typography['fontFamily']['value'] . ';';
         }
-        
+
         // Font Weight
         if (!empty($typography['fontWeight'])) {
             $styles[] = 'font-weight: ' . esc_attr($typography['fontWeight']) . ';';
         }
-        
+
         // Font Size
         if (!empty($typography['fontSize'][$device])) {
             $styles[] = 'font-size: ' . esc_attr($typography['fontSize'][$device]) . ';';
@@ -181,8 +200,39 @@ class Utilities
         if (!empty($typography['fontStyle'])) {
             $styles[] = 'font-style: ' . esc_attr($typography['fontStyle']) . ';';
         }
-        
+
         return implode(' ', $styles);
+    }
+
+    public static function generate_css_filters(?string $value): string
+    {
+        if (empty($value)) return '';
+
+        $filters = json_decode($value, true);
+        if (!is_array($filters)) return '';
+
+        $units     = [
+            'blur' => 'px',
+            'brightness' => '%',
+            'contrast' => '%',
+            'saturate' => '%',
+            'hue-rotate' => 'deg',
+            'invert' => '%',
+            'grayscale' => '%',
+            'sepia' => '%',
+        ];
+        $cssFilter = '';
+
+        foreach ($filters as $filter => $filterValue) {
+            if (!array_key_exists($filter, $units) || $filterValue === '' || $filterValue === null) continue;
+
+            $filterValue = floatval($filterValue);
+            $cssFilter  .= sprintf('%s(%s%s) ', $filter, $filterValue, $units[$filter]);
+        }
+
+        if ($cssFilter === '') return '';
+
+        return 'filter: ' . trim($cssFilter) . ';';
     }
 
     public static function generate_uniqueId($length)

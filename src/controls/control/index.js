@@ -1,6 +1,5 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, memo } from '@wordpress/element';
-import clsx from 'clsx';
 
 const BlockishControl = ({ type = "TextControl", slug, label = "", value: userDefinedValue, onChange: userDefinedOnChange, selectors = {}, ...props }) => {
     const Component = window?.blockish?.components[type];
@@ -26,12 +25,14 @@ const BlockishControl = ({ type = "TextControl", slug, label = "", value: userDe
         return null;
     }
 
-    const controlValue = userDefinedValue || value;
-
-    const controlOnChange = userDefinedOnChange || onChange;
+    const controlValue = userDefinedValue || value || '';
 
     const handleChange = (value) => {
-        controlOnChange({ [slug]: value });
+        if(userDefinedOnChange) {
+            userDefinedOnChange(value);
+        } else {
+            onChange({ [slug]: value });
+        }
     }
 
     return (

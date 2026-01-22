@@ -1,0 +1,209 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/image",
+  "version": "1.0.0",
+  "title": "Image",
+  "category": "blockish-framework",
+  "description": "Image block for showing image.",
+  "icon": "format-image",
+  "keywords": [
+    "blockish",
+    "image",
+    "img"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "image": {
+      "type": "object"
+    },
+    "imageSize": {
+      "type": "object",
+      "default": {
+        "value": "full",
+        "label": "Full Size"
+      }
+    },
+    "alt": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "captionType": {
+      "type": "string",
+      "default": "none"
+    },
+    "customCaption": {
+      "type": "string"
+    },
+    "alignment": {
+      "type": "object",
+      "default": {
+        "Desktop": "center"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "imageWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image": "width: {{VALUE}};"
+      }
+    },
+    "imageMaxWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image": "max-width: {{VALUE}};"
+      }
+    },
+    "imageHeight": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image": "height: {{VALUE}};"
+      }
+    },
+    "objectFit": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image": "object-fit: {{VALUE}};"
+      },
+      "condition": {
+				"rules": [
+					{
+						"condition": "not_empty",
+						"key": "imageHeight",
+						"value": ""
+					}
+				]
+			}
+    },
+    "imageOpacityNormal": {
+      "type": "number",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image": "opacity: {{VALUE}};"
+      }
+    },
+    "imageBorderNormal": {
+      "type": "string",
+      "groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-image"
+			}
+    },
+    "imageBorderRadiusNormal": {
+      "type": "object",
+      "selectors": {
+				".{{WRAPPER}} .blockish-image": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+    },
+    "imageBoxShadowNormal": {
+      "type": "string",
+      "groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}} .blockish-image"
+			}
+    },
+    "imageCSSFiltersNormal": {
+      "type": "string",
+      "groupSelector": {
+				"type": "BlockishCSSFilters",
+				"selector": ".{{WRAPPER}} .blockish-image"
+			}
+    },
+    "imageCSSFiltersHover": {
+      "type": "string",
+      "groupSelector": {
+				"type": "BlockishCSSFilters",
+				"selector": ".{{WRAPPER}} .blockish-image:hover"
+			}
+    },
+    "imageBoxShadowHover": {
+      "type": "string",
+      "groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}} .blockish-image:hover"
+			}
+    },
+    "imageBorderRadiusHover": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image:hover": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "imageBorderHover": {
+      "type": "string",
+      "groupSelector": {
+					"type": "BlockishBorder",
+					"selector": ".{{WRAPPER}} .blockish-image:hover"
+				}
+    },
+    "imageOpacityHover": {
+      "type": "number",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image:hover": "opacity: {{VALUE}};"
+      }
+    },
+    "imageHoverTransition": {
+      "type": "number",
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-image-hover-transition: {{VALUE}}s;"
+      }
+    },
+    "captionAlignment": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image-caption": "text-align: {{VALUE}};"
+      }
+    },
+    "captionColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image-caption": "color: {{VALUE}};"
+      }
+    },
+    "captionBackgroundColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image-caption": "background-color: {{VALUE}};"
+      }
+    },
+    "captionTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-image-caption"
+      }
+    },
+    "captionTextShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}} .blockish-image-caption"
+      }
+    },
+    "captionSpacing": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-image-caption": "margin-block-start: {{VALUE}};"
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css"
+}
