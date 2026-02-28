@@ -59,6 +59,20 @@
       "selectors": {
         ".{{WRAPPER}}:hover": "color: {{VALUE}};"
       }
+    },
+    "textShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "textShadowHover": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}:hover"
+      }
     }
   },
   "supports": {

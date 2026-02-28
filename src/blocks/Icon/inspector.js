@@ -1,13 +1,11 @@
 import { InspectorControls } from '@wordpress/block-editor';
 import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { addFilter } from '@wordpress/hooks';
 
-const Inspector = ({ attributes, advancedControls }) => {
+const Inspector = ({ advancedControls }) => {
     const {
         BlockishControl,
-        BlockishResponsiveControl,
-        BlockishGroupControl
+        BlockishResponsiveControl
     } = window?.blockish?.controls;
 
     return (
@@ -109,6 +107,11 @@ const Inspector = ({ attributes, advancedControls }) => {
                                                                     label={__('Color', 'blockish')}
                                                                     slug="color"
                                                                 />
+                                                                <BlockishResponsiveControl
+                                                                    type="AnglePickerControl"
+                                                                    label={__('Rotation', 'blockish')}
+                                                                    slug="rotation"
+                                                                />
                                                             </>
                                                         )
                                                     }
@@ -119,6 +122,11 @@ const Inspector = ({ attributes, advancedControls }) => {
                                                                     type="BlockishColor"
                                                                     label={__('Hover Color', 'blockish')}
                                                                     slug="hoverColor"
+                                                                />
+                                                                <BlockishResponsiveControl
+                                                                    type="AnglePickerControl"
+                                                                    label={__('Rotation', 'blockish')}
+                                                                    slug="rotationHover"
                                                                 />
                                                             </>
                                                         )

@@ -1,0 +1,141 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/video",
+	"version": "1.0.0",
+	"title": "Video",
+	"category": "blockish-framework",
+	"description": "Video block for showing self-hosted videos.",
+	"icon": "format-video",
+	"keywords": [ "blockish", "video", "media" ],
+	"example": {
+		"attributes": {
+			"preview": true
+		}
+	},
+	"attributes": {
+		"sourceType": {
+			"type": "object",
+			"default": {
+				"label": "YouTube",
+				"value": "youtube"
+			}
+		},
+		"youtubeUrl": {
+			"type": "string",
+			"default": "https://www.youtube.com/watch?v=IfpRqMh7HkE"
+		},
+		"vimeoUrl": {
+			"type": "string",
+			"default": "https://vimeo.com/361687086?fl=pl&fe=sh"
+		},
+		"selfHostedVideo": {
+			"type": "object"
+		},
+		"selfHostedUrl": {
+			"type": "string"
+		},
+		"poster": {
+			"type": "string"
+		},
+		"autoplay": {
+			"type": "boolean",
+			"default": false
+		},
+		"loop": {
+			"type": "boolean",
+			"default": false
+		},
+		"muted": {
+			"type": "boolean",
+			"default": false
+		},
+		"playOnMobile": {
+			"type": "boolean",
+			"default": true
+		},
+		"controls": {
+			"type": "boolean",
+			"default": true
+		},
+		"preload": {
+			"type": "string",
+			"default": "metadata"
+		},
+		"startTime": {
+			"type": "number",
+			"default": 0
+		},
+		"endTime": {
+			"type": "number",
+			"default": 0
+		},
+		"captions": {
+			"type": "boolean",
+			"default": false
+		},
+		"privacyMode": {
+			"type": "boolean",
+			"default": false
+		},
+		"lazyLoad": {
+			"type": "boolean",
+			"default": true
+		},
+		"suggestedVideos": {
+			"type": "object",
+			"default": {
+				"label": "Current Channel",
+				"value": "currentChannel"
+			}
+		},
+		"showOverlay": {
+			"type": "boolean",
+			"default": false
+		},
+		"overlayImage": {
+			"type": "object"
+		},
+		"showOverlayPlayIcon": {
+			"type": "boolean",
+			"default": true
+		},
+		"alignment": {
+			"type": "object",
+			"default": {
+				"Desktop": "center"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-video-player": "text-align: {{VALUE}};"
+			}
+		},
+		"videoWidth": {
+			"type": "object",
+			"default": {
+				"Desktop": "100%"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-video, .{{WRAPPER}} .components-sandbox": "width: {{VALUE}};"
+			}
+		},
+		"videoHeight": {
+			"type": "object",
+			"default": {
+				"Desktop": "360px"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-video, .{{WRAPPER}} .components-sandbox": "height: {{VALUE}};"
+			}
+		}
+	},
+	"supports": {
+		"html": true,
+		"anchor": true,
+		"align": [ "wide", "full" ]
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"viewScript": "file:./view.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}

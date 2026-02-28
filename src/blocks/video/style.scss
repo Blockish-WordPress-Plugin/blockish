@@ -1,0 +1,55 @@
+.blockish-video-wrapper {
+	.blockish-video-player {
+		position: relative;
+		width: 100%;
+		max-width: 100%;
+		line-height: 0;
+	}
+
+	.blockish-video {
+		width: 100%;
+		max-width: 100%;
+		height: 360px;
+		border: 0;
+	}
+
+	.blockish-video-overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+		border: 0;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+		pointer-events: auto;
+		cursor: pointer;
+	}
+
+	.blockish-video-overlay.is-hidden {
+		display: none;
+	}
+
+	.blockish-video-overlay-play-icon {
+		width: 68px;
+		height: 48px;
+		border-radius: 12px;
+		background: rgb(0 0 0 / 72%);
+		position: relative;
+	}
+
+	.blockish-video-overlay-play-icon::before {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 0;
+		height: 0;
+		transform: translate(-40%, -50%);
+		border-top: 10px solid transparent;
+		border-bottom: 10px solid transparent;
+		border-left: 16px solid #fff;
+	}
+}

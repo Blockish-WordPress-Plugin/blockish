@@ -53,6 +53,11 @@ class BlocksList extends ConfigList {
                 'package' => 'free',
                 'status'  => 'active',
             ),
+            'video' => array(
+                'name'    => __('Video', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
         );
     }
 }

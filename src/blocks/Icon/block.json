@@ -55,6 +55,18 @@
 			"selectors": {
 				".{{WRAPPER}} svg:hover": "fill: {{VALUE}};"
 			}
+		},
+		"rotation": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} svg": "transform: rotate({{VALUE}}deg);"
+			}
+		},
+		"rotationHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} svg:hover": "transform: rotate({{VALUE}}deg);"
+			}
 		}
 	},
 	"supports": {

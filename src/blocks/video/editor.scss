@@ -1,0 +1,18 @@
+.blockish-video-wrapper {
+	.components-sandbox {
+		pointer-events: none;
+	}
+
+	.blockish-video-iframe,
+	.blockish-video {
+		pointer-events: none;
+	}
+
+	&.is-selected {
+		.blockish-video-iframe,
+		.blockish-video,
+		.components-sandbox {
+			pointer-events: all;
+		}
+	}
+}

@@ -38,6 +38,7 @@ const BlockishControl = ({ type = "TextControl", slug, label = "", value: userDe
     return (
         <Component
             label={label || "Write your label here"}
+            checked={controlValue}
             value={controlValue}
             onChange={handleChange}
             __next40pxDefaultSize={true}

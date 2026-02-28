@@ -3,7 +3,14 @@
     "apiVersion": 3,
     "name": "blockish/button",
     "title": "Button",
-    "category": "blockish",
+    "category": "blockish-framework",
+    "keywords": [
+        "button",
+        "btn",
+        "link",
+        "call to action"
+    ],
+    "version": "1.0.0",
     "icon": "button",
     "description": "A customizable button block",
     "textdomain": "blockish",

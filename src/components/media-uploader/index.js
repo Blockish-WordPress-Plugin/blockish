@@ -23,6 +23,7 @@ const ALLOWED_MEDIA_TYPES = ['image'];
 
 const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = __('Upload Image', 'blockish'), value, onChange, allowedTypes = ALLOWED_MEDIA_TYPES, isInheritedValue = false }) => {
     const toggleRef = useRef();
+    const videoRef = useRef();
     const backgroundImageStyleProps = {};
     if (value?.url) {
         backgroundImageStyleProps.backgroundImage = `url(${value?.url})`;
@@ -75,13 +76,20 @@ const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = 
                                             : `blockish-media-uploader-${value?.id}-describedby`
                                     }
                                 >
-                                    {backgroundImageStyleProps?.backgroundImage && (
+                                    {backgroundImageStyleProps?.backgroundImage && value?.type !== 'video' && (
                                         <div className="blockish-media-uploader-image-wrapper">
                                             <div
                                                 className="blockish-media-uploader-image"
                                                 style={backgroundImageStyleProps}
                                             ></div>
                                         </div>
+                                    )}
+                                    {value?.type === 'video' && value?.url && (
+                                        <video
+                                            onContextMenu={(e) => e.preventDefault()}
+                                        >
+                                            <source src={`${value?.url}?muted=1&controls=0&autoplay=0&t=0`} />
+                                        </video>
                                     )}
                                     {!value?.id && placeholder}
                                 </Button>
