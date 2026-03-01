@@ -9,21 +9,16 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import Inspector from './inspector';
+import { getValidColorMode, getValidShape } from './shared';
 import './editor.scss';
 
 const ALLOWED_BLOCKS = [ 'blockish/social-icon-item' ];
 const TEMPLATE = [ [ 'blockish/social-icon-item' ] ];
-const SHAPE_OPTIONS = [ 'square', 'rounded', 'circle' ];
-const COLOR_MODES = [ 'official', 'custom' ];
 
 export default function Edit( { attributes, advancedControls, clientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
-	const shape = SHAPE_OPTIONS.includes( attributes?.shape )
-		? attributes.shape
-		: 'circle';
-	const colorMode = COLOR_MODES.includes( attributes?.iconColorMode )
-		? attributes.iconColorMode
-		: 'official';
+	const shape = getValidShape( attributes?.shape );
+	const colorMode = getValidColorMode( attributes?.iconColorMode );
 
 	const blockProps = useBlockProps( {
 		className: `blockish-social-icons shape-${ shape } is-color-${ colorMode }`,
@@ -39,19 +34,21 @@ export default function Edit( { attributes, advancedControls, clientId } ) {
 	const handleAddItem = () => {
 		insertBlock( createBlock( 'blockish/social-icon-item' ), undefined, clientId );
 	};
+	const addIconLabel = __( 'Add Icon', 'blockish' );
+	const { children, ...innerBlocksWrapperProps } = innerBlocksProps;
 
 	return (
 		<>
 			<Inspector attributes={ attributes } advancedControls={ advancedControls } />
 			<div className="blockish-social-icons-editor">
-				<ul { ...innerBlocksProps }>
-					{ innerBlocksProps.children }
+				<ul { ...innerBlocksWrapperProps }>
+					{ children }
 					<li className="blockish-social-icons-editor__appender-item">
 						<Button
 							className="blockish-social-icons-editor__appender-button"
 							icon={plus}
-							label={ __( 'Add Icon', 'blockish' ) }
-							aria-label={ __( 'Add Icon', 'blockish' ) }
+							label={ addIconLabel }
+							aria-label={ addIconLabel }
 							onClick={ handleAddItem }
 						/>
 					</li>

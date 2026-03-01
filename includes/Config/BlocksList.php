@@ -72,6 +72,7 @@ class BlocksList extends ConfigList {
                 'name'    => __('Icon List Item', 'blockish'),
                 'package' => 'free',
                 'status'  => 'active',
+                'parent'  => 'icon-list',
             ),
             'rating' => array(
                 'name'    => __('Rating', 'blockish'),
@@ -97,6 +98,7 @@ class BlocksList extends ConfigList {
                 'name'    => __('Social Icon Item', 'blockish'),
                 'package' => 'free',
                 'status'  => 'active',
+                'parent'  => 'social-icons',
             ),
         );
     }
