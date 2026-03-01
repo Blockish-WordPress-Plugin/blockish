@@ -1,9 +1,29 @@
 .blockish-social-icons-editor {
-	.blockish-social-icons {
-		pointer-events: none;
+	.blockish-social-icons-editor__appender-item {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		pointer-events: auto;
 	}
 
-	.blockish-social-icons-editor__appender {
-		margin-top: 12px;
+	.blockish-social-icons-editor__appender-button {
+		align-items: center;
+		background: #ffffff;
+		border: 1px dashed #9ca3af;
+		border-radius: 999px;
+		color: #6b7280;
+		cursor: pointer;
+		display: inline-flex;
+		height: 38px;
+		justify-content: center;
+		min-width: 38px;
+		padding: 0;
+		transition: all 0.2s ease;
+	}
+
+	.blockish-social-icons-editor__appender-button:hover {
+		background: #f9fafb;
+		border-color: #6b7280;
+		color: #374151;
 	}
 }

@@ -1,6 +1,9 @@
 .blockish-social-icons {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(42px, max-content));
+	grid-template-columns: repeat(
+		var(--blockish-social-icons-columns, auto-fit),
+		minmax(0, max-content)
+	);
 	align-items: center;
 	list-style: none;
 	margin: 0;
@@ -8,39 +11,15 @@
 	column-gap: 12px;
 	row-gap: 12px;
 
-	&.columns-1 {
-		grid-template-columns: repeat(1, minmax(0, 1fr));
-	}
-
-	&.columns-2 {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	&.columns-3 {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-	}
-
-	&.columns-4 {
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-	}
-
-	&.columns-5 {
-		grid-template-columns: repeat(5, minmax(0, 1fr));
-	}
-
-	&.columns-6 {
-		grid-template-columns: repeat(6, minmax(0, 1fr));
-	}
-
 	&.is-color-official {
 		.blockish-social-icon-item__link {
-			color: var(--blockish-social-icon-official-color, #2563eb);
+			background-color: var(--blockish-social-icon-official-color, #2563eb);
 		}
 	}
 
 	&.is-color-custom {
 		.blockish-social-icon-item__link {
-			color: var(--blockish-social-icons-custom-color, #111827);
+			background-color: var(--blockish-social-icons-primary-color, #111827);
 		}
 	}
 
@@ -73,6 +52,8 @@
 		align-items: center;
 		justify-content: center;
 		padding: 10px;
+		color: var(--blockish-social-icons-secondary-color, #ffffff);
+		border: 0;
 		line-height: 1;
 		text-decoration: none;
 		animation-duration: 0.6s;

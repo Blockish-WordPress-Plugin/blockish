@@ -57,12 +57,16 @@ const Inspector = ( { attributes, advancedControls } ) => {
 										},
 									] }
 								/>
-								<BlockishControl
+								<BlockishResponsiveControl
 									type="BlockishSelect"
 									label={ __( 'Columns', 'blockish' ) }
 									slug="columns"
+									left="7ch"
 									options={ [
-										{ label: __( 'Auto', 'blockish' ), value: 'auto' },
+										{
+											label: __( 'Auto', 'blockish' ),
+											value: 'auto-fit',
+										},
 										{ label: '1', value: '1' },
 										{ label: '2', value: '2' },
 										{ label: '3', value: '3' },
@@ -75,7 +79,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishToggleGroup"
 									label={ __( 'Alignment', 'blockish' ) }
 									slug="alignment"
-									left="7ch"
+									left="8ch"
 									options={ [
 										{ label: __( 'Left', 'blockish' ), value: 'flex-start' },
 										{ label: __( 'Center', 'blockish' ), value: 'center' },
@@ -94,7 +98,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 								>
 									<BlockishControl
 										type="BlockishToggleGroup"
-										label={ __( 'Color', 'blockish' ) }
+										label={ __( 'Primary Color', 'blockish' ) }
 										slug="iconColorMode"
 										options={ [
 											{
@@ -110,10 +114,15 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									{ attributes?.iconColorMode === 'custom' && (
 										<BlockishControl
 											type="BlockishColor"
-											label={ __( 'Custom Color', 'blockish' ) }
+											label={ __( 'Primary Color', 'blockish' ) }
 											slug="iconColor"
 										/>
 									) }
+									<BlockishControl
+										type="BlockishColor"
+										label={ __( 'Secondary Color', 'blockish' ) }
+										slug="iconSecondaryColor"
+									/>
 									<BlockishResponsiveControl
 										type="BlockishRangeUnit"
 										label={ __( 'Size', 'blockish' ) }
@@ -147,7 +156,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 										type="BlockishBorderRadius"
 										label={ __( 'Border Radius', 'blockish' ) }
 										slug="iconBorderRadius"
-										left="11ch"
+										left="6ch"
 									/>
 								</BlockishControl>
 

@@ -49,7 +49,9 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 	const { BlockishControl } = window?.blockish?.controls;
 
 	const applyNetworkPreset = ( network ) => {
-		const preset = NETWORKS?.[ network ];
+		
+		const preset = NETWORKS?.[ network?.value ];
+		
 		if ( ! preset ) {
 			setAttributes( { network } );
 			return;
@@ -70,7 +72,6 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 				tabType="top-level"
 				tabs={ [
 					{ name: 'content', title: 'Content' },
-					{ name: 'style', title: 'Style' },
 					{ name: 'advanced', title: 'Advanced' },
 				] }
 			>
@@ -111,17 +112,6 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									label={ __( 'Link', 'blockish' ) }
 									slug="link"
 								/>
-							</BlockishControl>
-						) }
-						{ tabName === 'style' && (
-							<BlockishControl
-								type="BlockishPanelBody"
-								title={ __( 'Icon', 'blockish' ) }
-								initialOpen={ true }
-							>
-								<p className="blockish-style-section-title">
-									{ __( 'Styled from parent Social Icons block.', 'blockish' ) }
-								</p>
 							</BlockishControl>
 						) }
 						{ tabName === 'advanced' && advancedControls }

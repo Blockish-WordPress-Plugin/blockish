@@ -16,6 +16,7 @@ const BlockishBlocksWrapperProps = createHigherOrderComponent(
                 ...props.wrapperProps,
                 className: clsx(
                     `bb-${hash}`,
+                    'blockish-block-wrapper',
                 )
             }
 

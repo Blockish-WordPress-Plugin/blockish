@@ -19,8 +19,13 @@
 			"default": "circle"
 		},
 		"columns": {
-			"type": "string",
-			"default": "auto"
+			"type": "object",
+			"default": {
+				"Desktop": "auto-fit"
+			},
+			"selectors": {
+				".{{WRAPPER}}": "--blockish-social-icons-columns: {{VALUE}};"
+			}
 		},
 		"alignment": {
 			"type": "object",
@@ -38,7 +43,14 @@
 		"iconColor": {
 			"type": "string",
 			"selectors": {
-				".{{WRAPPER}}": "--blockish-social-icons-custom-color: {{VALUE}};"
+				".{{WRAPPER}}": "--blockish-social-icons-primary-color: {{VALUE}};"
+			}
+		},
+		"iconSecondaryColor": {
+			"type": "string",
+			"default": "#FFFFFF",
+			"selectors": {
+				".{{WRAPPER}}": "--blockish-social-icons-secondary-color: {{VALUE}};"
 			}
 		},
 		"iconSize": {

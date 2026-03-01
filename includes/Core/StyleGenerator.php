@@ -79,6 +79,7 @@ class StyleGenerator
             $block_content = new \WP_HTML_Tag_Processor($block_content);
             $block_content->next_tag();
             $block_content->add_class($block_class);
+            $block_content->add_class('blockish-block-wrapper');
             return $block_content->get_updated_html();
         }
 
