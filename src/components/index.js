@@ -24,6 +24,8 @@ import BlockishIconPicker from "./icon-picker";
 import BlockishLink from "./link";
 import BlockishNumber from "./number";
 import BlockishDropdown from "./dropdown";
+import BlockishToolsPanel from "./tools-panel";
+import BlockishToggle from "./toggle";
 import BlockishTypography from "./typography";
 import BlockishFontFamily from "./font-family";
 import BlockishImagePlaceholder from "./placeholder";
@@ -31,7 +33,7 @@ import BlockishCSSFilters from "./css-filters";
 import BlockishDivider from "./divider";
 import BlockishTextStroke from "./text-stroke";
 
-if(window?.blockish?.screen) {
+if (window?.blockish?.screen) {
     window.blockish.components = {
         ...window?.wp?.components,
         BlockishColor,
@@ -58,6 +60,8 @@ if(window?.blockish?.screen) {
         BlockishLink,
         BlockishNumber,
         BlockishDropdown,
+        BlockishToolsPanel,
+        BlockishToggle,
         BlockishTypography,
         BlockishFontFamily,
         BlockishImagePlaceholder,

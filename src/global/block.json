@@ -22,7 +22,7 @@
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "z-index: {{VALUE}};"
-			}	
+			}
 		},
 		"minWidth": {
 			"type": "object",
@@ -180,7 +180,7 @@
 				".{{WRAPPER}}": "flex-shrink: {{VALUE}};"
 			}
 		},
-		"transformRotation": {
+		"transform": {
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "transform: rotate({{VALUE}}deg);"
@@ -204,7 +204,7 @@
 			"type": "number",
 			"selectors": {
 				".{{WRAPPER}}": "--blockish-background-hover-transition: {{VALUE}}s;"
-			}	
+			}
 		},
 		"border": {
 			"type": "string",
@@ -255,8 +255,256 @@
 		"preview": {
 			"type": "boolean",
 			"default": false
+		},
+		"rotate": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "transform: rotate({{VALUE}}deg);"
+			}
+		},
+		"rotateZ": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--rotate-z: {{VALUE}}deg;"
+			}
+		},
+		"rotate3D": {
+			"type": "boolean"
+		},
+		"rotateX": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--rotate-x: {{VALUE}}deg;"
+			}
+		},
+		"rotateY": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--rotate-y: {{VALUE}}deg;"
+			}
+		},
+		"scale": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-x: {{VALUE}}; --scale-y: {{VALUE}};"
+			}
+		},
+		"scaleSeparate": {
+			"type": "boolean"
+		},
+		"scaleX": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-x: {{VALUE}};"
+			}
+		},
+		"scaleY": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-y: {{VALUE}};"
+			}
+		},
+		"scale3DX": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-3d-x: {{VALUE}};"
+			}
+		},
+		"scale3DY": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-3d-y: {{VALUE}};"
+			}
+		},
+		"translateX": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--translate-x: {{VALUE}};"
+			}
+		},
+		"translateY": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--translate-y: {{VALUE}};"
+			}
+		},
+		"translate3D": {
+			"type": "boolean"
+		},
+		"translateZ": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--translate-z: {{VALUE}};"
+			}
+		},
+		"skewX": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--skew-x: {{VALUE}}deg;"
+			}
+		},
+		"skewY": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--skew-y: {{VALUE}}deg;"
+			}
+		},
+		"transformOrigin": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}}": "transform-origin: {{VALUE}};"
+			}
+		},
+		"transformOriginX": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--transform-origin-x: {{VALUE}};"
+			}
+		},
+		"transformOriginY": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--transform-origin-y: {{VALUE}};"
+			}
+		},
+		"perspective": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--perspective: {{VALUE}};"
+			}
+		},
+		"rotateZHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--rotate-z-hover: {{VALUE}}deg;"
+			}
+		},
+		"rotate3DHover": {
+			"type": "boolean"
+		},
+		"rotateXHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--rotate-x-hover: {{VALUE}}deg;"
+			}
+		},
+		"rotateYHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--rotate-y-hover: {{VALUE}}deg;"
+			}
+		},
+		"scaleHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-x-hover: {{VALUE}}; --scale-y-hover: {{VALUE}};"
+			}
+		},
+		"scaleSeparateHover": {
+			"type": "boolean"
+		},
+		"scaleXHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-x-hover: {{VALUE}};"
+			}
+		},
+		"scaleYHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-y-hover: {{VALUE}};"
+			}
+		},
+		"scale3DXHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-3d-x-hover: {{VALUE}};"
+			}
+		},
+		"scale3DYHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-3d-y-hover: {{VALUE}};"
+			}
+		},
+		"translateXHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--translate-x-hover: {{VALUE}};"
+			}
+		},
+		"translateYHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--translate-y-hover: {{VALUE}};"
+			}
+		},
+		"translate3DHover": {
+			"type": "boolean"
+		},
+		"translateZHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--translate-z-hover: {{VALUE}};"
+			}
+		},
+		"skewXHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--skew-x-hover: {{VALUE}}deg;"
+			}
+		},
+		"skewYHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--skew-y-hover: {{VALUE}}deg;"
+			}
+		},
+		"perspectiveHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--perspective-hover: {{VALUE}};"
+			}
+		},
+		"transformTransitionDuration": {
+			"type": "number",
+			"selectors": {
+				".{{WRAPPER}}": "--transform-transition: {{VALUE}}s;"
+			}
+		},
+		"applyTransform": {
+			"type": "boolean",
+			"default": true,
+			"selectors": {
+				".{{WRAPPER}}": "transform: perspective(var(--perspective, 1000px)) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) rotateZ(var(--rotate-z, 0deg)) translateX(var(--translate-x, 0px)) translateY(var(--translate-y, 0px)) translateZ(var(--translate-z, 0px)) scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1)) scale3d(var(--scale-3d-x, 1), var(--scale-3d-y, 1), 1) skewX(var(--skew-x, 0deg)) skewY(var(--skew-y, 0deg));"
+			}
+		},
+		"applyTransformHover": {
+			"type": "boolean",
+			"default": true,
+			"selectors": {
+				".{{WRAPPER}}:hover": "transform: perspective(var(--perspective-hover, var(--perspective, 1000px))) rotateX(var(--rotate-x-hover, var(--rotate-x, 0deg))) rotateY(var(--rotate-y-hover, var(--rotate-y, 0deg))) rotateZ(var(--rotate-z-hover, var(--rotate-z, 0deg))) translateX(var(--translate-x-hover, var(--translate-x, 0px))) translateY(var(--translate-y-hover, var(--translate-y, 0px))) translateZ(var(--translate-z-hover, var(--translate-z, 0px))) scaleX(var(--scale-x-hover, var(--scale-x, 1))) scaleY(var(--scale-y-hover, var(--scale-y, 1))) scale3d(var(--scale-3d-x-hover, var(--scale-3d-x, 1)), var(--scale-3d-y-hover, var(--scale-3d-y, 1)), 1) skewX(var(--skew-x-hover, var(--skew-x, 0deg))) skewY(var(--skew-y-hover, var(--skew-y, 0deg)));"
+			}
+		},
+		"applyTransformOriginCustom": {
+			"type": "boolean",
+			"default": true,
+			"selectors": {
+				".{{WRAPPER}}": "transform-origin: var(--transform-origin-x, 50%) var(--transform-origin-y, 50%);"
+			},
+			"condition": {
+				"rules": [
+					{
+						"condition": "==",
+						"key": "transformOrigin",
+						"value": "custom"
+					}
+				]
+			}
 		}
 	},
-	"usesContext": [ "display" ],
+	"usesContext": [
+		"display"
+	],
 	"editorScript": "file:./index.js"
 }
