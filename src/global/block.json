@@ -275,30 +275,12 @@
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--rotate-x: {{VALUE}}deg;"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "rotate3D",
-						"value": true
-					}
-				]
 			}
 		},
 		"rotateY": {
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--rotate-y: {{VALUE}}deg;"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "rotate3D",
-						"value": true
-					}
-				]
 			}
 		},
 		"scale": {
@@ -314,30 +296,24 @@
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--scale-x: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "scaleSeparate",
-						"value": true
-					}
-				]
 			}
 		},
 		"scaleY": {
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--scale-y: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "scaleSeparate",
-						"value": true
-					}
-				]
+			}
+		},
+		"scale3DX": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-3d-x: {{VALUE}};"
+			}
+		},
+		"scale3DY": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-3d-y: {{VALUE}};"
 			}
 		},
 		"translateX": {
@@ -359,15 +335,6 @@
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--translate-z: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "translate3D",
-						"value": true
-					}
-				]
 			}
 		},
 		"skewX": {
@@ -392,36 +359,18 @@
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--transform-origin-x: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "transformOrigin",
-						"value": "custom"
-					}
-				]
 			}
 		},
 		"transformOriginY": {
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--transform-origin-y: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "transformOrigin",
-						"value": "custom"
-					}
-				]
 			}
 		},
 		"perspective": {
 			"type": "object",
 			"selectors": {
-				".{{WRAPPER}}": "--perspective: {{VALUE}}px;"
+				".{{WRAPPER}}": "--perspective: {{VALUE}};"
 			}
 		},
 		"rotateZHover": {
@@ -437,30 +386,12 @@
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--rotate-x-hover: {{VALUE}}deg;"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "rotate3DHover",
-						"value": true
-					}
-				]
 			}
 		},
 		"rotateYHover": {
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--rotate-y-hover: {{VALUE}}deg;"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "rotate3DHover",
-						"value": true
-					}
-				]
 			}
 		},
 		"scaleHover": {
@@ -476,30 +407,24 @@
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--scale-x-hover: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "scaleSeparateHover",
-						"value": true
-					}
-				]
 			}
 		},
 		"scaleYHover": {
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--scale-y-hover: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "scaleSeparateHover",
-						"value": true
-					}
-				]
+			}
+		},
+		"scale3DXHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-3d-x-hover: {{VALUE}};"
+			}
+		},
+		"scale3DYHover": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "--scale-3d-y-hover: {{VALUE}};"
 			}
 		},
 		"translateXHover": {
@@ -521,15 +446,6 @@
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "--translate-z-hover: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "translate3DHover",
-						"value": true
-					}
-				]
 			}
 		},
 		"skewXHover": {
@@ -544,46 +460,10 @@
 				".{{WRAPPER}}": "--skew-y-hover: {{VALUE}}deg;"
 			}
 		},
-		"transformOriginHover": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}}": "--transform-origin-hover: {{VALUE}};"
-			}
-		},
-		"transformOriginXHover": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}}": "--transform-origin-x-hover: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "transformOriginHover",
-						"value": "custom"
-					}
-				]
-			}
-		},
-		"transformOriginYHover": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}}": "--transform-origin-y-hover: {{VALUE}};"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "transformOriginHover",
-						"value": "custom"
-					}
-				]
-			}
-		},
 		"perspectiveHover": {
 			"type": "object",
 			"selectors": {
-				".{{WRAPPER}}": "--perspective-hover: {{VALUE}}px;"
+				".{{WRAPPER}}": "--perspective-hover: {{VALUE}};"
 			}
 		},
 		"transformTransitionDuration": {
@@ -596,14 +476,14 @@
 			"type": "boolean",
 			"default": true,
 			"selectors": {
-				".{{WRAPPER}}": "transform: perspective(var(--perspective, 1000px)) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) rotateZ(var(--rotate-z, 0deg)) translateX(var(--translate-x, 0px)) translateY(var(--translate-y, 0px)) translateZ(var(--translate-z, 0px)) scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1)) skewX(var(--skew-x, 0deg)) skewY(var(--skew-y, 0deg));"
+				".{{WRAPPER}}": "transform: perspective(var(--perspective, 1000px)) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) rotateZ(var(--rotate-z, 0deg)) translateX(var(--translate-x, 0px)) translateY(var(--translate-y, 0px)) translateZ(var(--translate-z, 0px)) scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1)) scale3d(var(--scale-3d-x, 1), var(--scale-3d-y, 1), 1) skewX(var(--skew-x, 0deg)) skewY(var(--skew-y, 0deg));"
 			}
 		},
 		"applyTransformHover": {
 			"type": "boolean",
 			"default": true,
 			"selectors": {
-				".{{WRAPPER}}:hover": "transform: perspective(var(--perspective-hover, var(--perspective, 1000px))) rotateX(var(--rotate-x-hover, var(--rotate-x, 0deg))) rotateY(var(--rotate-y-hover, var(--rotate-y, 0deg))) rotateZ(var(--rotate-z-hover, var(--rotate-z, 0deg))) translateX(var(--translate-x-hover, var(--translate-x, 0px))) translateY(var(--translate-y-hover, var(--translate-y, 0px))) translateZ(var(--translate-z-hover, var(--translate-z, 0px))) scaleX(var(--scale-x-hover, var(--scale-x, 1))) scaleY(var(--scale-y-hover, var(--scale-y, 1))) skewX(var(--skew-x-hover, var(--skew-x, 0deg))) skewY(var(--skew-y-hover, var(--skew-y, 0deg)));"
+				".{{WRAPPER}}:hover": "transform: perspective(var(--perspective-hover, var(--perspective, 1000px))) rotateX(var(--rotate-x-hover, var(--rotate-x, 0deg))) rotateY(var(--rotate-y-hover, var(--rotate-y, 0deg))) rotateZ(var(--rotate-z-hover, var(--rotate-z, 0deg))) translateX(var(--translate-x-hover, var(--translate-x, 0px))) translateY(var(--translate-y-hover, var(--translate-y, 0px))) translateZ(var(--translate-z-hover, var(--translate-z, 0px))) scaleX(var(--scale-x-hover, var(--scale-x, 1))) scaleY(var(--scale-y-hover, var(--scale-y, 1))) scale3d(var(--scale-3d-x-hover, var(--scale-3d-x, 1)), var(--scale-3d-y-hover, var(--scale-3d-y, 1)), 1) skewX(var(--skew-x-hover, var(--skew-x, 0deg))) skewY(var(--skew-y-hover, var(--skew-y, 0deg)));"
 			}
 		},
 		"applyTransformOriginCustom": {
@@ -617,22 +497,6 @@
 					{
 						"condition": "==",
 						"key": "transformOrigin",
-						"value": "custom"
-					}
-				]
-			}
-		},
-		"applyTransformOriginCustomHover": {
-			"type": "boolean",
-			"default": true,
-			"selectors": {
-				".{{WRAPPER}}:hover": "transform-origin: var(--transform-origin-x-hover, var(--transform-origin-x, 50%)) var(--transform-origin-y-hover, var(--transform-origin-y, 50%));"
-			},
-			"condition": {
-				"rules": [
-					{
-						"condition": "==",
-						"key": "transformOriginHover",
 						"value": "custom"
 					}
 				]
