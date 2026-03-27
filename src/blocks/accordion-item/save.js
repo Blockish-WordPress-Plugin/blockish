@@ -61,20 +61,25 @@ export default function Save( { attributes, context } ) {
 	} );
 
 	return (
-		<details { ...blockProps } open={ !! attributes?.defaultOpen }>
-			<summary className="blockish-accordion-item-trigger">
-				<IconGroup openIcon={ openIcon } closeIcon={ closeIcon } />
-				<TitleTag className="blockish-accordion-item-heading">
-					<RichText.Content
-						tagName="span"
-						className="blockish-accordion-item-title-text"
-						value={ attributes?.title }
-					/>
-				</TitleTag>
-			</summary>
+		<div { ...blockProps }>
+			<details
+				className="blockish-accordion-item-details"
+				open={ !! attributes?.defaultOpen }
+			>
+				<summary className="blockish-accordion-item-trigger">
+					<IconGroup openIcon={ openIcon } closeIcon={ closeIcon } />
+					<TitleTag className="blockish-accordion-item-heading">
+						<RichText.Content
+							tagName="span"
+							className="blockish-accordion-item-title-text"
+							value={ attributes?.title }
+						/>
+					</TitleTag>
+				</summary>
+			</details>
 			<div className="blockish-accordion-item-panel">
 				<div { ...contentProps } />
 			</div>
-		</details>
+		</div>
 	);
 }

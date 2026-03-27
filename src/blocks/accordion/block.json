@@ -84,14 +84,14 @@
 			"type": "string",
 			"groupSelector": {
 				"type": "BlockishBackground",
-				"selector": ".{{WRAPPER}} .blockish-accordion-item[open]"
+				"selector": ".{{WRAPPER}} .blockish-accordion-item-details[open]"
 			}
 		},
 		"accordionBorderActive": {
 			"type": "string",
 			"groupSelector": {
 				"type": "BlockishBorder",
-				"selector": ".{{WRAPPER}} .blockish-accordion-item[open]"
+				"selector": ".{{WRAPPER}} .blockish-accordion-item-details[open]"
 			}
 		},
 		"accordionBorderRadius": {
@@ -174,27 +174,27 @@
 		"headerTextColorActive": {
 			"type": "string",
 			"selectors": {
-				".{{WRAPPER}} .blockish-accordion-item[open] .blockish-accordion-item-title-text": "color: {{VALUE}};"
+				".{{WRAPPER}} .blockish-accordion-item-details[open] .blockish-accordion-item-title-text": "color: {{VALUE}};"
 			}
 		},
 		"iconColorActive": {
 			"type": "string",
 			"selectors": {
-				".{{WRAPPER}} .blockish-accordion-item[open] .blockish-accordion-item-icon": "color: {{VALUE}};"
+				".{{WRAPPER}} .blockish-accordion-item-details[open] .blockish-accordion-item-icon": "color: {{VALUE}};"
 			}
 		},
 		"headerTextShadowActive": {
 			"type": "string",
 			"groupSelector": {
 				"type": "BlockishTextShadow",
-				"selector": ".{{WRAPPER}} .blockish-accordion-item[open] .blockish-accordion-item-title-text"
+				"selector": ".{{WRAPPER}} .blockish-accordion-item-details[open] .blockish-accordion-item-title-text"
 			}
 		},
 		"headerTextStrokeActive": {
 			"type": "string",
 			"groupSelector": {
 				"type": "BlockishTextStroke",
-				"selector": ".{{WRAPPER}} .blockish-accordion-item[open] .blockish-accordion-item-title-text"
+				"selector": ".{{WRAPPER}} .blockish-accordion-item-details[open] .blockish-accordion-item-title-text"
 			}
 		},
 		"contentBackground": {

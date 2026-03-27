@@ -37,13 +37,14 @@ const getAccordionSchemaData = ( element ) => {
 };
 
 const syncItemState = ( item, isOpen ) => {
+	const details = item.querySelector( '.blockish-accordion-item-details' );
 	const trigger = item.querySelector( '.blockish-accordion-item-trigger' );
 
-	if ( ! trigger ) {
+	if ( ! details || ! trigger ) {
 		return;
 	}
 
-	item.open = isOpen;
+	details.open = isOpen;
 };
 
 const mountAccordion = ( element ) => {
@@ -53,20 +54,19 @@ const mountAccordion = ( element ) => {
 	const maxExpanded = element.dataset.maxExpanded || 'one';
 
 	items.forEach( ( item ) => {
-		const trigger = item.querySelector(
-			'.blockish-accordion-item-trigger'
-		);
+		const details = item.querySelector( '.blockish-accordion-item-details' );
+		const trigger = item.querySelector( '.blockish-accordion-item-trigger' );
 
-		if ( ! trigger ) {
+		if ( ! details || ! trigger ) {
 			return;
 		}
 
-		syncItemState( item, item.open );
+		syncItemState( item, details.open );
 
 		trigger.addEventListener( 'click', ( event ) => {
 			event.preventDefault();
 
-			const willOpen = ! item.open;
+			const willOpen = ! details.open;
 
 			if ( willOpen && maxExpanded === 'one' ) {
 				items.forEach( ( sibling ) => {
