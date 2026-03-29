@@ -1,0 +1,105 @@
+.blockish-block-tab {
+	--blockish-tab-border-color: #d1d5db;
+	--blockish-tab-text-color: #111827;
+	--blockish-tab-bg: #ffffff;
+	--blockish-tab-panel-bg: #ffffff;
+	--blockish-tab-active-bg: #111827;
+	--blockish-tab-active-color: #ffffff;
+	--blockish-tab-gap: 10px;
+
+	.blockish-block-tab-layout {
+		display: flex;
+		flex-direction: column;
+		gap: var(--blockish-tab-gap);
+	}
+
+	& .blockish-block-tab-layout.is-direction-column {
+		flex-direction: column;
+	}
+
+	& .blockish-block-tab-layout.is-direction-column-reverse {
+		flex-direction: column-reverse;
+	}
+
+	& .blockish-block-tab-layout.is-direction-row {
+		align-items: stretch;
+		flex-direction: row;
+	}
+
+	& .blockish-block-tab-layout.is-direction-row-reverse {
+		align-items: stretch;
+		flex-direction: row-reverse;
+	}
+
+	.blockish-block-tab-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--blockish-tab-gap);
+	}
+
+	& .blockish-block-tab-layout.is-direction-row .blockish-block-tab-nav,
+	& .blockish-block-tab-layout.is-direction-row-reverse .blockish-block-tab-nav {
+		align-content: flex-start;
+		align-self: stretch;
+		flex: 0 0 auto;
+		flex-direction: column;
+		flex-wrap: nowrap;
+		min-height: 0;
+	}
+
+	& .blockish-block-tab-layout.is-direction-row .blockish-block-tab-items,
+	& .blockish-block-tab-layout.is-direction-row-reverse .blockish-block-tab-items {
+		flex: 1 1 auto;
+		min-height: 0;
+		min-width: 0;
+	}
+
+	& .blockish-block-tab-layout.is-direction-row .blockish-block-tab-trigger,
+	& .blockish-block-tab-layout.is-direction-row-reverse .blockish-block-tab-trigger {
+		flex: 1 1 0;
+	}
+
+	.blockish-block-tab-trigger {
+		align-items: center;
+		background: var(--blockish-tab-bg);
+		border: 1px solid var(--blockish-tab-border-color);
+		border-radius: 6px;
+		color: var(--blockish-tab-text-color);
+		cursor: pointer;
+		display: inline-flex;
+		font: inherit;
+		gap: 10px;
+		justify-content: center;
+		margin: 0;
+		padding: 10px 14px;
+	}
+
+	.blockish-block-tab-trigger[aria-selected='true'] {
+		background: var(--blockish-tab-active-bg);
+		border-color: var(--blockish-tab-active-bg);
+		color: var(--blockish-tab-active-color);
+	}
+
+	.blockish-block-tab-trigger-title {
+		display: inline-block;
+		line-height: 1.4;
+		min-width: 0;
+	}
+
+	.blockish-block-tab-trigger-icon {
+		display: inline-flex;
+		line-height: 0;
+	}
+
+	.blockish-block-tab-trigger-icon svg {
+		fill: currentColor;
+	}
+
+	.blockish-block-tab-item {
+		background: var(--blockish-tab-panel-bg);
+		border: 1px solid var(--blockish-tab-border-color);
+		border-radius: 8px;
+		height: 100%;
+		padding: 16px;
+	}
+}

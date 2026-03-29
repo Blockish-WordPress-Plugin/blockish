@@ -111,6 +111,17 @@ class BlocksList extends ConfigList {
                 'status'  => 'active',
                 'parent'  => 'accordion',
             ),
+            'tab' => array(
+                'name'    => __('Tab', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
+            'tab-item' => array(
+                'name'    => __('Tab Item', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+                'parent'  => 'tab',
+            ),
         );
     }
 }

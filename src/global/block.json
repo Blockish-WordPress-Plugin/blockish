@@ -138,6 +138,12 @@
 				".{{WRAPPER}}": "align-self: {{VALUE}};"
 			}
 		},
+		"justifySelf": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "justify-self: {{VALUE}};"
+			}
+		},
 		"flexOrder": {
 			"type": "object",
 			"selectors": {
@@ -178,6 +184,30 @@
 			"type": "object",
 			"selectors": {
 				".{{WRAPPER}}": "flex-shrink: {{VALUE}};"
+			}
+		},
+		"gridColumnStart": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "grid-column-start: {{VALUE}};"
+			}
+		},
+		"gridColumnEnd": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "grid-column-end: {{VALUE}};"
+			}
+		},
+		"gridRowStart": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "grid-row-start: {{VALUE}};"
+			}
+		},
+		"gridRowEnd": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "grid-row-end: {{VALUE}};"
 			}
 		},
 		"transform": {

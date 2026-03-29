@@ -1,0 +1,15 @@
+{
+	"name": "blockish/wrapper-link-extension",
+	"title": "Wrapper Link Extension",
+	"attributes": {
+		"wrapperLink": {
+			"type": "object",
+			"default": {}
+		}
+	},
+	"include": [
+		"*"
+	],
+	"exclude": [],
+	"editorScript": "file:./index.js"
+}

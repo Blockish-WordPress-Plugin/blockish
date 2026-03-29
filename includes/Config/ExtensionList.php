@@ -33,6 +33,11 @@ class ExtensionList extends ConfigList {
                 'package' => 'free',
                 'status'  => 'active',
             ),
+            'wrapper-link' => array(
+                'name'    => 'Wrapper Link',
+                'package' => 'free',
+                'status'  => 'active',
+            ),
         );
     }
 }

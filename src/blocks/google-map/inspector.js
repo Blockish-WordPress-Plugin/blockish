@@ -31,7 +31,7 @@ const Inspector = ( { advancedControls } ) => {
 						{ tabName === 'content' && (
 							<BlockishControl
 								type="BlockishPanelBody"
-								title={ __( 'Maps', 'blockish' ) }
+								title={ __( 'Google Maps', 'blockish' ) }
 								initialOpen={ true }
 							>
 								<BlockishControl
@@ -57,7 +57,7 @@ const Inspector = ( { advancedControls } ) => {
 						{ tabName === 'style' && (
 							<BlockishControl
 								type="BlockishPanelBody"
-								title={ __( 'Maps', 'blockish' ) }
+								title={ __( 'Google Maps', 'blockish' ) }
 								initialOpen={ true }
 							>
 								<BlockishControl
@@ -100,7 +100,7 @@ const Inspector = ( { advancedControls } ) => {
 													<BlockishControl
 														type="BlockishRangeControl"
 														label={ __(
-															'Transition(Sec)',
+															'Transition Duration (s)',
 															'blockish'
 														) }
 														slug="mapHoverTransition"

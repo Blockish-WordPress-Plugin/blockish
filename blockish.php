@@ -19,6 +19,7 @@ use Blockish\Core\Blocks;
 use Blockish\Core\Enqueue;
 use Blockish\Core\ExtenSions;
 use Blockish\Core\StyleGenerator;
+use Blockish\Hooks\WrapperLink;
 use Blockish\Routes\SVGUploaderV1;
 
 // Exit if accessed directly.
@@ -132,7 +133,8 @@ final class Blockish {
         Enqueue::get_instance();
         StyleGenerator::get_instance();
         SVGUploaderV1::get_instance();
-        // ExtenSions::get_instance();
+        ExtenSions::get_instance();
+        WrapperLink::get_instance();
     }
 
     public function admin_enqueue_scripts($screen) {

@@ -7,6 +7,7 @@ import Width from './components/width';
 import * as previews from './preview';
 import Position from './components/position';
 import Flex from './components/flex';
+import Grid from './components/grid';
 import Transform from './components/transform';
 import Background from './components/background';
 import Border from './components/border';
@@ -37,6 +38,11 @@ const BlockishBlocksAdvancedControls = createHigherOrderComponent(
                             {
                                 props?.context?.hasOwnProperty('display') && props?.context?.display === 'flex' && (
                                     <Flex {...props} />
+                                )
+                            }
+                            {
+                                props?.context?.hasOwnProperty('display') && props?.context?.display === 'grid' && (
+                                    <Grid {...props} />
                                 )
                             }
                             <Transform {...props} />

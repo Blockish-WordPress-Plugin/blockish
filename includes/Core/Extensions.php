@@ -10,275 +10,296 @@ class Extensions
 {
     use \Blockish\Traits\SingletonTrait;
 
-    public $scripts_handles = ['blockish-editorscript', 'blockish-script', 'blockish-viewscript'];
-    public $styles_handles = ['blockish-editorstyle', 'blockish-style', 'blockish-viewstyle'];
+    /**
+     * Cached extension metadata keyed by slug.
+     *
+     * @var array<string, array>
+     */
+    private $extensions = [];
 
     /**
      * Constructor.
-     * Registers the extensions.
      */
     private function __construct()
     {
-        add_action('enqueue_block_assets', [$this, 'register_extension_assets']);
-        add_filter('render_block_data', [$this, 'register_blockish_extensions'], 10);
+        add_action('init', [$this, 'load_extensions'], 11);
+        add_action('enqueue_block_editor_assets', [$this, 'enqueue_editor_assets']);
+        add_filter('block_type_metadata', [$this, 'inject_extension_attributes'], 20);
     }
 
     /**
-     * register_extension_assets
-     * 
-     */
-    public function register_extension_assets()
-    {
-        $active_extensions = ExtensionList::get_instance()->get_list('active');
-        foreach ($active_extensions as $slug => $extension) {
-            $path = BLOCKISH_EXTENSIONS_DIR . $slug;
-            if (is_readable($path)) {
-                $extension_metadata = $this->get_extensions_metadata($path);
-                if (!empty($extension_metadata)) {
-                    $this->register_assets($extension_metadata, $path);
-                    if (is_admin()) {
-                        foreach ($this->scripts_handles as $handle) {
-                            if (wp_script_is($handle, 'registered')) {
-                                wp_enqueue_script($handle);
-                            }
-                        }
-                    
-                        foreach ($this->styles_handles as $handle) {
-                            if (wp_style_is($handle, 'registered')) {
-                                wp_enqueue_style($handle);
-                            }
-                        }
-                    }               
-                }
-            }
-        }
-    }
-
-
-    /**
-     * Registers the active extensions from the ExtensionList.
-     */
-    public function register_blockish_extensions($block)
-    {
-        $active_extensions = ExtensionList::get_instance()->get_list('active');
-        if (isset($block['blockName']) && str_contains($block['blockName'], 'blockish') && !empty($active_extensions)) {
-            // Register the necessary assets from block.json
-            foreach ($active_extensions as $slug => $extension) {
-                $path = BLOCKISH_EXTENSIONS_DIR . $slug;
-                if (is_readable($path)) {
-                    $extension_metadata = $this->get_extensions_metadata($path);
-                    if (!empty($extension_metadata)) {
-                        foreach ($this->scripts_handles as $handle) {
-                            if (wp_script_is($handle, 'registered') && !str_contains($handle, 'editor')) {
-                                if (empty($extension_metadata['editorScriptData']['conditions'])) {
-                                    wp_enqueue_script('blockish-editorscript');
-                                } else {
-                                    $data = $extension_metadata['editorScriptData'];
-                                    $conditions = $data['conditions'] ?? [];
-                                    if ($this->should_execute_scripts($conditions, $block)) {
-                                        wp_enqueue_script('blockish-editorscript');
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $block;
-    }
-
-    /**
-     * Get WP filesystem
+     * Load active extension metadata and register their assets.
      *
      * @return void
      */
-    protected function get_filesystem()
+    public function load_extensions()
     {
-        // Check if WP_Filesystem is available
-        if (!function_exists('WP_Filesystem')) {
-            require_once ABSPATH . 'wp-admin/includes/file.php';
+        $active_extensions = ExtensionList::get_instance()->get_list('active');
+
+        if (empty($active_extensions)) {
+            return;
         }
 
-        // Initialize WP_Filesystem
-        WP_Filesystem();
+        foreach ($active_extensions as $slug => $extension) {
+            $path = BLOCKISH_EXTENSIONS_DIR . $slug;
+            if (!is_dir($path)) {
+                continue;
+            }
+
+            $metadata = $this->get_extension_metadata($path);
+            if (empty($metadata)) {
+                continue;
+            }
+
+            $this->extensions[$slug] = $metadata;
+            $this->register_assets($slug, $metadata, $path);
+        }
     }
 
     /**
-     * get_extensions_metadata
+     * Enqueue extension editor assets only.
      *
-     * @param string $path The path to the extension.
-     * @return array | false
+     * @return void
      */
-    private function get_extensions_metadata($path)
+    public function enqueue_editor_assets()
     {
-        $this->get_filesystem();
-        global $wp_filesystem;
+        foreach ($this->extensions as $slug => $metadata) {
+            $this->maybe_enqueue_handle($slug, 'editorScript');
+            $this->maybe_enqueue_handle($slug, 'editorStyle');
+        }
+    }
 
-        $block_json_path = $path . '/block.json';
-
-        // Ensure the block.json file exists
-        if (!is_readable($block_json_path)) {
-            return false;
+    /**
+     * Inject extension attributes into selected blocks via include/exclude rules.
+     *
+     * @param array $metadata Block metadata.
+     * @return array
+     */
+    public function inject_extension_attributes($metadata)
+    {
+        if (!isset($metadata['name']) || !is_string($metadata['name'])) {
+            return $metadata;
         }
 
-        // Get the contents of block.json
-        $block_json = $wp_filesystem->get_contents($block_json_path);
-
-        // Decode the JSON into an associative array
-        $metadata = json_decode($block_json, true);
-
-        if (empty($metadata)) {
-            return false;
+        if (empty($this->extensions)) {
+            return $metadata;
         }
 
-        // Check if the "file" key is available
-        if (!isset($path)) {
-            $path = $block_json_path;  // Use the path to block.json as a fallback
+        foreach ($this->extensions as $extension) {
+            if (!$this->extension_targets_block($extension, $metadata['name'])) {
+                continue;
+            }
+
+            if (empty($extension['attributes']) || !is_array($extension['attributes'])) {
+                continue;
+            }
+
+            if (!isset($metadata['attributes']) || !is_array($metadata['attributes'])) {
+                $metadata['attributes'] = [];
+            }
+
+            $metadata['attributes'] = array_merge($metadata['attributes'], $extension['attributes']);
         }
 
         return $metadata;
     }
 
     /**
-     * Registers scripts and styles for the extension.
+     * Get extension metadata from block.json.
      *
-     * @param array  $metadata The block.json metadata.
-     * @param string $path     The path to the extension directory.
+     * @param string $path Extension directory path.
+     * @return array|false
      */
-    private function register_assets($metadata, $path)
+    private function get_extension_metadata($path)
     {
-        // Register editor scripts and styles
-        $this->process_and_register_assets($metadata, $path, 'editorScript', 'script');
-        $this->process_and_register_assets($metadata, $path, 'editorStyle', 'style');
-        $this->process_and_register_assets($metadata, $path, 'style', 'style');
-        $this->process_and_register_assets($metadata, $path, 'script', 'script');
-        $this->process_and_register_assets($metadata, $path, 'viewScript', 'script');
-        $this->process_and_register_assets($metadata, $path, 'viewStyle', 'style');
+        $block_json_path = trailingslashit($path) . 'block.json';
+
+        if (!is_readable($block_json_path)) {
+            return false;
+        }
+
+        $contents = file_get_contents($block_json_path);
+        if ($contents === false) {
+            return false;
+        }
+
+        $metadata = json_decode($contents, true);
+        if (empty($metadata) || !is_array($metadata)) {
+            return false;
+        }
+
+        return $metadata;
     }
 
     /**
-     * Process asset registration (script or style) and enqueue.
+     * Register extension assets found in metadata.
      *
-     * @param array  $metadata   The block.json metadata.
-     * @param string $path       The path to the extension directory.
-     * @param string $field_name The field name in block.json (editorScript, editorStyle).
-     * @param string $type       Either 'script' or 'style'.
-     */
-    private function process_and_register_assets($metadata, $path, $field_name, $type)
-    {
-
-        if (empty($metadata[$field_name])) {
-            return;
-        }
-
-        $assets = $metadata[$field_name];
-
-        if (is_string($assets)) {
-            return $this->register_asset($path, $assets, $type, $field_name, $metadata);
-        }
-    }
-
-    /**
-     * Registers a script or style.
-     *
-     * @param string $extension_file The block's main file path for asset normalization.
-     * @param mixed  $asset      The asset, either a handle or file path.
-     * @param string $type       Either 'script' or 'style'.
-     */
-    private function register_asset($extension_file, $asset, $type, $field_name, $metadata)
-    {
-        // Ensure that $extension_file is not null before calling dirname()
-        if (empty($extension_file)) {
-            return;
-        }
-
-        // If the asset is a handle, do nothing as it's already registered.
-        if (!is_string($asset) || !str_starts_with($asset, 'file:')) {
-            return;
-        }
-
-        // Remove the 'file:' prefix and get the actual file path.
-        $asset = remove_block_asset_path_prefix($asset);
-        $path = wp_normalize_path($extension_file);
-
-        // Build the script asset file path and normalize it.
-        $script_asset_raw_path = $path . '/' . substr_replace($asset, '.asset.php', -strlen('.js'));
-        $script_asset_path = wp_normalize_path(realpath($script_asset_raw_path));
-
-        // Check for the asset file and asset.php (for dependencies and version).
-        $asset_path = wp_normalize_path(realpath($path . '/' . $asset));
-
-        $assets = [
-            'dependencies' => [],
-            'version'      => filemtime($asset_path),
-        ];
-
-        if (file_exists($script_asset_path)) {
-            $assets = include $script_asset_path;
-        }
-
-        // Register the script or style
-        $handle = 'blockish-' . sanitize_key($field_name);
-        $asset_url = plugins_url($asset, $path . '/' . $asset);
-        if ($type === 'script') {
-            $extension_3rd_party_dependencies = $metadata[$field_name . 'Data']['dependencies'] ?? [];
-            $assets['dependencies'] = array_merge($assets['dependencies'], $extension_3rd_party_dependencies);
-            wp_register_script(
-                $handle,
-                $asset_url,
-                $assets['dependencies'],
-                $assets['version'],
-                ['strategy' => 'defer', 'in_footer' => true]
-            );
-        } elseif ($type === 'style') {
-            wp_register_style(
-                $handle,
-                $asset_url,
-                [],
-                $assets['version']
-            );
-        }
-    }
-
-    /**
-     * handle_conditions
-     * 
-     * @param array $metadata
-     * @param array $conditions
-     * 
+     * @param string $slug Extension slug.
+     * @param array  $metadata Extension metadata.
+     * @param string $path Extension directory path.
      * @return void
      */
-
-    public function should_execute_scripts($conditions, $block)
+    private function register_assets($slug, $metadata, $path)
     {
-        if (empty($conditions)) {
-            return true;
+        $this->process_and_register_asset($slug, $metadata, $path, 'editorScript', 'script');
+        $this->process_and_register_asset($slug, $metadata, $path, 'editorStyle', 'style');
+        $this->process_and_register_asset($slug, $metadata, $path, 'script', 'script');
+        $this->process_and_register_asset($slug, $metadata, $path, 'style', 'style');
+        $this->process_and_register_asset($slug, $metadata, $path, 'viewScript', 'script');
+        $this->process_and_register_asset($slug, $metadata, $path, 'viewStyle', 'style');
+    }
+
+    /**
+     * Process one block.json asset field.
+     *
+     * @param string $slug Extension slug.
+     * @param array  $metadata Extension metadata.
+     * @param string $path Extension directory path.
+     * @param string $field_name Field name in block.json.
+     * @param string $type script|style.
+     * @return void
+     */
+    private function process_and_register_asset($slug, $metadata, $path, $field_name, $type)
+    {
+        if (empty($metadata[$field_name]) || !is_string($metadata[$field_name])) {
+            return;
         }
 
-        foreach ($conditions as $condition) {
-            $type = $condition['type'] ?? '';
+        $asset = $metadata[$field_name];
+        if (!str_starts_with($asset, 'file:')) {
+            return;
+        }
 
-            if ($type === 'attributes') {
-                $key = $condition['key'] ?? [];
-                // TODO: Implement multiple attributes conditions
-                if (empty($condition['value']) && !empty($block['attrs'][$key])) {
-                    return true;
-                }elseif (!empty($condition['value']) && $block['attrs'][$key] == $condition['value']) {
-                    return true;
-                }elseif (!empty($condition['value']) && $block['attrs'][$key] != $condition['value']) {
-                    return false;
-                }elseif (empty($condition['value']) && empty($block['attrs'][$key])) {
-                    return true;
+        $this->register_asset($slug, $path, $asset, $type, $field_name);
+    }
+
+    /**
+     * Register a single script/style handle.
+     *
+     * @param string $slug Extension slug.
+     * @param string $extension_path Extension directory path.
+     * @param string $asset Asset path with file: prefix.
+     * @param string $type script|style.
+     * @param string $field_name Field name from metadata.
+     * @return void
+     */
+    private function register_asset($slug, $extension_path, $asset, $type, $field_name)
+    {
+        $asset_relative_path = remove_block_asset_path_prefix($asset);
+        $asset_absolute_path = wp_normalize_path($extension_path . '/' . $asset_relative_path);
+
+        if (!file_exists($asset_absolute_path)) {
+            return;
+        }
+
+        $asset_data = [
+            'dependencies' => [],
+            'version' => filemtime($asset_absolute_path),
+        ];
+
+        if ($type === 'script') {
+            $script_asset_path = wp_normalize_path(
+                substr_replace($asset_absolute_path, '.asset.php', -strlen('.js'))
+            );
+
+            if (file_exists($script_asset_path)) {
+                $script_asset_data = include $script_asset_path;
+                if (is_array($script_asset_data)) {
+                    $asset_data = array_merge($asset_data, $script_asset_data);
                 }
-            }elseif ($type === 'meta') {
-                // TODO: Implement meta conditions
-            }elseif ($type === 'blockName') {
-                // TODO: Implement blockName conditions 
             }
         }
 
-        return false;
+        $handle = $this->get_extension_asset_handle($slug, $field_name);
+        $asset_url = plugins_url(
+            'build/extensions/' . $slug . '/' . ltrim($asset_relative_path, '/'),
+            BLOCKISH_DIR . 'blockish.php'
+        );
+
+        if ($type === 'script') {
+            wp_register_script(
+                $handle,
+                $asset_url,
+                $asset_data['dependencies'] ?? [],
+                $asset_data['version'] ?? false,
+                ['strategy' => 'defer', 'in_footer' => true]
+            );
+            return;
+        }
+
+        wp_register_style(
+            $handle,
+            $asset_url,
+            [],
+            $asset_data['version'] ?? false
+        );
     }
+
+    /**
+     * Generate deterministic handle per extension and field.
+     *
+     * @param string $slug Extension slug.
+     * @param string $field_name Metadata field.
+     * @return string
+     */
+    private function get_extension_asset_handle($slug, $field_name)
+    {
+        return 'blockish-extension-' . sanitize_key($slug) . '-' . sanitize_key($field_name);
+    }
+
+    /**
+     * Enqueue a registered extension asset handle if present.
+     *
+     * @param string $slug Extension slug.
+     * @param string $field_name Metadata field.
+     * @return void
+     */
+    private function maybe_enqueue_handle($slug, $field_name)
+    {
+        $handle = $this->get_extension_asset_handle($slug, $field_name);
+
+        if (str_contains($field_name, 'Style') || $field_name === 'style') {
+            if (wp_style_is($handle, 'registered')) {
+                wp_enqueue_style($handle);
+            }
+            return;
+        }
+
+        if (wp_script_is($handle, 'registered')) {
+            wp_enqueue_script($handle);
+        }
+    }
+
+    /**
+     * Check if an extension should target a given block name.
+     *
+     * @param array  $extension Extension metadata.
+     * @param string $block_name Current block name.
+     * @return bool
+     */
+    private function extension_targets_block($extension, $block_name)
+    {
+        $include = isset($extension['include']) && is_array($extension['include'])
+            ? $extension['include']
+            : [];
+        $exclude = isset($extension['exclude']) && is_array($extension['exclude'])
+            ? $extension['exclude']
+            : [];
+
+        if (!empty($include) && !in_array('*', $include, true) && !in_array($block_name, $include, true)) {
+            return false;
+        }
+
+        if (in_array($block_name, $exclude, true)) {
+            return false;
+        }
+
+        // If include is not defined, default to Blockish blocks.
+        if (empty($include)) {
+            return str_starts_with($block_name, 'blockish/');
+        }
+
+        return true;
+    }
+
 }

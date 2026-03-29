@@ -1,0 +1,35 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/tab-item",
+	"version": "1.0.0",
+	"title": "Tab Item",
+	"category": "blockish-framework",
+	"description": "Child block for tab content.",
+	"icon": "excerpt-view",
+	"parent": [
+		"blockish/tab"
+	],
+	"attributes": {
+		"title": {
+			"type": "string",
+			"default": "Tab"
+		},
+		"tabIcon": {
+			"type": "object"
+		},
+		"defaultActive": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"reusable": false
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}

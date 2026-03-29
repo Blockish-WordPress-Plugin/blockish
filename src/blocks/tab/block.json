@@ -1,0 +1,292 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/tab",
+	"version": "1.0.0",
+	"title": "Tab",
+	"category": "blockish-framework",
+	"description": "Tabbed content container for tab items.",
+	"icon": "index-card",
+	"keywords": [
+		"tabs",
+		"tab",
+		"content"
+	],
+	"attributes": {
+		"direction": {
+			"type": "object",
+			"default": {
+				"Desktop": "column"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-layout": "flex-direction: {{VALUE}};"
+			}
+		},
+		"justify": {
+			"type": "object",
+			"default": {
+				"Desktop": "flex-start"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-nav": "justify-content: {{VALUE}};"
+			}
+		},
+		"alignTitle": {
+			"type": "object",
+			"default": {
+				"Desktop": "left"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger-title": "text-align: {{VALUE}};"
+			}
+		},
+		"defaultActiveTab": {
+			"type": "number",
+			"default": 0
+		},
+		"navGap": {
+			"type": "object",
+			"default": {
+				"Desktop": "10px"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-nav": "gap: {{VALUE}};"
+			}
+		},
+		"distanceFromContent": {
+			"type": "object",
+			"default": {
+				"Desktop": "10px"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-layout": "gap: {{VALUE}};"
+			}
+		},
+		"tabsBackgroundNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger"
+			}
+		},
+		"tabsBorderNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger"
+			}
+		},
+		"tabsBoxShadowNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger"
+			}
+		},
+		"tabsBackgroundHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger:hover"
+			}
+		},
+		"tabsBorderHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger:hover"
+			}
+		},
+		"tabsBoxShadowHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger:hover"
+			}
+		},
+		"tabsBackgroundActive": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger[aria-selected='true']"
+			}
+		},
+		"tabsBorderActive": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger[aria-selected='true']"
+			}
+		},
+		"tabsBoxShadowActive": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger[aria-selected='true']"
+			}
+		},
+		"tabsBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"tabsPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"titleTypography": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTypography",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger-title"
+			}
+		},
+		"titleColorNormal": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger-title": "color: {{VALUE}};"
+			}
+		},
+		"titleColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger:hover .blockish-block-tab-trigger-title": "color: {{VALUE}};"
+			}
+		},
+		"titleColorActive": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger[aria-selected='true'] .blockish-block-tab-trigger-title": "color: {{VALUE}};"
+			}
+		},
+		"titleTextShadowNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger-title"
+			}
+		},
+		"titleTextShadowHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger:hover .blockish-block-tab-trigger-title"
+			}
+		},
+		"titleTextShadowActive": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger[aria-selected='true'] .blockish-block-tab-trigger-title"
+			}
+		},
+		"titleTextStrokeNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTextStroke",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger-title"
+			}
+		},
+		"titleTextStrokeHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTextStroke",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger:hover .blockish-block-tab-trigger-title"
+			}
+		},
+		"titleTextStrokeActive": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTextStroke",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-trigger[aria-selected='true'] .blockish-block-tab-trigger-title"
+			}
+		},
+		"iconPosition": {
+			"type": "object",
+			"default": {
+				"Desktop": "row"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger": "flex-direction: {{VALUE}};"
+			}
+		},
+		"iconSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger-icon svg": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"iconSpacing": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger": "gap: {{VALUE}};"
+			}
+		},
+		"iconColorNormal": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger-icon": "color: {{VALUE}};"
+			}
+		},
+		"iconColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger:hover .blockish-block-tab-trigger-icon": "color: {{VALUE}};"
+			}
+		},
+		"iconColorActive": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-trigger[aria-selected='true'] .blockish-block-tab-trigger-icon": "color: {{VALUE}};"
+			}
+		},
+		"contentBackground": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-item"
+			}
+		},
+		"contentColor": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-item": "color: {{VALUE}};"
+			}
+		},
+		"contentBorder": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-block-tab-item"
+			}
+		},
+		"contentBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-item": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"contentPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-tab-item": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js"
+}

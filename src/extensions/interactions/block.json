@@ -1,3 +1,13 @@
 {
+	"name": "blockish/interactions-extension",
+	"title": "Interactions Extension",
+	"attributes": {
+		"blockishInteractions": {
+			"type": "object",
+			"default": {}
+		}
+	},
+	"include": [],
+	"exclude": [],
 	"editorScript": "file:./index.js"
 }
