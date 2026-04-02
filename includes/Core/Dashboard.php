@@ -14,6 +14,7 @@ class Dashboard {
 
     private function __construct() {
         add_action( 'admin_menu', array( $this, 'register_menu_page' ) );
+        add_action( 'admin_menu', array( $this, 'hide_adjacent_separator' ), 100 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
     }
 
@@ -31,6 +32,36 @@ class Dashboard {
 
     public function render_dashboard_page() {
         echo '<div class="wrap"><div id="blockish-dashboard-root"></div></div>';
+    }
+
+    public function hide_adjacent_separator() {
+        global $menu;
+
+        if ( ! is_array( $menu ) ) {
+            return;
+        }
+
+        $keys = array_keys( $menu );
+        sort( $keys, SORT_NUMERIC );
+
+        foreach ( $keys as $index => $key ) {
+            if ( empty( $menu[ $key ][2] ) || self::PAGE_SLUG !== $menu[ $key ][2] ) {
+                continue;
+            }
+
+            $next_key = $keys[ $index + 1 ] ?? null;
+            $prev_key = $keys[ $index - 1 ] ?? null;
+
+            if ( null !== $next_key && ! empty( $menu[ $next_key ][4] ) && false !== strpos( $menu[ $next_key ][4], 'wp-menu-separator' ) ) {
+                unset( $menu[ $next_key ] );
+            }
+
+            if ( null !== $prev_key && ! empty( $menu[ $prev_key ][4] ) && false !== strpos( $menu[ $prev_key ][4], 'wp-menu-separator' ) ) {
+                unset( $menu[ $prev_key ] );
+            }
+
+            break;
+        }
     }
 
     public function enqueue_assets( $hook_suffix ) {

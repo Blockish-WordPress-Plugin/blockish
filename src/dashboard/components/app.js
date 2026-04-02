@@ -9,8 +9,7 @@ import DashboardSidebar from './dashboard-sidebar';
 import ContentArea from './content-area';
 
 export default function App() {
-	const { setActiveMenu, loadDashboard, saveDashboard, updateModuleStatus, updateModuleSettings } =
-		useDispatch(STORE_NAME);
+	const { setActiveMenu, loadDashboard, saveDashboard, updateModuleStatus, updateModuleSettings } = useDispatch(STORE_NAME);
 	const history = useHistory();
 	const location = useLocation();
 	const autoSaveTimeout = useRef(null);

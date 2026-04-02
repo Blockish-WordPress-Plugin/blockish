@@ -3,6 +3,8 @@ import DashboardHome from './dashboard-home';
 import BlocksPage from './blocks-page';
 import ExtensionsPage from './extensions-page';
 import PlaceholderSection from './placeholder-section';
+import SettingsPage from './settings-page';
+import IntegrationsPage from './integrations-page';
 
 export default function ContentArea({
 	activeMenu,
@@ -31,12 +33,7 @@ export default function ContentArea({
 	}
 
 	if (activeMenu === 'settings') {
-		return (
-			<PlaceholderSection
-				title={__('Settings', 'blockish')}
-				description={__('General dashboard settings will appear here.', 'blockish')}
-			/>
-		);
+		return <SettingsPage />;
 	}
 
 	if (activeMenu === 'extensions') {
@@ -52,12 +49,7 @@ export default function ContentArea({
 	}
 
 	if (activeMenu === 'integrations') {
-		return (
-			<PlaceholderSection
-				title={__('Integrations', 'blockish')}
-				description={__('Manage third-party service connections and sync status.', 'blockish')}
-			/>
-		);
+		return <IntegrationsPage />;
 	}
 
 	if (activeMenu === 'addons') {

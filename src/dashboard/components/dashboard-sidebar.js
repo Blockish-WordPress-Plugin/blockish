@@ -9,6 +9,7 @@ export default function DashboardSidebar({ activeMenu, onMenuClick }) {
 				<Heading className="blockish-heading-secondary" level={2}>
 					{__('Blockish', 'blockish')}
 				</Heading>
+				<Text className="blockish-text-muted">{__('Gutenberg Blocks', 'blockish')}</Text>
 			</VStack>
 
 			<nav className="blockish-sidebar-nav">

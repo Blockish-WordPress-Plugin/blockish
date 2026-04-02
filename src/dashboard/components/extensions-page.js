@@ -13,7 +13,7 @@ import {
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { EXTENSION_CONTROL_MAP, EXTENSION_FILTERS } from '../utils';
+import { EXTENSION_CONTROL_MAP, EXTENSION_FILTERS, getExtensionCategoryKey } from '../utils';
 import ExtensionCard from './extension-card';
 
 function humanizeSlug(slug) {
@@ -21,10 +21,6 @@ function humanizeSlug(slug) {
 		.split('-')
 		.map((part) => (part ? `${part[0].toUpperCase()}${part.slice(1)}` : ''))
 		.join(' ');
-}
-
-function normalizePackage(value) {
-	return value === 'pro' ? 'pro' : 'free';
 }
 
 function getExtensionSettingsInitialState(slug) {
@@ -57,13 +53,14 @@ export default function ExtensionsPage({
 
 	const allExtensions = useMemo(() => {
 		return Object.entries(extensions || {}).map(([slug, item]) => {
-			const packageKey = normalizePackage(item?.package);
+			const categoryKey = getExtensionCategoryKey(item, slug);
 			return {
 				slug,
 				name: item?.name || humanizeSlug(slug),
 				status: item?.status === 'inactive' ? 'inactive' : 'active',
-				packageKey,
-				packageLabel: packageKey === 'pro' ? __('Pro', 'blockish') : __('Free', 'blockish'),
+				categoryKey,
+				categoryLabel:
+					categoryKey === 'animation' ? __('Animation', 'blockish') : __('General', 'blockish'),
 				description: item?.description || __('Extension module', 'blockish'),
 				hasSpecialControls: Boolean(EXTENSION_CONTROL_MAP[slug]),
 			};
@@ -74,7 +71,7 @@ export default function ExtensionsPage({
 		const normalizedSearch = searchTerm.trim().toLowerCase();
 
 		return allExtensions.filter((extension) => {
-			const matchesFilter = activeFilter === 'all' || extension.packageKey === activeFilter;
+			const matchesFilter = activeFilter === 'all' || extension.categoryKey === activeFilter;
 			const matchesSearch =
 				!normalizedSearch ||
 				extension.name.toLowerCase().includes(normalizedSearch) ||
@@ -170,18 +167,20 @@ export default function ExtensionsPage({
 					</HStack>
 				</Flex>
 
-				<HStack className="blockish-category-filter" justify="flex-start">
-					{EXTENSION_FILTERS.map((filter) => (
-						<Button
-							key={filter.key}
-							className={`blockish-filter-button blockish-button-base ${activeFilter === filter.key ? 'is-active' : ''}`}
-							variant="tertiary"
-							onClick={() => setActiveFilter(filter.key)}
-						>
-							{__(filter.label, 'blockish')}
-						</Button>
-					))}
-				</HStack>
+				{EXTENSION_FILTERS.length > 1 && (
+					<HStack className="blockish-category-filter" justify="flex-start">
+						{EXTENSION_FILTERS.map((filter) => (
+							<Button
+								key={filter.key}
+								className={`blockish-filter-button blockish-button-base ${activeFilter === filter.key ? 'is-active' : ''}`}
+								variant="tertiary"
+								onClick={() => setActiveFilter(filter.key)}
+							>
+								{__(filter.label, 'blockish')}
+							</Button>
+						))}
+					</HStack>
+				)}
 			</section>
 
 			<div className="blockish-block-grid">
@@ -209,11 +208,13 @@ export default function ExtensionsPage({
 				>
 					<VStack className="blockish-modal-controls" spacing={4}>
 						<ToggleControl
+							className="blockish-toggle-control"
 							label={__('Enable Safe Mode', 'blockish')}
 							checked={Boolean(globalControls.enableSafeMode)}
 							onChange={(value) => updateGlobalControl('enableSafeMode', value)}
 						/>
 						<ToggleControl
+							className="blockish-toggle-control"
 							label={__('Auto-enable on install', 'blockish')}
 							checked={Boolean(globalControls.autoEnableOnInstall)}
 							onChange={(value) => updateGlobalControl('autoEnableOnInstall', value)}
@@ -228,6 +229,7 @@ export default function ExtensionsPage({
 			{selectedSchema && (
 				<Modal
 					title={__(selectedSchema.title, 'blockish')}
+					className="blockish-configure-modal"
 					onRequestClose={() => setSelectedExtensionSlug(null)}
 				>
 					<VStack className="blockish-modal-controls" spacing={4}>
@@ -237,6 +239,7 @@ export default function ExtensionsPage({
 								return (
 									<ToggleControl
 										key={control.key}
+										className="blockish-toggle-control"
 										label={__(control.label, 'blockish')}
 										checked={Boolean(value ?? savedSettings[control.key])}
 										onChange={(next) =>

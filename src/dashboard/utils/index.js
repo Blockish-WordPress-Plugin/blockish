@@ -13,10 +13,10 @@ export const SIDEBAR_MENUS = [
 	{ key: 'dashboard', label: 'Dashboard', icon: layoutDashboard },
 	{ key: 'blocks', label: 'Blocks', icon: blocksIcon },
 	{ key: 'extensions', label: 'Extensions', icon: plugIcon },
-	{ key: 'settings', label: 'Settings', icon: settingsIcon },
-	{ key: 'integrations', label: 'Integrations', icon: plugIcon },
-	{ key: 'addons', label: 'Addons', icon: packageIcon },
-	{ key: 'license', label: 'License', icon: keyIcon },
+	// { key: 'settings', label: 'Settings', icon: settingsIcon },
+	// { key: 'integrations', label: 'Integrations', icon: plugIcon },
+	// { key: 'addons', label: 'Addons', icon: packageIcon },
+	// { key: 'license', label: 'License', icon: keyIcon },
 ];
 
 export const BLOCK_FILTERS = [
@@ -29,8 +29,8 @@ export const BLOCK_FILTERS = [
 
 export const EXTENSION_FILTERS = [
 	{ key: 'all', label: 'All' },
-	{ key: 'free', label: 'Free' },
-	{ key: 'pro', label: 'Pro' },
+	{ key: 'general', label: 'General' },
+	{ key: 'animation', label: 'Animation' },
 ];
 
 export const EXTENSION_CONTROL_MAP = {
@@ -79,6 +79,20 @@ export function getBlockCategoryKey(item = {}, slug = '') {
 
 export function isChildBlock(item = {}) {
 	return Boolean(item?.parent);
+}
+
+export function getExtensionCategoryKey(item = {}, slug = '') {
+	const provided = (item?.category || '').toLowerCase();
+	if (provided && EXTENSION_FILTERS.some((filter) => filter.key === provided)) {
+		return provided;
+	}
+
+	const text = `${slug} ${item?.name || ''} ${item?.description || ''}`.toLowerCase();
+	if (/(animation|animate|interaction|motion|transition|viewport)/.test(text)) {
+		return 'animation';
+	}
+
+	return 'general';
 }
 
 export function buildStats(items = {}, options = {}) {

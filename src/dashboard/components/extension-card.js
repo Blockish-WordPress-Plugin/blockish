@@ -5,7 +5,6 @@ import {
 	CardBody,
 	Flex,
 	FormToggle,
-	Icon,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
@@ -23,32 +22,36 @@ export default function ExtensionCard({ extension, isSaving, onToggle, onOpenSet
 						<Heading className="blockish-block-card-title blockish-heading-tertiary" level={3}>
 							{extension.name}
 						</Heading>
-						<FormToggle
-							className="blockish-block-toggle"
-							checked={isActive}
-							onChange={(event) => onToggle(extension.slug, event.target.checked)}
-						/>
+						<div className="blockish-extension-controls">
+							<FormToggle
+								className="blockish-block-toggle"
+								checked={isActive}
+								onChange={(event) => onToggle(extension.slug, event.target.checked)}
+							/>
+							{extension.hasSpecialControls && (
+								<Button
+									className="blockish-configure-icon-button"
+									variant="tertiary"
+									icon={settingsIcon}
+									label={__('Configure extension', 'blockish')}
+									showTooltip
+									disabled={!isActive || isSaving}
+									onClick={() => onOpenSettings(extension.slug)}
+								/>
+							)}
+						</div>
 					</Flex>
 					<Text className="blockish-block-card-description blockish-text-muted">
 						{extension.description}
 					</Text>
 					<Flex justify="space-between" align="center">
-						<Text variant="muted">{extension.packageLabel}</Text>
+						<Text className={`blockish-extension-category-tag is-${extension.categoryKey || 'general'}`}>
+							{extension.categoryLabel}
+						</Text>
 						<Text className={`blockish-status-badge ${isActive ? 'is-active' : 'is-inactive'}`}>
 							{isActive ? __('Active', 'blockish') : __('Inactive', 'blockish')}
 						</Text>
 					</Flex>
-					{extension.hasSpecialControls && isActive && (
-						<Button
-							className="blockish-action-button is-secondary blockish-button-base blockish-button-secondary"
-							variant="secondary"
-							onClick={() => onOpenSettings(extension.slug)}
-							disabled={isSaving}
-						>
-							<Icon icon={settingsIcon} />
-							{__('Configure', 'blockish')}
-						</Button>
-					)}
 				</VStack>
 			</CardBody>
 		</Card>
