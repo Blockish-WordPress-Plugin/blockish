@@ -20,6 +20,7 @@ class ExtensionList extends ConfigList {
     public function __construct() {
         // Ensure parent constructor is called
         parent::__construct();
+        $this->remove_stale_extensions();
     }
 
     /**
@@ -28,26 +29,37 @@ class ExtensionList extends ConfigList {
      */
     protected function set_list() {
         $this->list = array(
-            'interactions' => array(
-                'name'    => 'Interactions',
-                'description' => __('Adds interaction and animation controls.', 'blockish'),
-                'settings_schema' => array(
-                    'enableViewportAnimation' => 'boolean',
-                    'defaultDelay' => 'string',
-                ),
+            'class-manager' => array(
+                'name'        => 'CSS Class Manager',
+                'description' => __( 'Create reusable global CSS classes and apply them to any Blockish block.', 'blockish' ),
                 'package' => 'free',
-                'status'  => 'active',
-            ),
-            'wrapper-link' => array(
-                'name'    => 'Wrapper Link',
-                'description' => __('Enable wrapper links for blocks.', 'blockish'),
-                'settings_schema' => array(
-                    'openInNewTabByDefault' => 'boolean',
-                    'relAttributes' => 'string',
-                ),
-                'package' => 'free',
-                'status'  => 'active',
+                'category'    => 'general',
+                'status'      => 'active',
             ),
         );
+    }
+
+    /**
+     * Remove extensions that are no longer defined from saved option payload.
+     *
+     * @return void
+     */
+    private function remove_stale_extensions() {
+        $saved_list = get_option( 'blockish_' . $this->type . '_list', array() );
+        if ( ! is_array( $saved_list ) ) {
+            return;
+        }
+
+        $valid_keys = array_keys( $this->list );
+        $cleaned    = array_intersect_key( $saved_list, array_flip( $valid_keys ) );
+
+        // Ensure required defaults exist after cleanup.
+        foreach ( $this->list as $key => $item ) {
+            if ( ! isset( $cleaned[ $key ] ) ) {
+                $cleaned[ $key ] = $item;
+            }
+        }
+
+        update_option( 'blockish_' . $this->type . '_list', $cleaned );
     }
 }

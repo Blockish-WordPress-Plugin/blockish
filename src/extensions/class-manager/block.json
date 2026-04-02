@@ -1,0 +1,16 @@
+{
+	"name": "blockish/class-manager-extension",
+	"title": "CSS Class Manager Extension",
+	"attributes": {
+		"classManager": {
+			"type": "array",
+			"default": []
+		}
+	},
+	"include": [
+		"*"
+	],
+	"exclude": [],
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./editor.scss"
+}
