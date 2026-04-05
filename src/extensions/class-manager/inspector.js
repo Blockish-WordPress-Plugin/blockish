@@ -6,18 +6,12 @@ import { plus, close } from '@wordpress/icons';
 import clsx from 'clsx';
 import InputDropdownContent from './components/input-dropdown-content';
 import ControlsDropdownContent from './components/controls-dropdown-content';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { getEntityTitle, removeClassById, useClasses } from './utils';
+import useExtensionsAttributes from '../../helpers/use-extensions-attributes';
 
 const Inspector = createHigherOrderComponent((WrappedComponent) => {
     return (props) => {
-        const { attributes } = useSelect((select) => {
-            return {
-                attributes: select('core/block-editor').getBlockAttributes(props.clientId),
-            };
-        }, [props?.clientId]);
-        const { updateBlockAttributes } = useDispatch('core/block-editor');
-        const setAttributes = (data) => updateBlockAttributes(props?.clientId, data);
+        const { attributes, setAttributes } = useExtensionsAttributes(props?.clientId);
         const selectedClasses = attributes?.classManager || [];
         const [selectedClass, setSelectedClass] = useState(null);
         const [selectedSubSelector, setSelectedSubSelector] = useState(null);
