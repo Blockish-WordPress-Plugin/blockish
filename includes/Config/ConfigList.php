@@ -73,6 +73,17 @@ abstract class ConfigList {
         $database_list = get_option( 'blockish_' . $this->type . '_list', array() );
 
         foreach ( $this->list as $key => $item ) {
+            $parent = $item['parent'] ?? null;
+
+            if ( $parent ) {
+                $parent_status = $database_list[ $parent ]['status'] ?? null;
+
+                // If a parent block is inactive, skip its children too.
+                if ( $parent_status === 'inactive' ) {
+                    continue;
+                }
+            }
+
             // Skip inactive items.
             if ( isset( $database_list[$key]['status'] ) && $database_list[$key]['status'] === 'inactive' ) {
                 continue;
@@ -109,6 +120,19 @@ abstract class ConfigList {
             } else {
                 // If it's a new item, add it to the saved list.
                 $saved_list[$key] = $item;
+            }
+        }
+
+        // Ensure child items follow their parent status if present.
+        foreach ( $saved_list as $key => $item ) {
+            $parent = $item['parent'] ?? null;
+            if ( ! $parent || ! isset( $saved_list[ $parent ] ) ) {
+                continue;
+            }
+
+            $parent_status = $saved_list[ $parent ]['status'] ?? null;
+            if ( in_array( $parent_status, array( 'active', 'inactive' ), true ) ) {
+                $saved_list[ $key ]['status'] = $parent_status;
             }
         }
 
