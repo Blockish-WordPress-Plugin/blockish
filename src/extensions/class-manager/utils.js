@@ -1,106 +1,185 @@
-import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 const EMPTY_ARRAY = [];
 const CLASS_POST_TYPE = 'blockish-classes';
-export const fontWeightOptions = [
-    { label: __('Default', 'blockish'), value: '' },
-    { label: __('100', 'blockish'), value: '100' },
-    { label: __('200', 'blockish'), value: '200' },
-    { label: __('300', 'blockish'), value: '300' },
-    { label: __('400', 'blockish'), value: '400' },
-    { label: __('500', 'blockish'), value: '500' },
-    { label: __('600', 'blockish'), value: '600' },
-    { label: __('700', 'blockish'), value: '700' },
-    { label: __('800', 'blockish'), value: '800' },
-    { label: __('900', 'blockish'), value: '900' },
+
+export const DISPLAY_OPTIONS = [
+    { label: 'Block', value: 'block' },
+    { label: 'Inline Block', value: 'inline-block' },
+    { label: 'Flex', value: 'flex' },
+    { label: 'Inline Flex', value: 'inline-flex' },
+    { label: 'Grid', value: 'grid' },
+    { label: 'Inline Grid', value: 'inline-grid' },
+    { label: 'None', value: 'none' },
 ];
 
-export const borderStyles = [
-    { label: __('None', 'blockish'), value: 'none' },
-    { label: __('Solid', 'blockish'), value: 'solid' },
-    { label: __('Dotted', 'blockish'), value: 'dotted' },
-    { label: __('Dashed', 'blockish'), value: 'dashed' },
-    { label: __('Double', 'blockish'), value: 'double' },
-    { label: __('Groove', 'blockish'), value: 'groove' },
-    { label: __('Ridge', 'blockish'), value: 'ridge' },
-    { label: __('Inset', 'blockish'), value: 'inset' },
-    { label: __('Outset', 'blockish'), value: 'outset' },
+export const FLEX_DIRECTION_OPTIONS = [
+    { label: 'Row', value: 'row' },
+    { label: 'Column', value: 'column' },
+    { label: 'Row Reverse', value: 'row-reverse' },
+    { label: 'Column Reverse', value: 'column-reverse' },
 ];
 
-export const overflowOptions = [
-    { label: __('Visible', 'blockish'), value: 'visible' },
-    { label: __('Hidden', 'blockish'), value: 'hidden' },
-    { label: __('Scroll', 'blockish'), value: 'scroll' },
-    { label: __('Auto', 'blockish'), value: 'auto' },
+export const FLEX_WRAP_OPTIONS = [
+    { label: 'No Wrap', value: 'nowrap' },
+    { label: 'Wrap', value: 'wrap' },
+    { label: 'Wrap Reverse', value: 'wrap-reverse' },
 ];
 
-export const backgroundTypes = [
-    { label: __('Color', 'blockish'), value: 'color' },
-    { label: __('Gradient', 'blockish'), value: 'gradient' },
-    { label: __('Image', 'blockish'), value: 'image' },
+export const JUSTIFY_CONTENT_OPTIONS = [
+    { label: 'Start', value: 'flex-start' },
+    { label: 'End', value: 'flex-end' },
+    { label: 'Center', value: 'center' },
+    { label: 'Space Between', value: 'space-between' },
+    { label: 'Space Around', value: 'space-around' },
+    { label: 'Space Evenly', value: 'space-evenly' },
 ];
 
-export const whiteSpaceOptions = [
-    { label: __('Normal', 'blockish'), value: 'normal' },
-    { label: __('Nowrap', 'blockish'), value: 'nowrap' },
-    { label: __('Pre', 'blockish'), value: 'pre' },
-    { label: __('Pre Line', 'blockish'), value: 'pre-line' },
-    { label: __('Pre Wrap', 'blockish'), value: 'pre-wrap' },
-    { label: __('Break Spaces', 'blockish'), value: 'break-spaces' },
+export const ALIGN_ITEMS_OPTIONS = [
+    { label: 'Start', value: 'flex-start' },
+    { label: 'End', value: 'flex-end' },
+    { label: 'Center', value: 'center' },
+    { label: 'Stretch', value: 'stretch' },
+    { label: 'Baseline', value: 'baseline' },
 ];
 
-export const displayOptions = [
-    { label: __('Block', 'blockish'), value: 'block' },
-    { label: __('Inline', 'blockish'), value: 'inline' },
-    { label: __('Flex', 'blockish'), value: 'flex' },
-    { label: __('Grid', 'blockish'), value: 'grid' },
+export const GRID_LAYOUT_OPTIONS = [
+    { label: 'Auto', value: 'auto' },
+    { label: 'Fixed', value: 'fixed' },
 ];
 
-export const positionOptions = [
-    { label: __('Static', 'blockish'), value: 'static' },
-    { label: __('Relative', 'blockish'), value: 'relative' },
-    { label: __('Absolute', 'blockish'), value: 'absolute' },
-    { label: __('Fixed', 'blockish'), value: 'fixed' },
-    { label: __('Sticky', 'blockish'), value: 'sticky' },
+export const POSITION_OPTIONS = [
+    { label: 'Static', value: 'static' },
+    { label: 'Relative', value: 'relative' },
+    { label: 'Absolute', value: 'absolute' },
+    { label: 'Fixed', value: 'fixed' },
+    { label: 'Sticky', value: 'sticky' },
 ];
 
-export const floatOptions = [
-    { label: __('Left', 'blockish'), value: 'left' },
-    { label: __('Right', 'blockish'), value: 'right' },
+export const OVERFLOW_OPTIONS = [
+    { label: 'Visible', value: 'visible' },
+    { label: 'Hidden', value: 'hidden' },
+    { label: 'Auto', value: 'auto' },
+    { label: 'Scroll', value: 'scroll' },
 ];
 
-export const clearOptions = [
-    { label: __('Left', 'blockish'), value: 'left' },
-    { label: __('Right', 'blockish'), value: 'right' },
-    { label: __('Both', 'blockish'), value: 'both' },
+export const OBJECT_FIT_OPTIONS = [
+    { label: 'Fill', value: 'fill' },
+    { label: 'Contain', value: 'contain' },
+    { label: 'Cover', value: 'cover' },
+    { label: 'None', value: 'none' },
+    { label: 'Scale Down', value: 'scale-down' },
 ];
 
-export const verticalAlignOptions = [
-    { label: __('Baseline', 'blockish'), value: 'baseline' },
-    { label: __('Top', 'blockish'), value: 'top' },
-    { label: __('Middle', 'blockish'), value: 'middle' },
-    { label: __('Bottom', 'blockish'), value: 'bottom' },
-    { label: __('Text Top', 'blockish'), value: 'text-top' },
-    { label: __('Text Bottom', 'blockish'), value: 'text-bottom' },
+export const ASPECT_RATIO_OPTIONS = [
+    { label: 'Auto', value: 'auto' },
+    { label: '1 / 1', value: '1 / 1' },
+    { label: '4 / 3', value: '4 / 3' },
+    { label: '3 / 2', value: '3 / 2' },
+    { label: '16 / 9', value: '16 / 9' },
+    { label: '21 / 9', value: '21 / 9' },
 ];
 
-export const gridLayoutTypeOptions = [
-    { label: __('Auto', 'blockish'), value: 'auto' },
-    { label: __('Manual', 'blockish'), value: 'manual' }
+export const FONT_WEIGHT_OPTIONS = [
+    { label: 'Default', value: '' },
+    { label: '100', value: '100' },
+    { label: '200', value: '200' },
+    { label: '300', value: '300' },
+    { label: '400', value: '400' },
+    { label: '500', value: '500' },
+    { label: '600', value: '600' },
+    { label: '700', value: '700' },
+    { label: '800', value: '800' },
+    { label: '900', value: '900' },
 ];
 
-export function minifyCSS(css) {
-    if (!css) return '';
-    return css
-        .replace(/\/\*[\s\S]*?\*\//g, '') // remove comments
-        .replace(/\s+/g, ' ')             // collapse whitespace
-        .replace(/\s*([{}:;,])\s*/g, '$1')// trim around tokens
-        .replace(/;}/g, '}')              // optional micro-opt
-        .trim();
-}
+export const TEXT_ALIGN_OPTIONS = [
+    { label: 'Left', value: 'left' },
+    { label: 'Center', value: 'center' },
+    { label: 'Right', value: 'right' },
+    { label: 'Justify', value: 'justify' },
+    { label: 'Start', value: 'start' },
+    { label: 'End', value: 'end' },
+];
+
+export const TEXT_DECORATION_OPTIONS = [
+    { label: 'None', value: 'none' },
+    { label: 'Underline', value: 'underline' },
+    { label: 'Overline', value: 'overline' },
+    { label: 'Line Through', value: 'line-through' },
+];
+
+export const TEXT_TRANSFORM_OPTIONS = [
+    { label: 'None', value: 'none' },
+    { label: 'Uppercase', value: 'uppercase' },
+    { label: 'Lowercase', value: 'lowercase' },
+    { label: 'Capitalize', value: 'capitalize' },
+];
+
+export const DIRECTION_OPTIONS = [
+    { label: 'LTR', value: 'ltr' },
+    { label: 'RTL', value: 'rtl' },
+];
+
+export const FONT_STYLE_OPTIONS = [
+    { label: 'Normal', value: 'normal' },
+    { label: 'Italic', value: 'italic' },
+    { label: 'Oblique', value: 'oblique' },
+];
+
+export const TEXT_OVERFLOW_OPTIONS = [
+    { label: 'Clip', value: 'clip' },
+    { label: 'Ellipsis', value: 'ellipsis' },
+];
+
+export const BACKGROUND_CLIP_OPTIONS = [
+    { label: 'Border Box', value: 'border-box' },
+    { label: 'Padding Box', value: 'padding-box' },
+    { label: 'Content Box', value: 'content-box' },
+    { label: 'Text', value: 'text' },
+];
+
+export const BLEND_MODE_OPTIONS = [
+    { label: 'Normal', value: 'normal' },
+    { label: 'Multiply', value: 'multiply' },
+    { label: 'Screen', value: 'screen' },
+    { label: 'Overlay', value: 'overlay' },
+    { label: 'Darken', value: 'darken' },
+    { label: 'Lighten', value: 'lighten' },
+    { label: 'Color Dodge', value: 'color-dodge' },
+    { label: 'Color Burn', value: 'color-burn' },
+    { label: 'Hard Light', value: 'hard-light' },
+    { label: 'Soft Light', value: 'soft-light' },
+    { label: 'Difference', value: 'difference' },
+    { label: 'Exclusion', value: 'exclusion' },
+    { label: 'Hue', value: 'hue' },
+    { label: 'Saturation', value: 'saturation' },
+    { label: 'Color', value: 'color' },
+    { label: 'Luminosity', value: 'luminosity' },
+];
+
+export const TRANSITION_TIMING_OPTIONS = [
+    { label: 'Ease', value: 'ease' },
+    { label: 'Linear', value: 'linear' },
+    { label: 'Ease In', value: 'ease-in' },
+    { label: 'Ease Out', value: 'ease-out' },
+    { label: 'Ease In Out', value: 'ease-in-out' },
+];
+
+export const TRANSFORM_ORIGIN_OPTIONS = [
+    { label: 'Top Left', value: 'top left' },
+    { label: 'Top Center', value: 'top center' },
+    { label: 'Top Right', value: 'top right' },
+    { label: 'Center Left', value: 'center left' },
+    { label: 'Center', value: 'center center' },
+    { label: 'Center Right', value: 'center right' },
+    { label: 'Bottom Left', value: 'bottom left' },
+    { label: 'Bottom Center', value: 'bottom center' },
+    { label: 'Bottom Right', value: 'bottom right' },
+    { label: 'Custom', value: 'custom' },
+];
 
 export function getEntityTitle(title) {
     if (typeof title === 'string') {
@@ -189,7 +268,11 @@ export const useClasses = (classes = [], searchInput = '', parent = null) => {
 
             const editedData = editedClassesById[classId];
             const savedData = savedClassMap.get(classId);
-            const classData = editedData || savedData || item;
+            const classData = editedData || savedData;
+
+            if (!classData) {
+                return null;
+            }
 
             return {
                 id: classId,
@@ -205,3 +288,47 @@ export function isValidCssClass(className) {
     const regex = /^[a-zA-Z_-][a-zA-Z0-9_-]*$/;
     return regex.test(className.trim());
 }
+
+export const safeParseClassManagerJSON = (value, fallback = null) => {
+    if (!value || typeof value !== 'string') {
+        return fallback;
+    }
+
+    try {
+        return JSON.parse(value);
+    } catch (error) {
+        return fallback;
+    }
+};
+
+export const buildClassManagerSelector = ({ item, parent }) => {
+    if (!item?.title) {
+        return '';
+    }
+
+    if (!parent?.title) {
+        return `.${item.title}`;
+    }
+
+    return item?.title?.startsWith(':')
+        ? `.${parent.title}.blockish-cm-${item.id}${item.title}`
+        : `.${parent.title}.blockish-cm-${item.id} ${item.title}`;
+};
+
+export const generateClassManagerItemStyle = ({ item, parent, generateStyles }) => {
+    if (!item?.title || !item?.content || typeof generateStyles !== 'function') {
+        return '';
+    }
+
+    const styleObject = safeParseClassManagerJSON(item.content, null);
+    if (!styleObject || typeof styleObject !== 'object' || Object.keys(styleObject).length === 0) {
+        return '';
+    }
+
+    const selector = buildClassManagerSelector({ item, parent });
+    if (!selector) {
+        return '';
+    }
+
+    return generateStyles(styleObject, selector);
+};

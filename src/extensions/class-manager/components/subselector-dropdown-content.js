@@ -4,7 +4,7 @@ import { plus, trash } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
-import { addClassItem, getEntityTitle, isValidCssClass, removeClassById } from '../utils';
+import { getEntityTitle, removeClassById } from '../utils';
 
 const CLASS_POST_TYPE = 'blockish-classes';
 
@@ -63,22 +63,27 @@ const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, set
             return;
         }
 
-        const next = addClassItem(current, {
-            id: item?.id,
-            title: item?.title,
-            parent: parent?.id,
-        }).map((entry) => {
-            if (entry?.id === item?.id) {
-                return { ...entry, parent: parent?.id };
-            }
-            return entry;
-        });
+        const exists = current.some((entry) => entry?.id === item?.id);
+        const next = exists
+            ? current.map((entry) => (
+                entry?.id === item?.id
+                    ? { ...entry, title: item?.title, parent: parent?.id }
+                    : entry
+            ))
+            : [
+                ...current,
+                {
+                    id: item?.id,
+                    title: item?.title,
+                    parent: parent?.id,
+                },
+            ];
 
         setAttributes({ classManagerSubselector: next });
     };
 
     const addSubSelector = async () => {
-        if (!normalizedSearchInput || !isValidCssClass(normalizedSearchInput) || hasClassExists) {
+        if (!normalizedSearchInput || hasClassExists) {
             return;
         }
 
@@ -92,6 +97,23 @@ const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, set
             return;
         }
 
+        const current = Array.isArray(attributes?.classManagerSubselector)
+            ? attributes.classManagerSubselector
+            : [];
+
+        if (!current.some((item) => item?.id === created.id)) {
+            setAttributes({
+                classManagerSubselector: [
+                    ...current,
+                    {
+                        id: created.id,
+                        title: getEntityTitle(created?.title) || normalizedSearchInput,
+                        parent: parent?.id,
+                    },
+                ],
+            });
+        }
+
         setSearchInput('');
         if (onClose) {
             onClose();
@@ -103,10 +125,13 @@ const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, set
             <SearchControl
                 __nextHasNoMarginBottom
                 className="blockish-class-manager-search"
-                placeholder={__('Write class name...', 'blockish')}
+                placeholder={__('Write css selector...', 'blockish')}
                 value={searchInput}
                 onChange={setSearchInput}
             />
+            <Text className="blockish-class-manager-search-info">
+                {__('Use a selector that targets something inside the current block.', 'blockish')}
+            </Text>
 
             <MenuGroup title={__('Classes', 'blockish')} className="blockish-class-manager-classes">
                 {visibleRecords.length > 0 && visibleRecords.map((item) => (
@@ -125,6 +150,12 @@ const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, set
                             tabIndex={0}
                             onClick={async (event) => {
                                 event.stopPropagation();
+                                const current = Array.isArray(attributes?.classManagerSubselector)
+                                    ? attributes.classManagerSubselector
+                                    : [];
+                                setAttributes({
+                                    classManagerSubselector: removeClassById(current, item?.id),
+                                });
                                 await deleteEntityRecord('postType', CLASS_POST_TYPE, item?.id, { force: true });
                             }}
                         >
@@ -134,15 +165,15 @@ const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, set
                 ))}
             </MenuGroup>
 
-            {normalizedSearchInput.length > 2 && (
+            {normalizedSearchInput.length > 0 && (
                 <Button
-                    disabled={hasClassExists || !isValidCssClass(normalizedSearchInput)}
+                    disabled={hasClassExists}
                     variant="primary"
                     className="blockish-class-manager-input-dropdown-add"
                     icon={plus}
                     onClick={addSubSelector}
                 >
-                    {__('Add Class', 'blockish')}
+                    {__('Add Selector', 'blockish')}
                 </Button>
             )}
         </div>

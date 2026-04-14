@@ -70,6 +70,14 @@ const InputDropdownContent = ({ attributes, setAttributes }) => {
                                         tabIndex={0}
                                         onClick={async (e) => {
                                             e.stopPropagation();
+                                            const nextClasses = removeClassById(selectedClasses, item?.id);
+                                            const nextSubSelectors = (attributes?.classManagerSubselector || []).filter(
+                                                (selectorItem) => selectorItem?.parent !== item?.id
+                                            );
+                                            setAttributes({
+                                                classManager: nextClasses,
+                                                classManagerSubselector: nextSubSelectors,
+                                            });
                                             await deleteEntityRecord('postType', CLASS_POST_TYPE, item?.id, { force: true });
                                         }}
                                     >

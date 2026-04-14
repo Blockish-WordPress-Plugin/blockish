@@ -192,6 +192,14 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         }
     }
 
+    .blockish-class-manager-search-info {
+        display: block;
+        margin-bottom: 10px;
+        color: #6b7280;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
     .blockish-class-manager-input-dropdown-add {
         width: 100%;
         justify-content: center !important;
@@ -248,82 +256,6 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             }
         }
 
-        .controls-dropdown-content-subselector-form {
-            .controls-dropdown-content-subselector-form-input {
-                &>.components-base-control__field {
-                    margin-bottom: 0 !important;
-
-                    .components-text-control__input {
-                        border: 1px solid $blockish-border !important;
-                        transition: $blockish-transition !important;
-
-                        &:focus,
-                        &:hover {
-                            border-color: $blockish-primary !important;
-                            color: $blockish-primary !important;
-                        }
-                    }
-                }
-            }
-
-            .controls-dropdown-content-subselector-form-button {
-                height: 32px !important;
-                @extend %blockish-primary-button;
-            }
-        }
-
-        .controls-dropdown-content-subselector-group {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-wrap: wrap;
-            max-width: 100%;
-            margin-block-end: 10px;
-
-            .controls-dropdown-content-subselector-group__item {
-                box-shadow: none;
-                color: $blockish-text;
-                border: 1px solid $blockish-border;
-                transition: $blockish-transition;
-                padding: 4px 8px;
-                height: 26px;
-                @extend %blockish-control-hover-primary;
-
-                &.active {
-                    background-color: $blockish-primary;
-                    color: #ffffff !important;
-                }
-            }
-        }
-
-        .blockish-class-manager-tab-panel {
-            .components-tab-panel__tabs {
-                justify-content: space-evenly;
-
-                .components-tab-panel__tabs-item {
-                    width: 100% !important;
-                    background-color: #dee7ff;
-                    color: $blockish-primary;
-                    height: 38px !important;
-                }
-
-                .components-tab-panel__tabs-item.is-active {
-                    background-color: $blockish-primary;
-                    color: #ffffff !important;
-                }
-            }
-
-            .components-tab-panel__tab-content {
-                .components-input-control__backdrop {
-                    height: auto !important;
-                    min-height: auto !important;
-                }
-
-                .css-1nmdiq5-menu {
-                    z-index: 4 !important;
-                }
-            }
-        }
     }
 
     .controls-dropdown-content-subselectors {
@@ -399,5 +331,70 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     .components-popover__content {
         width: 100% !important;
         padding: 16px !important;
+    }
+
+    .controls-dropdown-content-header-edit-form-row {
+        gap: 8px;
+        align-items: flex-end;
+    }
+
+    .controls-dropdown-content-header-edit-form-input {
+        flex: 1;
+
+        .components-base-control__field {
+            margin-bottom: 0 !important;
+        }
+
+        .components-text-control__input {
+            border: 1px solid $blockish-border !important;
+            min-height: 32px !important;
+            transition: $blockish-transition !important;
+
+            &:focus,
+            &:hover {
+                border-color: $blockish-primary !important;
+                color: $blockish-primary !important;
+            }
+        }
+    }
+
+    .controls-dropdown-content-header-edit-form-button {
+        height: 32px !important;
+        @extend %blockish-primary-button;
+    }
+}
+
+.blockish-class-manager-effect-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .blockish-class-manager-effect-actions {
+        align-items: center;
+        gap: 8px;
+    }
+
+    .blockish-class-manager-effect-dropdown {
+        width: 100%;
+        flex: 1;
+
+        > .components-dropdown {
+            width: 100%;
+        }
+
+        .components-button {
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+
+    .blockish-class-manager-effect-reset {
+        min-width: auto;
+        white-space: nowrap;
+    }
+
+    .blockish-transform-dropdown {
+        min-width: 250px;
+        padding: 10px;
     }
 }

@@ -9,15 +9,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ClassManager {
 	use \Blockish\Traits\SingletonTrait;
 
-	/**
-	 * @var array<string, array{slug: string, id: int}>
-	 */
-	private $used_classes = array();
+	private const CSS_META_KEY = 'blockishClassManagerStyles';
+	private $used_post_ids = array();
+	private $styles_enqueued = false;
 
 	private function __construct() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
 		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
 		add_action( 'wp_footer', array( $this, 'print_used_class_styles' ), 99 );
+		add_action( 'before_delete_post', array( $this, 'delete_child_classes_on_parent_delete' ) );
 	}
 
 	public function register_post_type() {
@@ -32,15 +32,27 @@ class ClassManager {
 				'show_in_nav_menus'     => false,
 				'exclude_from_search'   => true,
 				'publicly_queryable'    => false,
-				'hierarchical'          => false,
+				'hierarchical'          => true,
 				'show_in_rest'          => true,
 				'rest_base'             => 'blockish-classes',
 				'rest_controller_class' => 'WP_REST_Posts_Controller',
-				'supports'              => array( 'title', 'editor' ),
+				'supports'              => array( 'title', 'editor', 'page-attributes', 'custom-fields' ),
 				'capability_type'       => 'post',
 				'map_meta_cap'          => true,
 				'rewrite'               => false,
 				'query_var'             => false,
+			)
+		);
+
+		register_post_meta(
+			'blockish-classes',
+			self::CSS_META_KEY,
+			array(
+				'type'              => 'string',
+				'single'            => true,
+				'default'           => '',
+				'show_in_rest'      => true,
+				'sanitize_callback' => 'wp_strip_all_tags',
 			)
 		);
 	}
@@ -50,105 +62,198 @@ class ClassManager {
 			return $block_content;
 		}
 
-		$class_items = $block['attrs']['classManager'] ?? array();
-		if ( ! is_array( $class_items ) || empty( $class_items ) ) {
+		$class_items       = $block['attrs']['classManager'] ?? array();
+		$subselector_items = $block['attrs']['classManagerSubselector'] ?? array();
+
+		if ( ! is_array( $class_items ) ) {
+			$class_items = array();
+		}
+
+		if ( ! is_array( $subselector_items ) ) {
+			$subselector_items = array();
+		}
+
+		if ( empty( $class_items ) ) {
 			return $block_content;
 		}
 
-		$processor = new \WP_HTML_Tag_Processor( $block_content );
-		if ( ! $processor->next_tag() ) {
+		$tag_processor = new \WP_HTML_Tag_Processor( $block_content );
+		if ( ! $tag_processor->next_tag() ) {
 			return $block_content;
 		}
 
+		$requested_ids = array();
 		foreach ( $class_items as $class_item ) {
-			$class_data = $this->normalize_class_item( $class_item );
-			if ( empty( $class_data['slug'] ) ) {
+			if ( ! is_array( $class_item ) ) {
 				continue;
 			}
-
-			$processor->add_class( $class_data['slug'] );
-			$this->used_classes[ $class_data['slug'] ] = $class_data;
+			$class_id = absint( $class_item['id'] ?? 0 );
+			if ( $class_id > 0 ) {
+				$requested_ids[] = $class_id;
+			}
+		}
+		foreach ( $subselector_items as $selector_item ) {
+			if ( ! is_array( $selector_item ) ) {
+				continue;
+			}
+			$selector_id = absint( $selector_item['id'] ?? 0 );
+			$parent_id   = absint( $selector_item['parent'] ?? 0 );
+			if ( $selector_id > 0 ) {
+				$requested_ids[] = $selector_id;
+			}
+			if ( $parent_id > 0 ) {
+				$requested_ids[] = $parent_id;
+			}
 		}
 
-		return $processor->get_updated_html();
-	}
-
-	public function print_used_class_styles() {
-		if ( empty( $this->used_classes ) ) {
-			return;
+		$requested_ids = array_values( array_filter( array_unique( array_map( 'absint', $requested_ids ) ) ) );
+		if ( empty( $requested_ids ) ) {
+			return $block_content;
 		}
 
-		$styles = $this->get_styles_for_classes( $this->used_classes );
-
-		if ( empty( $styles ) ) {
-			return;
-		}
-
-		echo '<style id="blockish-class-manager-styles">' . $styles . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	}
-
-	/**
-	 * @param array<string, array{slug: string, id: int}> $classes
-	 * @return string
-	 */
-	private function get_styles_for_classes( $classes ) {
-		$posts = get_posts(
+		$existing_posts = get_posts(
 			array(
 				'post_type'      => 'blockish-classes',
 				'post_status'    => 'publish',
+				'post__in'       => $requested_ids,
 				'posts_per_page' => -1,
 			)
 		);
+		if ( empty( $existing_posts ) ) {
+			return $block_content;
+		}
 
-		if ( empty( $posts ) ) {
+		$existing_by_id = array();
+		foreach ( $existing_posts as $existing_post ) {
+			$existing_by_id[ (int) $existing_post->ID ] = $existing_post;
+		}
+
+		$selected_parent_ids = array();
+
+		foreach ( $class_items as $class_item ) {
+			if ( ! is_array( $class_item ) ) {
+				continue;
+			}
+
+			$class_id = absint( $class_item['id'] ?? 0 );
+			if ( $class_id <= 0 || empty( $existing_by_id[ $class_id ] ) ) {
+				continue;
+			}
+
+			$slug = $this->normalize_class_slug( $existing_by_id[ $class_id ]->post_title );
+			if ( '' === $slug ) {
+				continue;
+			}
+
+			$tag_processor->add_class( $slug );
+			$this->used_post_ids[ $class_id ] = true;
+			$selected_parent_ids[ $class_id ] = true;
+		}
+
+		if ( ! empty( $subselector_items ) && ! empty( $selected_parent_ids ) ) {
+			foreach ( $subselector_items as $selector_item ) {
+				if ( ! is_array( $selector_item ) ) {
+					continue;
+				}
+
+				$selector_id = absint( $selector_item['id'] ?? 0 );
+				$parent_id   = absint( $selector_item['parent'] ?? 0 );
+				if (
+					$selector_id <= 0 ||
+					$parent_id <= 0 ||
+					empty( $selected_parent_ids[ $parent_id ] ) ||
+					empty( $existing_by_id[ $selector_id ] ) ||
+					empty( $existing_by_id[ $parent_id ] )
+				) {
+					continue;
+				}
+
+				$tag_processor->add_class( 'blockish-cm-' . $selector_id );
+				$this->used_post_ids[ $selector_id ] = true;
+				$this->used_post_ids[ $parent_id ]   = true;
+			}
+		}
+
+		return $tag_processor->get_updated_html();
+	}
+
+	public function print_used_class_styles() {
+		if ( $this->styles_enqueued ) {
+			return;
+		}
+
+		if ( empty( $this->used_post_ids ) ) {
+			return;
+		}
+
+		$styles = $this->get_styles_for_classes();
+
+		if ( '' === $styles ) {
+			return;
+		}
+		$this->enqueue_inline_styles( $styles, true );
+	}
+
+	private function enqueue_inline_styles( $styles, $print_now = false ) {
+		if ( '' === $styles ) {
+			return;
+		}
+
+		$handle = 'blockish-block-styles';
+		if ( ! wp_style_is( $handle, 'registered' ) ) {
+			wp_register_style( $handle, false, array(), null );
+		}
+		wp_enqueue_style( $handle );
+
+		if ( wp_style_is( $handle, 'enqueued' ) ) {
+			wp_add_inline_style( $handle, $styles );
+			if ( $print_now ) {
+				wp_print_styles( array( $handle ) );
+			}
+			$this->styles_enqueued = true;
+		}
+	}
+
+	private function get_styles_for_classes() {
+		$post_ids = array_values( array_filter( array_map( 'absint', array_keys( $this->used_post_ids ) ) ) );
+		if ( empty( $post_ids ) ) {
 			return '';
 		}
 
-		$lookup = array();
-		$css    = '';
-
-		foreach ( $classes as $class ) {
-			if ( empty( $class['slug'] ) ) {
+		$css = '';
+		foreach ( $post_ids as $post_id ) {
+			$meta_css = trim( (string) get_post_meta( $post_id, self::CSS_META_KEY, true ) );
+			error_log( print_r( $meta_css, true ) );
+			if ( '' === $meta_css ) {
 				continue;
 			}
-
-			$lookup[ $class['slug'] ] = absint( $class['id'] ?? 0 );
-		}
-
-		foreach ( $posts as $post ) {
-			$slug = $this->normalize_class_slug( $post->post_title );
-			if ( empty( $slug ) || ! isset( $lookup[ $slug ] ) ) {
-				continue;
-			}
-
-			$expected_id = absint( $lookup[ $slug ] );
-			if ( $expected_id > 0 && (int) $post->ID !== $expected_id ) {
-				continue;
-			}
-
-			$content = trim( (string) $post->post_content );
-			if ( '' === $content ) {
-				continue;
-			}
-
-			if ( str_contains( $content, '{' ) ) {
-				$css .= $content;
-				continue;
-			}
-
-			$declarations = $this->sanitize_css_declarations( $content );
-			if ( '' === $declarations ) {
-				continue;
-			}
-
-			if ( ! str_ends_with( $declarations, ';' ) ) {
-				$declarations .= ';';
-			}
-
-			$css .= '.' . $slug . '{' . $declarations . '}';
+			$css .= $meta_css;
 		}
 
 		return $css;
+	}
+
+	public function delete_child_classes_on_parent_delete( $post_id ) {
+		if ( 'blockish-classes' !== get_post_type( $post_id ) ) {
+			return;
+		}
+
+		$children = get_posts(
+			array(
+				'post_type'   => 'blockish-classes',
+				'post_parent' => $post_id,
+				'numberposts' => -1,
+				'fields'      => 'ids',
+			)
+		);
+
+		if ( empty( $children ) ) {
+			return;
+		}
+
+		foreach ( $children as $child_id ) {
+			wp_delete_post( (int) $child_id, true );
+		}
 	}
 
 	/**
@@ -211,11 +316,5 @@ class ClassManager {
 		}
 
 		return $value;
-	}
-
-	private function sanitize_css_declarations( $css ) {
-		$css = wp_strip_all_tags( (string) $css );
-		$css = str_replace( array( '{', '}' ), '', $css );
-		return trim( $css );
 	}
 }

@@ -58,15 +58,28 @@ const ControlsDropdownContent = ({
     const classId = selectedClass?.id;
     const subSelectorId = selectedSubSelector?.id;
 
-    const { selectedClassRecord, selectedClassEdited, subSelectorsRaw, subSelectorEdited } = useSelect(
+    const { selectedClassRecord, selectedClassEdited, subSelectorsRaw, subSelectorsEditedById, subSelectorEdited } = useSelect(
         (select) => {
             const core = select('core');
+            const subSelectors = classId
+                ? (core.getEntityRecords('postType', CLASS_POST_TYPE, { per_page: -1, parent: classId }) || [])
+                : [];
+
+            const subSelectorsEdited = subSelectors.reduce((acc, item) => {
+                const id = item?.id;
+                if (!id) {
+                    return acc;
+                }
+
+                acc[id] = core.getEditedEntityRecord('postType', CLASS_POST_TYPE, id) || null;
+                return acc;
+            }, {});
+
             return {
                 selectedClassRecord: classId ? core.getEntityRecord('postType', CLASS_POST_TYPE, classId) : null,
                 selectedClassEdited: classId ? core.getEditedEntityRecord('postType', CLASS_POST_TYPE, classId) : null,
-                subSelectorsRaw: classId
-                    ? (core.getEntityRecords('postType', CLASS_POST_TYPE, { per_page: -1, parent: classId }) || [])
-                    : [],
+                subSelectorsRaw: subSelectors,
+                subSelectorsEditedById: subSelectorsEdited,
                 subSelectorEdited: subSelectorId
                     ? core.getEditedEntityRecord('postType', CLASS_POST_TYPE, subSelectorId)
                     : null,
@@ -81,10 +94,10 @@ const ControlsDropdownContent = ({
     const mergedSubSelectors = useMemo(() => {
         return subSelectorsRaw.map((item) => ({
             id: item?.id,
-            parent: item?.parent,
-            title: getEntityTitle(item?.title),
+            parent: subSelectorsEditedById[item?.id]?.parent ?? item?.parent,
+            title: getEntityTitle(subSelectorsEditedById[item?.id]?.title || item?.title),
         }));
-    }, [subSelectorsRaw]);
+    }, [subSelectorsRaw, subSelectorsEditedById]);
 
     const selectedClassTitle = getEntityTitle(selectedClassEdited?.title || selectedClassRecord?.title || selectedClass?.title);
     const selectedSubSelectorTitle = getEntityTitle(selectedSubSelector?.title);
@@ -204,27 +217,36 @@ const ControlsDropdownContent = ({
                             renderContent={({ onClose }) => (
                                 <VStack>
                                     <form
+                                        className="controls-dropdown-content-header-edit-form"
                                         onSubmit={(event) => {
                                             event.preventDefault();
                                             renameCurrent();
                                             onClose();
                                         }}
                                     >
-                                        <TextControl
-                                            label={__('Edit Class Name', 'blockish')}
-                                            value={editInput}
-                                            onChange={setEditInput}
-                                        />
-                                        <Button
-                                            type="submit"
-                                            disabled={!subSelectorId && !isValidCssClass(editInput)}
-                                            variant="primary"
-                                            size="small"
-                                            label={__('Save', 'blockish')}
-                                            showTooltip
-                                        >
-                                            {__('Save', 'blockish')}
-                                        </Button>
+                                        <Flex align="end" className="controls-dropdown-content-header-edit-form-row">
+                                            <FlexItem isBlock className="controls-dropdown-content-header-edit-form-input">
+                                                <TextControl
+                                                    label={__('Edit Class Name', 'blockish')}
+                                                    hideLabelFromVision
+                                                    value={editInput}
+                                                    onChange={setEditInput}
+                                                />
+                                            </FlexItem>
+                                            <FlexItem>
+                                                <Button
+                                                    className="controls-dropdown-content-header-edit-form-button"
+                                                    type="submit"
+                                                    disabled={!subSelectorId && !isValidCssClass(editInput)}
+                                                    variant="primary"
+                                                    size="small"
+                                                    label={__('Save', 'blockish')}
+                                                    showTooltip
+                                                >
+                                                    {__('Save', 'blockish')}
+                                                </Button>
+                                            </FlexItem>
+                                        </Flex>
                                     </form>
                                 </VStack>
                             )}

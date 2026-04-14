@@ -1,5 +1,5 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { Popover, Dropdown, MenuGroup, MenuItem, __experimentalText as Text } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { plus, close } from '@wordpress/icons';
@@ -17,6 +17,16 @@ const Inspector = createHigherOrderComponent((WrappedComponent) => {
         const [selectedSubSelector, setSelectedSubSelector] = useState(null);
         const containerRef = useRef(null);
         const classes = useClasses(attributes?.classManager);
+
+        useEffect(() => {
+            if (!selectedClass?.id) {
+                return;
+            }
+
+            if (!classes.some((item) => item?.id === selectedClass.id)) {
+                closePopover();
+            }
+        }, [classes, selectedClass]);
 
         const closePopover = () => {
             setSelectedClass(null);
