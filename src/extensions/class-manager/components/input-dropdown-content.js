@@ -89,10 +89,17 @@ const InputDropdownContent = ({ attributes, setAttributes }) => {
                         className='blockish-class-manager-input-dropdown-add'
                         icon={plus}
                         onClick={async () => {
-                            await saveEntityRecord('postType', CLASS_POST_TYPE, {
+                            const createdClass = await saveEntityRecord('postType', CLASS_POST_TYPE, {
                                 title: normalizedSearchInput,
                                 status: 'publish'
                             });
+
+                            if (createdClass?.id) {
+                                setAttributes({
+                                    classManager: addClassItem(selectedClasses, createdClass),
+                                });
+                            }
+
                             setSearchInput('');
                         }}
                     >

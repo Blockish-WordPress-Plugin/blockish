@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 const EMPTY_ARRAY = [];
 const CLASS_POST_TYPE = 'blockish-classes';
@@ -143,61 +144,59 @@ export function addClassItem(classes = [], item) {
 
 
 export const useClasses = (classes = [], searchInput = '', parent = null) => {
+    const classIds = useMemo(
+        () => classes.map((item) => item?.id).filter(Boolean),
+        [classes]
+    );
+
     const query = useMemo(() => ({
         per_page: -1,
         search: searchInput,
         parent: parent || 0,
-    }), [searchInput, parent]);
+        include: classIds.length ? classIds : undefined,
+    }), [searchInput, parent, classIds]);
 
     const { records: savedClasses } = useEntityRecords('postType', CLASS_POST_TYPE, query);
+    const editedClassesById = useSelect(
+        (select) => {
+            if (!classIds.length) {
+                return {};
+            }
+
+            const store = select('core');
+            return classIds.reduce((acc, id) => {
+                acc[id] = store.getEditedEntityRecord('postType', CLASS_POST_TYPE, id) || null;
+                return acc;
+            }, {});
+        },
+        [classIds.join(',')]
+    );
 
     return useMemo(() => {
-        if (!classes.length || !savedClasses?.length) {
+        if (!classes.length) {
             return EMPTY_ARRAY;
         }
 
         const savedClassMap = new Map(
-            savedClasses.map((item) => [item?.id, item])
+            (savedClasses || []).map((item) => [item?.id, item])
         );
 
         return classes.map((item) => {
-            const savedData = savedClassMap.get(item?.id);
-            if (!savedData) {
+            const classId = item?.id;
+            if (!classId) {
                 return null;
             }
 
-            return {
-                id: savedData?.id,
-                title: getEntityTitle(savedData?.title),
-            };
-        }).filter(Boolean);
-    }, [classes, savedClasses]);
-}
-
-export const useSelectors = (selectors = []) => {
-    const { records: savedSelectors } = useEntityRecords('postType', CLASS_POST_TYPE, { per_page: -1 });
-
-    return useMemo(() => {
-        if (!selectors.length || !savedSelectors?.length) {
-            return EMPTY_ARRAY;
-        }
-
-        const savedSelectorMap = new Map(
-            savedSelectors.map((item) => [item?.id, item])
-        );
-
-        return selectors.map((item) => {
-            const savedData = savedSelectorMap.get(item?.id);
-            if (!savedData) {
-                return null;
-            }
+            const editedData = editedClassesById[classId];
+            const savedData = savedClassMap.get(classId);
+            const classData = editedData || savedData || item;
 
             return {
-                id: savedData?.id,
-                title: getEntityTitle(savedData?.title),
+                id: classId,
+                title: getEntityTitle(classData?.title),
             };
         }).filter(Boolean);
-    }, [selectors, savedSelectors]);
+    }, [classes, editedClassesById, savedClasses]);
 }
 
 export function isValidCssClass(className) {

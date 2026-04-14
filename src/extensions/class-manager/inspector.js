@@ -7,10 +7,10 @@ import clsx from 'clsx';
 import InputDropdownContent from './components/input-dropdown-content';
 import ControlsDropdownContent from './components/controls-dropdown-content';
 import { getEntityTitle, removeClassById, useClasses } from './utils';
-import useExtensionsAttributes from '../../helpers/use-extensions-attributes';
 
 const Inspector = createHigherOrderComponent((WrappedComponent) => {
     return (props) => {
+        const { useExtensionsAttributes } = window.blockish.helpers;
         const { attributes, setAttributes } = useExtensionsAttributes(props?.clientId);
         const selectedClasses = attributes?.classManager || [];
         const [selectedClass, setSelectedClass] = useState(null);

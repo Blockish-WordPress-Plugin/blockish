@@ -1,3 +1,37 @@
+$blockish-primary: #001feb;
+$blockish-primary-soft: #001febaf;
+$blockish-danger: #eb0000;
+$blockish-border: #e9e9e9;
+$blockish-surface: #fff;
+$blockish-text: #101010;
+$blockish-transition: all 0.2s ease-in-out;
+$blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+%blockish-control-base {
+    border: 1px solid $blockish-border;
+    box-shadow: $blockish-control-shadow;
+    transition: $blockish-transition;
+}
+
+%blockish-control-hover-primary {
+    &:hover,
+    &:focus {
+        border-color: $blockish-primary !important;
+        color: $blockish-primary !important;
+    }
+}
+
+%blockish-primary-button {
+    background-color: $blockish-primary !important;
+    color: #fff !important;
+    transition: $blockish-transition !important;
+
+    &:hover {
+        background-color: $blockish-primary-soft !important;
+        color: #fff !important;
+    }
+}
+
 .blockish-class-manager {
     padding: 16px;
 
@@ -15,7 +49,7 @@
         position: relative;
 
         &.blockish-class-manager-class-item-selected {
-            background-color: #001feb;
+            background-color: $blockish-primary;
             color: #fff;
 
             .components-text {
@@ -25,7 +59,7 @@
 
         &:not(:last-child) {
             padding: 8px 12px !important;
-            border: 1px solid #e9e9e9;
+            border: 1px solid $blockish-border;
         }
 
         span {
@@ -38,7 +72,7 @@
                 top: -8px;
                 right: -7px;
                 cursor: pointer;
-                background-color: #eb0000;
+                background-color: $blockish-danger;
                 border-radius: 50%;
                 padding: 2px;
                 display: flex;
@@ -57,16 +91,14 @@
         min-width: auto !important;
         width: 30px;
         height: 30px;
-        border: 1px solid #e9e9e9;
-        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-        transition: all 0.2s ease-in-out;
+        @extend %blockish-control-base;
 
         &:focus,
         &:hover {
-            border-color: #001feb !important;
+            border-color: $blockish-primary !important;
 
             svg {
-                color: #001feb !important;
+                color: $blockish-primary !important;
             }
         }
     }
@@ -108,10 +140,10 @@
             cursor: pointer;
             padding: 8px !important;
             height: 30px !important;
-            border: 1px solid #e9e9e9;
+            border: 1px solid $blockish-border;
             border-radius: 6px;
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            transition: all 0.2s ease-in-out;
+            box-shadow: $blockish-control-shadow;
+            transition: $blockish-transition;
 
             &:not(:last-child) {
                 margin-bottom: 8px;
@@ -126,13 +158,13 @@
                     height: 16px;
 
                     svg {
-                        fill: #eb0000;
+                        fill: $blockish-danger;
                     }
                 }
             }
 
             &.blockish-class-manager-class-selected {
-                background-color: #001feb;
+                background-color: $blockish-primary;
                 color: #fff;
 
                 .components-text {
@@ -164,6 +196,20 @@
         width: 100%;
         justify-content: center !important;
         align-items: center;
+        background-color: $blockish-primary;
+        color: #fff;
+        height: 30px !important;
+
+        &[disabled] {
+            opacity: 0.5;
+            background-color: $blockish-primary-soft;
+            cursor: not-allowed;
+        }
+
+        &:hover {
+            background-color: $blockish-primary-soft !important;
+            color: #fff;
+        }
     }
 }
 
@@ -196,15 +242,9 @@
 
             .controls-dropdown-content-header-controls-button {
                 box-shadow: none;
-                border: 1px solid #e9e9e9;
-                color: #101010;
-                transition: all 0.2s ease-in-out;
-
-                &:hover,
-                &:focus {
-                    border-color: #001feb !important;
-                    color: #001feb !important;
-                }
+                color: $blockish-text;
+                @extend %blockish-control-base;
+                @extend %blockish-control-hover-primary;
             }
         }
 
@@ -214,13 +254,13 @@
                     margin-bottom: 0 !important;
 
                     .components-text-control__input {
-                        border: 1px solid #e9e9e9 !important;
-                        transition: all 0.2s ease-in-out !important;
+                        border: 1px solid $blockish-border !important;
+                        transition: $blockish-transition !important;
 
                         &:focus,
                         &:hover {
-                            border-color: #001feb !important;
-                            color: #001feb !important;
+                            border-color: $blockish-primary !important;
+                            color: $blockish-primary !important;
                         }
                     }
                 }
@@ -228,14 +268,7 @@
 
             .controls-dropdown-content-subselector-form-button {
                 height: 32px !important;
-                background-color: #001feb !important;
-                color: #fff !important;
-                transition: all 0.2s ease-in-out !important;
-
-                &:hover {
-                    background-color: #001febaf !important;
-                    color: #fff !important;
-                }
+                @extend %blockish-primary-button;
             }
         }
 
@@ -249,20 +282,15 @@
 
             .controls-dropdown-content-subselector-group__item {
                 box-shadow: none;
-                border: 1px solid #e9e9e9;
-                color: #101010;
-                transition: all 0.2s ease-in-out;
+                color: $blockish-text;
+                border: 1px solid $blockish-border;
+                transition: $blockish-transition;
                 padding: 4px 8px;
                 height: 26px;
-
-                &:hover,
-                &:focus {
-                    border-color: #001feb !important;
-                    color: #001feb !important;
-                }
+                @extend %blockish-control-hover-primary;
 
                 &.active {
-                    background-color: #001feb;
+                    background-color: $blockish-primary;
                     color: #ffffff !important;
                 }
             }
@@ -275,12 +303,12 @@
                 .components-tab-panel__tabs-item {
                     width: 100% !important;
                     background-color: #dee7ff;
-                    color: #001feb;
+                    color: $blockish-primary;
                     height: 38px !important;
                 }
 
                 .components-tab-panel__tabs-item.is-active {
-                    background-color: #001feb;
+                    background-color: $blockish-primary;
                     color: #ffffff !important;
                 }
             }
@@ -311,21 +339,21 @@
             width: auto;
             height: 28px !important;
             position: relative;
-            background-color: #fff;
-            color: #101010;
+            background-color: $blockish-surface;
+            color: $blockish-text;
 
             &:not(:last-child) {
                 padding: 8px 12px !important;
-                border: 1px solid #e9e9e9;
+                border: 1px solid $blockish-border;
             }
 
             &:hover {
-                background-color: #fff;
-                color: #101010;
+                background-color: $blockish-surface;
+                color: $blockish-text;
             }
 
             &.subselector-selected {
-                background-color: #001feb;
+                background-color: $blockish-primary;
 
                 .components-text {
                     color: #fff;
@@ -353,7 +381,7 @@
 
         .blockish-class-manager-subselector-input-dropdown {
             height: 28px !important;
-            border: 1px solid #e9e9e9;
+            border: 1px solid $blockish-border;
             display: flex;
             justify-content: center;
             align-items: center;
