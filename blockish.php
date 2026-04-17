@@ -18,9 +18,8 @@
 use Blockish\Core\Blocks;
 use Blockish\Core\Dashboard;
 use Blockish\Core\Enqueue;
-use Blockish\Core\ExtenSions;
 use Blockish\Core\StyleGenerator;
-use Blockish\Hooks\WrapperLink;
+use Blockish\Extensions\ExtensionsLoader;
 use Blockish\Routes\BlocksV1;
 use Blockish\Routes\ExtensionsV1;
 use Blockish\Routes\SVGUploaderV1;
@@ -132,15 +131,14 @@ final class Blockish {
         add_action( 'admin_enqueue_scripts', [$this, 'admin_enqueue_scripts'] );
 
         // Load plugin classes.
-        Blocks::get_instance();
         Dashboard::get_instance();
         Enqueue::get_instance();
         StyleGenerator::get_instance();
         BlocksV1::get_instance();
         ExtensionsV1::get_instance();
         SVGUploaderV1::get_instance();
-        ExtenSions::get_instance();
-        WrapperLink::get_instance();
+        Blocks::get_instance();
+        ExtensionsLoader::get_instance();
     }
 
     public function admin_enqueue_scripts($screen) {

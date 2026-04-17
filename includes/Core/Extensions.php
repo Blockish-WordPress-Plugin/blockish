@@ -29,7 +29,9 @@ class Extensions
      */
     private function __construct()
     {
-        add_action('init', [$this, 'register_extensions'], 11);
+        // Must run before block registration (Blocks::register_blocks on init priority 10)
+        // so extension attributes are available during block_type_metadata filtering.
+        add_action('init', [$this, 'register_extensions'], 9);
         add_action('enqueue_block_editor_assets', [$this, 'enqueue_editor_assets']);
     }
 
@@ -76,13 +78,19 @@ class Extensions
             'providesContext' => [],
         ];
 
+        // Safety net for any early metadata calls before init hooks complete.
+        if (empty($this->active_extensions)) {
+            $this->register_extensions();
+        }
+        
         if (
             empty($block_name) ||
-            !str_starts_with($block_name, 'blockish/') ||
+            !str_starts_with($block_name, 'blockish') ||
             empty($this->active_extensions)
         ) {
             return $merged;
         }
+
 
         foreach ($this->active_extensions as $extension) {
             if (!$this->extension_targets_block($extension, $block_name)) {
@@ -136,8 +144,8 @@ class Extensions
         }
 
         $slug = basename(untrailingslashit($path));
-        $this->discovered_extensions[$slug] = $metadata;
         $this->register_assets($slug, $metadata, $path);
+        $this->discovered_extensions[$slug] = $metadata;
 
         return $metadata;
     }
@@ -177,7 +185,7 @@ class Extensions
      * @param string $path Extension directory path.
      * @return void
      */
-    private function register_assets($slug, $metadata, $path)
+    private function register_assets($slug, &$metadata, $path)
     {
         $this->process_and_register_asset($slug, $metadata, $path, 'editorScript', 'script');
         $this->process_and_register_asset($slug, $metadata, $path, 'editorStyle', 'style');
@@ -197,18 +205,42 @@ class Extensions
      * @param string $type script|style.
      * @return void
      */
-    private function process_and_register_asset($slug, $metadata, $path, $field_name, $type)
+    private function process_and_register_asset($slug, &$metadata, $path, $field_name, $type)
     {
-        if (empty($metadata[$field_name]) || !is_string($metadata[$field_name])) {
+        if (empty($metadata[$field_name])) {
             return;
         }
 
-        $asset = $metadata[$field_name];
-        if (!str_starts_with($asset, 'file:')) {
+        $assets = is_array($metadata[$field_name])
+            ? $metadata[$field_name]
+            : [$metadata[$field_name]];
+
+        $registered_handles = [];
+
+        foreach ($assets as $index => $asset) {
+            if (!is_string($asset) || $asset === '') {
+                continue;
+            }
+
+            if (str_starts_with($asset, 'file:')) {
+                $handle = $this->register_asset($slug, $path, $asset, $type, $field_name, $index);
+                if (!empty($handle)) {
+                    $registered_handles[] = $handle;
+                }
+                continue;
+            }
+
+            $registered_handles[] = $asset;
+        }
+
+        if (empty($registered_handles)) {
+            unset($metadata[$field_name]);
             return;
         }
 
-        $this->register_asset($slug, $path, $asset, $type, $field_name);
+        $metadata[$field_name] = count($registered_handles) === 1
+            ? $registered_handles[0]
+            : array_values(array_unique($registered_handles));
     }
 
     /**
@@ -219,15 +251,16 @@ class Extensions
      * @param string $asset Asset path with file: prefix.
      * @param string $type script|style.
      * @param string $field_name Field name from metadata.
-     * @return void
+     * @param int    $index Asset index for unique generated handles.
+     * @return string
      */
-    private function register_asset($slug, $extension_path, $asset, $type, $field_name)
+    private function register_asset($slug, $extension_path, $asset, $type, $field_name, $index = 0)
     {
         $asset_relative_path = remove_block_asset_path_prefix($asset);
         $asset_absolute_path = wp_normalize_path($extension_path . '/' . $asset_relative_path);
 
         if (!file_exists($asset_absolute_path)) {
-            return;
+            return '';
         }
 
         $asset_data = [
@@ -248,10 +281,10 @@ class Extensions
             }
         }
 
-        $handle = $this->get_extension_asset_handle($slug, $field_name);
+        $handle = $this->get_extension_asset_handle($slug, $field_name, $index);
         $asset_url = $this->get_asset_url_from_path($asset_absolute_path);
         if (empty($asset_url)) {
-            return;
+            return '';
         }
 
         if ($type === 'script') {
@@ -262,7 +295,7 @@ class Extensions
                 $asset_data['version'] ?? false,
                 ['strategy' => 'defer', 'in_footer' => true]
             );
-            return;
+            return $handle;
         }
 
         wp_register_style(
@@ -271,6 +304,8 @@ class Extensions
             [],
             $asset_data['version'] ?? false
         );
+
+        return $handle;
     }
 
     /**
@@ -299,9 +334,15 @@ class Extensions
      * @param string $field_name Metadata field.
      * @return string
      */
-    private function get_extension_asset_handle($slug, $field_name)
+    private function get_extension_asset_handle($slug, $field_name, $index = 0)
     {
-        return 'blockish-extension-' . sanitize_key($slug) . '-' . sanitize_key($field_name);
+        $handle = 'blockish-extension-' . sanitize_key($slug) . '-' . sanitize_key($field_name);
+
+        if ($index > 0) {
+            $handle .= '-' . absint($index + 1);
+        }
+
+        return $handle;
     }
 
     /**
@@ -313,17 +354,27 @@ class Extensions
      */
     private function maybe_enqueue_handle($slug, $field_name)
     {
-        $handle = $this->get_extension_asset_handle($slug, $field_name);
+        if (empty($this->active_extensions[$slug][$field_name])) {
+            return;
+        }
+
+        $handles = is_array($this->active_extensions[$slug][$field_name])
+            ? $this->active_extensions[$slug][$field_name]
+            : [$this->active_extensions[$slug][$field_name]];
 
         if (str_contains($field_name, 'Style') || $field_name === 'style') {
-            if (wp_style_is($handle, 'registered')) {
-                wp_enqueue_style($handle);
+            foreach ($handles as $handle) {
+                if (is_string($handle) && wp_style_is($handle, 'registered')) {
+                    wp_enqueue_style($handle);
+                }
             }
             return;
         }
 
-        if (wp_script_is($handle, 'registered')) {
-            wp_enqueue_script($handle);
+        foreach ($handles as $handle) {
+            if (is_string($handle) && wp_script_is($handle, 'registered')) {
+                wp_enqueue_script($handle);
+            }
         }
     }
 

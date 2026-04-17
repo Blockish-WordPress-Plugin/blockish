@@ -1,0 +1,400 @@
+$blockish-primary: #001feb;
+$blockish-primary-soft: #001febaf;
+$blockish-danger: #eb0000;
+$blockish-border: #e9e9e9;
+$blockish-surface: #fff;
+$blockish-text: #101010;
+$blockish-transition: all 0.2s ease-in-out;
+$blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+%blockish-control-base {
+    border: 1px solid $blockish-border;
+    box-shadow: $blockish-control-shadow;
+    transition: $blockish-transition;
+}
+
+%blockish-control-hover-primary {
+    &:hover,
+    &:focus {
+        border-color: $blockish-primary !important;
+        color: $blockish-primary !important;
+    }
+}
+
+%blockish-primary-button {
+    background-color: $blockish-primary !important;
+    color: #fff !important;
+    transition: $blockish-transition !important;
+
+    &:hover {
+        background-color: $blockish-primary-soft !important;
+        color: #fff !important;
+    }
+}
+
+.blockish-class-manager {
+    padding: 16px;
+
+    &>div[role='group'] {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .blockish-class-manager-class-item {
+        width: auto;
+        height: 28px !important;
+        padding: 0 !important;
+        position: relative;
+
+        &.blockish-class-manager-class-item-selected {
+            background-color: $blockish-primary;
+            color: #fff;
+
+            .components-text {
+                color: #fff;
+            }
+        }
+
+        &:not(:last-child) {
+            padding: 8px 12px !important;
+            border: 1px solid $blockish-border;
+        }
+
+        span {
+            min-width: auto !important;
+
+            &.blockish-class-manager-class-item-remove {
+                width: 16px;
+                height: 16px;
+                position: absolute;
+                top: -8px;
+                right: -7px;
+                cursor: pointer;
+                background-color: $blockish-danger;
+                border-radius: 50%;
+                padding: 2px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                svg {
+                    fill: #fff;
+                }
+            }
+        }
+    }
+
+    .blockish-class-manager-add-btn {
+        min-height: auto !important;
+        min-width: auto !important;
+        width: 30px;
+        height: 30px;
+        @extend %blockish-control-base;
+
+        &:focus,
+        &:hover {
+            border-color: $blockish-primary !important;
+
+            svg {
+                color: $blockish-primary !important;
+            }
+        }
+    }
+}
+
+.blockish-class-manager-input-dropdown-content {
+    min-width: 220px;
+    max-width: 220px;
+
+    .components-popover__content {
+        width: 100% !important;
+
+        .blockish-input-dropdown-content {
+            padding: 16px;
+        }
+    }
+
+    .blockish-class-manager-classes {
+        padding: 0 !important;
+        max-height: 250px;
+        min-height: 50px;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #c4c4c4;
+            border-radius: 6px;
+        }
+
+        .blockish-class-manager-class {
+            cursor: pointer;
+            padding: 8px !important;
+            height: 30px !important;
+            border: 1px solid $blockish-border;
+            border-radius: 6px;
+            box-shadow: $blockish-control-shadow;
+            transition: $blockish-transition;
+
+            &:not(:last-child) {
+                margin-bottom: 8px;
+            }
+
+
+            .components-menu-item__item {
+                justify-content: space-between !important;
+
+                .blockish-class-manager-delete {
+                    width: 16px;
+                    height: 16px;
+
+                    svg {
+                        fill: $blockish-danger;
+                    }
+                }
+            }
+
+            &.blockish-class-manager-class-selected {
+                background-color: $blockish-primary;
+                color: #fff;
+
+                .components-text {
+                    color: #fff;
+                }
+
+                .blockish-class-manager-delete {
+                    svg {
+                        fill: #fff;
+                    }
+                }
+            }
+        }
+    }
+
+    .blockish-class-manager-search {
+        position: static;
+        margin-bottom: 10px;
+
+        .components-input-control__input {
+            min-height: auto !important;
+            height: 30px !important;
+            padding: 0;
+            padding-inline: 0 !important;
+        }
+    }
+
+    .blockish-class-manager-search-info {
+        display: block;
+        margin-bottom: 10px;
+        color: #6b7280;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .blockish-class-manager-input-dropdown-add {
+        width: 100%;
+        justify-content: center !important;
+        align-items: center;
+        background-color: $blockish-primary;
+        color: #fff;
+        height: 30px !important;
+
+        &[disabled] {
+            opacity: 0.5;
+            background-color: $blockish-primary-soft;
+            cursor: not-allowed;
+        }
+
+        &:hover {
+            background-color: $blockish-primary-soft !important;
+            color: #fff;
+        }
+    }
+}
+
+.blockish-class-manager-popover {
+    min-width: 340px !important;
+    max-width: 350px;
+    z-index: 99999 !important;
+
+    .components-popover__content {
+        width: 100% !important;
+        padding: 16px !important;
+
+        .components-base-control__field {
+            gap: 0 !important;
+        }
+
+        .controls-dropdown-content-header {
+            .controls-dropdown-content-header-title {
+                span {
+                    font-size: 16px;
+                    font-weight: 700;
+                }
+            }
+        }
+
+        .controls-dropdown-content-header-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            .controls-dropdown-content-header-controls-button {
+                box-shadow: none;
+                color: $blockish-text;
+                @extend %blockish-control-base;
+                @extend %blockish-control-hover-primary;
+            }
+        }
+
+    }
+
+    .controls-dropdown-content-subselectors {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+
+        .controls-dropdown-content-subselector {
+            outline: none !important;
+            box-shadow: none !important;
+            width: auto;
+            height: 28px !important;
+            position: relative;
+            background-color: $blockish-surface;
+            color: $blockish-text;
+
+            &:not(:last-child) {
+                padding: 8px 12px !important;
+                border: 1px solid $blockish-border;
+            }
+
+            &:hover {
+                background-color: $blockish-surface;
+                color: $blockish-text;
+            }
+
+            &.subselector-selected {
+                background-color: $blockish-primary;
+
+                .components-text {
+                    color: #fff;
+                }
+            }
+
+            .controls-dropdown-content-subselector-close {
+                position: absolute;
+                top: -7px;
+                right: -7px;
+                cursor: pointer;
+                background: red;
+                height: 16px;
+                width: 16px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
+
+                svg {
+                    fill: #fff;
+                }
+            }
+        }
+
+        .blockish-class-manager-subselector-input-dropdown {
+            height: 28px !important;
+            border: 1px solid $blockish-border;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .controls-dropdown-content-subselector {
+                height: auto !important;
+            }
+        }
+    }
+}
+
+.controls-dropdown-content-header-edit-dropdown-content {
+    min-width: 340px !important;
+
+    .components-popover__content {
+        width: 100% !important;
+        padding: 16px !important;
+    }
+
+    .controls-dropdown-content-header-edit-form-row {
+        gap: 8px;
+        align-items: flex-end;
+    }
+
+    .controls-dropdown-content-header-edit-form-input {
+        flex: 1;
+
+        .components-base-control__field {
+            margin-bottom: 0 !important;
+        }
+
+        .components-text-control__input {
+            border: 1px solid $blockish-border !important;
+            min-height: 32px !important;
+            transition: $blockish-transition !important;
+
+            &:focus,
+            &:hover {
+                border-color: $blockish-primary !important;
+                color: $blockish-primary !important;
+            }
+        }
+    }
+
+    .controls-dropdown-content-header-edit-form-button {
+        height: 32px !important;
+        @extend %blockish-primary-button;
+    }
+}
+
+.blockish-class-manager-effect-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .blockish-class-manager-effect-actions {
+        align-items: center;
+        gap: 8px;
+    }
+
+    .blockish-class-manager-effect-dropdown {
+        width: 100%;
+        flex: 1;
+
+        > .components-dropdown {
+            width: 100%;
+        }
+
+        .components-button {
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+
+    .blockish-class-manager-effect-reset {
+        min-width: auto;
+        white-space: nowrap;
+    }
+
+    .blockish-transform-dropdown {
+        min-width: 250px;
+        padding: 10px;
+    }
+}

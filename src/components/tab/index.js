@@ -5,6 +5,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import BeforeTabContent from './before-tab-content';
 import AfterTabContent from './after-tab-content';
 import { useMemo } from '@wordpress/element';
+import BeforeTab from './before-tab';
 
 /**
  * BlockishTab Component
@@ -36,29 +37,34 @@ const BlockishTab = ({ tabs = [], tabType = 'normal', children, ...props }) => {
     }, [tabs]);
 
     return (
-        <TabPanel
-            className={clsx('blockish-tab', { [`blockish-tab-${tabType}`]: tabType })}
-            activeClass="blockish-tab-active"
-            tabs={classifiedTabs}
-            {...props}
-        >
-            {({ name: tabName }) => (
-                <>
-                    {/* Render content before tab when type is 'top-level' */}
-                    {tabType === 'top-level' && (
-                        <BeforeTabContent blockName={blockName} clientId={clientId} tabName={tabName} />
-                    )}
-
-                    {/* Render children (tab content) */}
-                    {children({ name: tabName })}
-
-                    {/* Render content after tab when type is 'top-level' */}
-                    {tabType === 'top-level' && (
-                        <AfterTabContent blockName={blockName} clientId={clientId} tabName={tabName} />
-                    )}
-                </>
+        <>
+            {tabType === 'top-level' && (
+                <BeforeTab blockName={blockName} clientId={clientId} />
             )}
-        </TabPanel>
+            <TabPanel
+                className={clsx('blockish-tab', { [`blockish-tab-${tabType}`]: tabType })}
+                activeClass="blockish-tab-active"
+                tabs={classifiedTabs}
+                {...props}
+            >
+                {({ name: tabName }) => (
+                    <>
+                        {/* Render content before tab when type is 'top-level' */}
+                        {tabType === 'top-level' && (
+                            <BeforeTabContent blockName={blockName} clientId={clientId} tabName={tabName} />
+                        )}
+
+                        {/* Render children (tab content) */}
+                        {children({ name: tabName })}
+
+                        {/* Render content after tab when type is 'top-level' */}
+                        {tabType === 'top-level' && (
+                            <AfterTabContent blockName={blockName} clientId={clientId} tabName={tabName} />
+                        )}
+                    </>
+                )}
+            </TabPanel>
+        </>
     );
 };
 

@@ -1,12 +1,8 @@
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
-import { plugins } from '@wordpress/icons';
 import {
 	blocks as blocksIcon,
-	keyIcon,
 	layoutDashboard,
-	packageIcon,
 	plugIcon,
-	settingsIcon,
 } from '../../components/icons/block-icons';
 
 export const SIDEBAR_MENUS = [
@@ -34,20 +30,6 @@ export const EXTENSION_FILTERS = [
 ];
 
 export const EXTENSION_CONTROL_MAP = {
-	interactions: {
-		title: 'Interactions Controls',
-		controls: [
-			{ key: 'enableViewportAnimation', type: 'toggle', label: 'Enable viewport animation' },
-			{ key: 'defaultDelay', type: 'text', label: 'Default animation delay (ms)' },
-		],
-	},
-	'wrapper-link': {
-		title: 'Wrapper Link Controls',
-		controls: [
-			{ key: 'openInNewTabByDefault', type: 'toggle', label: 'Open links in new tab by default' },
-			{ key: 'relAttributes', type: 'text', label: 'Default rel attributes' },
-		],
-	},
 };
 
 export function isValidMenu(menuKey) {
