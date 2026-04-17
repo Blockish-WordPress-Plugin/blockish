@@ -44,9 +44,9 @@ class ClassManager {
 			array(
 				'label'                 => __( 'Class Manager', 'blockish' ),
 				'public'                => true,
-				'show_ui'               => true,
-				'show_in_menu'          => true,
-				'show_in_admin_bar'     => true,
+				'show_ui'               => false,
+				'show_in_menu'          => false,
+				'show_in_admin_bar'     => false,
 				'show_in_nav_menus'     => false,
 				'exclude_from_search'   => true,
 				'publicly_queryable'    => false,
