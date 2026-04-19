@@ -1,6 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
+import BlockishCodeEditor from '../../../components/code-editor';
 import {
 	Button,
 	Flex,
@@ -23,12 +24,26 @@ function normalizeClassItem(item = {}) {
 		typeof contentRaw === 'string'
 			? contentRaw
 			: contentRaw?.raw || contentRaw?.rendered || '';
+	let attributes = {};
+
+	try {
+		const parsed = JSON.parse(content || '{}');
+		if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+			attributes = parsed;
+		}
+	} catch (error) {
+		attributes = {
+			customCss: content || '',
+		};
+	}
 
 	return {
 		id: item.id,
 		title,
 		slug: item.slug || normalizeClassSlug(title),
 		content,
+		attributes,
+		customCss: attributes?.customCss || '',
 	};
 }
 
@@ -50,7 +65,11 @@ export default function ClassManagerSettings({ isOpen, onRequestClose }) {
 	const [search, setSearch] = useState('');
 	const [items, setItems] = useState([]);
 	const [editingId, setEditingId] = useState(null);
-	const [draft, setDraft] = useState({ title: '', content: '' });
+	const [draft, setDraft] = useState({
+		title: '',
+		attributes: '{}',
+		customCss: '',
+	});
 
 	const loadData = async () => {
 		setIsLoading(true);
@@ -112,24 +131,95 @@ export default function ClassManagerSettings({ isOpen, onRequestClose }) {
 
 	const beginEdit = (item) => {
 		setEditingId(item.id);
-		setDraft({ title: item.title || '', content: item.content || '' });
+		const attributes = item?.attributes && typeof item.attributes === 'object' ? item.attributes : {};
+		const attributesJson = JSON.stringify(attributes, null, 2);
+		setDraft({
+			title: item.title || '',
+			attributes: attributesJson,
+			customCss: attributes?.customCss || '',
+		});
 	};
 
 	const cancelEdit = () => {
 		setEditingId(null);
-		setDraft({ title: '', content: '' });
+		setDraft({ title: '', attributes: '{}', customCss: '' });
+	};
+
+	const updateCustomCss = (nextCss) => {
+		const safeCss = nextCss || '';
+		setDraft((prev) => {
+			let nextAttributes = {};
+			try {
+				const parsed = JSON.parse(prev.attributes || '{}');
+				if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+					nextAttributes = parsed;
+				}
+			} catch (error) {
+				nextAttributes = {};
+			}
+
+			nextAttributes.customCss = safeCss;
+			return {
+				...prev,
+				customCss: safeCss,
+				attributes: JSON.stringify(nextAttributes, null, 2),
+			};
+		});
+	};
+
+	const updateAttributes = (nextAttributes) => {
+		const nextText = nextAttributes || '';
+		setDraft((prev) => {
+			let nextCustomCss = prev.customCss || '';
+			try {
+				const parsed = JSON.parse(nextText || '{}');
+				if (
+					parsed &&
+					typeof parsed === 'object' &&
+					!Array.isArray(parsed) &&
+					typeof parsed.customCss === 'string'
+				) {
+					nextCustomCss = parsed.customCss;
+				}
+			} catch (error) {
+				// Keep previous CSS value until JSON is valid again.
+			}
+
+			return {
+				...prev,
+				attributes: nextText,
+				customCss: nextCustomCss,
+			};
+		});
 	};
 
 	const saveClass = async (id) => {
 		setIsSaving(true);
 		setError('');
 		try {
+			let parsedAttributes = {};
+			try {
+				parsedAttributes = JSON.parse(draft.attributes || '{}');
+			} catch (jsonError) {
+				setError(__('Attributes must be valid JSON before saving.', 'blockish'));
+				setIsSaving(false);
+				return;
+			}
+
+			if (!parsedAttributes || typeof parsedAttributes !== 'object' || Array.isArray(parsedAttributes)) {
+				setError(__('Attributes must be a JSON object.', 'blockish'));
+				setIsSaving(false);
+				return;
+			}
+
+			parsedAttributes.customCss = draft.customCss || '';
+
 			const updated = await apiFetch({
 				path: `/wp/v2/blockish-classes/${id}`,
 				method: 'POST',
 				data: {
 					title: draft.title || '',
-					content: draft.content || '',
+					content: JSON.stringify(parsedAttributes),
 				},
 			});
 			const normalized = normalizeClassItem(updated);
@@ -257,13 +347,26 @@ export default function ClassManagerSettings({ isOpen, onRequestClose }) {
 										value={draft.title}
 										onChange={(next) => setDraft((prev) => ({ ...prev, title: next }))}
 									/>
+									<BlockishCodeEditor
+										label={__('Custom CSS', 'blockish')}
+										help={__('Use {{SELECTOR}} to target this class selector.', 'blockish')}
+										value={draft.customCss}
+										onChange={updateCustomCss}
+										settings={{ mode: 'css', lineWrapping: true }}
+										rows={10}
+										placeholder={'{{SELECTOR}} {\n\n}'}
+									/>
 									<TextareaControl
 										className="blockish-class-manager-css-field"
-										label={__('CSS', 'blockish')}
-										help={__('Optional raw CSS for this class item.', 'blockish')}
-										value={draft.content}
-										onChange={(next) => setDraft((prev) => ({ ...prev, content: next }))}
+										label={__('Attributes', 'blockish')}
+										help={__('JSON attributes for this class. Editing here can override Custom CSS mapping.', 'blockish')}
+										value={draft.attributes}
+										onChange={updateAttributes}
+										rows={8}
 									/>
+									<Text className="blockish-text-muted">
+										{__('Warning: Edit Attributes carefully. Invalid JSON will block saving.', 'blockish')}
+									</Text>
 									<Flex className="blockish-class-manager-edit-actions" justify="flex-end">
 										<Button
 											className="blockish-class-manager-cancel-btn"

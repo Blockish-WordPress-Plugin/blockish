@@ -26,6 +26,8 @@ class Enqueue {
      * @return void
      */
     public function enqueue_block_editor_assets() {
+        $this->enqueue_wp_code_editor_assets();
+
         $this->register_and_enqueue_script(
             'blockish-components',
             BLOCKISH_URL . 'build/components/index.js',
@@ -63,6 +65,26 @@ class Enqueue {
             BLOCKISH_URL . 'build/global/index.js',
             BLOCKISH_DIR . 'build/global/index.asset.php'
         );
+    }
+
+    /**
+     * Enqueue WordPress code editor assets for Blockish editor controls.
+     *
+     * @return void
+     */
+    private function enqueue_wp_code_editor_assets() {
+        $settings = wp_enqueue_code_editor(
+            array(
+                'type' => 'text/css',
+            )
+        );
+
+        if (false === $settings) {
+            return;
+        }
+
+        wp_enqueue_script('code-editor');
+        wp_enqueue_style('code-editor');
     }
 
     /**

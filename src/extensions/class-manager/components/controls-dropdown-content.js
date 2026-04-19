@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import StyleControls from './style-controls';
 import SubselectorDropdownContent from './subselector-dropdown-content';
-import { getEntityTitle, isValidCssClass, removeClassById } from '../utils';
+import { generateClassSelector, getEntityTitle, isValidCssClass, removeClassById } from '../utils';
 
 const CLASS_POST_TYPE = 'blockish-classes';
 
@@ -143,6 +143,9 @@ const ControlsDropdownContent = ({
     }, [panelTitle]);
 
     const currentEntityId = subSelectorId || classId;
+    const currentSelector = subSelectorId
+        ? generateClassSelector(subSelectorId, selectedSubSelectorTitle, selectedClassTitle)
+        : generateClassSelector(classId, selectedClassTitle);
     const currentStyle = parseStyleContent(
         subSelectorId
             ? subSelectorEdited?.content
@@ -382,6 +385,7 @@ const ControlsDropdownContent = ({
             <div className="controls-dropdown-content-body">
                 <StyleControls
                     value={currentStyle}
+                    currentSelector={currentSelector}
                     onChange={(value) => {
                         if (!currentEntityId) {
                             return;

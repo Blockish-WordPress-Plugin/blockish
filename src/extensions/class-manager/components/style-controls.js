@@ -24,7 +24,7 @@ import {
     TRANSITION_TIMING_OPTIONS,
 } from '../utils';
 
-const StyleControls = ({ value = {}, onChange }) => {
+const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
     const {
         BlockishPanelBody,
         BlockishResponsive,
@@ -40,6 +40,7 @@ const StyleControls = ({ value = {}, onChange }) => {
         BlockishColor,
         BlockishBackground,
         BlockishCSSFilters,
+        BlockishCodeEditor,
         Button,
         TextControl,
         RangeControl,
@@ -84,6 +85,8 @@ const StyleControls = ({ value = {}, onChange }) => {
             transformOriginY: undefined,
         });
     };
+
+    const customCssExample = `{{SELECTOR}} {}`;
 
     return (
         <>
@@ -847,6 +850,20 @@ const StyleControls = ({ value = {}, onChange }) => {
                 onChange={(next) => onChange({ ...value, filters: next })}
             />
             </div>
+        </BlockishPanelBody>
+
+        <BlockishPanelBody title={__('Custom CSS', 'blockish')} initialOpen={false}>
+            <BlockishCodeEditor
+                label={__('Custom CSS', 'blockish')}
+                value={value?.customCss || customCssExample}
+                onChange={(next) => onChange({ ...value, customCss: next })}
+                settings={{ mode: 'css', lineWrapping: true }}
+                rows={10}
+                help={__('Use {{SELECTOR}} to target the current class selector.', 'blockish')}
+            />
+            <Text className="components-base-control__help">
+                {`${__('Current selector:', 'blockish')} ${currentSelector || '{{SELECTOR}}'}`}
+            </Text>
         </BlockishPanelBody>
         </>
     );

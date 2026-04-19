@@ -285,6 +285,10 @@
 	background: rgba(0, 0, 0, 0.5);
 }
 
+.toplevel_page_blockish-dashboard .components-modal__screen-overlay {
+	z-index: 99 !important;
+}
+
 .blockish-configure-modal.blockish-class-manager-modal .components-modal__frame {
 	width: 80vw;
 	max-width: 1280px;

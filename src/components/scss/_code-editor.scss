@@ -1,0 +1,22 @@
+.blockish-code-editor {
+    .CodeMirror {
+        border: 1px solid var(--border-color-primary);
+        border-radius: 6px;
+        min-height: 180px;
+    }
+
+    .CodeMirror-focused {
+        border-color: var(--border-color-primary);
+        box-shadow: var(--focus-box-shadow);
+    }
+
+    .blockish-code-editor-textarea {
+        .components-textarea-control__input {
+            font-family: Menlo, Consolas, Monaco, monospace;
+        }
+    }
+}
+
+.CodeMirror-hints {
+    z-index: 2147483647 !important;
+}

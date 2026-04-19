@@ -13,6 +13,19 @@ const toStyleObject = (value) => {
     return {};
 };
 
+const buildCustomCss = (customCss, selector) => {
+    if (!customCss || typeof customCss !== 'string') return '';
+
+    const trimmedCss = customCss.trim();
+    if (!trimmedCss) return '';
+
+    if (!selector) return trimmedCss;
+
+    return trimmedCss
+        .replace(/\{\{\s*SELECTOR\s*\}\}/g, selector)
+        .replace(/\bSELECTOR\b/g, selector);
+};
+
 const normalizeColor = (value) => {
     if (!value || typeof value !== 'string') return '';
     if (!value.includes('|')) return value;
@@ -257,9 +270,17 @@ const generateClassManagerStyles = (styles = [], device = 'Desktop') => {
 
         const styleObject = toStyleObject(item?.style);
         const rules = generateRuleSet(styleObject, device);
-        if (!rules) return;
+        const customCss = device === 'Desktop'
+            ? buildCustomCss(styleObject?.customCss, selector)
+            : '';
 
-        finalCss += `${selector} { ${rules} }`;
+        if (rules) {
+            finalCss += `${selector} { ${rules} }`;
+        }
+
+        if (customCss) {
+            finalCss += customCss;
+        }
     });
 
     return { [device]: finalCss };

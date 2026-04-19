@@ -40,6 +40,17 @@ class Dashboard {
             return;
         }
 
+        $settings = wp_enqueue_code_editor(
+            array(
+                'type' => 'text/css',
+            )
+        );
+
+        if ( false !== $settings ) {
+            wp_enqueue_script( 'code-editor' );
+            wp_enqueue_style( 'code-editor' );
+        }
+
         $script_asset_file = BLOCKISH_DIR . 'build/dashboard/index.asset.php';
 
         if ( ! file_exists( $script_asset_file ) ) {
