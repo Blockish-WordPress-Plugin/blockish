@@ -1,119 +1,158 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
 	Flex,
+	Modal,
+	TextControl,
 	__experimentalHeading as Heading,
-	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-
-const INTEGRATION_FILTERS = [
-	{ key: 'all', label: __('All', 'blockish') },
-	{ key: 'marketing', label: __('Marketing', 'blockish') },
-	{ key: 'analytics', label: __('Analytics', 'blockish') },
-	{ key: 'automation', label: __('Automation', 'blockish') },
-	{ key: 'communication', label: __('Communication', 'blockish') },
-	{ key: 'payments', label: __('Payments', 'blockish') },
-	{ key: 'crm', label: __('CRM', 'blockish') },
-	{ key: 'productivity', label: __('Productivity', 'blockish') },
-	{ key: 'developer', label: __('Developer', 'blockish') },
-];
+import { settingsIcon } from '../../components/icons/block-icons';
+import openaiLogo from '../assets/logos/openai.png';
+import geminiLogo from '../assets/logos/gemini.png';
 
 const INTEGRATIONS = [
 	{
-		key: 'mailchimp',
-		name: 'Mailchimp',
-		icon: '📧',
-		category: 'marketing',
-		description: __('Sync form submissions to your Mailchimp audience', 'blockish'),
+		key: 'openai',
+		name: 'OpenAI',
+		logoUrl: openaiLogo,
+		logoAlt: 'OpenAI logo',
+		description: __('Connect OpenAI to power AI content and assistant features inside Blockish.', 'blockish'),
 		status: 'connected',
 	},
 	{
-		key: 'google-analytics',
-		name: 'Google Analytics',
-		icon: '📊',
-		category: 'analytics',
-		description: __('Track block interactions and user engagement', 'blockish'),
+		key: 'gemini',
+		name: 'Gemini',
+		logoUrl: geminiLogo,
+		logoAlt: 'Gemini logo',
+		description: __('Connect Gemini to run Google-powered generation and smart assistance workflows.', 'blockish'),
 		status: 'connected',
-	},
-	{
-		key: 'zapier',
-		name: 'Zapier',
-		icon: '⚡',
-		category: 'automation',
-		description: __('Connect to 5000+ apps with automated workflows', 'blockish'),
-		status: 'available',
-		premium: true,
-	},
-	{
-		key: 'slack',
-		name: 'Slack',
-		icon: '💬',
-		category: 'communication',
-		description: __('Get notifications for form submissions and events', 'blockish'),
-		status: 'available',
-	},
-	{
-		key: 'stripe',
-		name: 'Stripe',
-		icon: '💳',
-		category: 'payments',
-		description: __('Accept payments directly through your blocks', 'blockish'),
-		status: 'available',
-		premium: true,
-	},
-	{
-		key: 'hubspot',
-		name: 'HubSpot',
-		icon: '🎯',
-		category: 'crm',
-		description: __('Capture leads and sync with your CRM', 'blockish'),
-		status: 'available',
-		premium: true,
-	},
-	{
-		key: 'convertkit',
-		name: 'ConvertKit',
-		icon: '✉️',
-		category: 'marketing',
-		description: __('Add subscribers to your email sequences', 'blockish'),
-		status: 'available',
-	},
-	{
-		key: 'google-sheets',
-		name: 'Google Sheets',
-		icon: '📄',
-		category: 'productivity',
-		description: __('Export form data to Google Sheets automatically', 'blockish'),
-		status: 'connected',
-	},
-	{
-		key: 'webhooks',
-		name: 'Webhooks',
-		icon: '🔗',
-		category: 'developer',
-		description: __('Send data to custom endpoints', 'blockish'),
-		status: 'available',
 	},
 ];
 
 export default function IntegrationsPage() {
-	const [activeFilter, setActiveFilter] = useState('all');
+	const [isConfigureModalOpen, setIsConfigureModalOpen] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
+	const [error, setError] = useState('');
+	const [activeIntegrationKey, setActiveIntegrationKey] = useState('');
+	const [savedApiKeys, setSavedApiKeys] = useState({});
+	const [draftApiKey, setDraftApiKey] = useState('');
+	const integrationsPath = window?.blockishDashboardData?.integrationsApiPath || '/blockish/v1/integrations';
 
-	const filteredItems = useMemo(() => {
-		if (activeFilter === 'all') {
-			return INTEGRATIONS;
-		}
+	useEffect(() => {
+		const loadIntegrations = async () => {
+			setError('');
+			try {
+				const response = await apiFetch({ path: integrationsPath, method: 'GET' });
+				const items = response?.integrations || {};
+				const mapped = {};
 
-		return INTEGRATIONS.filter((item) => item.category === activeFilter);
-	}, [activeFilter]);
+				Object.entries(items).forEach(([slug, config]) => {
+					const key = config?.settings?.apiKey || '';
+					if (typeof key === 'string') {
+						mapped[slug] = key;
+					}
+				});
+
+				setSavedApiKeys(mapped);
+			} catch (err) {
+				setError(err?.message || __('Failed to load integrations settings', 'blockish'));
+			}
+		};
+
+		loadIntegrations();
+	}, [integrationsPath]);
 
 	const connectedCount = useMemo(
 		() => INTEGRATIONS.filter((item) => item.status === 'connected').length,
 		[]
 	);
+
+	const activeIntegration = INTEGRATIONS.find((item) => item.key === activeIntegrationKey);
+
+	const handleOpenConfigure = (integrationKey) => {
+		setActiveIntegrationKey(integrationKey);
+		setDraftApiKey(savedApiKeys[integrationKey] || '');
+		setIsConfigureModalOpen(true);
+	};
+
+	const handleSaveConfiguration = () => {
+		if (!activeIntegrationKey) {
+			return;
+		}
+
+		const saveIntegration = async () => {
+			setIsSaving(true);
+			setError('');
+			const nextApiKey = draftApiKey.trim();
+
+			try {
+				const response = await apiFetch({
+					path: integrationsPath,
+					method: 'POST',
+					data: {
+						integrations: {
+							[activeIntegrationKey]: {
+								settings: {
+									apiKey: nextApiKey,
+								},
+							},
+						},
+					},
+				});
+
+				const saved = response?.integrations?.[activeIntegrationKey]?.settings?.apiKey || '';
+				setSavedApiKeys((prev) => ({
+					...prev,
+					[activeIntegrationKey]: saved,
+				}));
+				setIsConfigureModalOpen(false);
+			} catch (err) {
+				setError(err?.message || __('Failed to save integration settings', 'blockish'));
+			} finally {
+				setIsSaving(false);
+			}
+		};
+
+		saveIntegration();
+	};
+
+	const handleClearIntegration = (integrationKey) => {
+		const clearIntegration = async () => {
+			setIsSaving(true);
+			setError('');
+			try {
+				const response = await apiFetch({
+					path: integrationsPath,
+					method: 'POST',
+					data: {
+						integrations: {
+							[integrationKey]: {
+								settings: {
+									apiKey: '',
+								},
+							},
+						},
+					},
+				});
+
+				const saved = response?.integrations?.[integrationKey]?.settings?.apiKey || '';
+				setSavedApiKeys((prev) => ({
+					...prev,
+					[integrationKey]: saved,
+				}));
+			} catch (err) {
+				setError(err?.message || __('Failed to clear integration settings', 'blockish'));
+			} finally {
+				setIsSaving(false);
+			}
+		};
+
+		clearIntegration();
+	};
 
 	return (
 		<VStack className="blockish-integrations-page" spacing={5}>
@@ -128,69 +167,50 @@ export default function IntegrationsPage() {
 					)}
 				</Text>
 			</header>
-
-			<section className="blockish-panel blockish-integrations-filter-wrap">
-				<HStack className="blockish-integrations-filters" justify="flex-start">
-					{INTEGRATION_FILTERS.map((filter) => (
-						<Button
-							key={filter.key}
-							className={`blockish-filter-button blockish-button-base ${activeFilter === filter.key ? 'is-active' : ''}`}
-							variant="tertiary"
-							onClick={() => setActiveFilter(filter.key)}
-						>
-							{filter.label}
-						</Button>
-					))}
-				</HStack>
-			</section>
+			{error && <Text className="blockish-error">{error}</Text>}
 
 			<div className="blockish-integrations-grid">
-				{filteredItems.map((item) => {
-					const isConnected = item.status === 'connected';
+				{INTEGRATIONS.map((item) => {
 					return (
 						<section
 							key={item.key}
-							className={`blockish-integration-card ${isConnected ? 'is-connected' : ''}`}
+							className="blockish-integration-card is-connected"
 						>
-							<Flex justify="space-between" align="flex-start" className="blockish-integration-head">
-								<Flex gap={3} justify="flex-start" align="center">
-									<span className="blockish-integration-icon" aria-hidden="true">
-										{item.icon}
-									</span>
-									<div>
-										<Heading className="blockish-heading-secondary blockish-integration-title" level={3}>
-											{item.name}
-										</Heading>
-										<Text className="blockish-text-muted blockish-integration-category">
-											{INTEGRATION_FILTERS.find((filter) => filter.key === item.category)?.label}
-										</Text>
+							<Flex justify="space-between" align="center" className="blockish-integration-head">
+								<Flex gap={3} justify="flex-start" align="center" className="blockish-integration-title-wrap">
+									<div className="blockish-integration-logo-wrap">
+										<img className="blockish-integration-logo" src={item.logoUrl} alt={item.logoAlt} />
 									</div>
+									<Heading className="blockish-heading-secondary blockish-integration-title" level={3}>
+										{item.name}
+									</Heading>
 								</Flex>
-								{isConnected && <span className="blockish-integration-badge">{__('Connected', 'blockish')}</span>}
+								<Flex justify="flex-end" align="center" gap={2}>
+									<Button
+										className="blockish-configure-icon-button"
+										variant="tertiary"
+										icon={settingsIcon}
+										label={__('Configure integration', 'blockish')}
+										showTooltip
+										disabled={isSaving}
+										onClick={() => handleOpenConfigure(item.key)}
+									/>
+									{Boolean(savedApiKeys[item.key]) && (
+										<Button
+											className="blockish-action-button is-secondary blockish-button-base blockish-button-secondary"
+											variant="secondary"
+											disabled={isSaving}
+											onClick={() => handleClearIntegration(item.key)}
+										>
+											{__('Clear', 'blockish')}
+										</Button>
+									)}
+								</Flex>
 							</Flex>
 
 							<Text className="blockish-text-muted blockish-integration-description">
 								{item.description}
 							</Text>
-
-							<div className="blockish-integration-actions">
-								{item.premium && <span className="blockish-integration-premium">{__('Premium', 'blockish')}</span>}
-								<Flex justify="space-between" align="center" className="blockish-integration-actions-row">
-									<Button
-										className={`blockish-action-button blockish-button-base ${
-											isConnected ? 'is-secondary blockish-button-secondary' : 'is-primary blockish-button-primary'
-										}`}
-										variant={isConnected ? 'secondary' : 'primary'}
-									>
-										{isConnected ? __('Configure', 'blockish') : __('Connect', 'blockish')}
-									</Button>
-									{isConnected && (
-										<button type="button" className="blockish-integration-disconnect" aria-label={__('Disconnect', 'blockish')}>
-											×
-										</button>
-									)}
-								</Flex>
-							</div>
 						</section>
 					);
 				})}
@@ -213,6 +233,41 @@ export default function IntegrationsPage() {
 					</Text>
 				</Flex>
 			</section>
+
+			{isConfigureModalOpen && (
+				<Modal
+					title={sprintf(__('Configure %s', 'blockish'), activeIntegration?.name || __('Integration', 'blockish'))}
+					className="blockish-configure-modal"
+					onRequestClose={() => setIsConfigureModalOpen(false)}
+				>
+					<VStack className="blockish-modal-controls" spacing={4}>
+						<TextControl
+							label={__('API Key', 'blockish')}
+							value={draftApiKey}
+							onChange={(value) => setDraftApiKey(value)}
+							placeholder={sprintf(__('Enter %s API key', 'blockish'), activeIntegration?.name || __('integration', 'blockish'))}
+						/>
+						<Flex justify="flex-end" align="center" gap={2}>
+							<Button
+								className="blockish-action-button is-secondary blockish-button-base blockish-button-secondary"
+								variant="secondary"
+								disabled={isSaving}
+								onClick={() => setIsConfigureModalOpen(false)}
+							>
+								{__('Cancel', 'blockish')}
+							</Button>
+							<Button
+								className="blockish-action-button is-primary blockish-button-base blockish-button-primary"
+								variant="primary"
+								disabled={isSaving}
+								onClick={handleSaveConfiguration}
+							>
+								{__('Save', 'blockish')}
+							</Button>
+						</Flex>
+					</VStack>
+				</Modal>
+			)}
 		</VStack>
 	);
 }

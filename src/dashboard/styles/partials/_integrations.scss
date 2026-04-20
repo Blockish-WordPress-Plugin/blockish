@@ -21,7 +21,7 @@
 	background: var(--color-white);
 	border: 1px solid var(--color-gray-200);
 	border-radius: 12px;
-	padding: 18px;
+	padding: 24px;
 }
 
 .blockish-integration-card.is-connected {
@@ -29,26 +29,31 @@
 }
 
 .blockish-integration-head {
-	gap: 10px;
+	gap: 14px;
+	margin-bottom: 18px;
 }
 
-.blockish-integration-icon {
+.blockish-integration-logo-wrap {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 30px;
-	height: 30px;
-	font-size: 21px;
-	line-height: 1;
+	width: 44px;
+	height: 44px;
+	border-radius: 10px;
+	background: var(--color-gray-50);
+	border: 1px solid var(--color-gray-200);
+	flex-shrink: 0;
+}
+
+.blockish-integration-logo {
+	width: 26px;
+	height: 26px;
+	display: block;
 }
 
 .blockish-integration-title.components-heading {
 	margin: 0;
-}
-
-.blockish-integration-category.components-text {
-	margin-top: 2px;
-	font-size: var(--text-sm);
+	line-height: 1.2;
 }
 
 .blockish-integration-badge {
@@ -70,42 +75,10 @@
 }
 
 .blockish-integration-description.components-text {
-	margin-top: 14px;
+	margin-top: 10px;
+	margin-bottom: 24px;
 	line-height: 1.5;
-	min-height: 48px;
-}
-
-.blockish-integration-actions {
-	margin-top: 12px;
-	border-top: 1px solid var(--color-gray-200);
-	padding-top: 12px;
-}
-
-.blockish-integration-premium {
-	display: inline-flex;
-	align-items: center;
-	height: 22px;
-	padding: 0 8px;
-	border-radius: 6px;
-	background: #fcebc2;
-	color: #9c6d00;
-	font-size: 13px;
-	margin-bottom: 10px;
-}
-
-.blockish-integration-actions-row .components-button {
-	flex: 1;
-}
-
-.blockish-integration-disconnect {
-	border: none;
-	background: transparent;
-	color: #e1192d;
-	font-size: 30px;
-	line-height: 1;
-	width: 28px;
-	height: 28px;
-	cursor: pointer;
+	min-height: 64px;
 }
 
 .blockish-integrations-help {

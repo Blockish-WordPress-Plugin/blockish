@@ -89,6 +89,19 @@
 	color: var(--color-white) !important;
 }
 
+.blockish-ai-settings-modal {
+	min-width: 500px;
+}
+
+.blockish-configure-modal.blockish-ai-settings-modal .components-modal__frame {
+	width: 720px;
+	max-width: 720px;
+}
+
+.blockish-configure-modal.blockish-ai-settings-modal .components-modal__content {
+	min-width: 0;
+}
+
 .blockish-configure-modal.blockish-schemas-modal .components-modal__screen-overlay {
 	background: rgba(0, 0, 0, 0.5);
 }
@@ -254,6 +267,11 @@
 }
 
 @media (max-width: 782px) {
+	.blockish-configure-modal.blockish-ai-settings-modal .components-modal__frame {
+		width: calc(100vw - 20px);
+		max-width: calc(100vw - 20px);
+	}
+
 	.blockish-configure-modal.blockish-schemas-modal .components-modal__frame {
 		width: calc(100vw - 20px);
 		max-width: calc(100vw - 20px);

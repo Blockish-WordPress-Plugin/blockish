@@ -80,6 +80,7 @@ class Dashboard {
                 array(
                     'blocksApiPath'     => '/blockish/v1/blocks',
                     'extensionsApiPath' => '/blockish/v1/extensions',
+                    'integrationsApiPath' => '/blockish/v1/integrations',
                     'dashboardToolsApiPath' => '/blockish/v1/dashboard-tools',
                     'nonce'             => wp_create_nonce( 'wp_rest' ),
                     'siteUrl'           => admin_url(),

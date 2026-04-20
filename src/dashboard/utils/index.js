@@ -2,17 +2,19 @@ import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 import {
 	blocks as blocksIcon,
 	layoutDashboard,
+	packageIcon,
 	plugIcon,
+	puzzleIcon,
 	settingsIcon,
 } from '../../components/icons/block-icons';
 
 export const SIDEBAR_MENUS = [
 	{ key: 'dashboard', label: 'Dashboard', icon: layoutDashboard },
 	{ key: 'blocks', label: 'Blocks', icon: blocksIcon },
-	{ key: 'extensions', label: 'Extensions', icon: plugIcon },
-	{ key: 'addons', label: 'Addons', icon: plugIcon },
+	{ key: 'extensions', label: 'Extensions', icon: puzzleIcon },
+	{ key: 'addons', label: 'Addons', icon: packageIcon },
 	{ key: 'settings', label: 'Settings', icon: settingsIcon },
-	// { key: 'integrations', label: 'Integrations', icon: plugIcon },
+	{ key: 'integrations', label: 'Integrations', icon: plugIcon },
 	// { key: 'license', label: 'License', icon: keyIcon },
 ];
 
@@ -31,6 +33,21 @@ export const EXTENSION_FILTERS = [
 ];
 
 export const EXTENSION_CONTROL_MAP = {
+	'ai-design-assistant': {
+		title: 'AI Design Assistant Settings',
+		controls: [
+			{
+				key: 'provider',
+				type: 'button-group',
+				label: 'Provider',
+				requiresConfiguredProviders: true,
+				options: [
+					{ label: 'OpenAI', value: 'openai' },
+					{ label: 'Gemini', value: 'gemini' },
+				],
+			},
+		],
+	},
 };
 
 export function isValidMenu(menuKey) {

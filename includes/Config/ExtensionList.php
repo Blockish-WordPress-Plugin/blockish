@@ -36,6 +36,19 @@ class ExtensionList extends ConfigList {
                 'category'    => 'general',
                 'status'      => 'active',
             ),
+            'ai-design-assistant' => array(
+                'name'        => 'AI Design Assistant',
+                'description' => __( 'AI-powered design assistance for Blockish workflows.', 'blockish' ),
+                'package'     => 'free',
+                'category'    => 'general',
+                'status'      => 'active',
+                'settings'    => array(
+                    'provider' => '',
+                ),
+                'settings_schema' => array(
+                    'provider' => 'string',
+                ),
+            ),
         );
 
         $this->list = apply_filters( 'blockish/extensions/list', $this->list );
