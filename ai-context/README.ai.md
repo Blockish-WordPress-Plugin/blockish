@@ -18,7 +18,8 @@ Use this context system to make AI outputs:
    `ai-context/global/advanced-controls.ai.md`
 3. Read every relevant block spec in:
    `ai-context/blocks/*.ai.md`
-4. Read extension specs (when available) before writing extension-related attributes.
+4. Read extension specs before writing extension-related attributes:
+   `ai-context/extensions/*.ai.md`
 5. Execute using only documented attributes and conditional rules.
 
 ## AI Execution Workflow
@@ -67,7 +68,7 @@ If exact output is not possible:
 - Block specs:
   `ai-context/blocks/*.ai.md`
 - Extensions (planned):
-  `ai-context/extensions/*.ai.md`
+  `ai-context/extensions/class-manager.ai.md`
 - Scenarios/playbooks (planned):
   `ai-context/scenarios/*.ai.md`
 

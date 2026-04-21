@@ -27,6 +27,7 @@ In that case, container should wrap content blocks (heading/text/button/image).
 - Layout class is derived from `display`:
   - `layout-type-flex` (default)
   - `layout-type-grid`
+  - `layout-type-block`
 - Grid subtype class appears only when `display = grid`:
   - `grid-layout-type-auto`
   - `grid-layout-type-fixed`
@@ -52,7 +53,7 @@ Responsive note:
 - `containerMinHeight` (object by device)
 
 3. Layout Engine
-- `display` (string): `flex` or `grid`
+- `display` (string): `flex`, `grid`, or `block`
   - default: `flex`
 
 Flex-related:
@@ -71,6 +72,7 @@ Grid-related:
 Shared gap controls:
 - `columnGap` (object by device)
 - `rowGap` (object by device)
+  - shown/meaningful when `display` is not `block`
 
 4. Visual Style Controls
 - Background:
@@ -105,8 +107,10 @@ Container supports predefined column-style variation setups (e.g., 50-50, 33-33-
 AI can mimic these by nesting containers and setting custom widths/flex rules directly, even without variation UI actions.
 
 Nested container behavior:
-- child containers typically should be `isVariationPicked: true`
-- inner wrappers can use `containerWidth: align-custom-width` with device-based width values
+- child containers are auto-set to:
+  - `isVariationPicked: true`
+  - `containerWidth: align-custom-width`
+- custom width control remains available for nested containers via `customWidthContainer`
 
 ## Hero Section Composition (Recommended)
 
@@ -132,6 +136,7 @@ For a standard hero:
 - Only set attributes documented in this file.
 - Keep responsive objects consistent (`Desktop/Tablet/Mobile`) when writing device-aware values.
 - Do not switch to grid attributes unless `display` is `grid`.
+- Do not write flex/grid-only controls when `display` is `block`.
 - Do not rely on placeholder variation UI in automation; write direct attributes/inner blocks.
 - If design cannot be achieved by container/global controls, use `customCss` fallback rules from global doc sections `9` and `10`.
 
