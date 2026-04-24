@@ -201,7 +201,7 @@ const BlockishIconPicker = ({ label, value, onChange }) => {
                         setSelectedIcon={setSelectedIcon}
                         value={value}
                         deleteIcon={deleteIcon}
-                        createIcon={createIcon}
+                        onUploadFile={uploadFile}
                     />
 
                     <div className="blockish-icon-picker-modal-footer">

@@ -3,11 +3,12 @@ import {
     Flex,
     FlexBlock,
     FlexItem,
+    FormFileUpload,
     SearchControl,
     MenuGroup,
     MenuItem
 } from '@wordpress/components';
-import { closeSmall, copySmall, trash } from '@wordpress/icons';
+import { closeSmall, copySmall, upload } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 import { useEffect } from '@wordpress/element';
@@ -31,7 +32,8 @@ const ModalBody = ({
     setSearch,
     setSelectedIcon,
     value,
-    deleteIcon
+    deleteIcon,
+    onUploadFile
 }) => {
     const { isDev } = window?.blockishComponentsUtils;
     const { useScrollIntoView } = window?.blockish?.helpers;
@@ -96,6 +98,28 @@ const ModalBody = ({
 
             <FlexBlock>
                 <div className="blockish-icon-picker-modal-body-content">
+                    {icons.length === 0 && (
+                        <div className="blockish-icon-picker-empty-notice">
+                            {category === 'custom'
+                                ? __('No custom icons found. Upload an SVG icon to get started.', 'blockish')
+                                : __('No icons found. Try another search or category.', 'blockish')}
+
+                            {category === 'custom' && (
+                                <FormFileUpload
+                                    __next40pxDefaultSize
+                                    icon={upload}
+                                    accept="image/svg+xml"
+                                    className="blockish-icon-picker-empty-notice-upload-btn"
+                                    onChange={(event) => {
+                                        onUploadFile(event);
+                                    }}
+                                >
+                                    {__('Upload SVG', 'blockish')}
+                                </FormFileUpload>
+                            )}
+                        </div>
+                    )}
+
                     <div className="blockish-icon-picker-grid">
                         {icons.map((icon, index) => {
                             const viewBoxArr = icon?.icon?.viewBox;
