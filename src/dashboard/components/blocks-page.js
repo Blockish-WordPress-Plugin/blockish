@@ -70,6 +70,10 @@ export default function BlocksPage({ blocks = {}, isSaving, onSave, onToggleBloc
 		() => allBlocks.filter((block) => block.status === 'active').length,
 		[allBlocks]
 	);
+	const filteredBlockSlugs = useMemo(
+		() => filteredBlocks.map((block) => block.slug),
+		[filteredBlocks]
+	);
 
 	return (
 		<VStack className="blockish-blocks-page" spacing={5}>
@@ -99,16 +103,16 @@ export default function BlocksPage({ blocks = {}, isSaving, onSave, onToggleBloc
 						<Button
 							className="blockish-action-button is-secondary blockish-button-base blockish-button-secondary"
 							variant="secondary"
-							disabled={isSaving || allBlocks.length === 0}
-							onClick={() => onSetAllBlockStatus('active')}
+							disabled={isSaving || filteredBlockSlugs.length === 0}
+							onClick={() => onSetAllBlockStatus('active', filteredBlockSlugs)}
 						>
 							{__('Enable All', 'blockish')}
 						</Button>
 						<Button
 							className="blockish-action-button is-secondary blockish-button-base blockish-button-secondary"
 							variant="secondary"
-							disabled={isSaving || allBlocks.length === 0}
-							onClick={() => onSetAllBlockStatus('inactive')}
+							disabled={isSaving || filteredBlockSlugs.length === 0}
+							onClick={() => onSetAllBlockStatus('inactive', filteredBlockSlugs)}
 						>
 							{__('Disable All', 'blockish')}
 						</Button>
