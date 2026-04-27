@@ -205,7 +205,7 @@ if ( ! function_exists( 'blockish_dci_plugin' ) ) {
 			'core_file'            => false,
 			'plugin_deactivate_id' => false,
 			'menu'                 => array(
-				'slug' => 'blockish',
+				'slug' => 'blockish-dashboard',
 			),
 			'public_key'           => 'pk_AyXCKb51WP7urdbX5vdqe2ScQewFI3Bn',
 			'is_premium'           => false,
