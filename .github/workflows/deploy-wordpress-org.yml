@@ -20,8 +20,8 @@ jobs:
       - name: Verify release version
         run: |
           TAG="${GITHUB_REF_NAME#v}"
-          PLUGIN_VERSION=$(grep -E "^[[:space:]]*\* Version:" blockish.php | sed -E "s/.*Version:[[:space:]]*//")
-          STABLE_TAG=$(grep -E "^Stable tag:" readme.txt | sed -E "s/Stable tag:[[:space:]]*//")
+          PLUGIN_VERSION=$(grep -E "^[[:space:]]*\* Version:" blockish.php | sed -E "s/.*Version:[[:space:]]*//" | tr -d '\r')
+          STABLE_TAG=$(grep -E "^Stable tag:" readme.txt | sed -E "s/Stable tag:[[:space:]]*//" | tr -d '\r')
 
           if [ "$TAG" != "$PLUGIN_VERSION" ]; then
             echo "Git tag $GITHUB_REF_NAME does not match plugin Version $PLUGIN_VERSION."
