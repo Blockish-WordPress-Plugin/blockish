@@ -1,0 +1,509 @@
+/**
+ * DCI SDK Styles
+ * Version 1.2.2
+ *
+ * Uses CSS custom properties for all brand colors.
+ * Each plugin overrides --dci-primary and --dci-secondary in its own stylesheet
+ * to match its brand without touching this file.
+ *
+ * Default palette: professional blue-indigo (neutral, works for any product).
+ */
+
+/* ==========================================================================
+   Design Tokens
+   ========================================================================== */
+:root {
+	--dci-primary:       #8441a4;
+	--dci-primary-dark:  #6e3289;
+	--dci-primary-light: #f3ebf8;
+	--dci-secondary:     #e0528d;
+	--dci-skip-bg:       #f8f0fc;
+	--dci-skip-hover:    #f0e3f8;
+	--dci-danger:        #3e3d41;
+	--dci-danger-bg:     #eff0f4;
+	--dci-danger-hover:  #e2e2e5;
+	--dci-border:        #e2e2e5;
+	--dci-text:          #5f6169;
+	--dci-radius:        6px;
+	--dci-shadow:        0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   Global Admin Notice Banner
+   ========================================================================== */
+.dci-global-notice {
+	padding: 0;
+	border-color: var(--dci-primary);
+	border-left-width: 4px;
+	z-index: 99;
+	box-shadow: none;
+}
+
+.dci-global-notice .dci-global-header {
+	display: flex;
+	align-items: flex-start;
+	gap: 15px;
+	padding: 20px 25px;
+}
+
+.dci-global-notice .dci-global-header img {
+	width: 42px;
+	height: auto;
+	vertical-align: middle;
+	flex-shrink: 0;
+}
+
+.dci-notice-content h3 {
+	margin: 0 0 6px;
+	font-size: 16px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.dci-notice-content p {
+	margin: 0;
+	color: var(--dci-text);
+	max-width: 720px;
+	font-size: 13.5px;
+	line-height: 1.6;
+}
+
+.dci-notice-content p a {
+	color: var(--dci-primary);
+	font-weight: 500;
+	text-decoration: none;
+}
+
+.dci-notice-content p a:hover {
+	text-decoration: underline;
+}
+
+.dci-notice-button-wrap {
+	margin-top: 12px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+/* Shared button base */
+.dci-global-notice .dci-notice-button-wrap button {
+	padding: 8px 16px;
+	border-radius: var(--dci-radius);
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+	border: none;
+	transition: background-color 0.15s ease, opacity 0.15s ease;
+	line-height: 1.4;
+}
+
+/* Allow button — gradient, consistent across all plugins */
+.dci-global-notice .dci-button-allow {
+	background: linear-gradient(313deg, var(--dci-primary), var(--dci-secondary) 100%);
+	color: #fff;
+	border: none;
+}
+
+.dci-global-notice .dci-button-allow:hover {
+	background: linear-gradient(313deg, var(--dci-secondary), var(--dci-primary) 100%);
+	opacity: 0.92;
+}
+
+/* Skip button */
+.dci-global-notice .dci-button-skip {
+	background-color: var(--dci-skip-bg);
+	color: var(--dci-primary);
+}
+
+.dci-global-notice .dci-button-skip:hover {
+	background-color: var(--dci-skip-hover);
+}
+
+/* No Thanks / Disallow button */
+.dci-global-notice .dci-button-disallow {
+	background-color: var(--dci-danger-bg);
+	color: var(--dci-danger);
+}
+
+.dci-global-notice .dci-button-disallow:hover {
+	background-color: var(--dci-danger-hover);
+}
+
+button.notice-dismiss {
+	padding: 25px;
+}
+
+/* ==========================================================================
+   Popup Notice Modal (popup_notice: true mode)
+   ========================================================================== */
+.dci-notice {
+	position: relative;
+	height: 100vh;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	padding: 0;
+}
+
+.dci-notice-wrapper {
+	position: relative;
+	background: #fff;
+	width: 100%;
+	max-width: 420px;
+	margin: auto;
+	padding: 32px;
+	border: 1.5px solid var(--dci-border);
+	border-radius: 8px;
+	box-shadow: var(--dci-shadow);
+}
+
+.dci-notice-wrapper::before {
+	content: '';
+	background: transparent;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	z-index: -1;
+	left: -40px;
+	padding: 40px;
+	top: -40px;
+	border: 1.5px solid #cdcccc;
+	border-radius: 8px;
+}
+
+.dci-header {
+	text-align: justify;
+	margin-bottom: 32px;
+}
+
+.dci-title {
+	text-align: center;
+}
+
+.dci-actions {
+	border-top: 1px solid var(--dci-border);
+	border-bottom: 1px solid var(--dci-border);
+	padding: 14px 10px;
+}
+
+.dci-actions form {
+	display: flex;
+	justify-content: space-between;
+	margin: 0;
+	padding: 0;
+}
+
+.dci-actions button {
+	padding: 6px 16px !important;
+}
+
+.dci-permission {
+	padding: 28px;
+	text-align: center;
+}
+
+.dci-permission p {
+	margin: 0;
+	font-weight: 600;
+	font-size: 13px;
+	color: var(--dci-primary);
+}
+
+.dci-permission-item {
+	display: flex;
+	align-items: center;
+	column-gap: 16px;
+}
+
+.dci-data-list ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.dci-data-list li {
+	margin-bottom: 20px;
+}
+
+.dci-data-list li:last-child {
+	margin-bottom: 0;
+}
+
+.dci-data-list .dci-desc h3 {
+	margin: 0 0 4px;
+	font-size: 1.1em;
+}
+
+.dci-data-list .dci-desc p {
+	margin: 0;
+	font-size: 1em;
+}
+
+.dci-data-list .dashicons {
+	font-size: 30px;
+	height: 30px;
+	width: 30px;
+	color: var(--dci-primary);
+}
+
+/* ==========================================================================
+   Deactivate Feedback Modal
+   ========================================================================== */
+.dci-feedback-wrapper {
+	position: fixed;
+	z-index: 99999;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.55);
+	box-sizing: border-box;
+	overflow-y: auto;
+	display: block;
+}
+
+.dci-feedback-card {
+	background: #fff;
+	max-width: 860px;
+	margin: 0 auto;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 48px 56px;
+	border-radius: 12px;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.dci-feedback-card h2 {
+	margin: 0 0 8px;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #1d2327;
+}
+
+.dci-feedback-card > p {
+	font-size: 0.95rem;
+	font-weight: 400;
+	color: var(--dci-text);
+	margin-bottom: 1.5em;
+}
+
+.dci-feedback-card .dci-feedback-comments {
+	padding: 0.8em 0;
+}
+
+.dci-feedback-card .dci-feedback-comments label {
+	display: block;
+	margin-bottom: 0.4em;
+	font-weight: 500;
+	font-size: 13.5px;
+	color: #1d2327;
+}
+
+.dci-feedback-card .dci-feedback-comments textarea {
+	display: block;
+	width: 100%;
+	min-width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	font-size: 0.95rem;
+	line-height: 1.5;
+	color: #495057;
+	background-color: #fff;
+	border: 1px solid #ced4da;
+	border-radius: var(--dci-radius);
+	padding: 10px 12px;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dci-feedback-card .dci-feedback-comments textarea:focus {
+	color: #495057;
+	background-color: #fff;
+	border-color: var(--dci-primary);
+	outline: 0;
+	box-shadow: 0 0 0 3px rgba(34, 96, 255, 0.15);
+}
+
+/* Checkbox tiles */
+.dci-feedback-tabs {
+	margin-bottom: 0.8em;
+}
+
+.dci-feedback-tabs .dci-checkbox-group {
+	display: flex;
+	user-select: none;
+	gap: 0.8em;
+	flex-wrap: wrap;
+}
+
+.dci-feedback-tabs .dci-checkbox-input {
+	clip: rect(0 0 0 0);
+	clip-path: inset(100%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+.dci-feedback-tabs .dci-checkbox-input:checked + .dci-checkbox-tile {
+	border-color: var(--dci-primary);
+	box-shadow: 0 4px 12px rgba(34, 96, 255, 0.12);
+	color: var(--dci-primary);
+}
+
+.dci-feedback-tabs .dci-checkbox-input:checked + .dci-checkbox-tile::before {
+	transform: scale(1);
+	opacity: 1;
+	background-color: var(--dci-primary);
+	border-color: var(--dci-primary);
+}
+
+.dci-feedback-tabs .dci-checkbox-input:checked + .dci-checkbox-tile .dci-checkbox-icon,
+.dci-feedback-tabs .dci-checkbox-input:checked + .dci-checkbox-tile .dci-checkbox-label {
+	color: var(--dci-primary);
+}
+
+.dci-feedback-tabs .dci-checkbox-input:focus + .dci-checkbox-tile {
+	border-color: var(--dci-primary);
+	box-shadow: 0 4px 12px rgba(34, 96, 255, 0.12), 0 0 0 3px var(--dci-primary-light);
+}
+
+.dci-feedback-tabs .dci-checkbox-input:focus + .dci-checkbox-tile::before {
+	transform: scale(1);
+	opacity: 1;
+}
+
+.dci-feedback-tabs .dci-checkbox-tile {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 7rem;
+	min-height: 7rem;
+	border-radius: 8px;
+	border: 2px solid #d1d5e0;
+	background-color: #fff;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	cursor: pointer;
+	position: relative;
+}
+
+.dci-feedback-tabs .dci-checkbox-tile::before {
+	content: "";
+	position: absolute;
+	display: block;
+	width: 1.1rem;
+	height: 1.1rem;
+	border: 2px solid #b5bfd9;
+	background-color: #fff;
+	border-radius: 50%;
+	top: 0.3rem;
+	left: 0.3rem;
+	opacity: 0;
+	transform: scale(0);
+	transition: transform 0.2s ease, opacity 0.2s ease;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' fill='%23FFFFFF' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'%3E%3C/rect%3E%3Cpolyline points='216 72.005 104 184 48 128.005' fill='none' stroke='%23FFFFFF' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'%3E%3C/polyline%3E%3C/svg%3E");
+	background-size: 10px;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.dci-feedback-tabs .dci-checkbox-tile:hover {
+	border-color: var(--dci-primary);
+}
+
+.dci-feedback-tabs .dci-checkbox-icon {
+	transition: color 0.2s ease;
+	color: #6b7280;
+}
+
+.dci-feedback-tabs .dci-checkbox-icon svg {
+	width: 2rem;
+	height: 2rem;
+}
+
+.dci-feedback-tabs .dci-checkbox-label {
+	color: #6b7280;
+	transition: color 0.2s ease;
+	text-align: center;
+	font-size: 12.5px;
+	margin-top: 6px;
+}
+
+/* Action buttons */
+.dci-feedback-actions {
+	margin-top: 1em;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.dci-feedback-actions > div {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.dci-feedback-actions .button {
+	display: inline-flex;
+	align-items: center;
+	font-weight: 500;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	border: 1px solid transparent;
+	padding: 9px 18px;
+	font-size: 13px;
+	line-height: 1.2;
+	border-radius: var(--dci-radius);
+	transition: background-color 0.15s ease, color 0.15s ease;
+	text-decoration: none;
+}
+
+/* Skip & Deactivate / Cancel */
+.dci-feedback-actions .button:not(.dci-feedback-submit-btn) {
+	color: #374151;
+	border-color: #d1d5e0;
+	background: #fff;
+}
+
+.dci-feedback-actions .button:not(.dci-feedback-submit-btn):hover {
+	background: #f9fafb;
+	color: #111;
+}
+
+/* Submit & Deactivate */
+.dci-feedback-actions .dci-feedback-submit-btn {
+	color: #fff;
+	background-color: var(--dci-primary);
+	border-color: var(--dci-primary);
+}
+
+.dci-feedback-actions .dci-feedback-submit-btn:hover {
+	background-color: var(--dci-primary-dark);
+	border-color: var(--dci-primary-dark);
+	color: #fff;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media screen and (max-width: 767px) {
+	.dci-feedback-card {
+		padding: 28px 24px;
+		width: calc(100% - 32px);
+	}
+
+	.dci-feedback-tabs .dci-checkbox-group {
+		flex-wrap: wrap;
+	}
+
+	.dci-notice-button-wrap {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}

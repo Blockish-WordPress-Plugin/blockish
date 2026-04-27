@@ -66,13 +66,19 @@ export default function App() {
 		updateModuleStatus('blocks', slug, enabled ? 'active' : 'inactive');
 	};
 
-	const handleSetAllBlockStatus = (status) => {
+	const handleSetAllBlockStatus = (status, slugs = null) => {
 		pendingSaveRef.current = true;
+		if (Array.isArray(slugs) && slugs.length > 0) {
+			slugs.forEach((slug) => {
+				updateModuleStatus('blocks', slug, status);
+			});
+			return;
+		}
+
 		Object.entries(data?.blocks || {}).forEach(([slug, item]) => {
-			if (item?.parent) {
-				return;
+			if (!item?.parent) {
+				updateModuleStatus('blocks', slug, status);
 			}
-			updateModuleStatus('blocks', slug, status);
 		});
 	};
 
@@ -81,8 +87,15 @@ export default function App() {
 		updateModuleStatus('extensions', slug, enabled ? 'active' : 'inactive');
 	};
 
-	const handleSetAllExtensionStatus = (status) => {
+	const handleSetAllExtensionStatus = (status, slugs = null) => {
 		pendingSaveRef.current = true;
+		if (Array.isArray(slugs) && slugs.length > 0) {
+			slugs.forEach((slug) => {
+				updateModuleStatus('extensions', slug, status);
+			});
+			return;
+		}
+
 		Object.keys(data?.extensions || {}).forEach((slug) => {
 			updateModuleStatus('extensions', slug, status);
 		});

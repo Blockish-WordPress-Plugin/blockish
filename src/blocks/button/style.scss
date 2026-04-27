@@ -17,4 +17,11 @@
 		padding: 10px 20px;
 		transition: all 0.3s ease;
 	}
+
+	.blockish-button-icon {
+		svg {
+			width: 24px;
+			height: 24px;
+		}
+	}
 }

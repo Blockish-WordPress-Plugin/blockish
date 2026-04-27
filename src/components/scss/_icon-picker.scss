@@ -238,6 +238,21 @@
                         height: 22px;
                     }
                 }
+
+                .blockish-icon-picker-empty-notice {
+                    border: 1px dashed #dbdce2;
+                    border-radius: 4px;
+                    background: #f8f9fb;
+                    color: #50575e;
+                    padding: 12px 14px;
+                    margin: 0 0 20px;
+                    font-size: 13px;
+                    line-height: 1.5;
+
+                    .blockish-icon-picker-empty-notice-upload-btn {
+                        margin-top: 10px;
+                    }
+                }
             }
         }
 

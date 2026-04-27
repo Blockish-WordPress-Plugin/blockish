@@ -33,9 +33,7 @@
     "alignment": {
       "type": "object",
       "default": {
-        "Desktop": "left",
-        "Tablet": "left",
-        "Mobile": "left"
+        "Desktop": "left"
       },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"

@@ -14,7 +14,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 10px;
-		text-decoration: none;
+		text-decoration: none !important;
 	}
 
 	.blockish-icon-list-item-icon svg,

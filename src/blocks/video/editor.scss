@@ -4,14 +4,16 @@
 	}
 
 	.blockish-video-iframe,
-	.blockish-video {
+	.blockish-video,
+	.blockish-video-overlay {
 		pointer-events: none;
 	}
 
 	&.is-selected {
 		.blockish-video-iframe,
 		.blockish-video,
-		.components-sandbox {
+		.components-sandbox,
+		.blockish-video-overlay {
 			pointer-events: all;
 		}
 	}

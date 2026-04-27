@@ -18,13 +18,13 @@ const BlockishStyleTag = ({ attributes, hash, name, additionalStyles = '' }) => 
             const attributeValue = attributes[metaKey];
             const applyCss = (deviceSlug, value) => {
                 for (const selectorKey in metaAttribute.selectors) {
-                    const selector = replaceString(selectorKey, '{{WRAPPER}}', `bb-${hash}`);
+                    const selector = replaceString(selectorKey, '{{WRAPPER}}', `bb-${hash}.blockish-block-wrapper`);
                     cssRules[deviceSlug][selector] = (cssRules[deviceSlug][selector] || '') + replaceCssPlaceholders(metaAttribute.selectors[selectorKey], value);
                 }
 
                 if (metaAttribute?.groupSelector && metaAttribute?.groupSelector?.type) {
                     const type = metaAttribute?.groupSelector?.type;
-                    const selector = replaceString(metaAttribute?.groupSelector?.selector, '{{WRAPPER}}', `bb-${hash}`);
+                    const selector = replaceString(metaAttribute?.groupSelector?.selector, '{{WRAPPER}}', `bb-${hash}.blockish-block-wrapper`);
                     switch (type) {
                         case 'BlockishBackground':
                             let styles = generateBackgroundControlStyles(value, deviceSlug);

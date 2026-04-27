@@ -43,7 +43,7 @@ const Inspector = ({ attributes, advancedControls }) => {
 										<BlockishControl
 											type="BlockishLink"
 											label={__('Link', 'blockish')}
-											slug="link"
+											slug="url"
 										/>
 										<BlockishControl
 											type="BlockishIconPicker"
@@ -83,6 +83,16 @@ const Inspector = ({ attributes, advancedControls }) => {
 											label={__('Min Height', 'blockish')}
 											slug="buttonMinHeight"
 										/>
+										{
+											attributes?.icon?.path && (
+												<BlockishResponsiveControl
+													type="BlockishRangeUnit"
+													label={__('Icon Size', 'blockish')}
+													slug="buttonIconSize"
+													left="8ch"
+												/>
+											)
+										}
 										<BlockishResponsiveControl
 											type="BlockishToggleGroup"
 											label={__('Placement', 'blockish')}
@@ -222,6 +232,7 @@ const Inspector = ({ attributes, advancedControls }) => {
 										/>
 
 									</BlockishControl>
+
 								</>
 							)
 						}

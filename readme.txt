@@ -1,9 +1,13 @@
 === Blockish ===
-Contributors: bdkoder
-Donate link: https://github.com/bdkoder
+Author: wowdevs
+Author URI: https://wowdevs.com/
+Contributors: bdkoder, mizan42047
+Donate link: https://wowdevs.com/
 Tags: blocks, builder, designs
-Tested up to: 6.7.2
+Tested up to: 6.9
 Stable tag: 1.0.3
+Requires at least: 6.1
+Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +51,24 @@ You can get support for this plugin by creating a support ticket on the WordPres
 
 A JSON Schema for block.json [https://schemas.wp.org/trunk/block.json](https://schemas.wp.org/trunk/block.json) can be used by code editors to provide things like tooltips, autocomplete, and validation while editing block.json.
 
+
+== External Services ==
+
+This plugin connects to one external services under the conditions described below. No data is ever sent without a clear user action or explicit opt-in.
+
+= 1. Usage Analytics / Data Insights (dashboard.wowdevs.com) =
+
+**What it does:** Sends non-sensitive plugin usage data to help improve the plugin. This is part of the optional Data Insights program powered by the DCI SDK.
+
+**When it connects:** **Only if you explicitly opt in** when prompted. No data is ever sent without your consent. You can opt out at any time from the Sky Addons dashboard.
+
+**Data sent:** Plugin version, WordPress version, active theme, site language, and similar non-personal environment data. No passwords, user content, or personally identifiable information is transmitted.
+
+**Service:** wowDevs Data Insights, operated by wowDevs.
+Service URL: https://dashboard.wowdevs.com/
+Privacy Policy: https://wowdevs.com/privacy-policy/
+Terms of Service: https://wowdevs.com/terms-and-conditions/
+
 == Screenshots ==
 
 1. Creative Container Block
@@ -60,6 +82,23 @@ A JSON Schema for block.json [https://schemas.wp.org/trunk/block.json](https://s
 9. Creative Video Block
 
 == Changelog ==
+
+= 1.0.3 [27th April 2026] =
+
+* Accordion block added
+* Button block added
+* Counter block added
+* Google Map block added
+* Heading block added
+* Icon block added
+* Image block added
+* List block added
+* Progress Bar block added
+* Rating block added
+* Social Icons block added
+* Tab block added
+* Video block added
+* Improved: System improved
 
 = 1.0.0 [19th Jan 2025] =
 

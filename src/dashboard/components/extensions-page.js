@@ -82,6 +82,10 @@ export default function ExtensionsPage({
 		() => allExtensions.filter((extension) => extension.status === 'active').length,
 		[allExtensions]
 	);
+	const filteredExtensionSlugs = useMemo(
+		() => filteredExtensions.map((extension) => extension.slug),
+		[filteredExtensions]
+	);
 
 	const selectedSchema = selectedExtensionSlug ? EXTENSION_CONTROL_MAP[selectedExtensionSlug] : null;
 	const selectedExtension = selectedExtensionSlug ? extensions?.[selectedExtensionSlug] : null;
@@ -191,16 +195,16 @@ export default function ExtensionsPage({
 						<Button
 							className="blockish-action-button is-secondary blockish-button-base blockish-button-secondary"
 							variant="secondary"
-							disabled={isSaving || allExtensions.length === 0}
-							onClick={() => onSetAllExtensionStatus('active')}
+							disabled={isSaving || filteredExtensionSlugs.length === 0}
+							onClick={() => onSetAllExtensionStatus('active', filteredExtensionSlugs)}
 						>
 							{__('Enable All', 'blockish')}
 						</Button>
 						<Button
 							className="blockish-action-button is-secondary blockish-button-base blockish-button-secondary"
 							variant="secondary"
-							disabled={isSaving || allExtensions.length === 0}
-							onClick={() => onSetAllExtensionStatus('inactive')}
+							disabled={isSaving || filteredExtensionSlugs.length === 0}
+							onClick={() => onSetAllExtensionStatus('inactive', filteredExtensionSlugs)}
 						>
 							{__('Disable All', 'blockish')}
 						</Button>

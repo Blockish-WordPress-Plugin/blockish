@@ -5,8 +5,8 @@
  * Requires at least: 6.1
  * Requires PHP:      7.4
  * Version:           1.0.3
- * Author:            bdkoder
- * Author URI:        https://github.com/bdkoder
+ * Author:            wowdevs
+ * Author URI:        https://wowdevs.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       blockish
@@ -184,3 +184,45 @@ function blockish() {
     return Blockish::instance();
 }
 blockish();
+
+
+
+/**
+ * SDK Integration
+ */
+
+if ( ! function_exists( 'blockish_dci_plugin' ) ) {
+	function blockish_dci_plugin() {
+
+		// Include DCI SDK.
+		require_once dirname( __FILE__ ) . '/dci/start.php';
+
+		dci_dynamic_init( array(
+			'product_id'           => 5,
+			'plugin_name'          => 'Blockish - Creative Gutenberg Blocks', // make simple, must not empty
+			'plugin_title'         => 'Love using Blockish? Congrats 🎉  ( Never miss an Important Update )', // You can describe your plugin title here
+			'plugin_icon'          => plugins_url( 'assets/imgs/logo.svg', __FILE__ ), // delete the line if you don't need
+			'api_endpoint'         => 'https://dashboard.wowdevs.com/wp-json/dci/v1/data-insights',
+			'slug'                 => 'no-need', // folder-name or write 'no-need' if you don't want to use
+			'core_file'            => false,
+			'plugin_deactivate_id' => false,
+			'menu'                 => array(
+				'slug' => 'blockish-dashboard',
+			),
+			'public_key'           => 'pk_AyXCKb51WP7urdbX5vdqe2ScQewFI3Bn',
+			'is_premium'           => false,
+			// 'custom_data' => array(
+			// 'test' => 'value',
+			// ),
+			'popup_notice'         => false,
+			'deactivate_feedback'  => true,
+			// 'delay_time'    => array(
+			// 'time' => 3 * DAY_IN_SECONDS,
+			// ),
+			'text_domain'          => 'blockish',
+			'plugin_msg'           => '<p>Be Top-contributor by sharing non-sensitive plugin data and create an impact to the global WordPress community today! You can receive valuable emails periodically.</p>',
+		) );
+	}
+	add_action( 'admin_init', 'blockish_dci_plugin' );
+}
+

@@ -1,0 +1,81 @@
+name: Deploy to WordPress.org
+
+# 10up/action-wordpress-plugin-deploy publishes the built release files to
+# WordPress.org SVN trunk and to tags/$GITHUB_REF_NAME.
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  deploy:
+    name: Deploy tagged release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify release version
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PLUGIN_VERSION=$(grep -E "^[[:space:]]*\* Version:" blockish.php | sed -E "s/.*Version:[[:space:]]*//" | tr -d '\r')
+          STABLE_TAG=$(grep -E "^Stable tag:" readme.txt | sed -E "s/Stable tag:[[:space:]]*//" | tr -d '\r')
+
+          if [ "$TAG" != "$PLUGIN_VERSION" ]; then
+            echo "Git tag $GITHUB_REF_NAME does not match plugin Version $PLUGIN_VERSION."
+            exit 1
+          fi
+
+          if [ "$TAG" != "$STABLE_TAG" ]; then
+            echo "Git tag $GITHUB_REF_NAME does not match readme Stable tag $STABLE_TAG."
+            exit 1
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Release checks
+        run: npm run release:check
+
+      - name: Deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: blockish
+          ASSETS_DIR: .wordpress-org
+
+  github-release:
+    name: Create GitHub Release
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract changelog entry
+        id: changelog
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          NOTES=$(awk "/^= $TAG /,/^= [0-9]/" readme.txt | sed '$d' | tail -n +2)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Blockish ${{ env.VERSION }}
+          body: ${{ steps.changelog.outputs.notes }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.ref_name }}

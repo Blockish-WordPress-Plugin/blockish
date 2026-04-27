@@ -135,7 +135,7 @@ class StyleGenerator
         }
 
         $block_data['attrs']['blockClass'] = 'bb-' . \Blockish\Core\Utilities::generate_uniqueId(6);
-        $block_class = $block_data['attrs']['blockClass'];
+        $block_class = $block_data['attrs']['blockClass'].'.blockish-block-wrapper';
         $name = str_replace('blockish/', '', $block_data['blockName']);
         $metadata = \Blockish\Core\Utilities::get_block_metadata($name);
         $block_meta_attributes = $metadata['attributes'] ?? [];

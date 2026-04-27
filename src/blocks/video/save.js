@@ -66,7 +66,13 @@ export default function Save( { attributes } ) {
 
 	return (
 		<figure { ...blockProps }>
-			<div className="blockish-video-player">
+			<div
+				className={ `blockish-video-player${
+					attributes?.videoAspectRatio?.value === 'auto'
+						? ' is-aspect-auto'
+						: ''
+				}` }
+			>
 				{ isSelfHosted
 					? selfHostedUrl && (
 							<video

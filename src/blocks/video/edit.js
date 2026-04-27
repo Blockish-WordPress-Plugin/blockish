@@ -163,7 +163,13 @@ export default function Edit( {
 						/>
 					) }
 
-				<div className="blockish-video-player">
+				<div
+					className={ `blockish-video-player${
+						attributes?.videoAspectRatio?.value === 'auto'
+							? ' is-aspect-auto'
+							: ''
+					}` }
+				>
 					{ sourceType !== 'selfHosted' ? (
 						<EmbededVideo
 							attributes={ attributes }

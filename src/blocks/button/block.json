@@ -146,6 +146,12 @@
             "selectors": {
                 ".{{WRAPPER}} .blockish-button-link": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
             }
+        },
+        "buttonIconSize": {
+            "type": "object",
+            "selectors": {
+                ".{{WRAPPER}} .blockish-button-link .blockish-button-icon": "width: {{VALUE}}; height: {{VALUE}};"
+            }
         }
     },
     "editorScript": "file:./index.js",

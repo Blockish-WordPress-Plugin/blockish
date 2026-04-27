@@ -5,9 +5,10 @@ const getGoogleMapsEmbedUrl = ( location, zoom ) => {
 		? 14
 		: Math.min( 21, Math.max( 0, parsedZoom ) );
 
-	return `https://www.google.com/maps?q=${ encodeURIComponent(
+	// Use iwloc=near for better default marker behavior on searched locations.
+	return `https://maps.google.com/maps?hl=en&q=${ encodeURIComponent(
 		safeLocation
-	) }&z=${ safeZoom }&output=embed`;
+	) }&z=${ safeZoom }&t=m&iwloc=near&output=embed`;
 };
 
 export { getGoogleMapsEmbedUrl };

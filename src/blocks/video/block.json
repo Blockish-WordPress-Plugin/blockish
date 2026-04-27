@@ -109,22 +109,51 @@
 				".{{WRAPPER}} .blockish-video-player": "text-align: {{VALUE}};"
 			}
 		},
-		"videoWidth": {
+		"videoAspectRatio": {
 			"type": "object",
 			"default": {
-				"Desktop": "100%"
+				"label": "16:9",
+				"value": "16 / 9"
 			},
 			"selectors": {
-				".{{WRAPPER}} .blockish-video, .{{WRAPPER}} .components-sandbox": "width: {{VALUE}};"
+				".{{WRAPPER}} .blockish-video-player": "aspect-ratio: {{VALUE}};"
 			}
 		},
-		"videoHeight": {
+		"videoCSSFilters": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishCSSFilters",
+				"selector": ".{{WRAPPER}} .blockish-video, .{{WRAPPER}} .components-sandbox, .{{WRAPPER}} .blockish-video-sandbox"
+			}
+		},
+		"overlayPlayButtonSize": {
 			"type": "object",
-			"default": {
-				"Desktop": "360px"
-			},
 			"selectors": {
-				".{{WRAPPER}} .blockish-video, .{{WRAPPER}} .components-sandbox": "height: {{VALUE}};"
+				".{{WRAPPER}} .blockish-video-overlay-play-icon": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"overlayPlayButtonIconSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-video-overlay-play-icon": "--blockish-video-overlay-play-icon-size: {{VALUE}};"
+			}
+		},
+		"overlayPlayButtonBg": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-video-overlay-play-icon": "background: {{VALUE}};"
+			}
+		},
+		"overlayPlayButtonIconColor": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-video-overlay-play-icon::before": "border-left-color: {{VALUE}};"
+			}
+		},
+		"overlayPlayButtonBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-video-overlay-play-icon": "border-radius: {{VALUE}};"
 			}
 		}
 	},

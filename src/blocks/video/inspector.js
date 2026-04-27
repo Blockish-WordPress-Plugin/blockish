@@ -8,7 +8,7 @@ import {
 } from './utils';
 
 const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
-	const { BlockishControl, BlockishResponsiveControl } =
+	const { BlockishControl, BlockishResponsiveControl, BlockishGroupControl } =
 		window?.blockish?.controls;
 	const sourceType = attributes?.sourceType?.value;
 	const currentSource =
@@ -267,44 +267,119 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 						) }
 
 						{ tabName === 'style' && (
-							<BlockishControl
-								type="BlockishPanelBody"
-								title={ __( 'Video', 'blockish' ) }
-								initialOpen={ true }
-							>
-								<BlockishResponsiveControl
-									type="BlockishToggleGroup"
-									label={ __( 'Alignment', 'blockish' ) }
-									slug="alignment"
-									left="65px"
-									options={ [
-										{
-											value: 'left',
-											label: __( 'Left', 'blockish' ),
-										},
-										{
-											value: 'center',
-											label: __( 'Center', 'blockish' ),
-										},
-										{
-											value: 'right',
-											label: __( 'Right', 'blockish' ),
-										},
-									] }
-								/>
-								<BlockishResponsiveControl
-									type="BlockishRangeUnit"
-									label={ __( 'Width', 'blockish' ) }
-									slug="videoWidth"
-									left="40px"
-								/>
-								<BlockishResponsiveControl
-									type="BlockishRangeUnit"
-									label={ __( 'Height', 'blockish' ) }
-									slug="videoHeight"
-									left="44px"
-								/>
-							</BlockishControl>
+							<>
+								<BlockishControl
+									type="BlockishPanelBody"
+									title={ __( 'Video', 'blockish' ) }
+									initialOpen={ true }
+								>
+									<BlockishResponsiveControl
+										type="BlockishToggleGroup"
+										label={ __( 'Alignment', 'blockish' ) }
+										slug="alignment"
+										left="65px"
+										options={ [
+											{
+												value: 'left',
+												label: __( 'Left', 'blockish' ),
+											},
+											{
+												value: 'center',
+												label: __( 'Center', 'blockish' ),
+											},
+											{
+												value: 'right',
+												label: __( 'Right', 'blockish' ),
+											},
+										] }
+									/>
+									<BlockishControl
+										type="BlockishSelect"
+										label={ __( 'Aspect Ratio', 'blockish' ) }
+										slug="videoAspectRatio"
+										options={ [
+											{
+												label: __( 'Auto', 'blockish' ),
+												value: 'auto',
+											},
+											{
+												label: __( '16:9', 'blockish' ),
+												value: '16 / 9',
+											},
+											{
+												label: __( '4:3', 'blockish' ),
+												value: '4 / 3',
+											},
+											{
+												label: __( '1:1', 'blockish' ),
+												value: '1 / 1',
+											},
+											{
+												label: __( '21:9', 'blockish' ),
+												value: '21 / 9',
+											},
+										] }
+									/>
+									<BlockishGroupControl
+										type="BlockishCSSFilters"
+										label={ __( 'CSS Filters', 'blockish' ) }
+										slug="videoCSSFilters"
+									/>
+								</BlockishControl>
+
+								{ attributes?.showOverlay &&
+									attributes?.showOverlayPlayIcon && (
+										<BlockishControl
+											type="BlockishPanelBody"
+											title={ __(
+												'Overlay Play Button',
+												'blockish'
+											) }
+											initialOpen={ false }
+										>
+											<BlockishResponsiveControl
+												type="BlockishRangeUnit"
+												label={ __( 'Size', 'blockish' ) }
+												slug="overlayPlayButtonSize"
+												left="5ch"
+											/>
+											<BlockishResponsiveControl
+												type="BlockishRangeUnit"
+												label={ __(
+													'Icon Size',
+													'blockish'
+												) }
+												slug="overlayPlayButtonIconSize"
+												left="8ch"
+											/>
+											<BlockishControl
+												type="BlockishColor"
+												label={ __(
+													'Background',
+													'blockish'
+												) }
+												slug="overlayPlayButtonBg"
+											/>
+											<BlockishControl
+												type="BlockishColor"
+												label={ __(
+													'Icon Color',
+													'blockish'
+												) }
+												slug="overlayPlayButtonIconColor"
+											/>
+											<BlockishResponsiveControl
+												type="BlockishRangeUnit"
+												label={ __(
+													'Border Radius',
+													'blockish'
+												) }
+												slug="overlayPlayButtonBorderRadius"
+												left="12ch"
+											/>
+										</BlockishControl>
+									) }
+							</>
 						) }
 
 						{ tabName === 'advanced' && advancedControls }

@@ -5,14 +5,35 @@
 		position: relative;
 		width: 100%;
 		max-width: 100%;
+		aspect-ratio: 16 / 9;
 		line-height: 0;
+	}
+
+	.blockish-video-player.is-aspect-auto {
+		min-height: 360px;
 	}
 
 	.blockish-video {
 		width: 100%;
 		max-width: 100%;
-		height: 360px;
+		height: auto;
 		border: 0;
+	}
+
+	video.blockish-video,
+	.blockish-video-iframe {
+		height: 100%;
+	}
+
+	.blockish-video-sandbox,
+	.components-sandbox {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.blockish-video-iframe {
+		min-height: 360px;
 	}
 
 	.blockish-video-overlay {
@@ -35,6 +56,7 @@
 	}
 
 	.blockish-video-overlay-play-icon {
+		--blockish-video-overlay-play-icon-size: 16px;
 		width: 68px;
 		height: 48px;
 		border-radius: 12px;
@@ -50,8 +72,8 @@
 		width: 0;
 		height: 0;
 		transform: translate(-40%, -50%);
-		border-top: 10px solid transparent;
-		border-bottom: 10px solid transparent;
-		border-left: 16px solid #fff;
+		border-top: calc(var(--blockish-video-overlay-play-icon-size) * 0.625) solid transparent;
+		border-bottom: calc(var(--blockish-video-overlay-play-icon-size) * 0.625) solid transparent;
+		border-left: var(--blockish-video-overlay-play-icon-size) solid #fff;
 	}
 }

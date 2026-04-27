@@ -27,7 +27,7 @@ export default function Edit({ attributes, setAttributes, advancedControls }) {
                         onChange={(value) => setAttributes({ text: value })}
                         placeholder={__('Button Text', 'blockish')}
                     />
-                    <BlockishIcon className="blockish-button-icon" icon={attributes?.icon} width={24} height={24} fill="currentColor" />
+                    <BlockishIcon className="blockish-button-icon" icon={attributes?.icon} fill="currentColor" />
                 </a>
             </div>
         </>

@@ -444,7 +444,8 @@ class Utilities
 
             if ($device_slug === 'Desktop') {
                 $final_css .= $css_string;
-            } else {
+                continue;
+            } else if (!empty($css_string)) {
                 $final_css .= "@media screen and (max-width: {$device_value}){{$css_string}}";
             }
         }

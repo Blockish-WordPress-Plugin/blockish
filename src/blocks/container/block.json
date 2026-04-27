@@ -36,9 +36,7 @@
 		"customWidthContainer": {
 			"type": "object",
 			"default": {
-				"Desktop": "100%",
-				"Tablet": "100%",
-				"Mobile": "100%"
+				"Desktop": "100%"
 			},
 			"selectors": {
 				".{{WRAPPER}}.align-custom-width": "max-width: {{VALUE}};"
@@ -81,14 +79,6 @@
 				"Desktop": {
 					"label": "Center",
 					"value": "center"
-				},
-				"Tablet": {
-					"label": "Center",
-					"value": "center"
-				},
-				"Mobile": {
-					"label": "Center",
-					"value": "center"
 				}
 			},
 			"selectors": {
@@ -99,14 +89,6 @@
 			"type": "object",
 			"default": {
 				"Desktop": {
-					"label": "Center",
-					"value": "center"
-				},
-				"Tablet": {
-					"label": "Center",
-					"value": "center"
-				},
-				"Mobile": {
 					"label": "Center",
 					"value": "center"
 				}
