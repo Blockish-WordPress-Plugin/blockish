@@ -1,4 +1,7 @@
 === Blockish ===
+Version: 1.0.3
+Author: wowdevs
+Author URI: https://wowdevs.com/
 Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: blocks, builder, designs
