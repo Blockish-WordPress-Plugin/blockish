@@ -51,6 +51,24 @@ You can get support for this plugin by creating a support ticket on the WordPres
 
 A JSON Schema for block.json [https://schemas.wp.org/trunk/block.json](https://schemas.wp.org/trunk/block.json) can be used by code editors to provide things like tooltips, autocomplete, and validation while editing block.json.
 
+
+== External Services ==
+
+This plugin connects to one external services under the conditions described below. No data is ever sent without a clear user action or explicit opt-in.
+
+= 1. Usage Analytics / Data Insights (dashboard.wowdevs.com) =
+
+**What it does:** Sends non-sensitive plugin usage data to help improve the plugin. This is part of the optional Data Insights program powered by the DCI SDK.
+
+**When it connects:** **Only if you explicitly opt in** when prompted. No data is ever sent without your consent. You can opt out at any time from the Sky Addons dashboard.
+
+**Data sent:** Plugin version, WordPress version, active theme, site language, and similar non-personal environment data. No passwords, user content, or personally identifiable information is transmitted.
+
+**Service:** wowDevs Data Insights, operated by wowDevs.
+Service URL: https://dashboard.wowdevs.com/
+Privacy Policy: https://wowdevs.com/privacy-policy/
+Terms of Service: https://wowdevs.com/terms-and-conditions/
+
 == Screenshots ==
 
 1. Creative Container Block
