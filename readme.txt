@@ -1,6 +1,6 @@
 === Blockish ===
 Contributors: bdkoder, mizan42047
-Donate link: https://github.com/bdkoder
+Donate link: https://wowdevs.com/
 Tags: blocks, builder, designs
 Tested up to: 6.7.2
 Stable tag: 1.0.3
