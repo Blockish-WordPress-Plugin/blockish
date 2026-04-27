@@ -11,10 +11,14 @@
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
-		"plugin-zip": "wp-scripts plugin-zip",
+		"plugin-zip": "npm run zip",
 		"start": "wp-scripts start",
 		"start-hot": "wp-scripts start --hot",
-		"make-pot": "npx @wp-blocks/make-pot --exclude=node_modules,build,vendor,assets,src"
+		"make-pot": "npx @wp-blocks/make-pot --exclude=node_modules,build,vendor,assets,src",
+		"release": "bash scripts/release.sh",
+		"release:check": "npm run build && php -l blockish.php && find includes -name '*.php' -print0 | xargs -0 -n1 php -l && npm run zip",
+		"ship": "bash scripts/publish.sh",
+		"zip": "npm run build && rm -rf blockish blockish.zip blockish-v.$npm_package_version.zip && rsync -a --exclude-from=.buildignore . blockish && zip -qr blockish-v.$npm_package_version.zip blockish"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^30.26.0"
