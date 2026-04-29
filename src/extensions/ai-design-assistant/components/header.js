@@ -3,14 +3,16 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Button, Flex, Icon, __experimentalText as Text } from '@wordpress/components';
 import { addCard, timeToRead, trash, search } from '@wordpress/icons';
-import { CHAT_POST_TYPE, useChats } from '../utils/use-chats';
+import { useChats } from '../utils/use-chats';
+import { CHAT_POST_TYPE, CHAT_SESSION_KEY } from '../constants';
 
-export default function AssistantHeader({ title }) {
+export default function AssistantHeader({ selectedChat }) {
 	const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
+	const [showConfirm, setShowConfirm] = useState(false);
 	const containerRef = useRef(null);
 	const chatHistory = useChats(searchTerm);
-	const { deleteEntityRecord } = useDispatch( 'core' );
+	const { deleteEntityRecord } = useDispatch('core');
 
 	useEffect(() => {
 		const handleOutsideClick = (event) => {
@@ -20,6 +22,8 @@ export default function AssistantHeader({ title }) {
 
 			if (!containerRef.current.contains(event.target)) {
 				setIsHistoryOpen(false);
+				setShowConfirm(false);
+				setSearchTerm('');
 			}
 		};
 
@@ -29,13 +33,22 @@ export default function AssistantHeader({ title }) {
 		};
 	}, []);
 
-	const handleSelect = () => {
+	const handleSelect = (id) => {
 		setIsHistoryOpen(false);
+		setShowConfirm(false);
+		setSearchTerm('');
+		window.sessionStorage.setItem(CHAT_SESSION_KEY, id);
 	};
 
 	const deleteChat = async (id) => {
 		try {
-			await deleteEntityRecord('postType', CHAT_POST_TYPE, id);
+			const sessionId = window.sessionStorage.getItem(CHAT_SESSION_KEY);
+			if (id === sessionId) {
+				window.sessionStorage.removeItem(CHAT_SESSION_KEY);
+			}
+			await deleteEntityRecord('postType', CHAT_POST_TYPE, id, {
+				force: true,
+			});
 		} catch (error) {
 			console.error(error);
 		}
@@ -45,7 +58,7 @@ export default function AssistantHeader({ title }) {
 		<div className="blockish-ai-assistant-sidebar-header" ref={containerRef}>
 			<Flex justify="space-between" align="center">
 				<Text className="blockish-ai-assistant-sidebar-header-title">
-					{__('AI Design Assistant', 'blockish')}
+					{selectedChat?.title || __('AI Design Assistant', 'blockish')}
 				</Text>
 				<Flex align="center" expanded={false} gap={0}>
 					<Button
@@ -60,6 +73,7 @@ export default function AssistantHeader({ title }) {
 						variant="tertiary"
 						icon={addCard}
 						label={__('Create new chat', 'blockish')}
+						onClick={() => window.sessionStorage.removeItem(CHAT_SESSION_KEY)}
 					/>
 				</Flex>
 			</Flex>
@@ -81,7 +95,7 @@ export default function AssistantHeader({ title }) {
 					<div className="blockish-ai-assistant-history-list">
 						{chatHistory.length > 0 ? (
 							chatHistory.map((chat) => (
-								<Flex 
+								<Flex
 									key={chat?.id}
 									className="blockish-ai-assistant-history-item"
 									justify="space-between"
@@ -92,16 +106,35 @@ export default function AssistantHeader({ title }) {
 									<Text className="blockish-ai-assistant-history-item-title">
 										{chat?.title}
 									</Text>
-									<Button
-										className="blockish-ai-assistant-history-item-delete"
-										variant="tertiary"
-										icon={trash}
-										label={__('Delete', 'blockish')}
-										onClick={(event) => {
-											event.stopPropagation();
-											deleteChat(chat?.id);
-										}}
-									/>
+									{
+										!showConfirm ? (
+											<Button
+												className="blockish-ai-assistant-history-item-delete"
+												variant="tertiary"
+												icon={trash}
+												label={__('Delete', 'blockish')}
+												size='small'
+												onClick={(event) => {
+													event.stopPropagation();
+													setShowConfirm(true);
+												}}
+											/>
+										) : (
+											<Button
+												className="blockish-ai-assistant-history-item-delete"
+												variant="tertiary"
+												label={__('Cancel', 'blockish')}
+												size='small'
+												onClick={async (event) => {
+													event.stopPropagation();
+													await deleteChat(chat?.id);
+													setShowConfirm(false);
+												}}
+											>
+												{__('Confirm?', 'blockish')}
+											</Button>
+										)
+									}
 								</Flex>
 							))
 						) : (

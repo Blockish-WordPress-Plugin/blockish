@@ -39,7 +39,7 @@ class AiDesignAssistant {
 		);
 
 		register_post_type(
-			'blockish-ai-assistant-history',
+			'blockish-ai-history',
 			array(
 				'labels'                => $labels,
 				'public'                => true,
@@ -54,11 +54,11 @@ class AiDesignAssistant {
 				'menu_position'         => 25,
 				'supports'              => array( 'title', 'editor' ),
 				'show_in_rest'          => true,
-				'rest_base'             => 'assistant-chat-history',
+				'rest_base'             => 'blockish-ai-history',
 				'rest_controller_class' => 'WP_REST_Posts_Controller',
 				'capability_type'       => 'post',
 				'map_meta_cap'          => true,
-				'rewrite'               => array( 'slug' => 'assistant-chat-history' ),
+				'rewrite'               => array( 'slug' => 'blockish-ai-history' ),
 				'query_var'             => true,
 			)
 		);

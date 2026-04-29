@@ -1,6 +1,5 @@
 import { useSelect } from '@wordpress/data';
-
-export const CHAT_POST_TYPE = 'blockish-ai-assistant-history';
+import { CHAT_POST_TYPE } from '../constants';
 
 export const useChats = (search = '') => {
 	const { chats } = useSelect((select) => {

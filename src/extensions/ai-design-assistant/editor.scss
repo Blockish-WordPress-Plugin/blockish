@@ -125,6 +125,10 @@
 	font-size: 11px;
 	line-height: 1.3;
 	cursor: pointer;
+
+	&-title {
+		color: #fff !important;
+	}
 }
 
 .blockish-ai-assistant-history-item:hover,
