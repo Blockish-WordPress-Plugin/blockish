@@ -6,16 +6,11 @@ export const useChats = (search = '') => {
 		const { getEntityRecords, getEditedEntityRecord } = select('core');
 		const records = getEntityRecords('postType', CHAT_POST_TYPE, { search });
 		return {
-			chats:
-				(records &&
-					records.map((item) =>
-						getEditedEntityRecord('postType', CHAT_POST_TYPE, item?.id)
-					)) ||
-				[],
-		};
+			chats: records?.map((item) => getEditedEntityRecord('postType', CHAT_POST_TYPE, item?.id)),
+		}
 	}, [search]);
 
-	return chats;
+	return chats || [];
 };
 
 export const useChat = (id) => {
