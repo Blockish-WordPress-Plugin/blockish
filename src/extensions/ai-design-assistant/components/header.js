@@ -10,7 +10,7 @@ import { clearSessionChatId, getSessionChatId, setSessionChatId } from '../utils
 export default function AssistantHeader({ selectedChat }) {
 	const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
-	const [showConfirm, setShowConfirm] = useState(false);
+	const [confirmChatId, setConfirmChatId] = useState(null);
 	const containerRef = useRef(null);
 	const chatHistory = useChats(searchTerm);
 	const { deleteEntityRecord } = useDispatch('core');
@@ -23,7 +23,7 @@ export default function AssistantHeader({ selectedChat }) {
 
 			if (!containerRef.current.contains(event.target)) {
 				setIsHistoryOpen(false);
-				setShowConfirm(false);
+				setConfirmChatId(null);
 				setSearchTerm('');
 			}
 		};
@@ -36,7 +36,7 @@ export default function AssistantHeader({ selectedChat }) {
 
 	const handleSelect = (id) => {
 		setIsHistoryOpen(false);
-		setShowConfirm(false);
+		setConfirmChatId(null);
 		setSearchTerm('');
 		setSessionChatId(id);
 	};
@@ -50,6 +50,7 @@ export default function AssistantHeader({ selectedChat }) {
 			await deleteEntityRecord('postType', CHAT_POST_TYPE, id, {
 				force: true,
 			});
+			setConfirmChatId(null);
 		} catch (error) {
 			console.error(error);
 		}
@@ -108,7 +109,7 @@ export default function AssistantHeader({ selectedChat }) {
 										{chat?.title}
 									</Text>
 									{
-										!showConfirm ? (
+										confirmChatId !== chat?.id ? (
 											<Button
 												className="blockish-ai-assistant-history-item-delete"
 												variant="tertiary"
@@ -117,19 +118,18 @@ export default function AssistantHeader({ selectedChat }) {
 												size='small'
 												onClick={(event) => {
 													event.stopPropagation();
-													setShowConfirm(true);
+													setConfirmChatId(chat?.id);
 												}}
 											/>
 										) : (
 											<Button
 												className="blockish-ai-assistant-history-item-delete"
 												variant="tertiary"
-												label={__('Cancel', 'blockish')}
+												label={__('Confirm delete', 'blockish')}
 												size='small'
 												onClick={async (event) => {
 													event.stopPropagation();
 													await deleteChat(chat?.id);
-													setShowConfirm(false);
 												}}
 											>
 												{__('Confirm?', 'blockish')}
