@@ -6,12 +6,19 @@ import {
 } from '@wordpress/components';
 import { __ } from "@wordpress/i18n";
 
-const BlockishBackground = ({ value, onChange, label = __('Background', 'blockish'), ...props }) => {
+const BlockishBackground = ({ value, onChange, label = __('Background', 'blockish'), showVideo = false, ...props }) => {
     const { BlockishColor, BlockishMediaUploader, BlockishToggleGroup, BlockishSelect, BlockishRangeUnit, BlockishResponsive } = window.blockish.components;
     const { useDeviceType, useInheritResponsiveValue } = window.blockish.helpers;
     const device = useDeviceType();
+    const backgroundType = getValue(value, 'backgroundType') || 'classic';
+    const backgroundTypeOptions = [
+        { value: 'classic', label: __('Classic', 'blockish') },
+        { value: 'gradient', label: __('Gradient', 'blockish') },
+        ...(showVideo ? [{ value: 'video', label: __('Video', 'blockish') }] : []),
+    ];
     const inheritResponsiveValue = useInheritResponsiveValue(getValue(value, 'backgroundImage'));
     const backgrounControlValue = getValue(value, 'backgroundImage')?.[device] || inheritResponsiveValue;
+    const backgroundVideoControlValue = getValue(value, 'backgroundVideo');
     const getBackgroundImageSizes = () => {
         const sizes = backgrounControlValue?.sizes;
 
@@ -32,21 +39,28 @@ const BlockishBackground = ({ value, onChange, label = __('Background', 'blockis
         <div className="blockish-control blockish-group-control blockish-background-control">
             <BlockishToggleGroup
                 label={label}
-                value={getValue(value, 'backgroundType') || 'classic'}
+                value={showVideo || backgroundType !== 'video' ? backgroundType : 'classic'}
                 onChange={(nextValue) => onChange(createValue(value, { backgroundType: nextValue }))}
-                options={[
-                    { value: 'classic', label: __('Classic', 'blockish') },
-                    { value: 'gradient', label: __('Gradient', 'blockish') },
-                ]}
+                options={backgroundTypeOptions}
             />
             {
-                getValue(value, 'backgroundType') === 'gradient' ? (
+                backgroundType === 'gradient' ? (
                     <BlockishColor
                         label={__('Gradient', 'blockish')}
                         value={getValue(value, 'gradient')}
                         onChange={(nextValue) => onChange(createValue(value, { gradient: nextValue }))}
                         isGradient={true}
                     />
+                ) : showVideo && backgroundType === 'video' ? (
+                    <div className="blockish-background-video-section">
+                        <BlockishMediaUploader
+                            label={__('Video', 'blockish')}
+                            placeholder={__('Upload Video', 'blockish')}
+                            value={backgroundVideoControlValue}
+                            allowedTypes={['video']}
+                            onChange={(video) => onChange(createValue(value, { backgroundVideo: video }))}
+                        />
+                    </div>
                 ) : (
                     <ToolsPanel
                         label={__('Background Controls', 'blockish')}

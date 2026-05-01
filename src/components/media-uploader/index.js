@@ -13,7 +13,7 @@ import { useRef } from '@wordpress/element';
 const instructions = (
     <p>
         {__(
-            'To edit the image, you need permissions to upload media.',
+            'To edit the media, you need permissions to upload media.',
             'blockish'
         )}
     </p>
@@ -23,7 +23,6 @@ const ALLOWED_MEDIA_TYPES = ['image'];
 
 const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = __('Upload Image', 'blockish'), value, onChange, allowedTypes = ALLOWED_MEDIA_TYPES, isInheritedValue = false }) => {
     const toggleRef = useRef();
-    const videoRef = useRef();
     const backgroundImageStyleProps = {};
     if (value?.url) {
         backgroundImageStyleProps.backgroundImage = `url(${value?.url})`;
@@ -68,7 +67,7 @@ const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = 
                                     aria-label={
                                         !value?.id
                                             ? null
-                                            : __('Edit or replace the image')
+                                            : __('Edit or replace the media')
                                     }
                                     aria-describedby={
                                         !value?.id

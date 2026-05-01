@@ -409,6 +409,7 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                                                                     label={__('Background', 'blockish')}
                                                                     type="BlockishBackground"
                                                                     slug="containerBackground"
+                                                                    showVideo={true}
                                                                 />
                                                             )
                                                         case 'hover':
