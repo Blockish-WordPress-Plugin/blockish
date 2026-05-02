@@ -6,7 +6,7 @@ import {
 } from '@wordpress/components';
 import { __ } from "@wordpress/i18n";
 
-const BlockishBackground = ({ value, onChange, label = __('Background', 'blockish'), showVideo = false, ...props }) => {
+const BlockishBackground = ({ value, onChange, label = __('Background', 'blockish'), showVideo = false, noLabel = false, ...props }) => {
     const { BlockishColor, BlockishMediaUploader, BlockishToggleGroup, BlockishSelect, BlockishRangeUnit, BlockishResponsive } = window.blockish.components;
     const { useDeviceType, useInheritResponsiveValue } = window.blockish.helpers;
     const device = useDeviceType();
@@ -38,7 +38,7 @@ const BlockishBackground = ({ value, onChange, label = __('Background', 'blockis
     return (
         <div className="blockish-control blockish-group-control blockish-background-control">
             <BlockishToggleGroup
-                label={label}
+                label={!noLabel && label ? label : ''}
                 value={showVideo || backgroundType !== 'video' ? backgroundType : 'classic'}
                 onChange={(nextValue) => onChange(createValue(value, { backgroundType: nextValue }))}
                 options={backgroundTypeOptions}

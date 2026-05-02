@@ -410,6 +410,7 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                                                                     type="BlockishBackground"
                                                                     slug="containerBackground"
                                                                     showVideo={true}
+                                                                    noLabel={true}
                                                                 />
                                                             )
                                                         case 'hover':
@@ -418,6 +419,47 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                                                                     label={__('Hover Background', 'blockish')}
                                                                     type="BlockishBackground"
                                                                     slug="containerHoverBackground"
+                                                                    noLabel={true}
+                                                                />
+                                                            )
+                                                    }
+                                                }
+                                            }
+                                        </BlockishControl>
+                                    </BlockishControl>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Background Overlay', 'blockish')} initialOpen={true}>
+                                        <BlockishControl
+                                            type="BlockishTab"
+                                            tabs={[
+                                                {
+                                                    name: 'normal',
+                                                    title: 'Normal'
+                                                },
+                                                {
+                                                    name: 'hover',
+                                                    title: 'Hover'
+                                                }
+                                            ]}
+                                        >
+                                            {
+                                                ({ name: tabName }) => {
+                                                    switch (tabName) {
+                                                        case 'normal':
+                                                            return (
+                                                                <BlockishGroupControl
+                                                                    label={__('Overlay', 'blockish')}
+                                                                    type="BlockishBackgroundOverlay"
+                                                                    slug="containerBackgroundOverlay"
+                                                                    noLabel={true}
+                                                                />
+                                                            )
+                                                        case 'hover':
+                                                            return (
+                                                                <BlockishGroupControl
+                                                                    label={__('Hover Background', 'blockish')}
+                                                                    type="BlockishBackgroundOverlay"
+                                                                    slug="containerHoverBackgroundOverlay"
+                                                                    noLabel={true}
                                                                 />
                                                             )
                                                     }

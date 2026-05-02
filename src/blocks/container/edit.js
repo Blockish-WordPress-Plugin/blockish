@@ -23,16 +23,19 @@ export default function Edit({ attributes, setAttributes, advancedControls, clie
 	);
 	const { replaceInnerBlocks } = dispatch(blockEditorStore);
 	const backgroundVideo = getBackgroundVideo(attributes?.containerBackground);
+	const backgroundOverlay = typeof attributes?.containerBackgroundOverlay === 'string' ? JSON.parse(attributes?.containerBackgroundOverlay) : attributes?.containerBackgroundOverlay;
 	const blockProps = useBlockProps({
 		className: clsx({
 			'has-child-blocks': hasChildBlocks,
 			'blockish-container': attributes?.isVariationPicked && hasChildBlocks,
 			'has-background-video': backgroundVideo?.url,
+			'has-background-overlay': backgroundOverlay?.enabled,
 			[`${attributes?.containerWidth}`]: attributes?.containerWidth && attributes?.isVariationPicked,
 			[`layout-type-${attributes?.display}`]: attributes?.display,
 			[`grid-layout-type-${attributes?.gridLayoutType}`]: attributes?.display === 'grid' && attributes?.gridLayoutType,
 		}),
 	});
+	
 
 	const innerBlockProps = useInnerBlocksProps(blockProps, {
 		renderAppender: hasChildBlocks ? undefined : InnerBlocks?.ButtonBlockAppender

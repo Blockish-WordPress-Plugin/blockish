@@ -25,6 +25,7 @@ import generateTextStrokeControlStyles from "./generate-text-stroke-control-styl
 import useExtensionsAttributes from "./use-extensions-attributes";
 import generateCSS from "./generate-css";
 import deviceList from "./device-list";
+import generateBackgroundOverlayStyles from "./generate-background-overlay-styles";
 
 if( window?.blockish?.screen ){
     window.blockish.helpers = {
@@ -54,6 +55,7 @@ if( window?.blockish?.screen ){
         getLinkProps,
         generateCSSFilters,
         useExtensionsAttributes,
-        generateCSS
+        generateCSS,
+        generateBackgroundOverlayStyles,
     }
 }

@@ -1,12 +1,14 @@
 .wp-block-blockish-container {
 
     &:not(.has-child-blocks) {
-       > .block-list-appender {
+        >.block-list-appender {
             min-height: var(--container-min-height, 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: grab;
+            pointer-events: none;
+
             &::before {
                 content: '';
                 outline: 1px dashed #d3d3d3;
@@ -45,12 +47,17 @@
             top: 0;
             z-index: -99;
         }
+
+        >.block-list-appender {
+            pointer-events: auto;
+        }
     }
 
     &:not(.is-selected) {
-        > .block-list-appender:only-child {
+        >.block-list-appender:only-child {
             pointer-events: none;
-           .block-editor-inserter {
+
+            .block-editor-inserter {
                 opacity: 0;
             }
         }
@@ -68,7 +75,8 @@
             height: 16px;
         }
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             color: #1677ff;
             box-shadow: none !important;
             outline: none !important;

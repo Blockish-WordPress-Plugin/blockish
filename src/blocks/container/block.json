@@ -162,6 +162,20 @@
 				"selector": ".{{WRAPPER}}:hover"
 			}
 		},
+		"containerBackgroundOverlay": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackgroundOverlay",
+				"selector": ".{{WRAPPER}}.has-background-overlay::before"
+			}
+		},
+		"containerHoverBackgroundOverlay": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackgroundOverlay",
+				"selector": ".{{WRAPPER}}.has-background-overlay::before:hover"
+			}
+		},
 		"containerBorder": {
 			"type": "string",
 			"groupSelector": {

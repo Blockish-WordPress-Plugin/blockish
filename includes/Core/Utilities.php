@@ -260,6 +260,49 @@ class Utilities
         return $styles;
     }
 
+    public static function generate_background_overlay_styles($background_overlay)
+    {
+        if (empty($background_overlay) || !is_string($background_overlay)) {
+            return '';
+        }
+
+        $json_background_overlay = json_decode($background_overlay, true);
+        if (!is_array($json_background_overlay)) {
+            return '';
+        }
+
+        $styles = '';
+
+        $defualt = [
+            'type' => 'color',
+        ];
+
+        $background_overlay = wp_parse_args($json_background_overlay, $defualt);
+
+        if ($background_overlay['type'] === 'color' && !empty($background_overlay['color'])) {
+            $color = strpos($background_overlay['color'], '|') !== false ? explode('|', $background_overlay['color']) : $background_overlay['color'];
+            $styles .= 'background: ' . (is_array($color) ? 'var(' . esc_attr($color[0]) . ', ' . esc_attr($color[1]) . ')' : esc_attr($color)) . ';';
+        }
+
+        if ($background_overlay['type'] === 'gradient' && !empty($background_overlay['gradient'])) {
+            $styles .= 'background-image: ' . esc_attr($background_overlay['gradient']) . ';';
+        }
+
+        if (!empty($background_overlay['opacity'])) {
+            $styles .= 'opacity: calc(' . esc_attr($background_overlay['opacity']) . ' / 100);';
+        }
+
+        if (!empty($background_overlay['filters'])) {
+            $styles .= self::generate_css_filters($background_overlay['filters']);
+        }
+
+        if (!empty($background_overlay['blendMode'])) {
+            $styles .= 'mix-blend-mode: ' . esc_attr($background_overlay['blendMode']['value']) . ';';
+        }
+
+        return $styles;
+    }
+
     public static function generate_uniqueId($length)
     {
         return substr(bin2hex(random_bytes($length / 2)), 0, $length);

@@ -213,6 +213,13 @@ class StyleGenerator
                                 ? $css_rules[$device_slug][$selector] . $styles
                                 : $styles;
                             break;
+                        case 'BlockishBackgroundOverlay':
+                            if ($device_slug !== 'Desktop') break;
+                            $styles = Utilities::generate_background_overlay_styles($value);
+                            $css_rules['Desktop'][$selector] = isset($css_rules['Desktop'][$selector])
+                                ? $css_rules['Desktop'][$selector] . $styles
+                                : $styles;
+                            break;
                     }
                 }
             };
