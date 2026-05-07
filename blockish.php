@@ -20,6 +20,7 @@ use Blockish\Core\Dashboard;
 use Blockish\Core\Enqueue;
 use Blockish\Core\StyleGenerator;
 use Blockish\Extensions\ExtensionsLoader;
+use Blockish\Routes\AssistantV1;
 use Blockish\Routes\BlocksV1;
 use Blockish\Routes\DashboardToolsV1;
 use Blockish\Routes\ExtensionsV1;
@@ -83,6 +84,7 @@ final class Blockish {
         define( 'BLOCKISH_STYLES_DIR', BLOCKISH_DIR . 'build/styles/' );
         define( 'BLOCKISH_BLOCKS_DIR', BLOCKISH_DIR . 'build/blocks/' );
         define( 'BLOCKISH_EXTENSIONS_DIR', BLOCKISH_DIR . 'build/extensions/' );
+        define( 'BLOCKISH_AI_ASSISTANT_URL', 'http://localhost:3000/' );
         define( 'BLOCKISH_RESERVED_PLACEHOLDERS', [
             '{{VALUE}}',
             '{{TOP}}',
@@ -139,6 +141,7 @@ final class Blockish {
         BlocksV1::get_instance();
         ExtensionsV1::get_instance();
         IntegrationsV1::get_instance();
+        AssistantV1::get_instance();
         DashboardToolsV1::get_instance();
         SVGUploaderV1::get_instance();
         Blocks::get_instance();
