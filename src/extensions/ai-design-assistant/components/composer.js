@@ -7,6 +7,7 @@ import { useDispatch } from '@wordpress/data';
 import { getChatTitle } from '../utils/chat';
 import { CHAT_POST_TYPE } from '../constants';
 import { setSessionChatId } from '../utils/session';
+import useClassManagerContent from '../hooks/use-class-manager-content';
 
 export default function AssistantComposer({ selectedChat }) {
 	const textareaRef = useRef(null);
@@ -14,6 +15,7 @@ export default function AssistantComposer({ selectedChat }) {
 	const [assistantConfig, setAssistantConfig] = useState({ provider: '', apiKey: '' });
 	useTextareaHeight(textareaRef, input);
 	const { saveEntityRecord, editEntityRecord, saveEditedEntityRecord } = useDispatch('core');
+	const classManager = useClassManagerContent();
 
 	const resolveAssistantConfig = async () => {
 		try {
@@ -22,11 +24,9 @@ export default function AssistantComposer({ selectedChat }) {
 				apiFetch({ path: '/blockish/v1/integrations', method: 'GET' }),
 			]);
 
-			const configuredProvider =
-				extensionsResponse?.extensions?.['ai-design-assistant']?.settings?.provider || '';
+			const configuredProvider = extensionsResponse?.extensions?.['ai-design-assistant']?.settings?.provider || '';
 			const provider = configuredProvider || assistantConfig.provider || 'openai';
-			const apiKey =
-				integrationsResponse?.integrations?.[provider]?.settings?.apiKey || '';
+			const apiKey = integrationsResponse?.integrations?.[provider]?.settings?.apiKey || '';
 			const nextConfig = { provider, apiKey };
 
 			setAssistantConfig(nextConfig);
@@ -42,15 +42,60 @@ export default function AssistantComposer({ selectedChat }) {
 	}, []);
 
 	const getAssistantContent = (response) => {
-		if (typeof response?.response === 'string' && response.response.trim()) {
-			return response.response;
+		if (typeof response === 'string') {
+			return response;
 		}
 
-		if (typeof response?.message === 'string' && response.message.trim()) {
-			return response.message;
+		if (response) {
+			return JSON.stringify(response, null, 2);
 		}
 
 		return __('I could not generate a response right now. Please try again.', 'blockish');
+	};
+
+	const saveAssistantResponse = async (userInput, messagesForContext, chatId) => {
+		let assistantResponse;
+		try {
+			let configForRequest = assistantConfig;
+			if (!configForRequest.provider || !configForRequest.apiKey) {
+				configForRequest = await resolveAssistantConfig();
+			}
+
+			assistantResponse = await apiFetch({
+				path: '/blockish/v1/assistant',
+				method: 'POST',
+				data: {
+					message: userInput,
+					messages: messagesForContext,
+					provider: configForRequest.provider,
+					apiKey: configForRequest.apiKey,
+					classManager,
+				},
+			});
+		} catch (error) {
+			console.error(error);
+			assistantResponse = null;
+		}
+
+		const assistantMessage = {
+			id: `${Date.now() + 1}`,
+			role: 'assistant',
+			content: getAssistantContent(assistantResponse),
+		};
+
+		const nextMessages = [
+			...messagesForContext,
+			assistantMessage,
+		];
+
+		try {
+			await editEntityRecord('postType', CHAT_POST_TYPE, chatId, {
+				content: JSON.stringify(nextMessages),
+			})
+			await saveEditedEntityRecord('postType', CHAT_POST_TYPE, chatId);
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	const onSendMessage = async () => {
@@ -71,58 +116,29 @@ export default function AssistantComposer({ selectedChat }) {
 			: [message];
 		const userInput = input;
 		setInput('');
+		let chatId = selectedChat?.id;
 
-		let assistantResponse;
-		try {
-			let configForRequest = assistantConfig;
-			if (!configForRequest.provider || !configForRequest.apiKey) {
-				configForRequest = await resolveAssistantConfig();
-			}
-
-			assistantResponse = await apiFetch({
-				path: '/blockish/v1/assistant',
-				method: 'POST',
-				data: {
-					message: userInput,
-					messages: messagesForContext,
-					provider: configForRequest.provider,
-					apiKey: configForRequest.apiKey,
-				},
-			});
-		} catch (error) {
-			console.error(error);
-			assistantResponse = null;
-		}
-
-		const assistantMessage = {
-			id: `${Date.now() + 1}`,
-			role: 'assistant',
-			content: getAssistantContent(assistantResponse),
-		};
-
-		const nextMessages = [
-			...messagesForContext,
-			assistantMessage,
-		];
-
-		if (!selectedChat?.id) {
+		if (!chatId) {
 			const newChat = await saveEntityRecord('postType', CHAT_POST_TYPE, {
-				title: getChatTitle(nextMessages),
-				content: JSON.stringify(nextMessages),
+				title: getChatTitle(messagesForContext),
+				content: JSON.stringify(messagesForContext),
 				status: 'publish',
 			})
 
-			setSessionChatId(newChat.id);
+			chatId = newChat.id;
+			setSessionChatId(chatId);
 		} else {
 			try {
-				await editEntityRecord('postType', CHAT_POST_TYPE, selectedChat.id, {
-					content: JSON.stringify(nextMessages),
+				await editEntityRecord('postType', CHAT_POST_TYPE, chatId, {
+					content: JSON.stringify(messagesForContext),
 				})
-				await saveEditedEntityRecord('postType', CHAT_POST_TYPE, selectedChat?.id);
+				await saveEditedEntityRecord('postType', CHAT_POST_TYPE, chatId);
 			} catch (error) {
 				console.error(error);
 			}
 		}
+
+		await saveAssistantResponse(userInput, messagesForContext, chatId);
 	};
 
 	return (
