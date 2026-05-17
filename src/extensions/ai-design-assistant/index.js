@@ -6,6 +6,7 @@ import useSidebarHeight from './hooks/use-sidebar-height';
 import AssistantHeader from './components/header';
 import AssistantMessages from './components/messages';
 import AssistantComposer from './components/composer';
+import AssistantBlockContextMenu from './components/block-context-menu';
 import useSelectedChat from './hooks/use-selected-chat';
 import './editor.scss';
 
@@ -15,24 +16,27 @@ function AIDesignAssistantSidebar() {
 	const selectedChat = useSelectedChat();
 
 	return (
-		<PluginSidebar
-			name={ PLUGIN_NAME }
-			title={ __( 'AI Design Assistant', 'blockish' ) }
-			icon={ blockIcons?.aiDesignAssistantIcon }
-			className="blockish-ai-assistant-sidebar"
-		>
-			<div
-				className="blockish-ai-assistant"
-				ref={ setAssistantRoot }
-				style={
-					panelHeight ? { height: `${ panelHeight }px` } : undefined
-				}
+		<>
+			<AssistantBlockContextMenu />
+			<PluginSidebar
+				name={ PLUGIN_NAME }
+				title={ __( 'AI Design Assistant', 'blockish' ) }
+				icon={ blockIcons?.aiDesignAssistantIcon }
+				className="blockish-ai-assistant-sidebar"
 			>
-				<AssistantHeader selectedChat={ selectedChat } />
-				<AssistantMessages selectedChat={ selectedChat } />
-				<AssistantComposer selectedChat={ selectedChat } />
-			</div>
-		</PluginSidebar>
+				<div
+					className="blockish-ai-assistant"
+					ref={ setAssistantRoot }
+					style={
+						panelHeight ? { height: `${ panelHeight }px` } : undefined
+					}
+				>
+					<AssistantHeader selectedChat={ selectedChat } />
+					<AssistantMessages selectedChat={ selectedChat } />
+					<AssistantComposer selectedChat={ selectedChat } />
+				</div>
+			</PluginSidebar>
+		</>
 	);
 }
 

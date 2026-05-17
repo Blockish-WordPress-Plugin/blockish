@@ -1,6 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	Button,
 	Flex,
@@ -44,8 +43,6 @@ export default function ExtensionsPage({
 	const [activeFilter, setActiveFilter] = useState('all');
 	const [selectedExtensionSlug, setSelectedExtensionSlug] = useState(null);
 	const [extensionSettings, setExtensionSettings] = useState({});
-	const [configuredProviders, setConfiguredProviders] = useState({ openai: false, gemini: false });
-	const integrationsPath = window?.blockishDashboardData?.integrationsApiPath || '/blockish/v1/integrations';
 
 	const allExtensions = useMemo(() => {
 		return Object.entries(extensions || {}).map(([slug, item]) => {
@@ -106,54 +103,6 @@ export default function ExtensionsPage({
 			},
 		}));
 	};
-
-	useEffect(() => {
-		if (selectedExtensionSlug !== 'ai-design-assistant') {
-			return;
-		}
-
-		const savedProvider = extensions?.[selectedExtensionSlug]?.settings?.provider || '';
-		const draftProvider = extensionSettings?.[selectedExtensionSlug]?.provider || '';
-		if (savedProvider || draftProvider) {
-			return;
-		}
-
-		let isMounted = true;
-
-		const resolveDefaultProvider = async () => {
-			try {
-				const response = await apiFetch({ path: integrationsPath, method: 'GET' });
-				const integrations = response?.integrations || {};
-				const openAiKey = integrations?.openai?.settings?.apiKey || '';
-				const geminiKey = integrations?.gemini?.settings?.apiKey || '';
-				setConfiguredProviders({
-					openai: Boolean(openAiKey),
-					gemini: Boolean(geminiKey),
-				});
-
-				const defaultProvider = openAiKey ? 'openai' : geminiKey ? 'gemini' : '';
-				if (!isMounted || !defaultProvider) {
-					return;
-				}
-
-				updateExtensionControl('ai-design-assistant', 'provider', defaultProvider);
-			} catch (error) {
-				setConfiguredProviders({ openai: false, gemini: false });
-				// Keep manual selection flow if integrations API is unavailable.
-			}
-		};
-
-		resolveDefaultProvider();
-
-		return () => {
-			isMounted = false;
-		};
-	}, [
-		selectedExtensionSlug,
-		extensions?.['ai-design-assistant']?.settings?.provider,
-		extensionSettings?.['ai-design-assistant']?.provider,
-		integrationsPath,
-	]);
 
 	const handleSaveSettings = () => {
 		if (!selectedExtensionSlug) {
@@ -255,7 +204,6 @@ export default function ExtensionsPage({
 					schema={selectedSchema}
 					extension={selectedExtension}
 					extensionDraft={selectedDraft}
-					configuredProviders={configuredProviders}
 					onChange={updateExtensionControl}
 					onSave={handleSaveSettings}
 					onRequestClose={() => setSelectedExtensionSlug(null)}

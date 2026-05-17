@@ -23,8 +23,9 @@
 	"dependencies": {
 		"@wordpress/icons": "^11.0.0",
 		"clsx": "^2.1.1",
+		"history": "^5.3.0",
 		"html-react-parser": "^5.2.10",
-		"react-select": "^5.8.3",
-		"history": "^5.3.0"
+		"react-markdown": "^10.1.0",
+		"react-select": "^5.8.3"
 	}
 }

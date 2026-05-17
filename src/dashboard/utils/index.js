@@ -32,23 +32,7 @@ export const EXTENSION_FILTERS = [
 	{ key: 'animation', label: 'Animation' },
 ];
 
-export const EXTENSION_CONTROL_MAP = {
-	'ai-design-assistant': {
-		title: 'AI Design Assistant Settings',
-		controls: [
-			{
-				key: 'provider',
-				type: 'button-group',
-				label: 'Provider',
-				requiresConfiguredProviders: true,
-				options: [
-					{ label: 'OpenAI', value: 'openai' },
-					{ label: 'Gemini', value: 'gemini' },
-				],
-			},
-		],
-	},
-};
+export const EXTENSION_CONTROL_MAP = {};
 
 export function isValidMenu(menuKey) {
 	return SIDEBAR_MENUS.some((menu) => menu.key === menuKey);

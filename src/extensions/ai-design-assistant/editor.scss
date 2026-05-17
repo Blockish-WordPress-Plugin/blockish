@@ -153,28 +153,374 @@
 	gap: 8px;
 }
 
-.blockish-ai-assistant-message {
+.blockish-ai-assistant-message-row {
+	display: flex;
+	flex-direction: column;
 	max-width: 88%;
+}
+
+.blockish-ai-assistant-message-row--assistant {
+	align-self: flex-start;
+	max-width: 100%;
+}
+
+.blockish-ai-assistant-message-row--user {
+	align-self: flex-end;
+	align-items: flex-end;
+}
+
+.blockish-ai-assistant-message-row--user.is-editing {
+	align-self: stretch;
+	max-width: 100%;
+}
+
+.blockish-ai-assistant-message {
 	border-radius: 10px;
 	padding: 8px 10px;
 	font-size: 11px;
 	line-height: 1.45;
+	position: relative;
 }
 
-.blockish-ai-assistant-message p {
+.blockish-ai-assistant-message p,
+.blockish-ai-assistant-message ul,
+.blockish-ai-assistant-message ol,
+.blockish-ai-assistant-message h1,
+.blockish-ai-assistant-message h2,
+.blockish-ai-assistant-message h3,
+.blockish-ai-assistant-message h4,
+.blockish-ai-assistant-message h5,
+.blockish-ai-assistant-message h6 {
 	margin: 0;
 }
 
+.blockish-ai-assistant-message p + p,
+.blockish-ai-assistant-message p + ul,
+.blockish-ai-assistant-message p + ol,
+.blockish-ai-assistant-message ul + p,
+.blockish-ai-assistant-message ol + p,
+.blockish-ai-assistant-message h1 + p,
+.blockish-ai-assistant-message h2 + p,
+.blockish-ai-assistant-message h3 + p,
+.blockish-ai-assistant-message h4 + p {
+	margin-top: 6px;
+}
+
+.blockish-ai-assistant-message ul,
+.blockish-ai-assistant-message ol {
+	padding-left: 16px;
+}
+
+.blockish-ai-assistant-message li + li {
+	margin-top: 3px;
+}
+
+.blockish-ai-assistant-message strong {
+	color: #ffffff;
+	font-weight: 600;
+}
+
+.blockish-ai-assistant-message h1,
+.blockish-ai-assistant-message h2,
+.blockish-ai-assistant-message h3,
+.blockish-ai-assistant-message h4,
+.blockish-ai-assistant-message h5,
+.blockish-ai-assistant-message h6 {
+	color: #ffffff;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.35;
+}
+
+.blockish-ai-assistant-message-reasoning {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	max-width: 100%;
+	border: 0;
+	border-radius: 999px;
+	background: #181818;
+	padding: 4px 7px;
+	margin-bottom: 7px;
+	color: #8f98a3;
+	font-size: 10px;
+	line-height: 1.2;
+}
+
+.blockish-ai-assistant-message-reasoning-label {
+	color: #c5cbd3;
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.blockish-ai-assistant-message-reasoning-text {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.blockish-ai-assistant-message-reasoning-count {
+	flex: 0 0 auto;
+	color: #6f7782;
+	font-size: 10px;
+}
+
+.blockish-ai-assistant-message-attachments {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-top: 6px;
+}
+
+.blockish-ai-assistant-message-image {
+	display: block;
+	width: 100%;
+	max-width: 190px;
+	max-height: 180px;
+	border-radius: 7px;
+	object-fit: cover;
+}
+
+.blockish-ai-assistant-message-tools {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+	margin-top: 5px;
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(-4px) scale(0.98);
+	transform-origin: right center;
+	transition:
+		opacity 160ms ease,
+		transform 160ms ease;
+}
+
+.blockish-ai-assistant-message-row--user:hover .blockish-ai-assistant-message-tools,
+.blockish-ai-assistant-message-row--user:focus-within .blockish-ai-assistant-message-tools {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateY(0) scale(1);
+}
+
+.blockish-ai-assistant-message-time {
+	color: #9b9b9b;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.blockish-ai-assistant-message-tool {
+	width: 14px !important;
+	height: 14px !important;
+	min-width: auto !important;
+	min-height: auto !important;
+	padding: 0 !important;
+	color: #a6a6a6 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	transition:
+		color 120ms ease,
+		transform 120ms ease;
+}
+
+.blockish-ai-assistant-message-tool:hover,
+.blockish-ai-assistant-message-tool:focus {
+	color: #d7d7d7 !important;
+	transform: translateY(-1px);
+}
+
+.blockish-ai-assistant-message-edit {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+.blockish-ai-assistant-message-edit-input {
+	width: 100%;
+	min-height: 40px;
+	height: auto;
+	border: 0;
+	background: transparent;
+	padding: 0;
+	color: #ffffff !important;
+	-webkit-text-fill-color: #ffffff;
+	font-family: inherit;
+	font-size: 13px;
+	line-height: 1.4;
+	resize: none;
+	outline: none;
+	overflow: hidden;
+}
+
+.blockish-ai-assistant-message-edit-input:focus {
+	box-shadow: none;
+}
+
+.blockish-ai-assistant-message-edit-actions {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 5px;
+	margin-top: auto;
+	min-width: 0;
+}
+
+.blockish-ai-assistant-message-edit-action {
+	height: 26px !important;
+	min-height: 26px !important;
+	border-radius: 7px !important;
+	padding: 2px 8px !important;
+	font-size: 11px !important;
+	line-height: 1.2 !important;
+	box-shadow: none !important;
+}
+
+.blockish-ai-assistant-message-edit-action.is-cancel {
+	border: 1px solid #4b4b4b !important;
+	background: transparent !important;
+	color: #d7d7d7 !important;
+}
+
+.blockish-ai-assistant-message-edit-action.is-send {
+	border: 1px solid #d1d1d1 !important;
+	background: #d1d1d1 !important;
+	color: #151515 !important;
+}
+
+.blockish-ai-assistant-message-edit-action.is-send:disabled {
+	opacity: 0.55;
+}
+
+.blockish-ai-assistant-interaction {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	margin-top: 7px;
+}
+
+.blockish-ai-assistant-interaction-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 5px;
+}
+
+.blockish-ai-assistant-interaction-choice,
+.blockish-ai-assistant-interaction-submit {
+	min-height: 22px !important;
+	border-radius: 999px !important;
+	padding: 2px 7px !important;
+	font-size: 11px !important;
+	line-height: 1.2 !important;
+	color: #d7dde5 !important;
+	border-color: #3b3f45 !important;
+	background: #202020 !important;
+	box-shadow: none !important;
+}
+
+.blockish-ai-assistant-interaction-choice:hover,
+.blockish-ai-assistant-interaction-submit:hover {
+	color: #ffffff !important;
+	border-color: #626975 !important;
+	background: #262626 !important;
+}
+
+.blockish-ai-assistant-interaction-custom {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: end;
+	gap: 5px;
+	width: 100%;
+}
+
+.blockish-ai-assistant-interaction-input {
+	width: 100%;
+	border: 1px solid #3a3a3a;
+	border-radius: 7px;
+	background: #181818;
+	padding: 6px 7px;
+	color: #e5e7eb !important;
+	-webkit-text-fill-color: #e5e7eb;
+	font-size: 11px;
+	line-height: 1.35;
+	resize: vertical;
+}
+
+.blockish-ai-assistant-interaction-checks {
+	display: grid;
+	gap: 4px;
+	width: 100%;
+}
+
+.blockish-ai-assistant-interaction-check {
+	margin-bottom: 0 !important;
+}
+
+.blockish-ai-assistant-interaction-check .components-checkbox-control__input-container {
+	margin-right: 6px !important;
+}
+
+.blockish-ai-assistant-interaction-check .components-checkbox-control__label {
+	color: #e5e7eb !important;
+	font-size: 11px !important;
+	line-height: 1.25 !important;
+}
+
+.blockish-ai-assistant-schema-review {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 10px;
+}
+
+.blockish-ai-assistant-schema-review-action {
+	min-height: 26px !important;
+	height: 26px !important;
+	border-radius: 7px !important;
+	padding: 3px 10px !important;
+	font-size: 12px !important;
+	line-height: 1.2 !important;
+	box-shadow: none !important;
+}
+
+.blockish-ai-assistant-schema-review-action.is-accept {
+	color: #111111 !important;
+	background: #e7e7e7 !important;
+	border-color: #e7e7e7 !important;
+}
+
+.blockish-ai-assistant-schema-review-action.is-decline {
+	color: #d7dde5 !important;
+	background: transparent !important;
+	border: 1px solid #3b3f45 !important;
+}
+
 .blockish-ai-assistant-message--assistant {
-	align-self: flex-start;
-	background: #202020;
+	background: transparent;
 	color: #e5e7eb;
+	padding: 0;
+	border-radius: 0;
 }
 
 .blockish-ai-assistant-message--user {
-	align-self: flex-end;
 	background: #2f2f2f;
 	color: #ffffff;
+}
+
+.blockish-ai-assistant-message--user.is-editing {
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	border-radius: 20px;
+	background: #222323;
+	padding: 10px 14px 10px;
+	overflow: hidden;
 }
 
 .blockish-ai-assistant-composer {
@@ -183,6 +529,98 @@
 	border-top: 1px solid #2b2b2b;
 	padding: 8px 8px calc(30px + env(safe-area-inset-bottom, 0px));
 	background: #181818;
+}
+
+.blockish-ai-assistant-file-input {
+	display: none;
+}
+
+.blockish-ai-assistant-attachments {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.blockish-ai-assistant-attachment {
+	display: grid;
+	grid-template-columns: 34px minmax(0, 1fr) 18px;
+	align-items: center;
+	gap: 7px;
+	border: 1px solid #2f2f2f;
+	border-radius: 8px;
+	background: #202020;
+	padding: 5px 6px;
+}
+
+.blockish-ai-assistant-attachment-image {
+	width: 34px;
+	height: 34px;
+	border-radius: 6px;
+	object-fit: cover;
+}
+
+.blockish-ai-assistant-attachment-name {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: #d1d5db !important;
+	font-size: 11px !important;
+}
+
+.blockish-ai-assistant-attachment-remove {
+	width: 18px !important;
+	height: 18px !important;
+	min-width: auto !important;
+	padding: 0 !important;
+	color: #a3a3a3 !important;
+}
+
+.blockish-ai-assistant-attachment-error {
+	display: block;
+	margin-bottom: 8px;
+	color: #fca5a5 !important;
+	font-size: 11px !important;
+	line-height: 1.25 !important;
+}
+
+.blockish-ai-assistant-context {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	min-width: 0;
+	max-width: 190px;
+	border: 1px solid #2f2f2f;
+	border-radius: 999px;
+	background: #202020;
+	padding: 3px 6px;
+}
+
+.blockish-ai-assistant-context-label {
+	flex: 0 0 auto;
+	color: #858b94 !important;
+	font-size: 10px !important;
+	line-height: 1 !important;
+}
+
+.blockish-ai-assistant-context-value {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: #e5e7eb !important;
+	font-size: 11px !important;
+	line-height: 1 !important;
+}
+
+.blockish-ai-assistant-context-clear {
+	flex: 0 0 auto;
+	width: 14px !important;
+	height: 14px !important;
+	min-width: auto !important;
+	padding: 0 !important;
+	color: #a3a3a3 !important;
 }
 
 .blockish-ai-assistant-composer-input {
@@ -207,18 +645,12 @@
 	padding-bottom: 9px;
 }
 
-.blockish-ai-assistant-composer-icon {
+.blockish-ai-assistant-composer-action {
 	min-width: 24px !important;
 	height: 24px !important;
+	border-radius: 6px !important;
 	padding: 0 !important;
 	color: #9ca3af !important;
-}
-
-.blockish-ai-assistant-provider-switch {
-	height: 28px !important;
-	padding: 0 8px !important;
-	color: #9ca3af !important;
-	font-size: 11px !important;
 }
 
 .blockish-ai-assistant-send {

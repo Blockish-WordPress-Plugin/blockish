@@ -11,18 +11,9 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { settingsIcon } from '../../components/icons/block-icons';
-import openaiLogo from '../assets/logos/openai.png';
 import geminiLogo from '../assets/logos/gemini.png';
 
 const INTEGRATIONS = [
-	{
-		key: 'openai',
-		name: 'OpenAI',
-		logoUrl: openaiLogo,
-		logoAlt: 'OpenAI logo',
-		description: __('Connect OpenAI to power AI content and assistant features inside Blockish.', 'blockish'),
-		status: 'connected',
-	},
 	{
 		key: 'gemini',
 		name: 'Gemini',

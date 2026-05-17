@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { Button, Flex, Modal, TextControl, ToggleControl, __experimentalText as Text, __experimentalVStack as VStack } from '@wordpress/components';
-import { useHistory } from '../../routes';
+import { Flex, Modal, TextControl, ToggleControl, __experimentalText as Text, __experimentalVStack as VStack } from '@wordpress/components';
 
 function getExtensionSettingsInitialState(schema = []) {
 	const next = {};
@@ -17,13 +16,10 @@ export default function DefaultExtensionSettings({
 	schema,
 	extension,
 	extensionDraft,
-	configuredProviders = {},
 	onChange,
 	onSave,
 	onRequestClose,
 }) {
-	const history = useHistory();
-
 	if (!slug || !schema) {
 		return null;
 	}
@@ -57,32 +53,6 @@ export default function DefaultExtensionSettings({
 
 					if (control.type === 'button-group') {
 						const selectedValue = (value ?? savedSettings[control.key]) || '';
-						const requiresConfiguredProviders = Boolean(control.requiresConfiguredProviders);
-						const hasConfiguredProvider =
-							Boolean(configuredProviders?.openai) || Boolean(configuredProviders?.gemini);
-
-						if (requiresConfiguredProviders && !hasConfiguredProvider) {
-							return (
-								<VStack key={control.key} spacing={3}>
-									<Text variant="muted">
-										{__(
-											'No AI provider is configured yet. Please add an API key in Integrations first.',
-											'blockish'
-										)}
-									</Text>
-									<Button
-										className="blockish-action-button is-secondary blockish-button-base blockish-button-secondary"
-										variant="secondary"
-										onClick={() => {
-											onRequestClose?.();
-											history.push({ route: 'integrations' });
-										}}
-									>
-										{__('Go to Integrations', 'blockish')}
-									</Button>
-								</VStack>
-							);
-						}
 
 						return (
 							<VStack key={control.key} spacing={2}>

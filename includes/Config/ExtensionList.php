@@ -42,12 +42,6 @@ class ExtensionList extends ConfigList {
                 'package'     => 'free',
                 'category'    => 'general',
                 'status'      => 'active',
-                'settings'    => array(
-                    'provider' => '',
-                ),
-                'settings_schema' => array(
-                    'provider' => 'string',
-                ),
             ),
         );
 

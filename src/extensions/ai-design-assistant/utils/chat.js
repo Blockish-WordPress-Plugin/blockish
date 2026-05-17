@@ -44,3 +44,33 @@ export const getChatTitle = (sessionMessages = []) => {
 
 	return title.length > 40 ? `${title.slice(0, 40)}...` : title;
 };
+
+export const parseChatMessages = (content) => {
+	if (!content) {
+		return [];
+	}
+
+	try {
+		const messages = JSON.parse(content);
+		return Array.isArray(messages) ? messages : [];
+	} catch (error) {
+		return [];
+	}
+};
+
+export const copyTextToClipboard = async (content = '') => {
+	try {
+		await navigator.clipboard.writeText(content);
+		return;
+	} catch (error) {
+		const textarea = document.createElement('textarea');
+		textarea.value = content;
+		textarea.setAttribute('readonly', '');
+		textarea.style.position = 'fixed';
+		textarea.style.opacity = '0';
+		document.body.appendChild(textarea);
+		textarea.select();
+		document.execCommand('copy');
+		document.body.removeChild(textarea);
+	}
+};
