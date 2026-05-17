@@ -19,6 +19,9 @@ export default function AssistantMessages({ selectedChat }) {
 	const messages = selectedChat?.content
 		? parseChatMessages(selectedChat.content)
 		: INITIAL_MESSAGES;
+	const isChatBusy = messages.some((message) => (
+		message.role === 'assistant' && message?.isStreaming
+	));
 
 	const scrollToBottom = () => {
 		if (scrollFrameRef.current) {
@@ -52,7 +55,17 @@ export default function AssistantMessages({ selectedChat }) {
 		}
 	), []);
 
+	useEffect(() => {
+		if (isChatBusy && editingMessageId) {
+			cancelEditingMessage();
+		}
+	}, [isChatBusy, editingMessageId]);
+
 	const copyMessageContent = async (message) => {
+		if (isChatBusy) {
+			return;
+		}
+
 		const content = message?.content || '';
 
 		await copyTextToClipboard(content);
@@ -66,6 +79,10 @@ export default function AssistantMessages({ selectedChat }) {
 	};
 
 	const startEditingMessage = (message) => {
+		if (isChatBusy) {
+			return;
+		}
+
 		setEditingMessageId(message.id);
 		setEditingContent(message?.content || '');
 	};
@@ -137,7 +154,7 @@ export default function AssistantMessages({ selectedChat }) {
 								<span className="blockish-ai-assistant-caret" />
 							) : null}
 						</div>
-						{isUserMessage && !isEditing ? (
+						{isUserMessage && !isEditing && !isChatBusy ? (
 							<MessageActions
 								copied={copiedMessageId === message.id}
 								message={message}

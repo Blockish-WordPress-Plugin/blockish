@@ -11,15 +11,15 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { settingsIcon } from '../../components/icons/block-icons';
-import geminiLogo from '../assets/logos/gemini.png';
+import openRouterLogo from '../assets/logos/openai.png';
 
 const INTEGRATIONS = [
 	{
-		key: 'gemini',
-		name: 'Gemini',
-		logoUrl: geminiLogo,
-		logoAlt: 'Gemini logo',
-		description: __('Connect Gemini to run Google-powered generation and smart assistance workflows.', 'blockish'),
+		key: 'openrouter',
+		name: 'OpenRouter',
+		logoUrl: openRouterLogo,
+		logoAlt: 'OpenRouter logo',
+		description: __('Connect OpenRouter to run free testing models for AI generation workflows.', 'blockish'),
 		status: 'connected',
 	},
 ];

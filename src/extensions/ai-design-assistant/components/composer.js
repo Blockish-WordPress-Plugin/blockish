@@ -65,7 +65,7 @@ export default function AssistantComposer({ selectedChat }) {
 		try {
 			const response = await apiFetch({ path: '/blockish/v1/integrations', method: 'GET' });
 			const nextConfig = {
-				apiKey: response?.integrations?.gemini?.settings?.apiKey || '',
+				apiKey: response?.integrations?.openrouter?.settings?.apiKey || '',
 			};
 
 			setAssistantConfig(nextConfig);
@@ -161,7 +161,8 @@ export default function AssistantComposer({ selectedChat }) {
 					await updateChatMessages(chatId, latestMessages);
 				}
 			);
-			const assistantContent = streamedContent || getAssistantContent(assistantResponse);
+			const finalContent = assistantResponse ? getAssistantContent(assistantResponse) : '';
+			const assistantContent = finalContent || streamedContent;
 			const assistantInteraction = getAssistantInteraction(assistantResponse);
 			const assistantSchema = getAssistantSchema(assistantResponse);
 			const schemaResult = assistantSchema
