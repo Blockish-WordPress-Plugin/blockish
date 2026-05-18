@@ -232,39 +232,181 @@
 	line-height: 1.35;
 }
 
-.blockish-ai-assistant-message-reasoning {
-	display: inline-flex;
-	align-items: center;
-	gap: 5px;
-	max-width: 100%;
-	border: 0;
-	border-radius: 999px;
-	background: #181818;
-	padding: 4px 7px;
-	margin-bottom: 7px;
-	color: #8f98a3;
-	font-size: 10px;
-	line-height: 1.2;
+/* Thinking panel (shown while streaming) */
+.blockish-ai-thinking {
+	margin-bottom: 10px;
+	border: 1px solid #252525;
+	border-radius: 9px;
+	background: #191919;
+	padding: 8px 10px;
+	overflow: hidden;
 }
 
-.blockish-ai-assistant-message-reasoning-label {
-	color: #c5cbd3;
+.blockish-ai-thinking-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.blockish-ai-thinking-spinner {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	border: 1.5px solid #4b5563;
+	border-top-color: #9ca3af;
+	animation: blockish-ai-spin 0.8s linear infinite;
+	flex: 0 0 auto;
+}
+
+@keyframes blockish-ai-spin {
+	to { transform: rotate(360deg); }
+}
+
+.blockish-ai-thinking-label {
+	color: #9ca3af;
 	font-size: 10px;
 	font-weight: 600;
-	line-height: 1.2;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
 }
 
-.blockish-ai-assistant-message-reasoning-text {
-	min-width: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+.blockish-ai-thinking-steps {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
 }
 
-.blockish-ai-assistant-message-reasoning-count {
+.blockish-ai-thinking-step {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	font-size: 11px;
+	line-height: 1.35;
+	color: #4b5563;
+}
+
+.blockish-ai-thinking-step.is-done {
+	color: #6b7280;
+
+	.blockish-ai-thinking-step-icon {
+		color: #22c55e;
+	}
+}
+
+.blockish-ai-thinking-step.is-current {
+	color: #d1d5db;
+	animation: blockish-ai-pulse 1.4s ease-in-out infinite;
+
+	.blockish-ai-thinking-step-icon {
+		color: #60a5fa;
+	}
+}
+
+.blockish-ai-thinking-step.is-status {
+	color: #818cf8;
+	margin-top: 2px;
+
+	.blockish-ai-thinking-step-icon {
+		color: #818cf8;
+	}
+}
+
+@keyframes blockish-ai-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.65; }
+}
+
+.blockish-ai-thinking-step-icon {
 	flex: 0 0 auto;
-	color: #6f7782;
 	font-size: 10px;
+	line-height: 1.35;
+}
+
+.blockish-ai-thinking-step-label {
+	min-width: 0;
+}
+
+/* Reasoning panel (shown after streaming) */
+.blockish-ai-reasoning {
+	margin-top: 10px;
+	margin-bottom: 12px;
+	padding-top: 10px;
+	border-top: 1px solid #222222;
+}
+
+.blockish-ai-reasoning-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	border: 0;
+	background: transparent;
+	padding: 0;
+	color: #6b7280;
+	font-family: inherit;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: color 120ms ease;
+
+	&:hover {
+		color: #9ca3af;
+	}
+}
+
+.blockish-ai-reasoning-toggle-chevron {
+	font-size: 9px;
+}
+
+.blockish-ai-reasoning-toggle-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 14px;
+	height: 14px;
+	border-radius: 999px;
+	background: #252525;
+	padding: 0 4px;
+	color: #6b7280;
+	font-size: 9px;
+	font-weight: 600;
+}
+
+.blockish-ai-reasoning-steps {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.blockish-ai-reasoning-step {
+	display: flex;
+	align-items: baseline;
+	gap: 7px;
+	color: #6b7280;
+	font-size: 11px;
+	line-height: 1.45;
+}
+
+.blockish-ai-reasoning-step-dot {
+	flex: 0 0 auto;
+	width: 3px;
+	height: 3px;
+	border-radius: 50%;
+	background: #4b5563;
+	margin-top: 6px;
+}
+
+/* Summary line */
+.blockish-ai-summary {
+	margin-top: 10px;
+	color: #4b5563;
+	font-size: 10px;
+	font-style: italic;
+	line-height: 1.5;
 }
 
 .blockish-ai-assistant-message-attachments {
@@ -299,7 +441,9 @@
 }
 
 .blockish-ai-assistant-message-row--user:hover .blockish-ai-assistant-message-tools,
-.blockish-ai-assistant-message-row--user:focus-within .blockish-ai-assistant-message-tools {
+.blockish-ai-assistant-message-row--user:focus-within .blockish-ai-assistant-message-tools,
+.blockish-ai-assistant-message-row--assistant:hover .blockish-ai-assistant-message-tools,
+.blockish-ai-assistant-message-row--assistant:focus-within .blockish-ai-assistant-message-tools {
 	opacity: 1;
 	pointer-events: auto;
 	transform: translateY(0) scale(1);
@@ -678,5 +822,80 @@
 	51%,
 	100% {
 		opacity: 0;
+	}
+}
+
+.blockish-ai-awaiting-reply {
+	display: inline-flex;
+	align-self: flex-start;
+	align-items: center;
+	gap: 5px;
+	margin-top: 4px;
+	border: 1px solid #1d3a5f;
+	border-radius: 999px;
+	background: #0f1f35;
+	padding: 3px 8px 3px 6px;
+	color: #60a5fa;
+	font-size: 10px;
+	font-weight: 500;
+	pointer-events: none;
+	user-select: none;
+}
+
+.blockish-ai-awaiting-reply-dot {
+	flex: 0 0 auto;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: #3b82f6;
+	animation: blockish-ai-assistant-blink 1.2s ease-in-out infinite;
+}
+
+.blockish-ai-assistant-suggestions {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 4px 0 8px;
+}
+
+.blockish-ai-assistant-suggestions-header {
+	margin-bottom: 4px;
+}
+
+.blockish-ai-assistant-suggestions-label {
+	margin: 0;
+	color: #9ca3af;
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.3;
+}
+
+.blockish-ai-assistant-suggestion {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	border: 1px solid #2f2f2f;
+	border-radius: 8px;
+	background: #1e1e1e;
+	padding: 7px 10px;
+	color: #c9cdd5;
+	font-family: inherit;
+	font-size: 11px;
+	line-height: 1.35;
+	text-align: left;
+	cursor: pointer;
+	transition:
+		background 120ms ease,
+		border-color 120ms ease,
+		color 120ms ease;
+
+	&:hover {
+		background: #262626;
+		border-color: #3d3d3d;
+		color: #f0f0f0;
+	}
+
+	&:active {
+		background: #2c2c2c;
 	}
 }

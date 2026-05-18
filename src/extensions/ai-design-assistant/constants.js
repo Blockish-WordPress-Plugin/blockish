@@ -8,3 +8,5 @@ export const ASSISTANT_CONTEXT_EVENT = 'blockish-ai-assistant-context-change';
 export const ASSISTANT_INTERACTION_EVENT = 'blockish-ai-assistant-interaction';
 export const ASSISTANT_MESSAGE_EDIT_EVENT = 'blockish-ai-assistant-message-edit';
 export const ASSISTANT_SCHEMA_REVIEW_EVENT = 'blockish-ai-assistant-schema-review';
+export const ASSISTANT_SUGGESTION_EVENT = 'blockish-ai-assistant-suggestion';
+export const ASSISTANT_REGENERATE_EVENT = 'blockish-ai-assistant-regenerate';

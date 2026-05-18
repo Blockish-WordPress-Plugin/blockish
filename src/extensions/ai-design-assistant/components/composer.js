@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import useTextareaHeight from '../hooks/use-textarea-height';
 import { useDispatch } from '@wordpress/data';
-import { getChatTitle, parseChatMessages } from '../utils/chat';
+import { getChatTitle, parseChatMessages, getLastAssistantMessage } from '../utils/chat';
 import {
 	ASSISTANT_CONTEXT_EVENT,
 	ASSISTANT_INTERACTION_EVENT,
 	ASSISTANT_MESSAGE_EDIT_EVENT,
+	ASSISTANT_REGENERATE_EVENT,
 	ASSISTANT_SCHEMA_REVIEW_EVENT,
+	ASSISTANT_SUGGESTION_EVENT,
 	CHAT_POST_TYPE,
 } from '../constants';
 import {
@@ -20,7 +22,9 @@ import {
 import {
 	getAssistantContent,
 	getAssistantInteraction,
+	getAssistantReasoning,
 	getAssistantSchema,
+	getAssistantSummary,
 	requestAssistant,
 } from '../utils/assistant-request';
 import { readImageAttachment } from '../utils/attachments';
@@ -118,11 +122,11 @@ export default function AssistantComposer({ selectedChat }) {
 			{
 				id: assistantMessageId,
 				role: 'assistant',
-				content: __('Thinking...', 'blockish'),
-				reasoning: [
-					__('Reading your request.', 'blockish'),
-					__('Checking what information is missing.', 'blockish'),
-				],
+				content: '',
+				plan: [],
+				status: [],
+				reasoning: [],
+				summary: '',
 				isStreaming: true,
 			},
 		];
@@ -159,12 +163,31 @@ export default function AssistantComposer({ selectedChat }) {
 							: message
 					));
 					await updateChatMessages(chatId, latestMessages);
+				},
+				async (eventType, data) => {
+					if (eventType === 'plan') {
+						latestMessages = latestMessages.map((message) => (
+							message.id === assistantMessageId
+								? { ...message, plan: data?.steps || [] }
+								: message
+						));
+						await updateChatMessages(chatId, latestMessages);
+					} else if (eventType === 'status') {
+						latestMessages = latestMessages.map((message) => (
+							message.id === assistantMessageId
+								? { ...message, status: [ ...(message.status || []), data?.step ].filter(Boolean) }
+								: message
+						));
+						await updateChatMessages(chatId, latestMessages);
+					}
 				}
 			);
 			const finalContent = assistantResponse ? getAssistantContent(assistantResponse) : '';
 			const assistantContent = finalContent || streamedContent;
 			const assistantInteraction = getAssistantInteraction(assistantResponse);
 			const assistantSchema = getAssistantSchema(assistantResponse);
+			const assistantReasoning = getAssistantReasoning(assistantResponse);
+			const assistantSummary = getAssistantSummary(assistantResponse);
 			const schemaResult = assistantSchema
 				? await applyAssistantSchema(assistantSchema, 'new')
 				: { applied: false, schema: assistantSchema };
@@ -175,11 +198,14 @@ export default function AssistantComposer({ selectedChat }) {
 						...message,
 						content: assistantContent,
 						interaction: assistantInteraction,
+						reasoning: assistantReasoning,
+						summary: assistantSummary,
 						...(assistantSchema ? {
 							schema: schemaResult.schema,
 							schemaReview: schemaResult.applied ? 'pending' : 'failed',
 						} : {}),
-						reasoning: [],
+						plan: [],
+						status: [],
 						isStreaming: false,
 					}
 					: message
@@ -433,6 +459,61 @@ export default function AssistantComposer({ selectedChat }) {
 		};
 	}, [selectedChat]);
 
+	useEffect(() => {
+		const submitSuggestion = async (event) => {
+			const suggestion = event?.detail?.suggestion;
+
+			if (!suggestion || isRequesting) {
+				return;
+			}
+
+			await sendMessage({ content: suggestion });
+		};
+
+		window.addEventListener(ASSISTANT_SUGGESTION_EVENT, submitSuggestion);
+
+		return () => {
+			window.removeEventListener(ASSISTANT_SUGGESTION_EVENT, submitSuggestion);
+		};
+	}, [selectedChat, isRequesting, assistantConfig, assistantContext, classManager]);
+
+	useEffect(() => {
+		const handleRegenerate = async (event) => {
+			const { messageId } = event?.detail || {};
+
+			if (!selectedChat?.id || !messageId || isRequesting) {
+				return;
+			}
+
+			const currentMessages = parseChatMessages(selectedChat?.content);
+			const messageIndex = currentMessages.findIndex((m) => m.id === messageId);
+
+			if (messageIndex === -1) {
+				return;
+			}
+
+			const messagesBeforeAssistant = currentMessages.slice(0, messageIndex);
+			const lastUserMessage = messagesBeforeAssistant.slice().reverse().find((m) => m.role === 'user');
+
+			if (!lastUserMessage) {
+				return;
+			}
+
+			await saveAssistantResponse(
+				lastUserMessage.content,
+				messagesBeforeAssistant,
+				selectedChat.id,
+				Array.isArray(lastUserMessage.attachments) ? lastUserMessage.attachments : []
+			);
+		};
+
+		window.addEventListener(ASSISTANT_REGENERATE_EVENT, handleRegenerate);
+
+		return () => {
+			window.removeEventListener(ASSISTANT_REGENERATE_EVENT, handleRegenerate);
+		};
+	}, [selectedChat, isRequesting, assistantConfig, assistantContext, classManager]);
+
 	const onStopRequest = () => {
 		abortControllerRef.current?.abort();
 	};
@@ -452,6 +533,18 @@ export default function AssistantComposer({ selectedChat }) {
 			setAttachmentError(error instanceof Error ? error.message : __('Could not attach image.', 'blockish'));
 		}
 	};
+
+	const chatMessages = parseChatMessages(selectedChat?.content);
+	const lastAssistant = getLastAssistantMessage(chatMessages);
+	const lastContent = lastAssistant?.content || '';
+	const agentAskedQuestion = lastContent.toLowerCase().includes('**question:**') || lastContent.toLowerCase().includes('question:');
+	const composerPlaceholder = isRequesting
+		? __('Waiting for response…', 'blockish')
+		: agentAskedQuestion
+		? __('Type your answer…', 'blockish')
+		: chatMessages.length
+		? __('Ask for follow-up changes', 'blockish')
+		: __('What would you like to build?', 'blockish');
 
 	return (
 		<div className="blockish-ai-assistant-composer">
@@ -505,7 +598,7 @@ export default function AssistantComposer({ selectedChat }) {
 						onSendMessage();
 					}
 				}}
-				placeholder={__('Ask for follow-up changes', 'blockish')}
+				placeholder={composerPlaceholder}
 				rows={2}
 			/>
 			<Flex justify="space-between" align="center">

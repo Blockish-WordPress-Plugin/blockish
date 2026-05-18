@@ -51,6 +51,11 @@ export const getAssistantReasoning = (response) => {
 	return Array.isArray(reasoning) ? reasoning.filter(Boolean) : [];
 };
 
+export const getAssistantSummary = (response) => {
+	const responseData = response?.data || response;
+	return typeof responseData?.summary === 'string' ? responseData.summary : '';
+};
+
 const getRestUrl = (path) => {
 	const root = window?.wpApiSettings?.root || '/wp-json/';
 	return `${root.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
@@ -70,7 +75,7 @@ const getFetchHeaders = () => {
 	return headers;
 };
 
-const parseStreamEvent = async (part, onChunk) => {
+const parseStreamEvent = async (part, onChunk, onEvent) => {
 	const lines = part.split('\n');
 	const eventLine = lines.find((line) => line.startsWith('event:'));
 	const dataLine = lines.find((line) => line.startsWith('data:'));
@@ -99,6 +104,13 @@ const parseStreamEvent = async (part, onChunk) => {
 		throw new Error(eventData?.error || __('Assistant request failed.', 'blockish'));
 	}
 
+	if (eventName === 'plan' || eventName === 'status') {
+		if (onEvent) {
+			await onEvent(eventName, eventData);
+		}
+		return null;
+	}
+
 	const chunk = eventData.delta || eventData.message || eventData.content || '';
 
 	if (chunk) {
@@ -108,7 +120,7 @@ const parseStreamEvent = async (part, onChunk) => {
 	return eventData.response || null;
 };
 
-const readAssistantStream = async (response, onChunk) => {
+const readAssistantStream = async (response, onChunk, onEvent) => {
 	const reader = response.body?.getReader();
 
 	if (!reader) {
@@ -131,7 +143,7 @@ const readAssistantStream = async (response, onChunk) => {
 		buffer = parts.pop() || '';
 
 		for (const part of parts) {
-			finalResponse = await parseStreamEvent(part, onChunk) || finalResponse;
+			finalResponse = await parseStreamEvent(part, onChunk, onEvent) || finalResponse;
 		}
 	}
 
@@ -147,7 +159,7 @@ const readAssistantStream = async (response, onChunk) => {
 	return finalResponse;
 };
 
-export const requestAssistant = async (payload, signal, onChunk) => {
+export const requestAssistant = async (payload, signal, onChunk, onEvent) => {
 	const response = await fetch(getRestUrl('/blockish/v1/assistant'), {
 		method: 'POST',
 		headers: getFetchHeaders(),
@@ -171,7 +183,7 @@ export const requestAssistant = async (payload, signal, onChunk) => {
 	}
 
 	if (contentType.includes('text/event-stream')) {
-		return readAssistantStream(response, onChunk);
+		return readAssistantStream(response, onChunk, onEvent);
 	}
 
 	return response.json();

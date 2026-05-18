@@ -1,12 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
-export const INITIAL_MESSAGES = [
-	{
-		id: 'welcome',
-		role: 'assistant',
-		content: __('Hi! Tell me what you want to improve and I will suggest a design direction.', 'blockish'),
-	},
-];
+export const INITIAL_MESSAGES = [];
 
 export const getAssistantReply = (prompt) => {
 	const cleaned = prompt.trim();
@@ -56,6 +50,15 @@ export const parseChatMessages = (content) => {
 	} catch (error) {
 		return [];
 	}
+};
+
+export const getLastAssistantMessage = (messages = []) => {
+	for (let i = messages.length - 1; i >= 0; i--) {
+		if (messages[i]?.role === 'assistant') {
+			return messages[i];
+		}
+	}
+	return null;
 };
 
 export const copyTextToClipboard = async (content = '') => {
