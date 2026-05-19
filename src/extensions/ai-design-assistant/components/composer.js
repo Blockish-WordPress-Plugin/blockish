@@ -182,6 +182,7 @@ export default function AssistantComposer({ selectedChat }) {
 					}
 				}
 			);
+			console.log('[Blockish AI] Assistant response:', assistantResponse);
 			const finalContent = assistantResponse ? getAssistantContent(assistantResponse) : '';
 			const assistantContent = finalContent || streamedContent;
 			const assistantInteraction = getAssistantInteraction(assistantResponse);

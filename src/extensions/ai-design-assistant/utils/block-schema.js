@@ -3,6 +3,39 @@ import { createBlock } from '@wordpress/blocks';
 import { dispatch, select } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
+const FALLBACK_IMAGE_URL = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23f4f7fb'/%3E%3Cstop offset='.55' stop-color='%23dfe8f7'/%3E%3Cstop offset='1' stop-color='%23111827'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='800' fill='url(%23g)'/%3E%3Ccircle cx='920' cy='190' r='190' fill='%23ffffff' opacity='.18'/%3E%3Ccircle cx='230' cy='630' r='260' fill='%230f172a' opacity='.08'/%3E%3Cpath d='M220 520 390 350l130 130 120-120 340 340H220z' fill='%23ffffff' opacity='.76'/%3E%3Ccircle cx='425' cy='260' r='58' fill='%23ffffff' opacity='.82'/%3E%3C/svg%3E";
+
+const isUsableImageUrl = (value) => {
+	if (typeof value !== 'string') {
+		return false;
+	}
+
+	const url = value.trim();
+
+	if (! /^(https?:\/\/|data:image\/)/i.test(url) || /[\s{}]/.test(url)) {
+		return false;
+	}
+
+	if (url.startsWith('data:image/')) {
+		return true;
+	}
+
+	try {
+		const parsedUrl = new URL(url);
+		const hostname = parsedUrl.hostname.toLowerCase();
+
+		return ! [
+			'example.com',
+			'example.org',
+			'example.net',
+			'yourdomain.com',
+			'localhost',
+		].includes(hostname);
+	} catch (error) {
+		return false;
+	}
+};
+
 export const serializeBlock = (block, includeInnerBlocks = true) => {
 	if (!block) {
 		return null;
@@ -258,18 +291,74 @@ const restoreClassManagerExtensions = async (schema) => {
 	}
 };
 
+const normalizeImageAttributes = (attributes) => {
+	const imageValue = attributes.image;
+	const image = (
+		imageValue &&
+		typeof imageValue === 'object' &&
+		! Array.isArray(imageValue)
+	) ? imageValue : {};
+	const media = (
+		attributes.media &&
+		typeof attributes.media === 'object' &&
+		! Array.isArray(attributes.media)
+	) ? attributes.media : {};
+	const rawUrl = (
+		typeof imageValue === 'string' && imageValue.trim()
+			? imageValue.trim()
+			: null
+	) || image.url || image.source_url || image.src || media.url || media.source_url || media.src || attributes.url || attributes.imageUrl || attributes.src;
+	const url = isUsableImageUrl(rawUrl) ? rawUrl.trim() : FALLBACK_IMAGE_URL;
+	const alt = attributes.alt || image.alt || attributes.title || image.title || 'Generated section image';
+
+	return {
+		...attributes,
+		image: {
+			...image,
+			url,
+			alt,
+			width: typeof image.width === 'number' ? image.width : 1200,
+			height: typeof image.height === 'number' ? image.height : 800,
+		},
+		alt,
+		imageSize: attributes.imageSize || { value: 'full', label: 'Full Size' },
+	};
+};
+
+const normalizeSchemaBlockForEditor = (schemaBlock) => {
+	const attributes = { ...(schemaBlock.attributes || {}) };
+
+	if (schemaBlock.name === 'blockish/container') {
+		attributes.isVariationPicked = true;
+	}
+
+	if (schemaBlock.name === 'blockish/image') {
+		return {
+			...schemaBlock,
+			attributes: normalizeImageAttributes(attributes),
+		};
+	}
+
+	return {
+		...schemaBlock,
+		attributes,
+	};
+};
+
 const createEditorBlock = (schemaBlock) => {
 	if (!schemaBlock?.name) {
 		return null;
 	}
 
-	const innerBlocks = getSchemaBlocks(schemaBlock.innerBlocks)
+	const normalizedBlock = normalizeSchemaBlockForEditor(schemaBlock);
+
+	const innerBlocks = getSchemaBlocks(normalizedBlock.innerBlocks)
 		.map(createEditorBlock)
 		.filter(Boolean);
 
 	return createBlock(
-		schemaBlock.name,
-		schemaBlock.attributes || {},
+		normalizedBlock.name,
+		normalizedBlock.attributes || {},
 		innerBlocks
 	);
 };
