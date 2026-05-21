@@ -113,6 +113,40 @@ const BLOCK_SUGGESTIONS = {
 	],
 };
 
+const formatDuration = (durationMs) => {
+	if (typeof durationMs !== 'number') {
+		return '';
+	}
+
+	if (durationMs < 1000) {
+		return `${durationMs}ms`;
+	}
+
+	return `${(durationMs / 1000).toFixed(1)}s`;
+};
+
+const formatTokenCount = (value) => (
+	typeof value === 'number' ? value.toLocaleString() : '—'
+);
+
+const MessageMetrics = ({ metrics }) => {
+	if (!metrics) {
+		return null;
+	}
+
+	return (
+		<div className="blockish-ai-assistant-message-metrics">
+			<span>{formatDuration(metrics.durationMs)}</span>
+			<span>{__('In', 'blockish')}: {formatTokenCount(metrics.inputTokens)}</span>
+			<span>{__('Out', 'blockish')}: {formatTokenCount(metrics.outputTokens)}</span>
+			<span>{__('Total', 'blockish')}: {formatTokenCount(metrics.totalTokens)}</span>
+			{metrics.estimatedTokens ? (
+				<span>{__('est.', 'blockish')}</span>
+			) : null}
+		</div>
+	);
+};
+
 const MULTI_BLOCK_SUGGESTIONS = [
 	__( 'Improve spacing between these blocks', 'blockish' ),
 	__( 'Make these blocks more visually cohesive', 'blockish' ),
@@ -209,6 +243,11 @@ export default function AssistantMessages({ selectedChat }) {
 		message.role === 'assistant' && message?.isStreaming
 	));
 	const lastMessage = messages.at(-1);
+	const hasPendingInteraction = Boolean(
+		lastMessage?.role === 'assistant' &&
+		lastMessage?.interaction &&
+		!lastMessage?.interactionResponse
+	);
 	const lastAssistantMessage = !isChatBusy
 		? [...messages].reverse().find((m) => m.role === 'assistant' && !m.isStreaming)
 		: null;
@@ -216,7 +255,8 @@ export default function AssistantMessages({ selectedChat }) {
 		! isInitial &&
 		! isChatBusy &&
 		lastMessage?.role === 'assistant' &&
-		( lastMessage?.content?.toLowerCase().includes('**question:**') ||
+		( hasPendingInteraction ||
+		  lastMessage?.content?.toLowerCase().includes('**question:**') ||
 		  lastMessage?.content?.toLowerCase().includes('question:') )
 	);
 
@@ -324,6 +364,9 @@ export default function AssistantMessages({ selectedChat }) {
 						key={message.id}
 						className={`blockish-ai-assistant-message-row blockish-ai-assistant-message-row--${message.role}${isEditing ? ' is-editing' : ''}`}
 					>
+						{!isUserMessage && !isEditing ? (
+							<MessageMetrics metrics={message?.metrics} />
+						) : null}
 						<div
 							className={`blockish-ai-assistant-message blockish-ai-assistant-message--${message.role}${isEditing ? ' is-editing' : ''}`}
 						>
@@ -338,7 +381,6 @@ export default function AssistantMessages({ selectedChat }) {
 								<>
 									{message.role === 'assistant' && message?.isStreaming ? (
 										<MessageThinking
-											plan={message?.plan}
 											status={message?.status}
 										/>
 									) : null}
@@ -346,11 +388,14 @@ export default function AssistantMessages({ selectedChat }) {
 										<MessageReasoning
 											reasoning={message?.reasoning}
 											summary={message?.summary}
+											todo={message?.todo}
 										/>
 									) : null}
-									<ReactMarkdown>
-										{message?.content || ''}
-									</ReactMarkdown>
+									{message?.content && ( ! message?.isStreaming || ! message?.status?.length ) ? (
+										<ReactMarkdown>
+											{message.content}
+										</ReactMarkdown>
+									) : null}
 								</>
 							)}
 							<MessageAttachments
@@ -374,7 +419,7 @@ export default function AssistantMessages({ selectedChat }) {
 								onEdit={startEditingMessage}
 							/>
 						) : null}
-						{!isUserMessage && message.id === lastAssistantMessage?.id ? (
+						{!isUserMessage && message.id === lastAssistantMessage?.id && !hasPendingInteraction ? (
 							<MessageActions
 								message={message}
 								onRegenerate={regenerateMessage}

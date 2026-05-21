@@ -1,14 +1,36 @@
 import { __ } from '@wordpress/i18n';
 
+const getSchemaMessageFromText = (text) => {
+	if (typeof text !== 'string' || !text.trim().startsWith('{')) {
+		return '';
+	}
+
+	try {
+		const parsed = JSON.parse(text);
+
+		if (parsed?.schema?.new) {
+			return typeof parsed.message === 'string' && parsed.message.trim()
+				? parsed.message
+				: __('The block structure is ready.', 'blockish');
+		}
+	} catch (error) {
+		return '';
+	}
+
+	return '';
+};
+
+export const isAssistantSchemaContent = (text) => Boolean(getSchemaMessageFromText(text));
+
 export const getAssistantContent = (response) => {
 	const responseData = response?.data || response;
 
 	if (typeof responseData?.message === 'string') {
-		return responseData.message;
+		return getSchemaMessageFromText(responseData.message) || responseData.message;
 	}
 
 	if (typeof response === 'string') {
-		return response;
+		return getSchemaMessageFromText(response) || response;
 	}
 
 	if (typeof response?.response === 'string') {
@@ -51,140 +73,344 @@ export const getAssistantReasoning = (response) => {
 	return Array.isArray(reasoning) ? reasoning.filter(Boolean) : [];
 };
 
+export const getAssistantTodo = (response) => {
+	const responseData = response?.data || response;
+	const todo = responseData?.todo;
+
+	return Array.isArray(todo) ? todo.filter(Boolean) : [];
+};
+
 export const getAssistantSummary = (response) => {
 	const responseData = response?.data || response;
 	return typeof responseData?.summary === 'string' ? responseData.summary : '';
 };
 
-const getRestUrl = (path) => {
-	const root = window?.wpApiSettings?.root || '/wp-json/';
-	return `${root.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+export const getAssistantMetrics = (response) => {
+	const responseData = response?.data || response;
+	const metrics = responseData?.metrics;
+
+	return metrics && typeof metrics === 'object' ? metrics : null;
 };
 
-const getFetchHeaders = () => {
-	const headers = {
-		'Accept': 'text/event-stream',
-		'Content-Type': 'application/json',
+const getAssistantSocketConfig = () => {
+	const config = window?.blockishAiDesignAssistant || {};
+
+	return {
+		token: config.assistantWsAuthToken || '',
+		url: config.assistantWsUrl || '',
 	};
-	const nonce = window?.wpApiSettings?.nonce;
-
-	if (nonce) {
-		headers['X-WP-Nonce'] = nonce;
-	}
-
-	return headers;
 };
 
-const parseStreamEvent = async (part, onChunk, onEvent) => {
-	const lines = part.split('\n');
-	const eventLine = lines.find((line) => line.startsWith('event:'));
-	const dataLine = lines.find((line) => line.startsWith('data:'));
-	const eventName = eventLine?.replace(/^event:\s*/, '') || 'message';
+const createRequestId = () => (
+	typeof globalThis?.crypto?.randomUUID === 'function'
+		? globalThis.crypto.randomUUID()
+		: `assistant-${Date.now()}-${Math.random().toString(16).slice(2)}`
+);
 
-	if (!dataLine) {
-		return null;
-	}
-
-	const data = dataLine.replace(/^data:\s*/, '');
-
-	if (data === '[DONE]') {
-		return null;
-	}
-
-	let eventData;
-
-	try {
-		eventData = JSON.parse(data);
-	} catch (error) {
-		await onChunk(data);
-		return null;
-	}
-
-	if (eventName === 'error') {
-		throw new Error(eventData?.error || __('Assistant request failed.', 'blockish'));
-	}
-
-	if (eventName === 'plan' || eventName === 'status') {
-		if (onEvent) {
-			await onEvent(eventName, eventData);
-		}
-		return null;
-	}
-
-	const chunk = eventData.delta || eventData.message || eventData.content || '';
-
-	if (chunk) {
-		await onChunk(chunk);
-	}
-
-	return eventData.response || null;
+const createAbortError = () => {
+	const error = new Error(__('Assistant request was cancelled.', 'blockish'));
+	error.name = 'AbortError';
+	return error;
 };
 
-const readAssistantStream = async (response, onChunk, onEvent) => {
-	const reader = response.body?.getReader();
+const createSocketUrl = () => {
+	const { token, url } = getAssistantSocketConfig();
 
-	if (!reader) {
-		return response.json();
+	if (!url) {
+		throw new Error(__('Assistant WebSocket URL is missing.', 'blockish'));
 	}
 
-	const decoder = new TextDecoder();
-	let buffer = '';
-	let finalResponse = null;
-
-	while (true) {
-		const { done, value } = await reader.read();
-
-		if (done) {
-			break;
-		}
-
-		buffer += decoder.decode(value, { stream: true });
-		const parts = buffer.split('\n\n');
-		buffer = parts.pop() || '';
-
-		for (const part of parts) {
-			finalResponse = await parseStreamEvent(part, onChunk, onEvent) || finalResponse;
-		}
+	if (!token) {
+		throw new Error(__('Assistant authentication token is missing.', 'blockish'));
 	}
 
-	const remaining = buffer.trim();
-	if (remaining) {
-		try {
-			return JSON.parse(remaining);
-		} catch (error) {
-			await onChunk(remaining);
-		}
-	}
+	const socketUrl = new URL(url);
+	socketUrl.searchParams.set('token', token);
 
-	return finalResponse;
+	return socketUrl.toString();
 };
 
-export const requestAssistant = async (payload, signal, onChunk, onEvent) => {
-	const response = await fetch(getRestUrl('/blockish/v1/assistant'), {
-		method: 'POST',
-		headers: getFetchHeaders(),
-		body: JSON.stringify(payload),
-		signal,
-	});
+const normalizeStatusEventData = (eventData) => ({
+	...eventData,
+	step: eventData?.data?.message || eventData?.step || eventData?.message || '',
+});
 
-	const contentType = response.headers.get('content-type') || '';
+const formatLogDuration = (duration) => `${Math.round(duration)}ms`;
 
-	if (!response.ok) {
-		let errorMessage = __('Assistant request failed.', 'blockish');
+const createAssistantSocketLogger = () => {
+	const startedAt = performance.now();
+	let previousAt = startedAt;
 
-		try {
-			const errorResponse = await response.json();
-			errorMessage = errorResponse?.error || errorResponse?.message || errorMessage;
-		} catch (error) {
-			// Keep the generic message when the server does not return JSON.
+	return (label, data = {}) => {
+		const now = performance.now();
+		const elapsedMs = now - startedAt;
+		const sincePreviousMs = now - previousAt;
+		previousAt = now;
+
+		console.log(
+			`[Blockish AI][WS +${formatLogDuration(elapsedMs)} Δ${formatLogDuration(sincePreviousMs)}] ${label}`,
+			{
+				timing: {
+					elapsedMs: Math.round(elapsedMs),
+					sincePreviousMs: Math.round(sincePreviousMs),
+				},
+				...data,
+			}
+		);
+	};
+};
+
+export const requestAssistant = async (payload, signal, onChunk, onEvent) => (
+	new Promise((resolve, reject) => {
+		const requestId = createRequestId();
+		const socketUrl = createSocketUrl();
+		const socket = new WebSocket(socketUrl);
+		const logAssistantSocketEvent = createAssistantSocketLogger();
+		let settled = false;
+		let finalResponse = null;
+
+		logAssistantSocketEvent('connecting', {
+			requestId,
+			url: socketUrl.replace(/token=[^&]+/, 'token=[hidden]'),
+			payload,
+		});
+
+		const cleanup = () => {
+			signal?.removeEventListener('abort', abortRequest);
+		};
+
+		const settle = (callback, value) => {
+			if (settled) {
+				return;
+			}
+
+			settled = true;
+			cleanup();
+			callback(value);
+		};
+
+		const closeSocket = () => {
+			if (
+				socket.readyState === WebSocket.OPEN ||
+				socket.readyState === WebSocket.CONNECTING
+			) {
+				socket.close();
+			}
+		};
+
+		function abortRequest() {
+			logAssistantSocketEvent('cancel requested', { requestId });
+
+			if (socket.readyState === WebSocket.OPEN) {
+				socket.send(JSON.stringify({
+					type: 'assistant.cancel',
+					requestId,
+				}));
+				window.setTimeout(closeSocket, 100);
+			} else {
+				closeSocket();
+			}
+
+			settle(reject, createAbortError());
 		}
 
-		throw new Error(errorMessage);
-	}
+		if (signal?.aborted) {
+			abortRequest();
+			return;
+		}
 
-	if (contentType.includes('text/event-stream')) {
-		return readAssistantStream(response, onChunk, onEvent);
-	}
+		signal?.addEventListener('abort', abortRequest, { once: true });
 
-	return response.json();
-};
+		socket.addEventListener('open', async () => {
+			logAssistantSocketEvent('connected', { requestId });
+
+			if (onEvent) {
+				await onEvent('status', {
+					step: __('Connected to assistant', 'blockish'),
+				});
+			}
+
+			socket.send(JSON.stringify({
+				type: 'assistant.request',
+				requestId,
+				body: payload,
+			}));
+			logAssistantSocketEvent('request sent', { requestId, payload });
+		});
+
+		socket.addEventListener('message', async (event) => {
+			let eventData;
+
+			try {
+				eventData = JSON.parse(event.data);
+			} catch (error) {
+				logAssistantSocketEvent('raw message', {
+					requestId,
+					data: event.data,
+				});
+				if (onChunk) {
+					await onChunk(event.data);
+				}
+				return;
+			}
+
+			const eventType = eventData?.type || '';
+			logAssistantSocketEvent('event received', {
+				requestId,
+				type: eventType,
+				data: eventData,
+			});
+
+			if (eventType === 'assistant.status') {
+				if (onEvent) {
+					await onEvent('status', normalizeStatusEventData(eventData));
+				}
+				return;
+			}
+
+			if (eventType === 'assistant.tool_start') {
+				logAssistantSocketEvent('tool started', {
+					requestId,
+					agent: eventData?.data?.agent || '',
+					tool: eventData?.data?.name || '',
+					input: eventData?.data?.input,
+				});
+				if (onEvent) {
+					await onEvent('tool_start', eventData?.data || {});
+				}
+				return;
+			}
+
+			if (eventType === 'assistant.tool_end') {
+				logAssistantSocketEvent('tool completed', {
+					requestId,
+					agent: eventData?.data?.agent || '',
+					tool: eventData?.data?.name || '',
+					durationMs: eventData?.data?.durationMs,
+					status: eventData?.data?.status,
+					output: eventData?.data?.output,
+					error: eventData?.data?.error,
+				});
+				if (onEvent) {
+					await onEvent('tool_end', eventData?.data || {});
+				}
+				return;
+			}
+
+			if (eventType === 'assistant.interaction') {
+				const interactionData = eventData?.data || {};
+				if (onEvent) {
+					await onEvent('interaction', interactionData);
+				}
+				closeSocket();
+				settle(resolve, {
+					ok: true,
+					data: {
+						message: interactionData.message || '',
+						interaction: interactionData.interaction || null,
+						reasoning: [],
+						todo: [],
+						summary: '',
+						schema: { prev: null, new: null },
+					},
+				});
+				return;
+			}
+
+			if (eventType === 'assistant.interrupt') {
+				const interruptData = eventData?.data || {};
+				if (onEvent) {
+					await onEvent('interaction', interruptData);
+				}
+				closeSocket();
+				settle(resolve, {
+					ok: true,
+					data: {
+						message: interruptData.message || '',
+						interaction: interruptData.interaction || null,
+						reasoning: [],
+						todo: [],
+						summary: '',
+						schema: { prev: null, new: null },
+					},
+				});
+				return;
+			}
+
+			if (eventType === 'assistant.delta') {
+				const chunk = eventData?.data?.delta || eventData?.delta || '';
+
+				if (chunk && onChunk) {
+					await onChunk(chunk);
+				}
+				return;
+			}
+
+			if (eventType === 'assistant.answer_done') {
+				if (onEvent) {
+					await onEvent('answer_done', {});
+				}
+				return;
+			}
+
+			if (eventType === 'assistant.final') {
+				finalResponse = {
+					ok: eventData?.ok !== false,
+					data: eventData?.data,
+				};
+				logAssistantSocketEvent('final response received', {
+					requestId,
+					response: finalResponse,
+				});
+				closeSocket();
+				settle(resolve, finalResponse);
+				return;
+			}
+
+			if (eventType === 'assistant.done') {
+				closeSocket();
+				settle(resolve, finalResponse);
+				return;
+			}
+
+			if (eventType === 'assistant.cancelled') {
+				closeSocket();
+				settle(reject, createAbortError());
+				return;
+			}
+
+			if (eventType === 'assistant.error') {
+				closeSocket();
+				settle(
+					reject,
+					new Error(eventData?.error || __('Assistant request failed.', 'blockish'))
+				);
+			}
+		});
+
+		socket.addEventListener('error', (event) => {
+			logAssistantSocketEvent('connection error', { requestId, event });
+			settle(reject, new Error(__('Assistant WebSocket connection failed.', 'blockish')));
+		});
+
+		socket.addEventListener('close', (event) => {
+			logAssistantSocketEvent('closed', {
+				requestId,
+				code: event.code,
+				reason: event.reason,
+				wasClean: event.wasClean,
+			});
+
+			if (settled) {
+				return;
+			}
+
+			if (finalResponse) {
+				settle(resolve, finalResponse);
+				return;
+			}
+
+			settle(reject, new Error(__('Assistant WebSocket connection closed.', 'blockish')));
+		});
+	})
+);

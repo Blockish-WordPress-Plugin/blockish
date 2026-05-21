@@ -190,6 +190,19 @@ const MessageInteraction = ({ interaction, message }) => {
 		);
 	}
 
+	if (interaction.type === 'text') {
+		return (
+			<div className="blockish-ai-assistant-interaction">
+				<CustomSingleChoice
+					customValue={customValue}
+					interaction={interaction}
+					messageId={message.id}
+					setCustomValue={setCustomValue}
+				/>
+			</div>
+		);
+	}
+
 	return null;
 };
 

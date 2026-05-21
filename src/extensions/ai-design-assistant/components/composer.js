@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { Button, Flex, __experimentalText as Text } from '@wordpress/components';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
 import useTextareaHeight from '../hooks/use-textarea-height';
 import { useDispatch } from '@wordpress/data';
 import { getChatTitle, parseChatMessages, getLastAssistantMessage } from '../utils/chat';
@@ -22,9 +21,12 @@ import {
 import {
 	getAssistantContent,
 	getAssistantInteraction,
+	getAssistantMetrics,
 	getAssistantReasoning,
 	getAssistantSchema,
 	getAssistantSummary,
+	getAssistantTodo,
+	isAssistantSchemaContent,
 	requestAssistant,
 } from '../utils/assistant-request';
 import { readImageAttachment } from '../utils/attachments';
@@ -51,6 +53,10 @@ const getContextLabel = (context) => {
 	return blockLabel;
 };
 
+const INITIAL_REASONING_STATUS = [
+	__( 'Understanding the request', 'blockish' ),
+];
+
 export default function AssistantComposer({ selectedChat }) {
 	const textareaRef = useRef(null);
 	const fileInputRef = useRef(null);
@@ -59,30 +65,10 @@ export default function AssistantComposer({ selectedChat }) {
 	const [imageAttachments, setImageAttachments] = useState([]);
 	const [attachmentError, setAttachmentError] = useState('');
 	const [isRequesting, setIsRequesting] = useState(false);
-	const [assistantConfig, setAssistantConfig] = useState({ apiKey: '' });
 	const [assistantContext, setAssistantContextState] = useState(() => getAssistantContext());
 	useTextareaHeight(textareaRef, input);
 	const { saveEntityRecord, editEntityRecord, saveEditedEntityRecord } = useDispatch('core');
 	const classManager = useClassManagerContent();
-
-	const resolveAssistantConfig = async () => {
-		try {
-			const response = await apiFetch({ path: '/blockish/v1/integrations', method: 'GET' });
-			const nextConfig = {
-				apiKey: response?.integrations?.openrouter?.settings?.apiKey || '',
-			};
-
-			setAssistantConfig(nextConfig);
-			return nextConfig;
-		} catch (error) {
-			console.error(error);
-			return assistantConfig;
-		}
-	};
-
-	useEffect(() => {
-		resolveAssistantConfig();
-	}, []);
 
 	useEffect(() => {
 		const syncAssistantContext = (event) => {
@@ -122,11 +108,13 @@ export default function AssistantComposer({ selectedChat }) {
 			{
 				id: assistantMessageId,
 				role: 'assistant',
-				content: '',
+				content: __( 'Understanding the request…', 'blockish' ),
 				plan: [],
-				status: [],
+				status: INITIAL_REASONING_STATUS,
 				reasoning: [],
+				todo: [],
 				summary: '',
+				metrics: null,
 				isStreaming: true,
 			},
 		];
@@ -136,28 +124,27 @@ export default function AssistantComposer({ selectedChat }) {
 		await updateChatMessages(chatId, latestMessages);
 
 		try {
-			let configForRequest = assistantConfig;
-			if (!configForRequest.apiKey) {
-				configForRequest = await resolveAssistantConfig();
-			}
-
 			const assistantResponse = await requestAssistant(
 				{
 					message: userInput,
 					messages: messagesForContext,
+					threadId: String(chatId),
 					attachments: attachmentsForRequest,
-					apiKey: configForRequest.apiKey,
 					classManager,
 					assistantContext: getRequestAssistantContext(),
 				},
 				abortController.signal,
 				async (chunk) => {
 					streamedContent += chunk;
+					const visibleContent = isAssistantSchemaContent(streamedContent)
+						? __('Preparing block structure…', 'blockish')
+						: streamedContent;
 					latestMessages = latestMessages.map((message) => (
 						message.id === assistantMessageId
 							? {
 								...message,
-								content: streamedContent,
+								content: visibleContent,
+								status: [],
 								isStreaming: true,
 							}
 							: message
@@ -165,17 +152,90 @@ export default function AssistantComposer({ selectedChat }) {
 					await updateChatMessages(chatId, latestMessages);
 				},
 				async (eventType, data) => {
-					if (eventType === 'plan') {
+					if (eventType === 'status') {
 						latestMessages = latestMessages.map((message) => (
 							message.id === assistantMessageId
-								? { ...message, plan: data?.steps || [] }
+								? {
+									...message,
+									status: [
+										...(message.status || []),
+										data?.step,
+									].filter(Boolean),
+								}
 								: message
 						));
 						await updateChatMessages(chatId, latestMessages);
-					} else if (eventType === 'status') {
+					}
+
+					if (eventType === 'tool_start') {
+						const toolLabel = data?.name
+							? data.name.replace(/_/g, ' ')
+							: __('tool', 'blockish');
+						const agentLabel = data?.agent
+							? `${ data.agent.replace(/_/g, ' ') }: `
+							: '';
+
 						latestMessages = latestMessages.map((message) => (
 							message.id === assistantMessageId
-								? { ...message, status: [ ...(message.status || []), data?.step ].filter(Boolean) }
+								? {
+									...message,
+									status: [
+										...(message.status || []),
+										`${ __('Using', 'blockish') } ${ agentLabel }${ toolLabel }`,
+									].filter(Boolean),
+								}
+								: message
+						));
+						await updateChatMessages(chatId, latestMessages);
+					}
+
+					if (eventType === 'tool_end') {
+						const toolLabel = data?.name
+							? data.name.replace(/_/g, ' ')
+							: __('tool', 'blockish');
+						const agentLabel = data?.agent
+							? `${ data.agent.replace(/_/g, ' ') }: `
+							: '';
+
+						latestMessages = latestMessages.map((message) => (
+							message.id === assistantMessageId
+								? {
+									...message,
+									status: [
+										...(message.status || []),
+										`${ agentLabel }${ toolLabel } ${ __('ready', 'blockish') }`,
+									].filter(Boolean),
+								}
+								: message
+						));
+						await updateChatMessages(chatId, latestMessages);
+					}
+
+					if (eventType === 'interaction') {
+						latestMessages = latestMessages.map((message) => (
+							message.id === assistantMessageId
+								? {
+									...message,
+									content: data?.message || message.content,
+									interaction: data?.interaction || message.interaction,
+									status: [],
+									isStreaming: false,
+								}
+								: message
+						));
+						setIsRequesting(false);
+						await updateChatMessages(chatId, latestMessages);
+					}
+
+					if (eventType === 'answer_done') {
+						latestMessages = latestMessages.map((message) => (
+							message.id === assistantMessageId && streamedContent
+								? {
+									...message,
+									content: isAssistantSchemaContent(streamedContent)
+										? __('Preparing block structure…', 'blockish')
+										: streamedContent,
+								}
 								: message
 						));
 						await updateChatMessages(chatId, latestMessages);
@@ -189,6 +249,8 @@ export default function AssistantComposer({ selectedChat }) {
 			const assistantSchema = getAssistantSchema(assistantResponse);
 			const assistantReasoning = getAssistantReasoning(assistantResponse);
 			const assistantSummary = getAssistantSummary(assistantResponse);
+			const assistantTodo = getAssistantTodo(assistantResponse);
+			const assistantMetrics = getAssistantMetrics(assistantResponse);
 			const schemaResult = assistantSchema
 				? await applyAssistantSchema(assistantSchema, 'new')
 				: { applied: false, schema: assistantSchema };
@@ -200,7 +262,9 @@ export default function AssistantComposer({ selectedChat }) {
 						content: assistantContent,
 						interaction: assistantInteraction,
 						reasoning: assistantReasoning,
+						todo: assistantTodo,
 						summary: assistantSummary,
+						metrics: assistantMetrics,
 						...(assistantSchema ? {
 							schema: schemaResult.schema,
 							schemaReview: schemaResult.applied ? 'pending' : 'failed',
@@ -255,7 +319,10 @@ export default function AssistantComposer({ selectedChat }) {
 		interactionResponse = null,
 		prepareMessages = (messages) => messages,
 	}) => {
-		if ((!content.trim() && !attachments.length) || isRequesting) {
+		if (
+			(!content.trim() && !attachments.length) ||
+			(isRequesting && !interactionResponse)
+		) {
 			return;
 		}
 
@@ -350,7 +417,19 @@ export default function AssistantComposer({ selectedChat }) {
 		);
 	};
 
+	const chatMessages = parseChatMessages(selectedChat?.content);
+	const lastAssistant = getLastAssistantMessage(chatMessages);
+	const lastContent = lastAssistant?.content || '';
+	const agentAskedQuestion = lastContent.toLowerCase().includes('**question:**') || lastContent.toLowerCase().includes('question:');
+	const hasPendingInteraction = Boolean(
+		lastAssistant?.interaction && !lastAssistant?.interactionResponse
+	);
+
 	const onSendMessage = async () => {
+		if (hasPendingInteraction) {
+			return;
+		}
+
 		const currentAttachments = imageAttachments;
 		const userInput = input;
 
@@ -401,7 +480,7 @@ export default function AssistantComposer({ selectedChat }) {
 		return () => {
 			window.removeEventListener(ASSISTANT_INTERACTION_EVENT, submitInteractionResponse);
 		};
-	}, [selectedChat, isRequesting, assistantConfig, assistantContext, classManager]);
+	}, [selectedChat, isRequesting, assistantContext, classManager]);
 
 	useEffect(() => {
 		const submitEditedMessage = async (event) => {
@@ -413,7 +492,7 @@ export default function AssistantComposer({ selectedChat }) {
 		return () => {
 			window.removeEventListener(ASSISTANT_MESSAGE_EDIT_EVENT, submitEditedMessage);
 		};
-	}, [selectedChat, isRequesting, assistantConfig, assistantContext, classManager]);
+	}, [selectedChat, isRequesting, assistantContext, classManager]);
 
 	useEffect(() => {
 		const reviewSchema = async (event) => {
@@ -476,7 +555,7 @@ export default function AssistantComposer({ selectedChat }) {
 		return () => {
 			window.removeEventListener(ASSISTANT_SUGGESTION_EVENT, submitSuggestion);
 		};
-	}, [selectedChat, isRequesting, assistantConfig, assistantContext, classManager]);
+	}, [selectedChat, isRequesting, assistantContext, classManager]);
 
 	useEffect(() => {
 		const handleRegenerate = async (event) => {
@@ -513,7 +592,7 @@ export default function AssistantComposer({ selectedChat }) {
 		return () => {
 			window.removeEventListener(ASSISTANT_REGENERATE_EVENT, handleRegenerate);
 		};
-	}, [selectedChat, isRequesting, assistantConfig, assistantContext, classManager]);
+	}, [selectedChat, isRequesting, assistantContext, classManager]);
 
 	const onStopRequest = () => {
 		abortControllerRef.current?.abort();
@@ -535,12 +614,10 @@ export default function AssistantComposer({ selectedChat }) {
 		}
 	};
 
-	const chatMessages = parseChatMessages(selectedChat?.content);
-	const lastAssistant = getLastAssistantMessage(chatMessages);
-	const lastContent = lastAssistant?.content || '';
-	const agentAskedQuestion = lastContent.toLowerCase().includes('**question:**') || lastContent.toLowerCase().includes('question:');
 	const composerPlaceholder = isRequesting
 		? __('Waiting for response…', 'blockish')
+		: hasPendingInteraction
+		? __('Answer the question above', 'blockish')
 		: agentAskedQuestion
 		? __('Type your answer…', 'blockish')
 		: chatMessages.length
@@ -600,6 +677,7 @@ export default function AssistantComposer({ selectedChat }) {
 					}
 				}}
 				placeholder={composerPlaceholder}
+				disabled={isRequesting || hasPendingInteraction}
 				rows={2}
 			/>
 			<Flex justify="space-between" align="center">
@@ -631,7 +709,7 @@ export default function AssistantComposer({ selectedChat }) {
 						iconSize={14}
 						onClick={() => fileInputRef.current?.click()}
 						label={__('Attach image', 'blockish')}
-						disabled={isRequesting}
+						disabled={isRequesting || hasPendingInteraction}
 					/>
 					<Button
 						className="blockish-ai-assistant-send"
@@ -640,7 +718,10 @@ export default function AssistantComposer({ selectedChat }) {
 						iconSize={12}
 						onClick={isRequesting ? onStopRequest : onSendMessage}
 						label={isRequesting ? __('Stop', 'blockish') : __('Send', 'blockish')}
-						disabled={!isRequesting && !input.trim() && !imageAttachments.length}
+						disabled={
+							!isRequesting &&
+							(hasPendingInteraction || (!input.trim() && !imageAttachments.length))
+						}
 					/>
 				</Flex>
 			</Flex>
