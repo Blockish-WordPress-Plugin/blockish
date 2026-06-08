@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - '.wordpress-org/assets/**'
+      - 'readme.txt'
   workflow_dispatch:
 
 jobs:

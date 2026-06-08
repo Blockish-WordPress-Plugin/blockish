@@ -3,7 +3,7 @@ Author: wowdevs
 Author URI: https://wowdevs.com/
 Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
-Tags: blocks, builder, designs
+Tags: blocks, gutenberg blocks, page builder, gutenberg, block editor
 Tested up to: 6.9
 Stable tag: 1.0.4
 Requires at least: 6.1
@@ -11,18 +11,60 @@ Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-The Blockish plugin is a collection of creative Gutenberg blocks that help you design your website with ease.
+Blockish gives you 15 creative Gutenberg blocks and a Class Manager extension to build beautiful websites — no page builder required.
 
 == Description ==
 
-Get creative with the Blockish plugin. This plugin is a collection of creative Gutenberg blocks that help you design your website with ease. The plugin is designed to be lightweight and easy to use. It is perfect for bloggers, designers, developers, and anyone who wants to create beautiful websites.
+**Blockish** is a lightweight Gutenberg blocks plugin that gives you full design freedom inside the WordPress block editor. Whether you're building a landing page, portfolio, or business website, Blockish has the blocks you need — all with rich styling controls and no bloat.
 
-== Features ==
+== Blocks Included (15 Blocks) ==
 
-- Easy to use
-- Lightweight
-- Creative blocks
-- Perfect for bloggers, designers, developers, and anyone who wants to create beautiful websites
+= Layout =
+* **Container** — Flexible section wrapper with background, spacing, and layout controls
+
+= Typography =
+* **Heading** — Highly customizable headings with advanced typography options
+
+= Media =
+* **Image** — Enhanced image block with overlay, border, and alignment controls
+* **Video** — Embed and style videos with custom controls
+* **Icon** — Add scalable SVG icons with color and size controls
+
+= Interactive =
+* **Accordion** — Collapsible content sections for FAQs and more
+* **Tab** — Tabbed content panels for organized information
+* **Nav Menu** — Custom navigation menu block for headers and footers
+
+= Data & Stats =
+* **Counter** — Animated number counter for statistics and metrics
+* **Progress Bar** — Stylish progress bars with labels and animations
+* **Rating** — Star rating display for reviews and testimonials
+
+= Lists & Icons =
+* **Icon List** — Beautiful icon-based lists to replace plain bullet points
+
+= Social & CTA =
+* **Social Icons** — Social media icon links with color and size controls
+* **Button** — Fully styled call-to-action buttons
+
+= Maps =
+* **Google Map** — Embed Google Maps with custom zoom and height
+
+== Extensions ==
+
+= Class Manager =
+
+Blockish adds a **Class Manager** panel to every block in the editor — including core WordPress blocks. Define styles once for a CSS class, then reuse that class across any block on any page. It's the easiest way to keep your design consistent without writing CSS files or editing your theme. Sub-selector support lets you target child elements within a class too.
+
+== Why Blockish? ==
+
+- **15 creative blocks** — everything you need for professional pages
+- **Class Manager** — define styles once, reuse them across any block on any page
+- **Lightweight** — no jQuery, no bloat, fast-loading
+- **Responsive** — every block is fully responsive out of the box
+- **Easy to use** — works natively inside the WordPress block editor
+- **Highly customizable** — rich styling controls for colors, spacing, typography, and more
+- **Free** — 100% free, no upsells or locked features
 
 == Installation ==
 
