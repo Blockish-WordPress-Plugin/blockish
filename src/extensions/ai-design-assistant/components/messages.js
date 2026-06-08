@@ -9,7 +9,6 @@ const FULL_PAGE_SUGGESTIONS = [
 	__( 'Build a hero section', 'blockish' ),
 	__( 'Create a landing page for my product', 'blockish' ),
 	__( 'Design a pricing section', 'blockish' ),
-	__( 'Make a contact section', 'blockish' ),
 	__( 'Build a features section', 'blockish' ),
 	__( 'Add a testimonials section', 'blockish' ),
 	__( 'Create an FAQ section', 'blockish' ),
@@ -17,7 +16,6 @@ const FULL_PAGE_SUGGESTIONS = [
 	__( 'Build an about section', 'blockish' ),
 	__( 'Create a team section', 'blockish' ),
 	__( 'Design a portfolio section', 'blockish' ),
-	__( 'Build a stats section', 'blockish' ),
 ];
 
 const BLOCK_SUGGESTIONS = {

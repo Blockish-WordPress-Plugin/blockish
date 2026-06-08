@@ -27,6 +27,7 @@ import {
 	getAssistantSummary,
 	getAssistantTodo,
 	isAssistantSchemaContent,
+	isAssistantToolJsonContent,
 	requestAssistant,
 } from '../utils/assistant-request';
 import { readImageAttachment } from '../utils/attachments';
@@ -98,7 +99,8 @@ export default function AssistantComposer({ selectedChat }) {
 		userInput,
 		messagesForContext,
 		chatId,
-		attachmentsForRequest = []
+		attachmentsForRequest = [],
+		interactionResponse = null
 	) => {
 		const assistantMessageId = `${Date.now() + 1}`;
 		const abortController = new AbortController();
@@ -130,13 +132,15 @@ export default function AssistantComposer({ selectedChat }) {
 					messages: messagesForContext,
 					threadId: String(chatId),
 					attachments: attachmentsForRequest,
+					...(interactionResponse ? { interactionResponse } : {}),
 					classManager,
 					assistantContext: getRequestAssistantContext(),
 				},
 				abortController.signal,
 				async (chunk) => {
 					streamedContent += chunk;
-					const visibleContent = isAssistantSchemaContent(streamedContent)
+					const visibleContent = isAssistantSchemaContent(streamedContent) ||
+						isAssistantToolJsonContent(streamedContent)
 						? __('Preparing block structure…', 'blockish')
 						: streamedContent;
 					latestMessages = latestMessages.map((message) => (
@@ -232,7 +236,8 @@ export default function AssistantComposer({ selectedChat }) {
 							message.id === assistantMessageId && streamedContent
 								? {
 									...message,
-									content: isAssistantSchemaContent(streamedContent)
+									content: isAssistantSchemaContent(streamedContent) ||
+										isAssistantToolJsonContent(streamedContent)
 										? __('Preparing block structure…', 'blockish')
 										: streamedContent,
 								}
@@ -366,7 +371,8 @@ export default function AssistantComposer({ selectedChat }) {
 			userInput,
 			messagesForContext,
 			chatId,
-			currentAttachments
+			currentAttachments,
+			interactionResponse
 		);
 	};
 

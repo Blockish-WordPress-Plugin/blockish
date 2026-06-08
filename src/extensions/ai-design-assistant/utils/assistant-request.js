@@ -22,6 +22,33 @@ const getSchemaMessageFromText = (text) => {
 
 export const isAssistantSchemaContent = (text) => Boolean(getSchemaMessageFromText(text));
 
+export const isAssistantToolJsonContent = (text) => {
+	if (typeof text !== 'string') {
+		return false;
+	}
+
+	const trimmedText = text.trim();
+
+	if (!trimmedText.startsWith('{')) {
+		return false;
+	}
+
+	try {
+		const parsed = JSON.parse(trimmedText);
+
+		return Boolean(
+			parsed?.documentTitle ||
+			parsed?.cursor !== undefined ||
+			parsed?.nextCursor !== undefined ||
+			parsed?.instruction ||
+			parsed?.results ||
+			parsed?.query
+		);
+	} catch (error) {
+		return /"documentTitle"|"nextCursor"|"instruction"|"results"|"query"/.test(trimmedText);
+	}
+};
+
 export const getAssistantContent = (response) => {
 	const responseData = response?.data || response;
 
