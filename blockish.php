@@ -4,7 +4,7 @@
  * Description:       A collection of creative Gutenberg blocks to help you build beautiful websites.
  * Requires at least: 6.1
  * Requires PHP:      7.4
- * Version:           1.0.3
+ * Version:           1.0.4
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * License:           GPL-2.0-or-later
@@ -41,7 +41,7 @@ final class Blockish {
      *
      * @var string
      */
-    const VERSION = '1.0.3';
+    const VERSION = '1.0.4';
 
     /**
      * Holds the instance of this class.
@@ -130,6 +130,8 @@ final class Blockish {
         });
 
         add_action( 'admin_enqueue_scripts', [$this, 'admin_enqueue_scripts'] );
+        add_action( 'admin_enqueue_scripts', [$this, 'override_dci_styles'], 999 );
+        add_action( 'admin_init', [$this, 'init_dci'] );
 
         // Load plugin classes.
         Dashboard::get_instance();
@@ -148,6 +150,55 @@ final class Blockish {
             'ajaxurl' => admin_url( 'admin-ajax.php' ),
             'screen' => $screen
         ]);
+    }
+
+    public function override_dci_styles() {
+        if ( ! wp_style_is( 'dci-sdk-wowdevs', 'enqueued' ) ) {
+            return;
+        }
+
+        wp_add_inline_style( 'dci-sdk-wowdevs', '
+            :root {
+                --dci-primary:       #2563eb;
+                --dci-primary-dark:  #1d4ed8;
+                --dci-primary-light: #eff6ff;
+                --dci-secondary:     #3b82f6;
+                --dci-skip-bg:       #f9fafb;
+                --dci-skip-hover:    #f3f4f6;
+                --dci-border:        #e5e7eb;
+                --dci-text:          #4b5563;
+                --dci-radius:        8px;
+            }
+            .dci-global-notice.notice-success {
+                border-left-color: #2563eb;
+                background: #fff;
+            }
+        ' );
+    }
+
+    public function init_dci() {
+        require_once BLOCKISH_DIR . 'dci/start.php';
+
+        dci_dynamic_init( array(
+            'product_id'           => 5,
+            'plugin_name'          => 'Blockish - Creative Gutenberg Blocks',
+            'plugin_title'         => 'Love using Blockish? Congrats 🎉  ( Never miss an Important Update )',
+            'plugin_icon'          => 'https://ps.w.org/blockish/assets/icon-256x256.png',
+
+            'api_endpoint'         => 'https://dashboard.wowdevs.com/wp-json/dci/v1/data-insights',
+            'slug'                 => 'blockish',
+            'core_file'            => false,
+            'plugin_deactivate_id' => false,
+            'menu'                 => array(
+                'slug' => 'blockish-dashboard',
+            ),
+            'public_key'           => 'pk_AyXCKb51WP7urdbX5vdqe2ScQewFI3Bn',
+            'is_premium'           => false,
+            'popup_notice'         => false,
+            'deactivate_feedback'  => true,
+            'text_domain'          => 'blockish',
+            'plugin_msg'           => '<p>Be Top-contributor by sharing non-sensitive plugin data and create an impact to the global WordPress community today! You can receive valuable emails periodically.</p>',
+        ) );
     }
 
     /**
@@ -185,42 +236,4 @@ blockish();
 
 
 
-/**
- * SDK Integration
- */
-
-if ( ! function_exists( 'blockish_dci_plugin' ) ) {
-	function blockish_dci_plugin() {
-
-		// Include DCI SDK.
-		require_once dirname( __FILE__ ) . '/dci/start.php';
-
-		dci_dynamic_init( array(
-			'product_id'           => 5,
-			'plugin_name'          => 'Blockish - Creative Gutenberg Blocks', // make simple, must not empty
-			'plugin_title'         => 'Love using Blockish? Congrats 🎉  ( Never miss an Important Update )', // You can describe your plugin title here
-			'plugin_icon'          => plugins_url( 'assets/imgs/logo.svg', __FILE__ ), // delete the line if you don't need
-			'api_endpoint'         => 'https://dashboard.wowdevs.com/wp-json/dci/v1/data-insights',
-			'slug'                 => 'blockish',
-			'core_file'            => false,
-			'plugin_deactivate_id' => false,
-			'menu'                 => array(
-				'slug' => 'blockish-dashboard',
-			),
-			'public_key'           => 'pk_AyXCKb51WP7urdbX5vdqe2ScQewFI3Bn',
-			'is_premium'           => false,
-			// 'custom_data' => array(
-			// 'test' => 'value',
-			// ),
-			'popup_notice'         => false,
-			'deactivate_feedback'  => true,
-			// 'delay_time'    => array(
-			// 'time' => 3 * DAY_IN_SECONDS,
-			// ),
-			'text_domain'          => 'blockish',
-			'plugin_msg'           => '<p>Be Top-contributor by sharing non-sensitive plugin data and create an impact to the global WordPress community today! You can receive valuable emails periodically.</p>',
-		) );
-	}
-	add_action( 'admin_init', 'blockish_dci_plugin' );
-}
 
