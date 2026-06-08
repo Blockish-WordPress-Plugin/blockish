@@ -18,10 +18,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy assets to WordPress.org
-        uses: 10up/action-wordpress-org-deploy@stable
+        uses: 10up/action-wordpress-plugin-asset-update@stable
         with:
           plugin-slug: blockish
           svn-username: ${{ secrets.SVN_USERNAME }}
           svn-password: ${{ secrets.SVN_PASSWORD }}
           assets-dir: .wordpress-org/assets
-          generate-zip: false
