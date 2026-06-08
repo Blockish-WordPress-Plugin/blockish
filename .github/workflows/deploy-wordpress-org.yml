@@ -40,7 +40,7 @@ jobs:
         run: unzip blockish.zip -d ./dist/
 
       - name: Deploy to WordPress.org
-        uses: 10up/action-wordpress-org-deploy@v1
+        uses: 10up/action-wordpress-org-deploy@stable
         with:
           plugin-slug: blockish
           svn-username: ${{ secrets.SVN_USERNAME }}
