@@ -19,8 +19,8 @@ jobs:
 
       - name: Deploy assets to WordPress.org
         uses: 10up/action-wordpress-plugin-asset-update@stable
-        with:
-          plugin-slug: blockish
-          svn-username: ${{ secrets.SVN_USERNAME }}
-          svn-password: ${{ secrets.SVN_PASSWORD }}
-          assets-dir: .wordpress-org/assets
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: blockish
+          ASSETS_DIR: .wordpress-org/assets
