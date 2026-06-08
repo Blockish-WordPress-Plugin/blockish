@@ -24,3 +24,4 @@ jobs:
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: blockish
           ASSETS_DIR: .wordpress-org/assets
+          IGNORE_OTHER_FILES: true
