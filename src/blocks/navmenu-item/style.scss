@@ -1,0 +1,23 @@
+.blockish-block-navmenu-item {
+	color: currentColor;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 12px;
+	border-radius: 4px;
+	white-space: nowrap;
+	transition: background 0.15s ease, color 0.15s ease;
+
+	&:hover {
+		background: rgba( 0, 0, 0, 0.06 );
+	}
+
+	// When inside offcanvas, full-width row style
+	.blockish-block-navmenu-offcanvas-nav & {
+		display: flex;
+		padding: 10px 12px;
+		border-radius: 6px;
+		font-size: 15px;
+		white-space: normal;
+	}
+}

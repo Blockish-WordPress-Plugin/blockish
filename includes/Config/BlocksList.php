@@ -140,6 +140,19 @@ class BlocksList extends ConfigList {
                 'status'  => 'active',
                 'parent'  => 'tab',
             ),
+            'navmenu' => array(
+                'name'        => __('Nav Menu', 'blockish'),
+                'description' => __('Navigation menu block for headers and footers.', 'blockish'),
+                'package'     => 'free',
+                'status'      => 'active',
+            ),
+            'navmenu-item' => array(
+                'name'        => __('Nav Menu Item', 'blockish'),
+                'description' => __('Item for the Nav Menu block.', 'blockish'),
+                'package'     => 'free',
+                'status'      => 'active',
+                'parent'      => 'navmenu',
+            ),
         );
 
         $this->list = apply_filters( 'blockish/blocks/list', $this->list );

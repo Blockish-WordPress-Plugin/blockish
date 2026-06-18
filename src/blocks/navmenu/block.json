@@ -1,0 +1,63 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/navmenu",
+	"version": "1.0.0",
+	"title": "Nav Menu",
+	"category": "blockish-framework",
+	"description": "Nav menu block for gutenberg.",
+	"icon": "menu",
+	"keywords": ["nav", "menu", "navigation", "navbar"],
+	"allowedBlocks": [ "blockish/navmenu-item" ],
+	"attributes": {
+		"menuBreakpoint": {
+			"type": "string",
+			"default": "tablet"
+		},
+		"menuBreakpointCustom": {
+			"type": "number",
+			"default": 992
+		},
+		"scrollLockOffcanvas": {
+			"type": "boolean",
+			"default": true
+		},
+		"justifyContent": {
+			"type": "object",
+			"default": {
+				"Desktop": "flex-start"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-nav": "justify-content: {{VALUE}};"
+			}
+		},
+		"alignItems": {
+			"type": "object",
+			"default": {
+				"Desktop": "center"
+			},
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-nav": "align-items: {{VALUE}};"
+			}
+		},
+		"menuAnimation": {
+			"type": "string",
+			"default": "none"
+		},
+		"isVertical": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": ["wide", "full"]
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
+}

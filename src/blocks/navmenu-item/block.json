@@ -1,0 +1,35 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/navmenu-item",
+	"version": "1.0.0",
+	"title": "Nav Menu Item",
+	"category": "blockish-framework",
+	"description": "Item for the Nav Menu block.",
+	"icon": "minus",
+	"parent": ["blockish/navmenu"],
+	"attributes": {
+		"label": {
+			"type": "string",
+			"default": "Menu Item"
+		},
+		"url": {
+			"type": "string",
+			"default": "#"
+		},
+		"openInNewTab": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": false,
+		"reusable": false
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php"
+}
