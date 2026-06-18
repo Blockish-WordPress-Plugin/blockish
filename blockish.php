@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name:       Blockish
  * Description:       A collection of creative Gutenberg blocks to help you build beautiful websites.
@@ -20,13 +21,14 @@ use Blockish\Core\Dashboard;
 use Blockish\Core\Enqueue;
 use Blockish\Core\StyleGenerator;
 use Blockish\Extensions\ExtensionsLoader;
+use Blockish\Mcp\Loader;
 use Blockish\Routes\BlocksV1;
 use Blockish\Routes\DashboardToolsV1;
 use Blockish\Routes\ExtensionsV1;
 use Blockish\Routes\SVGUploaderV1;
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if (! defined('ABSPATH')) {
     exit;
 }
 
@@ -34,8 +36,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Main Blockish Class.
  * Implements the singleton pattern to ensure only one instance is running.
  */
-final class Blockish {
-    
+final class Blockish
+{
+
     /**
      * Plugin version.
      *
@@ -54,18 +57,19 @@ final class Blockish {
      * Private constructor for singleton pattern.
      * Prevents the direct creation of an object from this class.
      */
-    private function __construct() {
+    private function __construct()
+    {
         // Define plugin constants.
         $this->define_constants();
 
         // Load after plugin activation.
-        register_activation_hook( __FILE__, array( $this, 'activated_plugin' ) );
+        register_activation_hook(__FILE__, array($this, 'activated_plugin'));
 
         // Load autoloader (vendor/autoload.php).
-        require_once BLOCKISH_DIR . 'vendor/autoload.php';
+        require_once BLOCKISH_DIR . 'vendor/autoload_packages.php';
 
         // Initialize plugin hooks.
-        add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
+        add_action('plugins_loaded', array($this, 'plugins_loaded'));
     }
 
     /**
@@ -73,16 +77,17 @@ final class Blockish {
      *
      * @return void
      */
-    public function define_constants() {
-        define( 'BLOCKISH_VERSION', self::VERSION );
-        define( 'BLOCKISH_NAME', '' );
-        define( 'BLOCKISH_URL', trailingslashit( plugin_dir_url( __FILE__ ) ) );
-        define( 'BLOCKISH_DIR', trailingslashit( plugin_dir_path( __FILE__ ) ) );
-        define( 'BLOCKISH_INCLUDES_DIR', BLOCKISH_DIR . 'includes/' );
-        define( 'BLOCKISH_STYLES_DIR', BLOCKISH_DIR . 'build/styles/' );
-        define( 'BLOCKISH_BLOCKS_DIR', BLOCKISH_DIR . 'build/blocks/' );
-        define( 'BLOCKISH_EXTENSIONS_DIR', BLOCKISH_DIR . 'build/extensions/' );
-        define( 'BLOCKISH_RESERVED_PLACEHOLDERS', [
+    public function define_constants()
+    {
+        define('BLOCKISH_VERSION', self::VERSION);
+        define('BLOCKISH_NAME', '');
+        define('BLOCKISH_URL', trailingslashit(plugin_dir_url(__FILE__)));
+        define('BLOCKISH_DIR', trailingslashit(plugin_dir_path(__FILE__)));
+        define('BLOCKISH_INCLUDES_DIR', BLOCKISH_DIR . 'includes/');
+        define('BLOCKISH_STYLES_DIR', BLOCKISH_DIR . 'build/styles/');
+        define('BLOCKISH_BLOCKS_DIR', BLOCKISH_DIR . 'build/blocks/');
+        define('BLOCKISH_EXTENSIONS_DIR', BLOCKISH_DIR . 'build/extensions/');
+        define('BLOCKISH_RESERVED_PLACEHOLDERS', [
             '{{VALUE}}',
             '{{TOP}}',
             '{{BOTTOM}}',
@@ -92,7 +97,7 @@ final class Blockish {
             '{{TOP_RIGHT}}',
             '{{BOTTOM_LEFT}}',
             '{{BOTTOM_RIGHT}}',
-        ] );
+        ]);
     }
 
     /**
@@ -101,13 +106,14 @@ final class Blockish {
      *
      * @return void
      */
-    public function activated_plugin() {
+    public function activated_plugin()
+    {
         // Update plugin version in the options table.
-        update_option( 'blockish_version', BLOCKISH_VERSION );
+        update_option('blockish_version', BLOCKISH_VERSION);
 
         // Set installed time if it doesn't exist.
-        if ( ! get_option( 'blockish_installed_time' ) ) {
-            add_option( 'blockish_installed_time', time() );
+        if (! get_option('blockish_installed_time')) {
+            add_option('blockish_installed_time', time());
         }
     }
 
@@ -117,21 +123,22 @@ final class Blockish {
      *
      * @return void
      */
-    public function plugins_loaded() {
+    public function plugins_loaded()
+    {
 
         // Add a custom class to the admin body tag.
-        add_filter( 'admin_body_class', function( $classes ) {
+        add_filter('admin_body_class', function ($classes) {
             return $classes . ' blockish';
         });
 
         // Add custom classes to the front-end body tag.
-        add_filter( 'body_class', function( $classes ) {
-            return array_merge( $classes, array( 'blockish', 'blockish-frontend' ) );
+        add_filter('body_class', function ($classes) {
+            return array_merge($classes, array('blockish', 'blockish-frontend'));
         });
 
-        add_action( 'admin_enqueue_scripts', [$this, 'admin_enqueue_scripts'] );
-        add_action( 'admin_enqueue_scripts', [$this, 'override_dci_styles'], 999 );
-        add_action( 'admin_init', [$this, 'init_dci'] );
+        add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
+        add_action('admin_enqueue_scripts', [$this, 'override_dci_styles'], 999);
+        add_action('admin_init', [$this, 'init_dci']);
 
         // Load plugin classes.
         Dashboard::get_instance();
@@ -143,21 +150,31 @@ final class Blockish {
         SVGUploaderV1::get_instance();
         Blocks::get_instance();
         ExtensionsLoader::get_instance();
+
+        if (! class_exists('WP\MCP\Core\McpAdapter')) {
+            // MCP Adapter is not active — show an admin notice or return early.
+            return;
+        }
+
+        \WP\MCP\Core\McpAdapter::instance();
+        Loader::get_instance();
     }
 
-    public function admin_enqueue_scripts($screen) {
-        wp_localize_script( 'wp-block-editor', 'blockish', [
-            'ajaxurl' => admin_url( 'admin-ajax.php' ),
+    public function admin_enqueue_scripts($screen)
+    {
+        wp_localize_script('wp-block-editor', 'blockish', [
+            'ajaxurl' => admin_url('admin-ajax.php'),
             'screen' => $screen
         ]);
     }
 
-    public function override_dci_styles() {
-        if ( ! wp_style_is( 'dci-sdk-wowdevs', 'enqueued' ) ) {
+    public function override_dci_styles()
+    {
+        if (! wp_style_is('dci-sdk-wowdevs', 'enqueued')) {
             return;
         }
 
-        wp_add_inline_style( 'dci-sdk-wowdevs', '
+        wp_add_inline_style('dci-sdk-wowdevs', '
             :root {
                 --dci-primary:       #2563eb;
                 --dci-primary-dark:  #1d4ed8;
@@ -173,13 +190,14 @@ final class Blockish {
                 border-left-color: #2563eb;
                 background: #fff;
             }
-        ' );
+        ');
     }
 
-    public function init_dci() {
+    public function init_dci()
+    {
         require_once BLOCKISH_DIR . 'dci/start.php';
 
-        dci_dynamic_init( array(
+        dci_dynamic_init(array(
             'product_id'           => 5,
             'plugin_name'          => 'Blockish - Creative Gutenberg Blocks',
             'plugin_title'         => 'Love using Blockish? Congrats 🎉  ( Never miss an Important Update )',
@@ -198,7 +216,7 @@ final class Blockish {
             'deactivate_feedback'  => true,
             'text_domain'          => 'blockish',
             'plugin_msg'           => '<p>Be Top-contributor by sharing non-sensitive plugin data and create an impact to the global WordPress community today! You can receive valuable emails periodically.</p>',
-        ) );
+        ));
     }
 
     /**
@@ -206,8 +224,9 @@ final class Blockish {
      *
      * @return Blockish
      */
-    public static function instance() {
-        if ( is_null( self::$instance ) ) {
+    public static function instance()
+    {
+        if (is_null(self::$instance)) {
             self::$instance = new self();
         }
         return self::$instance;
@@ -229,11 +248,8 @@ final class Blockish {
  *
  * @return Blockish
  */
-function blockish() {
+function blockish()
+{
     return Blockish::instance();
 }
 blockish();
-
-
-
-
