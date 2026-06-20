@@ -398,6 +398,15 @@ Workflow: call `blockish/get-classes` to check for an existing class → if need
 
 "Accepts children" tells you whether `innerBlocks` is valid for that block. Leaf blocks (no) must not have `innerBlocks`.
 
+### 7.1 WP-core `anchor` / `align` (not in each block's own attribute list)
+
+These two are not custom Blockish attributes — they come from WordPress core's block "supports" system, but they're real, settable attributes via your schema's `attributes` object just like any other.
+
+- `anchor` (Scalar string) — sets the block wrapper's HTML `id`. Supported by **every Blockish block except `blockish/button`**.
+- `align` (Scalar string, `"wide"` or `"full"`) — WP-core wide/full-width alignment (theme-dependent visual effect). Supported by top-level/standalone blocks (container, heading, image, video, icon, rating, counter, progress-bar, google-map, icon-list, social-icons, tab, accordion) — **not** supported by child-only blocks (`accordion-item`, `icon-list-item`, `social-icon-item`, `tab-item`) or by `blockish/button`.
+
+Each block's table below calls these out only where relevant (container, button); assume `anchor` works everywhere else unless noted.
+
 ---
 
 ### `blockish/container`
@@ -411,9 +420,9 @@ The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 | `isVariationPicked` | Scalar (boolean) | `false` | **Always set to `true`.** |
 | `tagName` | Option | `{"label":"Div","value":"div"}` | `Div`/`div` · `Section`/`section` · `Article`/`article` · `Main`/`main` · `Aside`/`aside` · `Header`/`header` · `Footer`/`footer` |
 | `display` | Scalar (string) | `"flex"` | `"flex"` `"grid"` |
-| `containerWidth` | Scalar (string) | `"alignfull"` | `"alignfull"` `"alignwide"` `"custom"` (with `customWidthContainer`) |
-| `customWidthContainer` | Responsive | `{"Desktop":"100%"}` | Active when `containerWidth` = `"custom"` |
-| `containerMinHeight` | Responsive | unset | |
+| `containerWidth` | Scalar (string) | `"alignfull"` | `"alignfull"` `"alignwide"` `"align-custom-width"` (with `customWidthContainer`) — **the custom option's value is the literal string `"align-custom-width"`, not `"custom"`** |
+| `customWidthContainer` | Responsive | `{"Desktop":"100%"}` | Active when `containerWidth` = `"align-custom-width"` |
+| `containerMinHeight` | Responsive | `{"Desktop":"0"}` | |
 | `overflow` | Responsive-Option | unset | `"visible"` `"hidden"` `"scroll"` `"auto"` |
 | `flexDirection` | Responsive-Option | `{"Desktop":{"label":"Row","value":"row"}}` | `Row`/`row` · `Column`/`column` · `Row Reverse`/`row-reverse` · `Column Reverse`/`column-reverse` |
 | `flexWrap` | Responsive-Option | unset | `No Wrap`/`nowrap` · `Wrap`/`wrap` · `Wrap Reverse`/`wrap-reverse` *(labels inferred, see TODO)* |
@@ -432,9 +441,12 @@ The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 | `containerHoverBackgroundOverlay` | Stringified-JSON (Background Overlay) | unset | Hover state |
 | `containerBorder` | Stringified-JSON (Border) | unset | Normal state |
 | `containerHoverBorder` | Stringified-JSON (Border) | unset | Hover state |
-| `containerBorderRadius` | Border-Radius | unset | |
+| `containerBorderRadius` | Border-Radius | unset | Normal state |
+| `containerHoverBorderRadius` | Border-Radius | unset | Hover state |
 | `containerBoxShadow` | Stringified-JSON (Box Shadow) | unset | Normal state |
 | `containerHoverBoxShadow` | Stringified-JSON (Box Shadow) | unset | Hover state |
+| `anchor` | Scalar (string) | unset | WP-core "HTML anchor" — sets the element's `id`. See §7.1. |
+| `align` | Scalar (string) | unset | `"wide"` `"full"` — WP-core wide/full alignment. See §7.1. |
 
 Minimal schema:
 ```json
@@ -481,7 +493,10 @@ A call-to-action link. **Accepts children: no.**
 | `text` | Scalar (string) | `"Click Here"` | |
 | `url` | Link | unset | |
 | `icon` | Icon | unset | |
-| `iconPosition` | Scalar (string) | `"row"` | `"row"` (icon before text) `"row-reverse"` (icon after) |
+| `iconPosition` | Scalar (string) | `"row"` | `"row"` (icon before text) `"row-reverse"` (icon after) — order of icon vs. text inside the button |
+| `buttonPlacement` | Responsive-Option | unset | `"flex-start"` `"center"` `"flex-end"` — horizontal position of the **whole button** within its parent container. The parent's `alignItems`/`justifyContent` does NOT center a button; use this instead. Mobile-only centering: `{"Desktop":{"value":"flex-end"},"Mobile":{"value":"center"}}` |
+| `buttonAlignment` | Responsive-Option | unset | `"left"` `"center"` `"right"` — aligns the icon+text **inside** the button (text-align + justify-content on the inner link), independent of `buttonPlacement` |
+| `buttonContentSpacing` | Responsive | unset | Gap between icon and text inside the button |
 | `buttonTextColor` | Color | unset | Normal |
 | `buttonHoverTextColor` | Color | unset | Hover |
 | `buttonBackground` | Stringified-JSON (Background) | unset | Normal |
@@ -491,12 +506,15 @@ A call-to-action link. **Accepts children: no.**
 | `buttonBorderRadius` | Border-Radius | unset | |
 | `buttonPadding` | Spacing | unset | |
 | `buttonTypography` | Stringified-JSON (Typography) | unset | |
+| `buttonTextShadow` | Stringified-JSON (Box Shadow) | unset | |
 | `buttonBoxShadow` | Stringified-JSON (Box Shadow) | unset | Normal |
 | `buttonHoverBoxShadow` | Stringified-JSON (Box Shadow) | unset | Hover |
 | `buttonHoverTransition` | Scalar (number, seconds) | unset | |
 | `buttonWidth` | Responsive | unset | |
 | `buttonMinHeight` | Responsive | unset | |
 | `buttonIconSize` | Responsive | unset | |
+
+`blockish/button` does **not** support `anchor` or `align` (no `id`, no wide/full alignment) — unlike almost every other Blockish block. See §7.1.
 
 Minimal schema:
 ```json
@@ -1025,3 +1043,19 @@ Items below are flagged rather than guessed, per source ambiguity. Resolve again
 7. **`position` (global) enum completeness** — documented as `relative/absolute/fixed/sticky`. A parallel options list elsewhere in the codebase (Class Manager's own style controls) also includes `static` — unconfirmed whether the global block attribute's own control offers `static` too, or whether that's specific to the Class Manager UI only.
 8. **Stats-row composite example (§8)** sets `gridColumns` without also setting `gridLayoutType: "fixed"`. Per `gridLayoutType`'s default (`"auto"`), `gridColumns` has no effect unless `gridLayoutType` is explicitly `"fixed"`. Flagged here instead of silently corrected in the example — when applying this rewrite, either fix the example to include `"gridLayoutType": "fixed"`, or confirm `gridColumns` has some auto-mode effect that makes the omission intentional.
 9. **`sourceType` (video) value correction** — the previous version of this doc listed the self-hosted enum value as `"self-hosted"` (hyphenated) in the attribute table, but the block's own source (`video/utils.js`) defines it as `"selfHosted"` (camelCase). This rewrite uses `"selfHosted"` throughout as the confirmed-correct value — flagging the correction in case anything downstream still expects the old (wrong) hyphenated form.
+
+---
+
+## 10. Runtime gotchas (learned by driving the MCP, not obvious from source)
+
+These are behaviors confirmed by actually using the abilities end-to-end, not just by reading code. If something here ever looks wrong, re-verify against the actual ability/block source before trusting either source over the other.
+
+- **`block_schema` REPLACES the staged schema, it does not merge or append.** Calling `blockish/manage-post` with `block_schema` again before the previous one has been applied in the editor discards the old pending schema entirely. There is no "add to the pending schema" — always submit the complete schema you want staged.
+- **`get-posts`' `content` field reflects only what's already been *applied* in the editor**, not whatever schema is currently pending/staged. Read it to know the real, live state of a post before building an edit — it will not show you what an unapplied pending schema would add.
+- **There is no single-attribute patch for an already-applied block.** To correct something a human already approved into real blocks: read the post's current `content`, find the block in question, build a corrected replacement schema for that block/section (reproducing every attribute they already have — not just the one you're changing, or you will silently revert their other edits), stage it, then have the human select the old block in the editor and apply via **Replace**. Never write raw `<!-- wp:blockish/... -->` markup into `post_content` directly — that bypasses the whole apply flow and produces invalid/empty blocks (see earlier sections on why hand-written markup fails).
+- **Very large or deeply nested schemas (~4+ levels deep) can fail with a misleading error** like `name is a required property of block_schema[0]` — this is a size/depth limit being hit, not an actual schema mistake. If you see this error on a structurally-correct schema: flatten unnecessary wrapper levels (e.g. put an icon directly on a card-like block instead of wrapping it in an extra container "chip"), and split a large page into multiple `manage-post` calls (e.g. stage and apply one section at a time) rather than one giant nested tree.
+- **Featured image is two calls, in order:** `blockish/get-media` first (check if a suitable image already exists) → `blockish/upload-media` only if needed (public, direct `.jpg`/`.jpeg`/`.png`/`.gif`/`.webp` URL) → pass the resulting `attachment_id` as `featured_media` to `blockish/manage-post`.
+- **Global Styles are reachable through `blockish/manage-post` too** — they're an ordinary post of type `wp_global_styles`, one per active theme, with the style overrides stored as JSON in `post_content`. This lets you override theme.json-level settings (which you otherwise cannot touch via any ability) without modifying any file — fully reversible the same way. No ability reports which theme is active or which `wp_global_styles` post belongs to it; infer it as the most-recently-modified `wp_global_styles` post (via `blockish/get-posts` with `post_type: "wp_global_styles"`), or ask. Example payload to remove block gap site-wide:
+  ```json
+  {"version":3,"isGlobalStylesUserThemeJSON":true,"styles":{"spacing":{"blockGap":"0px"}}}
+  ```

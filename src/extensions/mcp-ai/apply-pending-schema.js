@@ -3,15 +3,16 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import { createPortal } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { Button } from '@wordpress/components';
+import { Button, DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { check, trash } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const META_KEY = '_blockish_block_schema';
 
-// insertBlocks() expects actual Block objects (clientId + normalized attributes
-// + recursively-real innerBlocks), not the plain {name, attributes, innerBlocks}
-// JSON we store in meta — createBlock() is what produces that real shape.
+// insertBlocks()/replaceBlocks() expect actual Block objects (clientId +
+// normalized attributes + recursively-real innerBlocks), not the plain
+// {name, attributes, innerBlocks} JSON we store in meta — createBlock() is
+// what produces that real shape.
 const schemaNodeToBlock = (node) => {
     if (!node || typeof node !== 'object' || !node.name) {
         return null;
@@ -63,7 +64,19 @@ const useHeaderSettingsNode = () => {
 const ApplyPendingSchema = () => {
     const postType = useSelect((select) => select('core/editor').getCurrentPostType(), []);
     const [meta, setMeta] = useEntityProp('postType', postType, 'meta');
-    const { insertBlocks } = useDispatch('core/block-editor');
+    const { insertBlocks, replaceBlocks } = useDispatch('core/block-editor');
+
+    const { selectedClientId, rootClientId, selectedIndex, topLevelCount } = useSelect((select) => {
+        const blockEditor = select('core/block-editor');
+        const clientId = blockEditor.getSelectedBlockClientId();
+
+        return {
+            selectedClientId: clientId,
+            rootClientId: clientId ? blockEditor.getBlockRootClientId(clientId) || undefined : undefined,
+            selectedIndex: clientId ? blockEditor.getBlockIndex(clientId) : -1,
+            topLevelCount: blockEditor.getBlockOrder().length,
+        };
+    }, []);
 
     const headerSettingsNode = useHeaderSettingsNode();
     const pendingSchema = meta && meta[META_KEY] ? meta[META_KEY] : null;
@@ -74,41 +87,67 @@ const ApplyPendingSchema = () => {
 
     const clearPendingSchema = () => setMeta({ ...meta, [META_KEY]: '' });
 
-    const handleApprove = () => {
+    const getBlocks = () => {
         try {
             const schema = JSON.parse(pendingSchema);
             const schemaArray = Array.isArray(schema) ? schema : [schema];
-            const blocks = schemaArray.map(schemaNodeToBlock).filter(Boolean);
-
-            if (!blocks.length) {
-                clearPendingSchema();
-                return;
-            }
-
-            insertBlocks(blocks);
-            clearPendingSchema();
+            return schemaArray.map(schemaNodeToBlock).filter(Boolean);
         } catch (e) {
             console.error(e);
+            return [];
         }
     };
 
-    const handleCancel = () => {
-        try {
-            clearPendingSchema();
-        } catch (e) {
-            console.error(e);
+    // A click on any of these is itself the approval — undo is always one
+    // Ctrl/Cmd+Z away in the editor, so there's no need for a separate confirm step.
+    const runAndClear = (action) => {
+        const blocks = getBlocks();
+        if (blocks.length) {
+            action(blocks);
         }
+        clearPendingSchema();
     };
 
+    const appendToEnd = () => runAndClear((blocks) => insertBlocks(blocks, topLevelCount, undefined));
+    const insertBefore = () => runAndClear((blocks) => insertBlocks(blocks, selectedIndex, rootClientId));
+    const insertAfter = () => runAndClear((blocks) => insertBlocks(blocks, selectedIndex + 1, rootClientId));
+    const replaceSelected = () => runAndClear((blocks) => replaceBlocks(selectedClientId, blocks));
+
+    const handleCancel = () => clearPendingSchema();
 
     return createPortal(
         <div className="blockish-mcp-ai-pending-actions">
-            <Button
-                className="blockish-mcp-ai-approve"
-                icon={check}
-                label={__('Approve AI Layout', 'blockish')}
-                onClick={handleApprove}
-            />
+            {selectedClientId ? (
+                <DropdownMenu
+                    className="blockish-mcp-ai-approve"
+                    icon={check}
+                    label={__('Approve AI Layout', 'blockish')}
+                >
+                    {({ onClose }) => (
+                        <MenuGroup>
+                            <MenuItem onClick={() => { insertBefore(); onClose(); }}>
+                                {__('Insert before selected block', 'blockish')}
+                            </MenuItem>
+                            <MenuItem onClick={() => { insertAfter(); onClose(); }}>
+                                {__('Insert after selected block', 'blockish')}
+                            </MenuItem>
+                            <MenuItem onClick={() => { replaceSelected(); onClose(); }}>
+                                {__('Replace selected block', 'blockish')}
+                            </MenuItem>
+                            <MenuItem onClick={() => { appendToEnd(); onClose(); }}>
+                                {__('Add to end of content', 'blockish')}
+                            </MenuItem>
+                        </MenuGroup>
+                    )}
+                </DropdownMenu>
+            ) : (
+                <Button
+                    className="blockish-mcp-ai-approve"
+                    icon={check}
+                    label={__('Approve AI Layout', 'blockish')}
+                    onClick={appendToEnd}
+                />
+            )}
             <Button
                 className="blockish-mcp-ai-cancel"
                 icon={trash}
