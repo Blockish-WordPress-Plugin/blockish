@@ -36,6 +36,13 @@ class ExtensionList extends ConfigList {
                 'category'    => 'general',
                 'status'      => 'active',
             ),
+            'mcp-ai' => array(
+                'name'        => 'AI / MCP Access',
+                'description' => __( 'Exposes Blockish abilities (posts, blocks, CSS classes) to AI tools over the Model Context Protocol for this entire site. Enable only if you trust the AI client connecting to this site — it can create and edit content and CSS classes.', 'blockish' ),
+                'package'     => 'free',
+                'category'    => 'general',
+                'status'      => 'active',
+            ),
         );
 
         $this->list = apply_filters( 'blockish/extensions/list', $this->list );

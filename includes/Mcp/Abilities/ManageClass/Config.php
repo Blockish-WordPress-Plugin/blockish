@@ -14,6 +14,8 @@ class Config
             'label'               => __('Create, Update or Delete CSS Class', 'blockish'),
             'description'         => __('Manages CSS classes in the Blockish Class Manager. Each class is a custom post of type "blockish-classes".
 
+RULE: Only use this for CSS that has no equivalent block attribute. If a block attribute or control already produces the style (background, border, padding, typography, box-shadow, etc. — see blockish/get-block-docs), set that attribute directly instead of creating a class for it.
+
 HOW IT WORKS:
 - "name" becomes the CSS class name applied to blocks. It is auto-normalized: lowercase, spaces become hyphens, only a-z / 0-9 / hyphens / underscores allowed, must start with a letter or underscore.
 - "css" stores raw CSS in post meta. It is output to the page exactly as stored — no selector is added automatically. You MUST write complete CSS rules including the selector. Use the "css_selector" value returned in the response as the root selector.

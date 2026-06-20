@@ -6,6 +6,14 @@ The Class Manager lets you create named, reusable CSS classes and apply them to 
 
 Classes are stored as WordPress custom posts of type `blockish-classes`. Their CSS is stored in the `blockishClassManagerStyles` post meta and is output to the page `<head>` for any page that uses the class.
 
+**Rule: the decision is about reuse, not just attribute availability.**
+
+- **One-off style, used on a single block instance:** set the matching attribute directly (check `blockish/get-block-docs` for a global or block-specific attribute first — background, border, padding, typography, box-shadow, etc.). Only fall back to `customCss` if no attribute covers it. Do not create a class for a one-off.
+- **The same style is needed on many blocks or repeats across pages:** create a Class for it — **even if an attribute exists** that could produce the same style. Repeating an attribute's value (especially a Stringified-JSON one like `background`/`border`/`boxShadow`) on every block duplicates that styling data and the CSS generated from it on every single instance. A Class is defined once and referenced by name everywhere it's used, so the CSS stays optimized instead of duplicated.
+- **No attribute exists for the property at all, and it's needed on many blocks:** Class Manager — no question.
+
+So: reusable → Class (regardless of whether an attribute could also do it). One-off → attribute first, `customCss` only as last resort.
+
 ---
 
 ## Two Types of Classes
@@ -14,14 +22,14 @@ Classes are stored as WordPress custom posts of type `blockish-classes`. Their C
 
 - Created with no `parent_id`
 - Identified by a slug derived from its name: `"hero card"` → `.hero-card`
-- Adds the slug as a CSS class directly to the block wrapper `<div>`
+- Adds the slug as a CSS class directly to the block's wrapper element (whatever tag that block uses — `<div>`, `<ul>`, `<li>`, `<figure>`, `<h1>`–`<h6>`, etc., not always a `<div>`)
 - CSS is written using `.{slug}` as the selector
 
 ### Child class (subselector)
 
 - Created with a `parent_id` pointing to an existing parent class
 - Identified by its post ID, **not** its name: selector is always `.blockish-cm-{post_id}`
-- Adds `blockish-cm-{post_id}` to the block wrapper `<div>`
+- Adds `blockish-cm-{post_id}` to the block's wrapper element (same tag the block actually renders, not necessarily a `<div>`)
 - Used to create per-block variations of a parent style
 - **Requires the parent class to also be applied to the same block** — child classes are skipped if the parent is not applied
 
@@ -59,7 +67,7 @@ The response includes:
 
 ### Step 3 — Apply the class to a block
 
-Add `classManager` and/or `classManagerSubselector` to the block's attributes in `post_content`.
+Add `classManager` and/or `classManagerSubselector` to the block's `attributes` object in your schema.
 
 ### Step 4 — Write CSS
 

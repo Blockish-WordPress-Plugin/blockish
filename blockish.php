@@ -16,6 +16,7 @@
  * @package           Blockish
  */
 
+use Blockish\Config\ExtensionList;
 use Blockish\Core\Blocks;
 use Blockish\Core\Dashboard;
 use Blockish\Core\Enqueue;
@@ -153,6 +154,19 @@ final class Blockish
 
         if (! class_exists('WP\MCP\Core\McpAdapter')) {
             // MCP Adapter is not active — show an admin notice or return early.
+            return;
+        }
+
+        // Defer the extension-list check (and anything that depends on it, like
+        // translated strings in ExtensionList) until init — checking this early,
+        // directly in plugins_loaded, triggers WP's "translation loaded too early" notice.
+        add_action('init', [$this, 'maybe_init_mcp'], 1);
+    }
+
+    public function maybe_init_mcp()
+    {
+        if (empty(ExtensionList::get_instance()->get_list('active')['mcp-ai'])) {
+            // AI/MCP access extension is disabled for this site — do not expose any abilities.
             return;
         }
 

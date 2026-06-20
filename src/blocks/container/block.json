@@ -44,6 +44,9 @@
 		},
 		"containerMinHeight": {
 			"type": "object",
+			"default": {
+				"Desktop": "0"
+			},
 			"selectors": {
 				".{{WRAPPER}}": "--container-min-height: {{VALUE}};"
 			}

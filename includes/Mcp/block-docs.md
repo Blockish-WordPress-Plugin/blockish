@@ -1,945 +1,1027 @@
 # Blockish Block Reference
 
-## Overview
+## 1. How to read this doc
 
-Blockish is a WordPress Gutenberg block plugin. All blocks are prefixed `blockish/`. Blocks are stored as WordPress block markup in `post_content`.
+You (the AI) build a **schema**: a JSON tree of `{ name, attributes, innerBlocks }` objects. That is your entire job.
 
-### Block Markup Format
+- `name` — block name, e.g. `"blockish/container"`.
+- `attributes` — only the attributes you want different from their default. Anything you omit automatically falls back to the block's registered default — you never need to repeat a default value, and you never need to compute what an omitted value "renders as." That is handled for you.
+- `innerBlocks` — array of child schema nodes, same shape, recursive. Only for blocks marked "Accepts children: yes" below.
 
-```
-<!-- wp:blockish/heading {"content":"Hello","tag":{"label":"H2","value":"h2"}} -->
-<h2 class="wp-block-blockish-heading">Hello</h2>
-<!-- /wp:blockish/heading -->
-```
+**You never write HTML, CSS classes, or comment markup of any kind.** Turning your schema into real Gutenberg blocks happens in the editor, not by you. Do not include a `content` field. Do not try to reproduce a block's rendered HTML. If you find yourself writing an HTML tag, stop — that's a sign you've stepped outside your job.
 
-The JSON inside the comment is the block's attributes. For dynamic blocks (PHP-rendered) the HTML between tags is empty — only the JSON matters.
+**Your schema is staged for human review, not written live.** Passing `block_schema` to `blockish/manage-post` does not put anything into `post_content`. It saves the schema as pending data on the post. A human must open that post in the block editor, where an "Apply AI Layout" control appears in the editor header only while a pending schema exists, and explicitly apply it (choosing where: end of content, or — if a block is selected — before/after/inside it) before it becomes real content. Never pass a schema as `post_content` directly, and never expect it to appear on the live post without that manual step.
 
-### Nesting
-
-```
-<!-- wp:blockish/container {"display":"grid","gridColumns":{"Desktop":3}} -->
-<!-- wp:blockish/heading {"content":"Title"} /-->
-<!-- wp:blockish/button {"text":"Click"} /-->
-<!-- /wp:blockish/container -->
-```
-
-Self-closing inner blocks use ` /-->`.
+Workflow:
+1. Read this doc (and `class-manager-docs.md` if you need reusable CSS classes).
+2. Build the schema tree for the page: an array of `{ name, attributes, innerBlocks }` nodes.
+3. Call `blockish/manage-post` with `post_id` (or omit to create a new post) and `block_schema` set to that array. Do not set `post_content` to anything schema- or markup-related in the same call.
+4. Tell the user the post is ready for review and link them to the returned `edit_url` — they need to open it and click "Apply AI Layout" to turn the schema into real blocks.
 
 ---
 
-## Attribute Format Reference
+## 2. Attribute type legend
 
----
+Every attribute in every block below is one of these shapes. The per-block tables reference these by name. Read this section once; you won't need to re-derive any shape.
 
-### Responsive Object
+### Scalar
 
-Per-device values. Only `Desktop` required; others inherit from Desktop.
+A plain string, number, or boolean — used as-is.
 
 ```json
-{ "Desktop": "24px", "Tablet": "20px", "Mobile": "16px" }
+"text": "Click Here"
+"rating": 4.5
+"defaultOpen": true
 ```
 
-Some responsive values hold an option object instead of a plain string:
+### Option
 
-```json
-{ "Desktop": { "label": "Row", "value": "row" } }
-```
-
----
-
-### Tag Object
+`{ "label": "...", "value": "..." }`. The `value` is what's functionally used; `label` is the human-readable name. Always send both.
 
 ```json
 { "label": "H2", "value": "h2" }
 ```
 
-Valid values: `h1` `h2` `h3` `h4` `h5` `h6` `div` `section` `article` `main` `aside` `header` `footer` `p` `span`
+### Responsive
 
----
-
-### Link / URL Object
+Per-device scalar values: `{ "Desktop": ..., "Tablet": ..., "Mobile": ... }`. Only `Desktop` is required — `Tablet`/`Mobile` inherit from `Desktop` if omitted.
 
 ```json
-{ "url": "https://example.com", "newTab": false, "noFollow": false }
+{ "Desktop": "24px", "Tablet": "20px", "Mobile": "16px" }
 ```
 
----
+### Responsive-Option
 
-### Icon Object (SVG)
+A Responsive wrapper where each device's value is an Option object instead of a plain scalar.
 
 ```json
-{ "viewBox": [0, 0, 576, 512], "path": "M288 32 L576 480 L0 480 Z" }
+{ "Desktop": { "label": "Row", "value": "row" }, "Mobile": { "label": "Column", "value": "column" } }
 ```
 
-`viewBox` is 4 numbers. `path` is the SVG `d` string.
+### Spacing
 
----
-
-### Image Object
-
-```json
-{ "id": 123, "url": "https://example.com/photo.jpg", "width": 1200, "height": 800 }
-```
-
-`id` is the WordPress attachment ID. Use `0` if only a URL is available.
-
----
-
-### Color (string)
-
-Plain CSS colors. For AI-generated content always use hex or rgba — never guess a theme preset slug.
-
-```
-"#1a73e8"
-"rgba(0, 0, 0, 0.5)"
-```
-
-WP theme preset format (only use when slug is known):
-```
-"--wp--preset--color--primary|#1a73e8"
-```
-
----
-
-### Spacing Object (padding / margin)
-
-Flat object — use responsive wrapper for per-device values.
+`{ "top": "...", "right": "...", "bottom": "...", "left": "..." }`. Used directly, or wrapped in a Responsive object when the attribute is per-device (the per-block table tells you which).
 
 ```json
 { "top": "40px", "right": "20px", "bottom": "40px", "left": "20px" }
 ```
 
-Responsive:
-
+Responsive form:
 ```json
-{
-  "Desktop": { "top": "60px", "right": "40px", "bottom": "60px", "left": "40px" },
-  "Mobile":  { "top": "24px", "right": "16px", "bottom": "24px", "left": "16px" }
-}
+{ "Desktop": { "top": "60px", "right": "40px", "bottom": "60px", "left": "40px" }, "Mobile": { "top": "24px", "right": "16px", "bottom": "24px", "left": "16px" } }
 ```
 
----
+### Border-Radius
 
-### Border Radius Object
+`{ "topLeft": "...", "topRight": "...", "bottomRight": "...", "bottomLeft": "..." }`, wrapped in a Responsive object.
 
 ```json
 { "Desktop": { "topLeft": "8px", "topRight": "8px", "bottomRight": "8px", "bottomLeft": "8px" } }
 ```
 
-For a pill/circle use `"50%"` on all corners.
+Use `"50%"` on all four corners for a pill/circle.
 
----
+### Icon
 
-### Typography (JSON string)
+`{ "viewBox": [x, y, width, height], "path": "..." }` — an SVG path. `viewBox` is 4 numbers; `path` is the SVG `d` attribute string.
 
-**Must be JSON.stringified** — it is stored as a `string` attribute, not an object.
+```json
+{ "viewBox": [0, 0, 576, 512], "path": "M288 32 L576 480 L0 480 Z" }
+```
+
+### Link
+
+`{ "url": "...", "newTab": false, "noFollow": false }`.
+
+```json
+{ "url": "https://example.com", "newTab": false, "noFollow": false }
+```
+
+### Image
+
+`{ "id": ..., "url": "...", "width": ..., "height": ... }` — a WordPress media object. `id` is the attachment ID (use `0` if only a URL is known).
+
+```json
+{ "id": 123, "url": "https://example.com/photo.jpg", "width": 1200, "height": 800 }
+```
+
+### Color
+
+A plain CSS color string. Always use hex or `rgba()` — never guess a theme preset slug.
+
+```json
+"#1a73e8"
+"rgba(0, 0, 0, 0.5)"
+```
+
+### Stringified-JSON
+
+**The most error-prone type.** The attribute's value is a `string`, and that string's content is itself JSON (so you JSON-encode an object/array, then use the resulting text as the string value — in a `{ "blocks": [...] }` payload this means escaped quotes inside the outer JSON). There are several named shapes, defined below. Each per-block table cell says `Stringified-JSON (ShapeName)` and you look up that shape here.
+
+#### Shape: Typography
 
 ```json
 "{\"fontWeight\":\"700\",\"fontSize\":{\"Desktop\":\"32px\",\"Tablet\":\"24px\",\"Mobile\":\"20px\"},\"lineHeight\":{\"Desktop\":\"1.2\"},\"letterSpacing\":{\"Desktop\":\"0px\"},\"textTransform\":\"uppercase\",\"fontStyle\":\"normal\",\"textDecoration\":\"none\"}"
 ```
 
-Minimum example (size only):
+| Key | Type | Default | Notes/enum |
+|---|---|---|---|
+| `fontFamily` | Option | unset | `{"value": "Inter, sans-serif", "label": "Inter"}` |
+| `fontWeight` | Scalar (string) | unset | `"100"` `"200"` `"300"` `"400"` `"500"` `"600"` `"700"` `"800"` `"900"` |
+| `fontSize` | Responsive | unset | e.g. `{"Desktop":"24px"}` — `px`/`em`/`rem` |
+| `lineHeight` | Responsive | unset | e.g. `{"Desktop":"1.5"}` |
+| `letterSpacing` | Responsive | unset | e.g. `{"Desktop":"0.05em"}` |
+| `textTransform` | Scalar (string) | `"none"` | `"none"` `"uppercase"` `"lowercase"` `"capitalize"` |
+| `fontStyle` | Scalar (string) | `"normal"` | `"normal"` `"italic"` |
+| `textDecoration` | Scalar (string) | `"none"` | `"none"` `"underline"` `"line-through"` |
 
-```json
-"{\"fontSize\":{\"Desktop\":\"18px\"}}"
-```
+Omit any key you don't need — you do not need to pass the whole object, only the keys you're changing.
 
-| Key | Type | Valid values |
-|---|---|---|
-| `fontFamily` | object | `{"value": "Inter, sans-serif", "label": "Inter"}` |
-| `fontWeight` | string | `"100"` `"200"` `"300"` `"400"` `"500"` `"600"` `"700"` `"800"` `"900"` |
-| `fontSize` | Responsive Object | `{"Desktop":"24px"}` — supports `px` `em` `rem` |
-| `lineHeight` | Responsive Object | `{"Desktop":"1.5"}` |
-| `letterSpacing` | Responsive Object | `{"Desktop":"0.05em"}` |
-| `textTransform` | string | `"none"` `"uppercase"` `"lowercase"` `"capitalize"` |
-| `fontStyle` | string | `"normal"` `"italic"` |
-| `textDecoration` | string | `"none"` `"underline"` `"line-through"` |
+#### Shape: Background
 
----
-
-### Background (JSON string)
-
-**Must be JSON.stringified.**
-
-Solid color:
 ```json
 "{\"backgroundType\":\"classic\",\"backgroundColor\":\"#f5f7fa\"}"
 ```
 
-With image:
 ```json
 "{\"backgroundType\":\"classic\",\"backgroundColor\":\"#000\",\"backgroundImage\":{\"Desktop\":{\"id\":45,\"url\":\"https://example.com/bg.jpg\"}},\"backgroundImageSize\":{\"Desktop\":{\"value\":\"cover\",\"label\":\"Cover\"}},\"backgroundImagePosition\":{\"Desktop\":{\"value\":\"center center\",\"label\":\"Center Center\"}},\"backgroundImageRepeat\":{\"Desktop\":{\"value\":\"no-repeat\",\"label\":\"No Repeat\"}}}"
 ```
 
-Gradient:
 ```json
 "{\"backgroundType\":\"gradient\",\"gradient\":\"linear-gradient(135deg, #667eea 0%, #764ba2 100%)\"}"
 ```
 
-| Key | Valid values |
-|---|---|
-| `backgroundType` | `"classic"` `"gradient"` |
-| `backgroundImageSize.*.value` | `"cover"` `"contain"` `"auto"` |
-| `backgroundImagePosition.*.value` | `"center center"` `"top center"` `"bottom center"` `"left center"` `"right center"` |
-| `backgroundImageRepeat.*.value` | `"no-repeat"` `"repeat"` `"repeat-x"` `"repeat-y"` |
-| `backgroundImageAttachment.value` | `"scroll"` `"fixed"` |
+Video (`blockish/container`'s `containerBackground` only — see that block's section):
+```json
+"{\"backgroundType\":\"video\",\"backgroundVideo\":{\"id\":88,\"url\":\"https://example.com/bg-loop.mp4\"}}"
+```
 
----
+| Key | Type | Default | Notes/enum |
+|---|---|---|---|
+| `backgroundType` | Scalar (string) | `"classic"` | `"classic"` `"gradient"` `"video"` — `"video"` only works on `blockish/container`'s `containerBackground`, silently ignored elsewhere |
+| `backgroundColor` | Color | unset | |
+| `gradient` | Scalar (string, CSS gradient) | unset | Used when `backgroundType` = `"gradient"` |
+| `backgroundVideo` | Image (video file) | unset | Used when `backgroundType` = `"video"` |
+| `backgroundImage` | Responsive of Image | unset | |
+| `backgroundImageSize` | Responsive-Option | `{"value":"cover"}` | `"cover"` `"contain"` `"auto"` |
+| `backgroundImagePosition` | Responsive-Option | `{"value":"center center"}` | `"center center"` `"top center"` `"bottom center"` `"left center"` `"right center"` |
+| `backgroundImageRepeat` | Responsive-Option | `{"value":"no-repeat"}` | `"no-repeat"` `"repeat"` `"repeat-x"` `"repeat-y"` |
+| `backgroundImageAttachment` | Option | `{"value":"scroll"}` | `"scroll"` `"fixed"` |
 
-### Background Overlay (JSON string)
+#### Shape: Background Overlay
 
-**Must be JSON.stringified.** Renders on top of the background — used for darkening/tinting images.
+Renders on top of the background, for darkening/tinting images.
 
-Color overlay:
 ```json
 "{\"enabled\":true,\"type\":\"color\",\"color\":\"rgba(0,0,0,0.5)\",\"opacity\":100}"
 ```
 
-Gradient overlay:
 ```json
 "{\"enabled\":true,\"type\":\"gradient\",\"gradient\":\"linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.7) 100%)\",\"opacity\":100}"
 ```
 
-| Key | Valid values |
-|---|---|
-| `enabled` | `true` `false` |
-| `type` | `"color"` `"gradient"` |
-| `opacity` | `0`–`100` (integer) |
-| `blendMode.value` | `"normal"` `"multiply"` `"overlay"` `"screen"` `"darken"` `"lighten"` |
+| Key | Type | Default | Notes/enum |
+|---|---|---|---|
+| `enabled` | Scalar (boolean) | `false` | |
+| `type` | Scalar (string) | `"color"` | `"color"` `"gradient"` |
+| `color` | Color | unset | Used when `type` = `"color"` |
+| `gradient` | Scalar (string, CSS gradient) | unset | Used when `type` = `"gradient"` |
+| `opacity` | Scalar (integer) | `100` | `0`–`100` |
+| `blendMode` | Option | `{"value":"normal"}` | `"normal"` `"multiply"` `"overlay"` `"screen"` `"darken"` `"lighten"` |
 
----
+#### Shape: Border
 
-### Border (JSON string)
-
-**Must be JSON.stringified.**
-
-Linked (all sides same):
 ```json
 "{\"width\":{\"Desktop\":\"1px\"},\"style\":\"solid\",\"color\":\"#e0e0e0\"}"
 ```
 
-Unlinked (per side — only specify sides you need):
+Per-side (only specify the sides you need):
 ```json
 "{\"top\":{\"width\":{\"Desktop\":\"2px\"},\"style\":\"solid\",\"color\":\"#333\"},\"bottom\":{\"width\":{\"Desktop\":\"1px\"},\"style\":\"dashed\",\"color\":\"#ccc\"}}"
 ```
 
-`style` valid values: `"solid"` `"dashed"` `"dotted"` `"double"` `"none"`
+| Key | Type | Default | Notes/enum |
+|---|---|---|---|
+| `width` | Responsive | unset | |
+| `style` | Scalar (string) | `"solid"` | `"solid"` `"dashed"` `"dotted"` `"double"` `"none"` |
+| `color` | Color | unset | |
+| `top`/`right`/`bottom`/`left` | Object (same shape: `width`/`style`/`color`) | unset | Use instead of the linked `width`/`style`/`color` keys for per-side control |
 
----
+#### Shape: Box Shadow / Text Shadow
 
-### Box Shadow / Text Shadow (JSON string)
-
-**Must be JSON.stringified.** Value is an **array** of shadow objects.
+The value is a JSON **array** of shadow objects (not a single object). Default: `[]` (no shadow).
 
 ```json
 "[{\"x\":\"0px\",\"y\":\"4px\",\"blur\":\"16px\",\"spread\":\"0px\",\"color\":\"rgba(0,0,0,0.12)\",\"inset\":false}]"
 ```
 
-Text shadow (no `spread` or `inset`):
+Text shadow (no `spread`/`inset`):
 ```json
 "[{\"x\":\"1px\",\"y\":\"1px\",\"blur\":\"4px\",\"color\":\"rgba(0,0,0,0.3)\"}]"
 ```
 
-Multiple shadows — add more objects to the array.
+| Key | Type | Notes |
+|---|---|---|
+| `x` | Scalar (length) | Horizontal offset |
+| `y` | Scalar (length) | Vertical offset |
+| `blur` | Scalar (length) | Blur radius |
+| `spread` | Scalar (length) | Box shadow only |
+| `color` | Color | |
+| `inset` | Scalar (boolean) | Box shadow only |
 
----
+Add more objects to the array for multiple shadows.
 
-### CSS Filters (JSON string)
+#### Shape: CSS Filters
 
-**Must be JSON.stringified.** Units are added automatically — pass raw numbers only.
+Units are added automatically — pass raw numbers only. Default: `{}` (no filters; every value below is its visual no-op value). Only include keys you're changing.
 
 ```json
 "{\"blur\":0,\"brightness\":100,\"contrast\":100,\"saturate\":100,\"hue-rotate\":0,\"invert\":0,\"grayscale\":0,\"sepia\":0}"
 ```
 
-| Key | Unit added | Normal value | Example effect |
-|---|---|---|---|
-| `blur` | `px` | `0` | `2` → soft blur |
-| `brightness` | `%` | `100` | `80` → darker |
-| `contrast` | `%` | `100` | `120` → more contrast |
-| `saturate` | `%` | `100` | `0` → grayscale |
-| `hue-rotate` | `deg` | `0` | `180` → inverted hue |
-| `invert` | `%` | `0` | `100` → negative |
-| `grayscale` | `%` | `0` | `100` → full grayscale |
-| `sepia` | `%` | `0` | `80` → sepia tone |
+| Key | Unit added | No-op value |
+|---|---|---|
+| `blur` | `px` | `0` |
+| `brightness` | `%` | `100` |
+| `contrast` | `%` | `100` |
+| `saturate` | `%` | `100` |
+| `hue-rotate` | `deg` | `0` |
+| `invert` | `%` | `0` |
+| `grayscale` | `%` | `0` |
+| `sepia` | `%` | `0` |
 
-Only include keys you want to change. Omitted keys are not applied.
+#### Shape: Text Stroke
 
----
-
-### Text Stroke (JSON string)
-
-**Must be JSON.stringified.**
+Default: `{}` (no stroke).
 
 ```json
 "{\"width\":{\"Desktop\":\"1px\"},\"color\":\"#1a1a2e\"}"
 ```
 
----
-
-### Transform Attributes (Responsive Objects)
-
-Individual attributes — set only what you need. Numbers only; units are added automatically.
-
-| Attribute | Auto unit | Example |
-|---|---|---|
-| `rotateZ` | `deg` | `{"Desktop":"45"}` |
-| `rotateX` | `deg` | `{"Desktop":"15"}` |
-| `rotateY` | `deg` | `{"Desktop":"-10"}` |
-| `translateX` | as-is | `{"Desktop":"20px"}` |
-| `translateY` | as-is | `{"Desktop":"-10px"}` |
-| `scale` | multiplier | `{"Desktop":"1.05"}` |
-| `scaleX` | multiplier | `{"Desktop":"1.2"}` |
-| `scaleY` | multiplier | `{"Desktop":"0.8"}` |
-| `skewX` | `deg` | `{"Desktop":"5"}` |
-| `skewY` | `deg` | `{"Desktop":"3"}` |
-| `perspective` | as-is | `{"Desktop":"800px"}` |
-
-Hover variants: same format with `Hover` suffix — `rotateZHover`, `scaleHover`, etc.
-
-`transformTransitionDuration` — number in seconds, e.g. `0.3`.
+| Key | Type |
+|---|---|
+| `width` | Responsive |
+| `color` | Color |
 
 ---
 
-## Global Attributes (available on every block)
+## 3. Transform attributes
 
-Do **not** set `blockClass` or `styles` — they are auto-managed.
+Individual top-level Responsive attributes (not a Stringified-JSON shape). Set only what you need; everything else defaults to unset/no-op. Pass raw numbers — units are added automatically.
 
-### Layout & Sizing
-
-| Attribute | Format | Example |
+| Attribute | Auto unit | No-op |
 |---|---|---|
-| `padding` | Spacing Object | `{"top":"40px","right":"20px","bottom":"40px","left":"20px"}` |
-| `margin` | Spacing Object | `{"top":"0px","bottom":"32px","right":"0px","left":"0px"}` |
-| `widthType` | Responsive Object (option) | `{"Desktop":{"value":"100%"}}` · set to `{"Desktop":{"value":"custom"}}` to enable `customWidth` |
-| `customWidth` | Responsive Object | `{"Desktop":"480px"}` — active when `widthType` = `"custom"` |
-| `minWidth` | Responsive Object | `{"Desktop":"200px"}` |
-| `maxWidth` | Responsive Object | `{"Desktop":"960px"}` |
-| `zIndex` | Responsive Object | `{"Desktop":"10"}` |
+| `rotateZ` | `deg` | `0` |
+| `rotateX` | `deg` | `0` |
+| `rotateY` | `deg` | `0` |
+| `translateX` | as-is | `0` |
+| `translateY` | as-is | `0` |
+| `scale` | multiplier | `1` |
+| `scaleX` | multiplier | `1` |
+| `scaleY` | multiplier | `1` |
+| `skewX` | `deg` | `0` |
+| `skewY` | `deg` | `0` |
+| `perspective` | as-is | `1000px` |
+
+Hover variants use the same names with a `Hover` suffix (`rotateZHover`, `scaleHover`, etc.) — same defaults. `transformTransitionDuration` is a Scalar (number of seconds), default unset. You never need to set `applyTransform`/`applyTransformHover` — they default to `true` and apply automatically whenever you set any transform attribute.
+
+---
+
+## 4. Global attributes (available on every block)
+
+Never set `blockClass` or `styles` — they are internal/auto-managed. Every attribute below defaults to **unset** unless noted — omitting it means no effect, the block/browser default applies.
+
+### Layout & sizing
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `padding` | Spacing (Responsive) | unset | |
+| `margin` | Spacing (Responsive) | unset | |
+| `widthType` | Responsive-Option | unset | `{"value":"100%"}` · set `{"value":"custom"}` to enable `customWidth` — full enum not confirmed, see TODO |
+| `customWidth` | Responsive | unset | Active when `widthType` = `"custom"` |
+| `minWidth` | Responsive | unset | |
+| `maxWidth` | Responsive | unset | |
+| `zIndex` | Responsive | unset | |
 
 ### Position
 
-| Attribute | Format | Valid values / Example |
-|---|---|---|
-| `position` | Responsive Object (option) | `{"Desktop":{"value":"relative"}}` · `"relative"` `"absolute"` `"fixed"` `"sticky"` |
-| `positionTop` | Responsive Object | `{"Desktop":"0px"}` — only applies when `position` is set |
-| `positionRight` | Responsive Object | `{"Desktop":"0px"}` |
-| `positionBottom` | Responsive Object | `{"Desktop":"0px"}` |
-| `positionLeft` | Responsive Object | `{"Desktop":"0px"}` |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `position` | Responsive-Option | unset | `"relative"` `"absolute"` `"fixed"` `"sticky"` |
+| `positionTop` | Responsive | unset | Only applies when `position` is set |
+| `positionRight` | Responsive | unset | |
+| `positionBottom` | Responsive | unset | |
+| `positionLeft` | Responsive | unset | |
 
-### Flex Child (when block is inside a flex container)
+### Flex child (block is inside a flex container)
 
-| Attribute | Format | Valid values / Example |
-|---|---|---|
-| `alignSelf` | Responsive Object (option) | `{"Desktop":{"value":"flex-start"}}` · `"auto"` `"flex-start"` `"center"` `"flex-end"` `"stretch"` `"baseline"` |
-| `justifySelf` | Responsive Object (option) | `{"Desktop":{"value":"center"}}` · `"auto"` `"start"` `"center"` `"end"` `"stretch"` |
-| `flexOrder` | Responsive Object (option) | `{"Desktop":{"value":"1"}}` · set to `{"value":"custom"}` + use `flexCustomOrder` for arbitrary number |
-| `flexCustomOrder` | Responsive Object | `{"Desktop":"3"}` — only active when `flexOrder` = `"custom"` |
-| `flexGrow` | Responsive Object | `{"Desktop":"1"}` — `0` = no grow, `1` = grow to fill |
-| `flexShrink` | Responsive Object | `{"Desktop":"0"}` — `0` = don't shrink, `1` = can shrink |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `alignSelf` | Responsive-Option | unset | `"auto"` `"flex-start"` `"center"` `"flex-end"` `"stretch"` `"baseline"` |
+| `justifySelf` | Responsive-Option | unset | `"auto"` `"start"` `"center"` `"end"` `"stretch"` |
+| `flexOrder` | Responsive-Option | unset | `{"value":"1"}` · `{"value":"custom"}` + `flexCustomOrder` for an arbitrary number |
+| `flexCustomOrder` | Responsive | unset | Active when `flexOrder` = `"custom"` |
+| `flexGrow` | Responsive | unset | `"0"` = no grow, `"1"` = grow to fill |
+| `flexShrink` | Responsive | unset | `"0"` = don't shrink, `"1"` = can shrink |
 
-### Grid Child (when block is inside a grid container)
+### Grid child (block is inside a grid container)
 
-| Attribute | Format | Example |
-|---|---|---|
-| `gridColumnStart` | Responsive Object | `{"Desktop":"1"}` |
-| `gridColumnEnd` | Responsive Object | `{"Desktop":"span 2"}` — spans 2 columns |
-| `gridRowStart` | Responsive Object | `{"Desktop":"1"}` |
-| `gridRowEnd` | Responsive Object | `{"Desktop":"span 2"}` |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `gridColumnStart` | Responsive | unset | |
+| `gridColumnEnd` | Responsive | unset | e.g. `"span 2"` |
+| `gridRowStart` | Responsive | unset | |
+| `gridRowEnd` | Responsive | unset | e.g. `"span 2"` |
 
-### Appearance (global)
+### Appearance
 
-| Attribute | Format | Notes |
-|---|---|---|
-| `background` | Background (JSON string) | Block background — normal state |
-| `backgroundHover` | Background (JSON string) | Block background — hover state |
-| `backgroundHoverTransition` | number | Seconds, e.g. `0.3` |
-| `border` | Border (JSON string) | Block border — normal state |
-| `borderHover` | Border (JSON string) | Block border — hover state |
-| `borderRadius` | Border Radius Object | `{"Desktop":{"topLeft":"8px","topRight":"8px","bottomRight":"8px","bottomLeft":"8px"}}` |
-| `borderRadiusHover` | Border Radius Object | Same format |
-| `borderHoverTransition` | number | Seconds, e.g. `0.3` |
-| `boxShadow` | Box Shadow (JSON string) | Block shadow — normal state |
-| `boxShadowHover` | Box Shadow (JSON string) | Block shadow — hover state |
-
----
-
-## Custom CSS (per block)
-
-Every block has a `customCss` attribute for one-off, block-specific CSS that does not need to be reused elsewhere.
-
-- Write plain CSS. Use `{{SELECTOR}}` to target this block's wrapper element.
-- `{{SELECTOR}}` resolves to the block's unique scoped class at render time (e.g., `.bb-a1b2c3.blockish-block-wrapper`).
-- Do **not** set `blockClass` or `styles` — they are auto-managed and will be overwritten.
-
-```
-<!-- wp:blockish/container {
-  "customCss":"{{SELECTOR}} { background: linear-gradient(135deg,#667eea,#764ba2); } {{SELECTOR}}:hover { opacity: 0.9; }"
-} /-->
-```
-
-Target a child element:
-
-```
-"customCss": "{{SELECTOR}} h2 { font-size: 3rem; line-height: 1; } {{SELECTOR}} .wp-block-blockish-button { margin-top: 24px; }"
-```
-
-**When to use `customCss` vs Class Manager:**
-
-| Situation | Use |
-|---|---|
-| One-off style for a single block instance | `customCss` attribute |
-| Style that will be applied to multiple blocks or reused across pages | Class Manager (`blockish/manage-class`) |
-| Pseudo-selectors (`:hover`, `::before`) or child selectors on a named class | Class Manager child class |
+| Attribute | Type | Default | Notes |
+|---|---|---|---|
+| `background` | Stringified-JSON (Background) | unset | Normal state |
+| `backgroundHover` | Stringified-JSON (Background) | unset | Hover state |
+| `backgroundHoverTransition` | Scalar (number, seconds) | unset | |
+| `border` | Stringified-JSON (Border) | unset | Normal state |
+| `borderHover` | Stringified-JSON (Border) | unset | Hover state |
+| `borderRadius` | Border-Radius | unset | |
+| `borderRadiusHover` | Border-Radius | unset | |
+| `borderHoverTransition` | Scalar (number, seconds) | unset | |
+| `boxShadow` | Stringified-JSON (Box Shadow) | unset | Normal state |
+| `boxShadowHover` | Stringified-JSON (Box Shadow) | unset | Hover state |
+| `customCss` | Scalar (string, raw CSS) | no-op template | See §5 |
+| `classManager` | Array of `{id, title}` | `[]` | See §6 |
+| `classManagerSubselector` | Array of `{id, title, parent}` | `[]` | See §6 |
 
 ---
 
-## Applying Class Manager Classes to Blocks
+## 5. `customCss` — last resort only
 
-Classes created via `blockish/manage-class` are applied to blocks through two attributes:
+`customCss` lets you write raw CSS for a single block instance. The decision is about **reuse first, attribute availability second** — check in this order, every time:
 
-### `classManager` — apply a parent class
+1. **Is this style needed on more than one block, or reused across pages?** → use Class Manager (§6), even if an attribute exists that could also produce it. Repeating the same attribute value (especially a long Stringified-JSON one) on every block duplicates that data and its generated CSS each time; a Class is defined once and referenced everywhere, so it stays optimized instead of duplicated.
+2. **One-off (this single block only) — does a global attribute cover it?** (padding, margin, background, border, borderRadius, boxShadow, transform, position, flex/grid child props) → use that attribute.
+3. **One-off — does a block-specific attribute cover it?** (check that block's table) → use that attribute.
+4. **One-off, and neither exists** → use `customCss` as the last resort.
 
-A parent class has no `parent_id`. Its CSS selector is `.{slug}` (e.g., `.hero-card`). The slug is added directly to the block wrapper's `class`.
+Never use `customCss` for a one-off style that an attribute already does (e.g. padding, a background color, a border-radius) — it bypasses the responsive system, hover-state system, and editor preview. And never repeat the same attribute value across many blocks when a Class would do it once.
 
+Format: plain CSS, with `{{SELECTOR}}` as a placeholder for this block's scoped wrapper selector.
+
+```json
+"customCss": "{{SELECTOR}} { background: linear-gradient(135deg,#667eea,#764ba2); } {{SELECTOR}}:hover { opacity: 0.9; }"
+```
+
+```json
+"customCss": "{{SELECTOR}} h2 { font-size: 3rem; } {{SELECTOR}} .wp-block-blockish-button { margin-top: 24px; }"
+```
+
+---
+
+## 6. Class Manager classes
+
+Classes created via `blockish/manage-class` (see `class-manager-docs.md`) attach to a block through two attributes.
+
+`classManager` — apply a parent class (no `parent_id`):
 ```json
 "classManager": [{"id": 45, "title": "hero-card"}]
 ```
 
-- `id` — the `post_id` returned by `blockish/get-classes` or `blockish/manage-class`
-- `title` — the normalized slug (same as `name` in the classes list)
-- Multiple parent classes: add more objects to the array
-
-### `classManagerSubselector` — apply a child class
-
-A child class has a `parent_id`. Its CSS selector is `.blockish-cm-{post_id}`. The class `blockish-cm-{id}` is added to the block wrapper.
-
+`classManagerSubselector` — apply a child class (has a `parent_id`). The `parent` key is **required**; without it the class has no effect, and the matching parent class must also be in `classManager` on the same block:
 ```json
 "classManagerSubselector": [{"id": 67, "title": "featured", "parent": 45}]
 ```
 
-- `parent` key is **required** — must be the `post_id` of the parent class. Without it the class is not applied.
-- The parent class must also be in `classManager` on the same block.
-
-### Full example — block with both parent and child classes assigned
-
-```
-<!-- wp:blockish/container {
-  "classManager": [{"id": 45, "title": "hero-card"}],
-  "classManagerSubselector": [{"id": 67, "title": "featured", "parent": 45}]
-} -->
-<!-- wp:blockish/heading {"content":"Hello"} /-->
-<!-- /wp:blockish/container -->
-```
+Workflow: call `blockish/get-classes` to check for an existing class → if needed, `blockish/manage-class` (action `create`) → use the returned `post_id`/`name` in `classManager`/`classManagerSubselector`. Writing the CSS for a class is a separate concern, fully covered in `class-manager-docs.md` — it is unrelated to block markup generation.
 
 ---
 
-### Writing CSS for Class Manager classes
+## 7. Per-block reference
 
-The CSS stored in a class is output **as-is** to the page — the system adds no wrapper or selector. You must write complete, valid CSS rules including the selector.
-
-**Rule:** always use the `css_selector` value returned by `blockish/manage-class` as the root selector.
-
-**Parent class example** (`css_selector` = `.hero-card`):
-
-```css
-.hero-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 32px;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
-.hero-card:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  transform: translateY(-3px);
-}
-.hero-card h2 {
-  font-size: 1.5rem;
-  color: #111827;
-  margin-bottom: 12px;
-}
-```
-
-**Child class example** (`css_selector` = `.blockish-cm-67`):
-
-```css
-.blockish-cm-67 {
-  border: 2px solid #1a73e8;
-  background: #e8f0fe;
-}
-.blockish-cm-67:hover {
-  background: #d2e3fc;
-}
-```
-
-**Rules:**
-
-| Rule | Detail |
-|---|---|
-| Full selector required | `css_selector { ... }` — never write bare declarations |
-| Standard CSS only | No SCSS / Less. Pseudo-classes, pseudo-elements, combinators all valid. |
-| Transitions inline | Include `transition` in the base rule, not the hover rule |
-| Specificity | Classes are global — keep selectors scoped to your class to avoid side effects |
-| No `!important` | Avoid unless overriding a WordPress default that cannot be removed any other way |
-
-**Parent vs child — when to use which:**
-
-| Use case | Type |
-|---|---|
-| A named, reusable style (`.card`, `.badge`, `.hero-section`) | Parent class |
-| A variant of a parent that applies different styles on specific blocks (e.g. a "featured" card in a card grid) | Child class |
-| Pseudo-class / child element styles scoped to a single block instance | Child class |
-
----
-
-### Workflow: create a class then apply it
-
-1. Call `blockish/get-class-manager-docs` for the full CSS writing reference (once per session).
-2. Call `blockish/get-classes` to check if the class already exists.
-3. If not, call `blockish/manage-class` (action: `create`, name, css) — it returns `post_id`, `name`, and `css_selector`.
-4. Add to `classManager` (parent): `{"id": post_id, "title": name}`.
-5. Add to `classManagerSubselector` (child): `{"id": post_id, "title": name, "parent": parent_post_id}` — `parent` is required.
-
----
-
-## Block Reference
+"Accepts children" tells you whether `innerBlocks` is valid for that block. Leaf blocks (no) must not have `innerBlocks`.
 
 ---
 
 ### `blockish/container`
 
-The primary layout block. Wraps other blocks. Supports flexbox and CSS grid.
+The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `tagName` | `{"label":"Section","value":"section"}` | `div` `section` `article` `main` `aside` `header` `footer` |
-| `display` | `"flex"` or `"grid"` | Switches between flex and grid mode |
-| `containerWidth` | `"alignfull"` `"alignwide"` `"custom"` | Use `"custom"` + `customWidthContainer` for a fixed width |
-| `customWidthContainer` | `{"Desktop":"1200px"}` | Active when `containerWidth` = `"custom"` |
-| `containerMinHeight` | `{"Desktop":"500px"}` | Min height, e.g. for hero sections |
-| `overflow` | `{"Desktop":{"value":"hidden"}}` | `"visible"` `"hidden"` `"scroll"` `"auto"` |
-| **— Flex —** | | |
-| `flexDirection` | `{"Desktop":{"label":"Row","value":"row"}}` | `"row"` `"column"` `"row-reverse"` `"column-reverse"` |
-| `flexWrap` | `{"Desktop":{"label":"Wrap","value":"wrap"}}` | `"nowrap"` `"wrap"` `"wrap-reverse"` |
-| `justifyContent` | `{"Desktop":{"label":"Center","value":"center"}}` | `"flex-start"` `"center"` `"flex-end"` `"space-between"` `"space-around"` `"space-evenly"` |
-| `alignItems` | `{"Desktop":{"label":"Center","value":"center"}}` | `"flex-start"` `"center"` `"flex-end"` `"stretch"` `"baseline"` |
-| `columnGap` | `{"Desktop":"24px"}` | Gap between flex columns |
-| `rowGap` | `{"Desktop":"24px"}` | Gap between flex rows |
-| **— Grid —** | | |
-| `gridLayoutType` | `"auto"` or `"fixed"` | `"auto"` = auto-fit columns; `"fixed"` = explicit column/row count |
-| `gridColumns` | `{"Desktop":3,"Tablet":2,"Mobile":1}` | Column count — used when `gridLayoutType` = `"fixed"` |
-| `gridRows` | `{"Desktop":2}` | Row count — used when `gridLayoutType` = `"fixed"` |
-| `autoGridWidth` | `{"Desktop":"14rem"}` | Min column width — used when `gridLayoutType` = `"auto"` |
-| `autoGridHeight` | `{"Desktop":"200px"}` | Row height for auto grid |
-| **— Container appearance —** | | |
-| `containerBackground` | Background (JSON string) | Normal state |
-| `containerHoverBackground` | Background (JSON string) | Hover state |
-| `containerBackgroundOverlay` | Background Overlay (JSON string) | Overlay on background — normal |
-| `containerHoverBackgroundOverlay` | Background Overlay (JSON string) | Overlay on background — hover |
-| `containerBorder` | Border (JSON string) | Normal state |
-| `containerHoverBorder` | Border (JSON string) | Hover state |
-| `containerBorderRadius` | `{"Desktop":{"topLeft":"12px","topRight":"12px","bottomRight":"12px","bottomLeft":"12px"}}` | |
-| `containerBoxShadow` | Box Shadow (JSON string) | Normal state |
-| `containerHoverBoxShadow` | Box Shadow (JSON string) | Hover state |
+**Hard requirement:** `isVariationPicked` defaults to `false` but must always be set to `true` in `attributes`. Without it, the block renders its empty layout-picker placeholder instead of any content — this is the one attribute that breaks the omit-if-default rule.
 
-**Example — hero section:**
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `isVariationPicked` | Scalar (boolean) | `false` | **Always set to `true`.** |
+| `tagName` | Option | `{"label":"Div","value":"div"}` | `Div`/`div` · `Section`/`section` · `Article`/`article` · `Main`/`main` · `Aside`/`aside` · `Header`/`header` · `Footer`/`footer` |
+| `display` | Scalar (string) | `"flex"` | `"flex"` `"grid"` |
+| `containerWidth` | Scalar (string) | `"alignfull"` | `"alignfull"` `"alignwide"` `"custom"` (with `customWidthContainer`) |
+| `customWidthContainer` | Responsive | `{"Desktop":"100%"}` | Active when `containerWidth` = `"custom"` |
+| `containerMinHeight` | Responsive | unset | |
+| `overflow` | Responsive-Option | unset | `"visible"` `"hidden"` `"scroll"` `"auto"` |
+| `flexDirection` | Responsive-Option | `{"Desktop":{"label":"Row","value":"row"}}` | `Row`/`row` · `Column`/`column` · `Row Reverse`/`row-reverse` · `Column Reverse`/`column-reverse` |
+| `flexWrap` | Responsive-Option | unset | `No Wrap`/`nowrap` · `Wrap`/`wrap` · `Wrap Reverse`/`wrap-reverse` *(labels inferred, see TODO)* |
+| `justifyContent` | Responsive-Option | `{"Desktop":{"label":"Center","value":"center"}}` | `Flex Start`/`flex-start` · `Center`/`center` · `Flex End`/`flex-end` · `Space Between`/`space-between` · `Space Around`/`space-around` · `Space Evenly`/`space-evenly` *(non-default labels inferred, see TODO)* |
+| `alignItems` | Responsive-Option | `{"Desktop":{"label":"Center","value":"center"}}` | `Flex Start`/`flex-start` · `Center`/`center` · `Flex End`/`flex-end` · `Stretch`/`stretch` · `Baseline`/`baseline` *(non-default labels inferred, see TODO)* |
+| `columnGap` | Responsive | unset | |
+| `rowGap` | Responsive | unset | |
+| `gridLayoutType` | Scalar (string) | `"auto"` | `"auto"` (auto-fit columns) `"fixed"` (explicit count) |
+| `gridColumns` | Responsive | `{"Desktop":3,"Tablet":2,"Mobile":1}` | Used when `gridLayoutType` = `"fixed"` |
+| `gridRows` | Responsive | `{"Desktop":1}` | Used when `gridLayoutType` = `"fixed"` |
+| `autoGridWidth` | Responsive | `{"Desktop":"12rem"}` | Used when `gridLayoutType` = `"auto"` |
+| `autoGridHeight` | Responsive | unset | |
+| `containerBackground` | Stringified-JSON (Background) | unset | Normal state. **Only this attribute supports `backgroundType:"video"`.** |
+| `containerHoverBackground` | Stringified-JSON (Background) | unset | Hover state |
+| `containerBackgroundOverlay` | Stringified-JSON (Background Overlay) | unset | Normal state |
+| `containerHoverBackgroundOverlay` | Stringified-JSON (Background Overlay) | unset | Hover state |
+| `containerBorder` | Stringified-JSON (Border) | unset | Normal state |
+| `containerHoverBorder` | Stringified-JSON (Border) | unset | Hover state |
+| `containerBorderRadius` | Border-Radius | unset | |
+| `containerBoxShadow` | Stringified-JSON (Box Shadow) | unset | Normal state |
+| `containerHoverBoxShadow` | Stringified-JSON (Box Shadow) | unset | Hover state |
 
-```
-<!-- wp:blockish/container {"display":"flex","flexDirection":{"Desktop":{"label":"Column","value":"column"}},"alignItems":{"Desktop":{"label":"Center","value":"center"}},"justifyContent":{"Desktop":{"label":"Center","value":"center"}},"containerMinHeight":{"Desktop":"100vh"},"containerBackground":"{\"backgroundType\":\"classic\",\"backgroundColor\":\"#0f172a\"}","padding":{"top":"80px","right":"40px","bottom":"80px","left":"40px"}} -->
-<!-- wp:blockish/heading {"content":"Welcome","tag":{"label":"H1","value":"h1"},"color":"#ffffff"} /-->
-<!-- /wp:blockish/container -->
+Minimal schema:
+```json
+{
+  "name": "blockish/container",
+  "attributes": { "isVariationPicked": true },
+  "innerBlocks": []
+}
 ```
 
 ---
 
 ### `blockish/heading`
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `content` | `"Our Services"` | Plain text or HTML |
-| `tag` | `{"label":"H2","value":"h2"}` | `h1`–`h6` |
-| `alignment` | `{"Desktop":"center","Mobile":"left"}` | `"left"` `"center"` `"right"` |
-| `typography` | Typography (JSON string) | Full font control |
-| `color` | `"#0f172a"` | Normal text color |
-| `hoverColor` | `"#1a73e8"` | Text color on hover |
-| `textShadow` | Box Shadow (JSON string) | Normal text shadow |
-| `textShadowHover` | Box Shadow (JSON string) | Hover text shadow |
+A heading element with full text styling. **Accepts children: no.**
 
-**Example:**
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `content` | Scalar (string, HTML allowed) | `"Heading Text"` | |
+| `tag` | Option | `{"label":"H2","value":"h2"}` | `H1`/`h1` · `H2`/`h2` · `H3`/`h3` · `H4`/`h4` · `H5`/`h5` · `H6`/`h6` · `Div`/`div` · `Section`/`section` · `Article`/`article` · `Main`/`main` · `Aside`/`aside` · `Header`/`header` · `Footer`/`footer` · `p`/`span` *(p/span label text not confirmed, see TODO)* |
+| `alignment` | Responsive | `{"Desktop":"left"}` | `"left"` `"center"` `"right"` |
+| `typography` | Stringified-JSON (Typography) | unset | |
+| `color` | Color | unset | Normal |
+| `hoverColor` | Color | unset | Hover |
+| `textShadow` | Stringified-JSON (Box Shadow) | unset | Normal |
+| `textShadowHover` | Stringified-JSON (Box Shadow) | unset | Hover |
 
-```
-<!-- wp:blockish/heading {"content":"Build Faster","tag":{"label":"H1","value":"h1"},"alignment":{"Desktop":"center"},"color":"#0f172a","typography":"{\"fontWeight\":\"700\",\"fontSize\":{\"Desktop\":\"56px\",\"Tablet\":\"40px\",\"Mobile\":\"32px\"},\"lineHeight\":{\"Desktop\":\"1.1\"}}"} /-->
+Minimal schema:
+```json
+{
+  "name": "blockish/heading",
+  "attributes": { "content": "Build Faster", "tag": { "label": "H1", "value": "h1" } }
+}
 ```
 
 ---
 
 ### `blockish/button`
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `text` | `"Get Started"` | Button label |
-| `url` | `{"url":"https://example.com","newTab":true,"noFollow":false}` | Link destination |
-| `icon` | Icon Object | Optional SVG icon |
-| `iconPosition` | `"row"` or `"row-reverse"` | `"row"` = icon left of text; `"row-reverse"` = icon right |
-| `buttonTextColor` | `"#ffffff"` | Label color — normal |
-| `buttonHoverTextColor` | `"#ffffff"` | Label color — hover |
-| `buttonBackground` | Background (JSON string) | Button background — normal |
-| `buttonHoverBackground` | Background (JSON string) | Button background — hover |
-| `buttonBorder` | Border (JSON string) | Normal |
-| `buttonHoverBorderColor` | `"#1a73e8"` | Border color override on hover |
-| `buttonBorderRadius` | `{"Desktop":{"topLeft":"6px","topRight":"6px","bottomRight":"6px","bottomLeft":"6px"}}` | |
-| `buttonPadding` | `{"top":"14px","right":"28px","bottom":"14px","left":"28px"}` | Inner padding |
-| `buttonTypography` | Typography (JSON string) | |
-| `buttonBoxShadow` | Box Shadow (JSON string) | Normal |
-| `buttonHoverBoxShadow` | Box Shadow (JSON string) | Hover |
-| `buttonHoverTransition` | `0.3` | Hover transition in seconds |
-| `buttonWidth` | `{"Desktop":"200px"}` | Fixed width |
-| `buttonMinHeight` | `{"Desktop":"48px"}` | Minimum height |
-| `buttonIconSize` | `{"Desktop":"18px"}` | Icon size override |
+A call-to-action link. **Accepts children: no.**
 
-**Example:**
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `text` | Scalar (string) | `"Click Here"` | |
+| `url` | Link | unset | |
+| `icon` | Icon | unset | |
+| `iconPosition` | Scalar (string) | `"row"` | `"row"` (icon before text) `"row-reverse"` (icon after) |
+| `buttonTextColor` | Color | unset | Normal |
+| `buttonHoverTextColor` | Color | unset | Hover |
+| `buttonBackground` | Stringified-JSON (Background) | unset | Normal |
+| `buttonHoverBackground` | Stringified-JSON (Background) | unset | Hover |
+| `buttonBorder` | Stringified-JSON (Border) | unset | Normal |
+| `buttonHoverBorderColor` | Color | unset | Hover border color override |
+| `buttonBorderRadius` | Border-Radius | unset | |
+| `buttonPadding` | Spacing | unset | |
+| `buttonTypography` | Stringified-JSON (Typography) | unset | |
+| `buttonBoxShadow` | Stringified-JSON (Box Shadow) | unset | Normal |
+| `buttonHoverBoxShadow` | Stringified-JSON (Box Shadow) | unset | Hover |
+| `buttonHoverTransition` | Scalar (number, seconds) | unset | |
+| `buttonWidth` | Responsive | unset | |
+| `buttonMinHeight` | Responsive | unset | |
+| `buttonIconSize` | Responsive | unset | |
 
-```
-<!-- wp:blockish/button {"text":"Get Started Free","url":{"url":"/signup","newTab":false},"buttonBorderRadius":{"Desktop":{"topLeft":"6px","topRight":"6px","bottomRight":"6px","bottomLeft":"6px"}},"buttonPadding":{"top":"14px","right":"28px","bottom":"14px","left":"28px"},"buttonBackground":"{\"backgroundType\":\"classic\",\"backgroundColor\":\"#1a73e8\"}","buttonTextColor":"#ffffff"} /-->
+Minimal schema:
+```json
+{
+  "name": "blockish/button",
+  "attributes": { "text": "Get Started Free", "url": { "url": "/signup", "newTab": false } }
+}
 ```
 
 ---
 
 ### `blockish/icon`
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `icon` | `{"viewBox":[0,0,24,24],"path":"M12 2 L22 22 L2 22 Z"}` | SVG data |
-| `link` | `{"url":"https://example.com","newTab":false}` | Makes icon a link |
-| `size` | `{"Desktop":"48px","Mobile":"32px"}` | Icon size |
-| `color` | `"#1a73e8"` | Fill — normal |
-| `hoverColor` | `"#0d47a1"` | Fill — hover |
-| `alignment` | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
-| `rotation` | `{"Desktop":"0deg"}` | Rotation angle — normal |
-| `rotationHover` | `{"Desktop":"90deg"}` | Rotation angle — hover |
+A single standalone SVG icon. **Accepts children: no.**
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `icon` | Icon | 5-point star | |
+| `link` | Link | unset | Makes the icon a link |
+| `size` | Responsive | unset | |
+| `color` | Color | unset | Normal |
+| `hoverColor` | Color | unset | Hover |
+| `alignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
+| `rotation` | Responsive | unset | Normal |
+| `rotationHover` | Responsive | unset | Hover |
+
+Minimal schema:
+```json
+{ "name": "blockish/icon", "attributes": {} }
+```
 
 ---
 
 ### `blockish/image`
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `image` | `{"id":123,"url":"https://example.com/photo.jpg","width":1200,"height":800}` | |
-| `alt` | `"Team photo"` | Alt text |
-| `imageSize` | `{"value":"full","label":"Full Size"}` | WP size: `"thumbnail"` `"medium"` `"large"` `"full"` |
-| `captionType` | `"none"` `"attachment"` `"custom"` | `"attachment"` = WP media caption; `"custom"` = use `customCaption` |
-| `customCaption` | `"Photo by Jane Doe"` | Used when `captionType` = `"custom"` |
-| `alignment` | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
-| `imageWidth` | `{"Desktop":"100%"}` | CSS width |
-| `imageMaxWidth` | `{"Desktop":"600px"}` | CSS max-width |
-| `imageHeight` | `{"Desktop":"400px"}` | CSS height |
-| `objectFit` | `{"Desktop":{"value":"cover"}}` | `"fill"` `"contain"` `"cover"` `"none"` `"scale-down"` |
-| `imageBorderRadiusNormal` | `{"Desktop":{"topLeft":"8px","topRight":"8px","bottomRight":"8px","bottomLeft":"8px"}}` | |
-| `imageBorderNormal` | Border (JSON string) | Normal |
-| `imageBoxShadowNormal` | Box Shadow (JSON string) | Normal |
-| `imageCSSFiltersNormal` | CSS Filters (JSON string) | Normal |
-| `imageCSSFiltersHover` | CSS Filters (JSON string) | Hover |
-| `imageOpacityNormal` | `0.9` | 0–1 |
-| `imageOpacityHover` | `1` | 0–1 |
-| `imageHoverTransition` | `0.3` | Seconds |
+**Accepts children: no.**
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `image` | Image | unset | |
+| `alt` | Scalar (string) | unset | |
+| `imageSize` | Option | `{"value":"full","label":"Full Size"}` | `Thumbnail`/`thumbnail` · `Medium`/`medium` · `Large`/`large` · `Full Size`/`full` |
+| `captionType` | Scalar (string) | `"none"` | `"none"` `"attachment"` (WP media caption) `"custom"` (use `customCaption`) |
+| `customCaption` | Scalar (string) | unset | Used when `captionType` = `"custom"` |
+| `alignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
+| `imageWidth` | Responsive | unset | |
+| `imageMaxWidth` | Responsive | unset | |
+| `imageHeight` | Responsive | unset | |
+| `objectFit` | Responsive-Option | unset | `"fill"` `"contain"` `"cover"` `"none"` `"scale-down"` *(label text not confirmed, see TODO)* |
+| `imageBorderRadiusNormal` | Border-Radius | unset | |
+| `imageBorderNormal` | Stringified-JSON (Border) | unset | |
+| `imageBoxShadowNormal` | Stringified-JSON (Box Shadow) | unset | |
+| `imageCSSFiltersNormal` | Stringified-JSON (CSS Filters) | unset | Normal |
+| `imageCSSFiltersHover` | Stringified-JSON (CSS Filters) | unset | Hover |
+| `imageOpacityNormal` | Scalar (number, 0–1) | unset | |
+| `imageOpacityHover` | Scalar (number, 0–1) | unset | |
+| `imageHoverTransition` | Scalar (number, seconds) | unset | |
+
+Minimal schema:
+```json
+{
+  "name": "blockish/image",
+  "attributes": { "image": { "id": 123, "url": "https://example.com/photo.jpg", "width": 1200, "height": 800 }, "alt": "Team photo" }
+}
+```
 
 ---
 
 ### `blockish/video`
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `sourceType` | `{"label":"YouTube","value":"youtube"}` | `"youtube"` `"vimeo"` `"self-hosted"` |
-| `youtubeUrl` | `"https://www.youtube.com/watch?v=XXXXX"` | Full URL |
-| `vimeoUrl` | `"https://vimeo.com/123456"` | Full URL |
-| `selfHostedVideo` | `{"id":45,"url":"https://example.com/video.mp4"}` | WP media object |
-| `selfHostedUrl` | `"https://example.com/video.mp4"` | Direct URL fallback |
-| `poster` | `"https://example.com/thumb.jpg"` | Poster image URL |
-| `autoplay` | `false` | `true` or `false` |
-| `loop` | `false` | |
-| `muted` | `false` | Set to `true` when autoplay is `true` |
-| `controls` | `true` | Show native player controls |
-| `lazyLoad` | `true` | |
-| `startTime` | `30` | Start at second 30 |
-| `endTime` | `0` | `0` = play to end |
-| `privacyMode` | `false` | YouTube: use `youtube-nocookie.com` |
-| `suggestedVideos` | `{"label":"Current Channel","value":"currentChannel"}` | `"currentChannel"` `"anyVideo"` |
-| `videoAspectRatio` | `{"label":"16:9","value":"16 / 9"}` | `"16 / 9"` `"4 / 3"` `"1 / 1"` `"9 / 16"` |
-| `showOverlay` | `false` | Show poster + play button on top of video |
-| `overlayImage` | Image Object | Custom overlay poster |
-| `showOverlayPlayIcon` | `true` | Show play button on overlay |
-| `videoCSSFilters` | CSS Filters (JSON string) | |
+**Accepts children: no.**
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `sourceType` | Option | `{"label":"YouTube","value":"youtube"}` | `YouTube`/`youtube` · `Vimeo`/`vimeo` · `Self-hosted`/`selfHosted` |
+| `youtubeUrl` | Scalar (string, URL) | demo placeholder | Always override |
+| `vimeoUrl` | Scalar (string, URL) | demo placeholder | Always override |
+| `selfHostedVideo` | Image (video file) | unset | |
+| `selfHostedUrl` | Scalar (string, URL) | unset | Fallback if no media object |
+| `poster` | Scalar (string, URL) | unset | |
+| `autoplay` | Scalar (boolean) | `false` | |
+| `loop` | Scalar (boolean) | `false` | |
+| `muted` | Scalar (boolean) | `false` | Set `true` if `autoplay` is `true` |
+| `playOnMobile` | Scalar (boolean) | `true` | |
+| `controls` | Scalar (boolean) | `true` | |
+| `preload` | Scalar (string) | `"metadata"` | `"none"` `"metadata"` `"auto"` — self-hosted only |
+| `lazyLoad` | Scalar (boolean) | `true` | |
+| `startTime` | Scalar (number, seconds) | `0` | |
+| `endTime` | Scalar (number, seconds) | `0` | `0` = play to end |
+| `captions` | Scalar (boolean) | `false` | |
+| `privacyMode` | Scalar (boolean) | `false` | YouTube no-cookie domain |
+| `suggestedVideos` | Option | `{"label":"Current Channel","value":"currentChannel"}` | `Current Channel`/`currentChannel` · `Any Video`/`anyVideo` |
+| `videoAspectRatio` | Option | `{"label":"16:9","value":"16 / 9"}` | `16:9`/`"16 / 9"` · `4:3`/`"4 / 3"` · `1:1`/`"1 / 1"` · `9:16`/`"9 / 16"` *(label text inferred, see TODO)* |
+| `showOverlay` | Scalar (boolean) | `false` | |
+| `overlayImage` | Image | unset | |
+| `showOverlayPlayIcon` | Scalar (boolean) | `true` | |
+| `videoCSSFilters` | Stringified-JSON (CSS Filters) | unset | |
+
+Minimal schema:
+```json
+{
+  "name": "blockish/video",
+  "attributes": { "sourceType": { "label": "YouTube", "value": "youtube" }, "youtubeUrl": "https://www.youtube.com/watch?v=XXXXX" }
+}
+```
 
 ---
 
 ### `blockish/google-map`
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `location` | `"1600 Amphitheatre Parkway, Mountain View, CA"` | Address or place name |
-| `zoom` | `14` | `1` (world) – `20` (building). `14` is good for city-level |
-| `mapHeight` | `"400px"` | CSS height — px or vh |
-| `mapCSSFiltersNormal` | CSS Filters (JSON string) | For grayscale/dark map effects |
-| `mapCSSFiltersHover` | CSS Filters (JSON string) | |
-| `mapHoverTransition` | `0.3` | Seconds |
+**Accepts children: no.**
 
-**Grayscale map example:**
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `location` | Scalar (string) | `"New York, NY"` | Always override |
+| `zoom` | Scalar (integer) | `14` | `1` (world) – `20` (building) |
+| `mapHeight` | Scalar (string, CSS length) | `"360px"` | |
+| `mapCSSFiltersNormal` | Stringified-JSON (CSS Filters) | unset | |
+| `mapCSSFiltersHover` | Stringified-JSON (CSS Filters) | unset | |
+| `mapHoverTransition` | Scalar (number, seconds) | unset | |
 
-```
-<!-- wp:blockish/google-map {"location":"New York, NY","zoom":13,"mapHeight":"480px","mapCSSFiltersNormal":"{\"grayscale\":100}"} /-->
+Minimal schema:
+```json
+{
+  "name": "blockish/google-map",
+  "attributes": { "location": "1600 Amphitheatre Parkway, Mountain View, CA", "zoom": 14 }
+}
 ```
 
 ---
 
 ### `blockish/icon-list`
 
-Contains `blockish/icon-list-item` children.
+A list of icon+text rows. **Accepts children: yes** (only `blockish/icon-list-item`).
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `layout` | `"column"` or `"row"` | `"column"` = stacked list; `"row"` = horizontal |
-| `rowGap` | `{"Desktop":"16px"}` | Vertical gap between items |
-| `columnGap` | `{"Desktop":"24px"}` | Horizontal gap (when layout is `"row"`) |
-| `itemPadding` | `{"top":"8px","right":"0px","bottom":"8px","left":"0px"}` | Per-item padding |
-| `itemContentSpacing` | `{"Desktop":"12px"}` | Gap between icon and text |
-| `itemIconSize` | `{"Desktop":"20px"}` | Icon size for all items |
-| `itemIconColor` | `"#1a73e8"` | Icon color for all items — normal |
-| `itemIconHoverColor` | `"#0d47a1"` | Icon color for all items — hover |
-| `itemTextColor` | `"#374151"` | Text color for all items — normal |
-| `itemTextHoverColor` | `"#111827"` | Text color for all items — hover |
-| `itemTextTypography` | Typography (JSON string) | Typography for all items |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `layout` | Scalar (string) | `"column"` | `"column"` (stacked) `"row"` (horizontal) |
+| `rowGap` | Responsive | `{"Desktop":"12px"}` | |
+| `columnGap` | Responsive | `{"Desktop":"12px"}` | Used when `layout` = `"row"` |
+| `itemPadding` | Spacing | unset | |
+| `itemContentSpacing` | Responsive | `{"Desktop":"10px"}` | Gap between icon and text |
+| `itemIconSize` | Responsive | unset | |
+| `itemIconColor` | Color | unset | Normal |
+| `itemIconHoverColor` | Color | unset | Hover |
+| `itemIconHoverTransition` | Scalar (number, seconds) | `0.2` | |
+| `itemTextColor` | Color | unset | Normal |
+| `itemTextHoverColor` | Color | unset | Hover |
+| `itemTextHoverTransition` | Scalar (number, seconds) | `0.2` | |
+| `itemTextTypography` | Stringified-JSON (Typography) | unset | |
+
+Minimal schema:
+```json
+{
+  "name": "blockish/icon-list",
+  "attributes": {},
+  "innerBlocks": [
+    { "name": "blockish/icon-list-item", "attributes": { "text": "Free forever plan" } }
+  ]
+}
+```
 
 ---
 
 ### `blockish/icon-list-item`
 
-Must be inside `blockish/icon-list`.
+Must be a child of `blockish/icon-list`. **Accepts children: no.**
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `text` | `"Free forever plan"` | Item label (HTML allowed) |
-| `icon` | Icon Object | Item SVG icon |
-| `link` | `{"url":"/pricing","newTab":false}` | Makes item a link |
-| `iconSize` | `{"Desktop":"18px"}` | Per-item override |
-| `iconColor` | `"#22c55e"` | Per-item icon color — normal |
-| `iconHoverColor` | `"#16a34a"` | Per-item icon color — hover |
-| `textColor` | `"#374151"` | Per-item text color — normal |
-| `textHoverColor` | `"#111827"` | Per-item text color — hover |
-| `iconHoverTransition` | `0.2` | Seconds |
-| `textHoverTransition` | `0.2` | Seconds |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `text` | Scalar (string, HTML allowed) | `"Icon list item"` | |
+| `icon` | Icon | star icon | |
+| `link` | Link | unset | |
+| `iconSize` | Responsive | unset | |
+| `iconColor` | Color | unset | Normal |
+| `iconHoverColor` | Color | unset | Hover |
+| `textColor` | Color | unset | Normal |
+| `textHoverColor` | Color | unset | Hover |
+| `iconHoverTransition` | Scalar (number, seconds) | `0.2` | |
+| `textHoverTransition` | Scalar (number, seconds) | `0.2` | |
 
 ---
 
 ### `blockish/rating`
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `rating` | `4.5` | Current value — decimals OK |
-| `ratingScale` | `5` | Max value, typically `5` or `10` |
-| `icon` | Icon Object | Icon shape — default is a star |
-| `alignment` | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
-| `iconSize` | `{"Desktop":"28px"}` | Per-icon size |
-| `iconSpacing` | `{"Desktop":"4px"}` | Gap between icons |
-| `iconColor` | `"#f59e0b"` | Filled (active) icon color |
-| `unmarkedColor` | `"#d1d5db"` | Unfilled icon color |
+A star/icon rating display. **Accepts children: no.**
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `rating` | Scalar (number) | `5` | Decimals allowed |
+| `ratingScale` | Scalar (integer) | `5` | Typically `5` or `10` |
+| `icon` | Icon | star icon | |
+| `alignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
+| `iconSize` | Responsive | `{"Desktop":"24px"}` | |
+| `iconSpacing` | Responsive | `{"Desktop":"6px"}` | |
+| `iconColor` | Color | unset | Filled/active |
+| `unmarkedColor` | Color | unset | Unfilled |
+
+Minimal schema:
+```json
+{ "name": "blockish/rating", "attributes": { "rating": 4.5 } }
+```
 
 ---
 
 ### `blockish/counter`
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `startNumber` | `0` | Count from |
-| `endNumber` | `500` | Count to |
-| `numberPrefix` | `"$"` | Text before number |
-| `numberSuffix` | `"+"` | Text after number — e.g. `"+"` `"%"` `"k"` |
-| `animationDuration` | `2` | Seconds to reach `endNumber` |
-| `thousandSeparator` | `true` | `true` = `1,000`; `false` = `1000` |
-| `separator` | `{"label":"Default","value":"default"}` | Separator style |
-| `title` | `"Happy Clients"` | Label near the number |
-| `titleTag` | `{"label":"H4","value":"h4"}` | `h1`–`h6` |
-| `titlePosition` | `"before"` or `"after"` | `"before"` = title above number; `"after"` = title below |
-| `titleHorizontalAlignment` | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
-| `numberPosition` | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
-| `numberTextColor` | `"#1a73e8"` | Number color |
-| `numberTypography` | Typography (JSON string) | Number font |
-| `titleTextColor` | `"#374151"` | Title color |
-| `titleTypography` | Typography (JSON string) | Title font |
+An animated counting number. **Accepts children: no.**
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `startNumber` | Scalar (number) | `0` | |
+| `endNumber` | Scalar (number) | `100` | |
+| `numberPrefix` | Scalar (string) | `""` | |
+| `numberSuffix` | Scalar (string) | `""` | |
+| `animationDuration` | Scalar (number, seconds) | `2` | |
+| `thousandSeparator` | Scalar (boolean) | `true` | `true` → `1,000`; `false` → `1000` |
+| `separator` | Option | `{"label":"Default","value":"default"}` | Full enum not confirmed — see TODO |
+| `title` | Scalar (string) | `"Cool Number"` | |
+| `titleTag` | Option | `{"label":"H3","value":"h3"}` | Same enum as heading's `tag` (§Heading) |
+| `titlePosition` | Scalar (string) | `"before"` | `"before"` (above number) `"after"` (below) |
+| `titleHorizontalAlignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
+| `titleVerticalAlignment` | Responsive | `{"Desktop":"center"}` | `"top"` `"center"` `"bottom"` |
+| `titleGap` | Responsive | `{"Desktop":"8px"}` | |
+| `numberPosition` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
+| `numberTextColor` | Color | unset | |
+| `numberTypography` | Stringified-JSON (Typography) | unset | |
+| `titleTextColor` | Color | unset | |
+| `titleTypography` | Stringified-JSON (Typography) | unset | |
+
+Minimal schema:
+```json
+{
+  "name": "blockish/counter",
+  "attributes": { "endNumber": 500, "numberSuffix": "+", "title": "Happy Clients" }
+}
+```
 
 ---
 
 ### `blockish/progress-bar`
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `title` | `"JavaScript"` | Label above the bar |
-| `titleTag` | `{"label":"H4","value":"h4"}` | `h1`–`h6` |
-| `showTitle` | `true` | Show/hide title |
-| `percentage` | `85` | Fill level — integer 0–100 |
-| `animationDuration` | `1.5` | Fill animation in seconds |
-| `displayPercentage` | `true` | Show `"85%"` inside the bar fill |
-| `innerText` | `"Advanced"` | Replaces percentage number with custom text |
-| `percentageFillColor` | `"#1a73e8"` | Fill bar color |
-| `percentageBackgroundColor` | `"#e5e7eb"` | Track background color |
-| `percentageHeight` | `{"Desktop":"14px"}` | Bar height |
-| `percentageBorderRadius` | `{"Desktop":"100px"}` | Full rounding for pill shape |
-| `titleTextColor` | `"#111827"` | |
-| `innerTextColor` | `"#ffffff"` | Text inside the fill |
+**Accepts children: no.**
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `title` | Scalar (string) | `"Progress"` | |
+| `titleTag` | Option | `{"label":"H4","value":"h4"}` | Same enum as heading's `tag` (§Heading) |
+| `showTitle` | Scalar (boolean) | `true` | |
+| `percentage` | Scalar (integer, 0–100) | `50` | |
+| `animationDuration` | Scalar (number, seconds) | `2` | |
+| `displayPercentage` | Scalar (boolean) | `true` | |
+| `innerText` | Scalar (string) | placeholder text | Always override; replaces the percentage label when set |
+| `percentageFillColor` | Color | unset | |
+| `percentageBackgroundColor` | Color | unset | |
+| `percentageHeight` | Responsive | unset | |
+| `percentageBorderRadius` | Responsive | unset | |
+| `titleTextColor` | Color | unset | |
+| `innerTextColor` | Color | unset | |
+
+Minimal schema:
+```json
+{
+  "name": "blockish/progress-bar",
+  "attributes": { "title": "JavaScript", "percentage": 85 }
+}
+```
 
 ---
 
 ### `blockish/social-icons`
 
-Contains `blockish/social-icon-item` children.
+**Accepts children: yes** (only `blockish/social-icon-item`).
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `shape` | `"circle"` | `"circle"` `"square"` `"rounded"` |
-| `alignment` | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
-| `columns` | `{"Desktop":"auto-fit"}` | `"auto-fit"` or a number e.g. `{"Desktop":5}` |
-| `iconColorMode` | `"official"` | `"official"` = brand colors; `"custom"` = use `iconColor` |
-| `iconColor` | `"#ffffff"` | Custom icon color — active when `iconColorMode` = `"custom"` |
-| `iconSecondaryColor` | `"#ffffff"` | Background/secondary color |
-| `iconSize` | `{"Desktop":"40px"}` | Icon display size |
-| `iconPadding` | `{"top":"8px","right":"8px","bottom":"8px","left":"8px"}` | Padding inside each icon cell |
-| `iconSpacing` | `{"Desktop":"12px"}` | Gap between icons (horizontal) |
-| `iconRowsGap` | `{"Desktop":"12px"}` | Gap between icon rows |
-| `iconBorder` | Border (JSON string) | Border per icon |
-| `iconBorderRadius` | Border Radius Object | Corner rounding per icon |
-| `hoverAnimation` | `"none"` | `"none"` `"float"` `"sink"` `"grow"` `"spin"` `"pulse"` |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `shape` | Scalar (string) | `"circle"` | `"circle"` `"square"` `"rounded"` |
+| `alignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
+| `columns` | Responsive | `{"Desktop":"auto-fit"}` | `"auto-fit"` or an integer |
+| `iconColorMode` | Scalar (string) | `"official"` | `"official"` (brand colors) `"custom"` (use `iconColor`) |
+| `iconColor` | Color | unset | Active when `iconColorMode` = `"custom"` |
+| `iconSecondaryColor` | Color | `"#FFFFFF"` | |
+| `iconSize` | Responsive | unset | |
+| `iconPadding` | Spacing | unset | |
+| `iconSpacing` | Responsive | `{"Desktop":"12px"}` | |
+| `iconRowsGap` | Responsive | `{"Desktop":"12px"}` | |
+| `iconBorder` | Stringified-JSON (Border) | unset | |
+| `iconBorderRadius` | Border-Radius | unset | |
+| `hoverAnimation` | Scalar (string) | `"none"` | `"none"` `"float"` `"sink"` `"grow"` `"spin"` `"pulse"` |
+
+Minimal schema:
+```json
+{
+  "name": "blockish/social-icons",
+  "attributes": {},
+  "innerBlocks": [
+    { "name": "blockish/social-icon-item", "attributes": { "network": "instagram", "label": "Instagram", "officialColor": "#E1306C", "link": { "url": "https://instagram.com/username", "newTab": true } } }
+  ]
+}
+```
 
 ---
 
 ### `blockish/social-icon-item`
 
-Must be inside `blockish/social-icons`.
+Must be a child of `blockish/social-icons`. **Accepts children: no.**
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `network` | `"instagram"` | `facebook` `twitter` `instagram` `linkedin` `youtube` `pinterest` `tiktok` `github` `dribbble` `behance` `snapchat` `reddit` `whatsapp` `telegram` `discord` |
-| `label` | `"Instagram"` | Accessible label / tooltip |
-| `icon` | Icon Object | SVG — defaults to the network icon if omitted |
-| `officialColor` | `"#E1306C"` | Brand hex color for this item |
-| `link` | `{"url":"https://instagram.com/username","newTab":true}` | Profile URL |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `network` | Scalar (string) | `"facebook"` | `facebook` `twitter` `instagram` `linkedin` `youtube` `pinterest` `tiktok` `github` `dribbble` `behance` `snapchat` `reddit` `whatsapp` `telegram` `discord` |
+| `label` | Scalar (string) | `"Facebook"` | Keep in sync with `network` |
+| `icon` | Icon | matches default `network` (Facebook glyph) | Override when changing `network` |
+| `officialColor` | Color | `"#1877F2"` | Override when changing `network` |
+| `link` | Link | unset | |
 
 ---
 
 ### `blockish/accordion`
 
-Contains `blockish/accordion-item` children.
+**Accepts children: yes** (only `blockish/accordion-item`).
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `maxItemExpanded` | `"one"` | `"one"` = only one panel open at a time; `"many"` = multiple allowed |
-| `faqSchema` | `true` | Adds `FAQPage` JSON-LD — good for SEO on FAQ pages |
-| `iconPosition` | `{"Desktop":"row"}` | `"row"` = icon on right; `"row-reverse"` = icon on left |
-| `itemPosition` | `{"Desktop":"start"}` | Content alignment inside header: `"start"` `"center"` `"end"` |
-| `itemsSpaceBetween` | `{"Desktop":"8px"}` | Gap between accordion items |
-| `distanceBetweenContent` | `{"Desktop":"12px"}` | Gap between header and open content panel |
-| `accordionBackgroundNormal` | Background (JSON string) | Per-item background — normal |
-| `accordionBorderNormal` | Border (JSON string) | Per-item border — normal |
-| `accordionBorderRadius` | Border Radius Object | Corner rounding |
-| `accordionPadding` | `{"top":"16px","right":"20px","bottom":"16px","left":"20px"}` | Header inner padding |
-| `headerTypography` | Typography (JSON string) | Header text font |
-| `headerTextColor` | `"#111827"` | Header text — normal |
-| `headerTextColorHover` | `"#1a73e8"` | Header text — hover |
-| `headerTextColorActive` | `"#1a73e8"` | Header text — active/open |
-| `iconColor` | `"#6b7280"` | Toggle icon — normal |
-| `iconColorHover` | `"#1a73e8"` | Toggle icon — hover |
-| `iconColorActive` | `"#1a73e8"` | Toggle icon — active |
-| `iconSize` | `{"Desktop":"16px"}` | Toggle icon size |
-| `contentBackground` | Background (JSON string) | Content area background |
-| `contentTextColor` | `"#374151"` | Content area text color |
-| `contentPadding` | `{"top":"16px","right":"20px","bottom":"20px","left":"20px"}` | Content area padding |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `maxItemExpanded` | Scalar (string) | `"one"` | `"one"` (single open panel) `"many"` (multiple allowed) |
+| `faqSchema` | Scalar (boolean) | `false` | Adds `FAQPage` JSON-LD |
+| `iconPosition` | Responsive | `{"Desktop":"row"}` | `"row"` (icon right) `"row-reverse"` (icon left) |
+| `itemPosition` | Responsive | `{"Desktop":"start"}` | `"start"` `"center"` `"end"` |
+| `itemsSpaceBetween` | Responsive | unset | |
+| `distanceBetweenContent` | Responsive | unset | |
+| `accordionBackgroundNormal` | Stringified-JSON (Background) | unset | |
+| `accordionBorderNormal` | Stringified-JSON (Border) | unset | |
+| `accordionBorderRadius` | Border-Radius | unset | |
+| `accordionPadding` | Spacing | unset | |
+| `headerTypography` | Stringified-JSON (Typography) | unset | |
+| `headerTextColor` | Color | unset | Normal |
+| `headerTextColorHover` | Color | unset | Hover |
+| `headerTextColorActive` | Color | unset | Active/open |
+| `iconColor` | Color | unset | Toggle icon, normal |
+| `iconColorHover` | Color | unset | Toggle icon, hover |
+| `iconColorActive` | Color | unset | Toggle icon, active |
+| `iconSize` | Responsive | unset | |
+| `contentBackground` | Stringified-JSON (Background) | unset | |
+| `contentTextColor` | Color | unset | |
+| `contentPadding` | Spacing | unset | |
 
-**Example with FAQ schema:**
-
+Minimal schema:
+```json
+{
+  "name": "blockish/accordion",
+  "attributes": { "faqSchema": true },
+  "innerBlocks": [
+    { "name": "blockish/accordion-item", "attributes": { "title": "What is Blockish?", "defaultOpen": true }, "innerBlocks": [ { "name": "core/paragraph", "attributes": { "content": "Blockish is a Gutenberg block plugin." } } ] },
+    { "name": "blockish/accordion-item", "attributes": { "title": "Is it free?" }, "innerBlocks": [ { "name": "core/paragraph", "attributes": { "content": "Yes, the core plugin is free." } } ] }
+  ]
+}
 ```
-<!-- wp:blockish/accordion {"faqSchema":true,"maxItemExpanded":"one"} -->
-<!-- wp:blockish/accordion-item {"title":"What is Blockish?","defaultOpen":true} -->
-<!-- wp:paragraph --><p>Blockish is a Gutenberg block plugin.</p><!-- /wp:paragraph -->
-<!-- /wp:blockish/accordion-item -->
-<!-- wp:blockish/accordion-item {"title":"Is it free?"} -->
-<!-- wp:paragraph --><p>Yes, the core plugin is free.</p><!-- /wp:paragraph -->
-<!-- /wp:blockish/accordion-item -->
-<!-- /wp:blockish/accordion -->
-```
+
+(`maxItemExpanded` is omitted because `"one"` is already the default.)
 
 ---
 
 ### `blockish/accordion-item`
 
-Must be inside `blockish/accordion`.
+Must be a child of `blockish/accordion`. **Accepts children: yes** (any blocks — this is the panel's content area).
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `title` | `"What is included?"` | Panel header text |
-| `titleTag` | `{"label":"H3","value":"h3"}` | `h1`–`h6` |
-| `defaultOpen` | `false` | Set `true` on one item to open it by default |
-| `expandIcon` | Icon Object | Icon when panel is collapsed (default: plus) |
-| `collapseIcon` | Icon Object | Icon when panel is expanded (default: minus) |
-| `itemId` | — | Auto-generated — leave empty |
-
-Content area accepts any inner blocks.
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `title` | Scalar (string) | `"Accordion item"` | |
+| `titleTag` | Option | `{"label":"H3","value":"h3"}` | Same enum as heading's `tag` (§Heading) |
+| `defaultOpen` | Scalar (boolean) | `false` | Set `true` on exactly one item to open it by default |
+| `expandIcon` | Icon | plus icon | Shown while panel is collapsed |
+| `collapseIcon` | Icon | minus icon | Shown while panel is expanded |
+| `itemId` | Scalar (string) | auto-generated | Leave unset |
 
 ---
 
 ### `blockish/tab`
 
-Contains `blockish/tab-item` children.
+**Accepts children: yes** (only `blockish/tab-item`).
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `direction` | `{"Desktop":"column"}` | `"column"` = tab nav on top; `"row"` = tab nav on left side |
-| `defaultActiveTab` | `0` | Zero-based index of initially active tab |
-| `justify` | `{"Desktop":"flex-start"}` | Tab nav alignment: `"flex-start"` `"center"` `"flex-end"` `"space-between"` |
-| `alignTitle` | `{"Desktop":"left"}` | Text align inside each tab button: `"left"` `"center"` `"right"` |
-| `navGap` | `{"Desktop":"8px"}` | Gap between tab buttons |
-| `distanceFromContent` | `{"Desktop":"16px"}` | Gap between tab nav row and content panel |
-| `iconPosition` | `{"Desktop":"row"}` | Icon on tab button: `"row"` = icon left; `"row-reverse"` = icon right |
-| `tabsBackgroundNormal` | Background (JSON string) | Tab button bg — normal |
-| `tabsBackgroundHover` | Background (JSON string) | Tab button bg — hover |
-| `tabsBackgroundActive` | Background (JSON string) | Tab button bg — active |
-| `tabsBorderNormal` | Border (JSON string) | Tab button border — normal |
-| `tabsBorderActive` | Border (JSON string) | Tab button border — active |
-| `tabsBorderRadius` | Border Radius Object | Tab button corner rounding |
-| `tabsPadding` | `{"top":"10px","right":"20px","bottom":"10px","left":"20px"}` | Tab button inner padding |
-| `titleTypography` | Typography (JSON string) | Tab title font |
-| `titleColorNormal` | `"#6b7280"` | Tab title — normal |
-| `titleColorHover` | `"#111827"` | Tab title — hover |
-| `titleColorActive` | `"#1a73e8"` | Tab title — active |
-| `iconSize` | `{"Desktop":"18px"}` | Tab icon size |
-| `iconColorNormal` | `"#9ca3af"` | Tab icon — normal |
-| `iconColorActive` | `"#1a73e8"` | Tab icon — active |
-| `contentBackground` | Background (JSON string) | Content panel background |
-| `contentColor` | `"#374151"` | Content panel text color |
-| `contentBorder` | Border (JSON string) | Content panel border |
-| `contentBorderRadius` | Border Radius Object | Content panel corner rounding |
-| `contentPadding` | `{"top":"24px","right":"24px","bottom":"24px","left":"24px"}` | Content panel padding |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `direction` | Responsive | `{"Desktop":"column"}` | `"column"` (nav on top) `"row"` (nav on side) |
+| `defaultActiveTab` | Scalar (integer) | `0` | Zero-based index — must match the `tab-item` with `defaultActive: true` |
+| `justify` | Responsive | `{"Desktop":"flex-start"}` | `"flex-start"` `"center"` `"flex-end"` `"space-between"` |
+| `alignTitle` | Responsive | `{"Desktop":"left"}` | `"left"` `"center"` `"right"` |
+| `navGap` | Responsive | `{"Desktop":"10px"}` | |
+| `distanceFromContent` | Responsive | `{"Desktop":"10px"}` | |
+| `iconPosition` | Responsive | `{"Desktop":"row"}` | `"row"` (icon left) `"row-reverse"` (icon right) |
+| `tabsBackgroundNormal` | Stringified-JSON (Background) | unset | |
+| `tabsBackgroundHover` | Stringified-JSON (Background) | unset | |
+| `tabsBackgroundActive` | Stringified-JSON (Background) | unset | |
+| `tabsBorderNormal` | Stringified-JSON (Border) | unset | |
+| `tabsBorderActive` | Stringified-JSON (Border) | unset | |
+| `tabsBorderRadius` | Border-Radius | unset | |
+| `tabsPadding` | Spacing | unset | |
+| `titleTypography` | Stringified-JSON (Typography) | unset | |
+| `titleColorNormal` | Color | unset | |
+| `titleColorHover` | Color | unset | |
+| `titleColorActive` | Color | unset | |
+| `iconSize` | Responsive | unset | |
+| `iconColorNormal` | Color | unset | |
+| `iconColorActive` | Color | unset | |
+| `contentBackground` | Stringified-JSON (Background) | unset | |
+| `contentColor` | Color | unset | |
+| `contentBorder` | Stringified-JSON (Border) | unset | |
+| `contentBorderRadius` | Border-Radius | unset | |
+| `contentPadding` | Spacing | unset | |
+
+Minimal schema:
+```json
+{
+  "name": "blockish/tab",
+  "attributes": {},
+  "innerBlocks": [
+    { "name": "blockish/tab-item", "attributes": { "title": "Overview", "defaultActive": true }, "innerBlocks": [ { "name": "core/paragraph", "attributes": { "content": "Overview content here." } } ] },
+    { "name": "blockish/tab-item", "attributes": { "title": "Features" }, "innerBlocks": [ { "name": "core/paragraph", "attributes": { "content": "Features content here." } } ] }
+  ]
+}
+```
 
 ---
 
 ### `blockish/tab-item`
 
-Must be inside `blockish/tab`.
+Must be a child of `blockish/tab`. **Accepts children: yes** (any blocks — this is the panel's content area).
 
-| Attribute | Valid values / Example | Notes |
-|---|---|---|
-| `title` | `"Features"` | Tab button label |
-| `tabIcon` | Icon Object | Optional icon on the tab button |
-| `defaultActive` | `false` | Set `true` on one item — must match `defaultActiveTab` index on parent |
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `title` | Scalar (string) | `"Tab"` | |
+| `tabIcon` | Icon | unset | |
+| `defaultActive` | Scalar (boolean) | `false` | Set `true` on exactly one item — index must match parent's `defaultActiveTab` |
 
-Content area accepts any inner blocks.
+---
 
-**Example:**
+## 8. Composite examples
 
+### Hero section (nested container + heading + button)
+
+```json
+{
+  "name": "blockish/container",
+  "attributes": {
+    "isVariationPicked": true,
+    "flexDirection": { "Desktop": { "label": "Column", "value": "column" } },
+    "containerMinHeight": { "Desktop": "100vh" },
+    "containerBackground": "{\"backgroundType\":\"classic\",\"backgroundColor\":\"#0f172a\"}",
+    "padding": { "top": "80px", "right": "40px", "bottom": "80px", "left": "40px" }
+  },
+  "innerBlocks": [
+    {
+      "name": "blockish/heading",
+      "attributes": { "content": "Welcome", "tag": { "label": "H1", "value": "h1" }, "color": "#ffffff" }
+    },
+    {
+      "name": "blockish/button",
+      "attributes": {
+        "text": "Get Started Free",
+        "url": { "url": "/signup", "newTab": false },
+        "buttonBackground": "{\"backgroundType\":\"classic\",\"backgroundColor\":\"#1a73e8\"}",
+        "buttonTextColor": "#ffffff",
+        "buttonPadding": { "top": "14px", "right": "28px", "bottom": "14px", "left": "28px" },
+        "buttonBorderRadius": { "Desktop": { "topLeft": "6px", "topRight": "6px", "bottomRight": "6px", "bottomLeft": "6px" } }
+      }
+    }
+  ]
+}
 ```
-<!-- wp:blockish/tab {"defaultActiveTab":0,"navGap":{"Desktop":"8px"},"distanceFromContent":{"Desktop":"16px"}} -->
-<!-- wp:blockish/tab-item {"title":"Overview","defaultActive":true} -->
-<!-- wp:paragraph --><p>Overview content here.</p><!-- /wp:paragraph -->
-<!-- /wp:blockish/tab-item -->
-<!-- wp:blockish/tab-item {"title":"Features"} -->
-<!-- wp:paragraph --><p>Features content here.</p><!-- /wp:paragraph -->
-<!-- /wp:blockish/tab-item -->
-<!-- /wp:blockish/tab -->
+
+Note what's omitted because it already matches the container's defaults: `display` (defaults `"flex"`), `alignItems`/`justifyContent` (both default Center), `containerWidth` (defaults `"alignfull"`). Only `isVariationPicked` (required override), `flexDirection`, `containerMinHeight`, `containerBackground`, and `padding` actually differ from default.
+
+### Stats row (grid container with three counters)
+
+```json
+{
+  "name": "blockish/container",
+  "attributes": {
+    "isVariationPicked": true,
+    "display": "grid",
+    "gridColumns": { "Desktop": 3, "Tablet": 2, "Mobile": 1 },
+    "columnGap": { "Desktop": "32px" }
+  },
+  "innerBlocks": [
+    { "name": "blockish/counter", "attributes": { "endNumber": 500, "numberSuffix": "+", "title": "Happy Clients" } },
+    { "name": "blockish/counter", "attributes": { "endNumber": 99, "numberSuffix": "%", "title": "Uptime" } },
+    { "name": "blockish/counter", "attributes": { "endNumber": 24, "numberSuffix": "/7", "title": "Support" } }
+  ]
+}
 ```
+
+`display: "grid"` is included because it differs from the container default (`"flex"`); `gridLayoutType` is omitted because `"fixed"` is implied by setting `gridColumns`... **actually `gridLayoutType` default is `"auto"`, and `gridColumns` only takes effect when `gridLayoutType` = `"fixed"` — this example should also set `"gridLayoutType": "fixed"` explicitly.** See TODO — flagging this rather than silently fixing, since it changes a worked example's correctness and you should know why.
+
+### FAQ accordion
+
+```json
+{
+  "name": "blockish/accordion",
+  "attributes": { "faqSchema": true },
+  "innerBlocks": [
+    {
+      "name": "blockish/accordion-item",
+      "attributes": { "title": "What is Blockish?", "defaultOpen": true },
+      "innerBlocks": [ { "name": "core/paragraph", "attributes": { "content": "Blockish is a Gutenberg block plugin." } } ]
+    },
+    {
+      "name": "blockish/accordion-item",
+      "attributes": { "title": "Is it free?" },
+      "innerBlocks": [ { "name": "core/paragraph", "attributes": { "content": "Yes, the core plugin is free." } } ]
+    }
+  ]
+}
+```
+
+---
+
+## 9. TODO / needs verification
+
+Items below are flagged rather than guessed, per source ambiguity. Resolve against actual `block.json`/`utils.js`/inspector source before treating as authoritative:
+
+1. **`widthType` (global) full enum** — only `"100%"` and `"custom"` are confirmed; the full list of selectable width presets is not in the source reviewed.
+2. **`flexWrap`, non-default `justifyContent`/`alignItems` labels** (container) — values (`nowrap`, `flex-start`, etc.) are confirmed, but the exact `label` text for non-default options is inferred from naming convention, not read directly from the option-list source.
+3. **`tag`/Tag Object — labels for `p` and `span`** — values confirmed, label text (e.g. "Paragraph" vs "P") not confirmed.
+4. **`objectFit` (image)** — confirmed as Responsive-Option with values `fill/contain/cover/none/scale-down`, but unclear from source whether this control actually carries a `label` field at all (existing doc only ever showed `{"value":"cover"}`, no label).
+5. **`videoAspectRatio` label text** — values (`"16 / 9"` etc.) confirmed from prior doc; label text (`"16:9"` etc.) inferred from the pattern of the default, not individually confirmed.
+6. **`separator` (counter) full enum** — only the default (`{"label":"Default","value":"default"}`) is known. Other selectable separator styles are not documented anywhere reviewed.
+7. **`position` (global) enum completeness** — documented as `relative/absolute/fixed/sticky`. A parallel options list elsewhere in the codebase (Class Manager's own style controls) also includes `static` — unconfirmed whether the global block attribute's own control offers `static` too, or whether that's specific to the Class Manager UI only.
+8. **Stats-row composite example (§8)** sets `gridColumns` without also setting `gridLayoutType: "fixed"`. Per `gridLayoutType`'s default (`"auto"`), `gridColumns` has no effect unless `gridLayoutType` is explicitly `"fixed"`. Flagged here instead of silently corrected in the example — when applying this rewrite, either fix the example to include `"gridLayoutType": "fixed"`, or confirm `gridColumns` has some auto-mode effect that makes the omission intentional.
+9. **`sourceType` (video) value correction** — the previous version of this doc listed the self-hosted enum value as `"self-hosted"` (hyphenated) in the attribute table, but the block's own source (`video/utils.js`) defines it as `"selfHosted"` (camelCase). This rewrite uses `"selfHosted"` throughout as the confirmed-correct value — flagging the correction in case anything downstream still expects the old (wrong) hyphenated form.

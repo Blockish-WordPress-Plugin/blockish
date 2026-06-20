@@ -15,6 +15,8 @@ class Loader
     {
         add_action('wp_abilities_api_categories_init', [$this, 'register_categories']);
         add_action('wp_abilities_api_init', [$this, 'register_abilities']);
+
+        BlockSchemaMeta::get_instance();
     }
 
     public function register_categories()
@@ -35,6 +37,9 @@ class Loader
         Abilities\ManageClass\Config::class,
         Abilities\BlockDocs\Config::class,
         Abilities\GetClassManagerDocs\Config::class,
+        Abilities\UploadMedia\Config::class,
+        Abilities\GetMedia\Config::class,
+        Abilities\GetPosts\Config::class,
     ];
 
     public function register_abilities()
