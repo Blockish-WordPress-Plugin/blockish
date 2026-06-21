@@ -163,10 +163,15 @@ Video (`blockish/container`'s `containerBackground` only — see that block's se
 | `gradient` | Scalar (string, CSS gradient) | unset | Used when `backgroundType` = `"gradient"` |
 | `backgroundVideo` | Image (video file) | unset | Used when `backgroundType` = `"video"` |
 | `backgroundImage` | Responsive of Image | unset | |
-| `backgroundImageSize` | Responsive-Option | `{"value":"cover"}` | `"cover"` `"contain"` `"auto"` |
-| `backgroundImagePosition` | Responsive-Option | `{"value":"center center"}` | `"center center"` `"top center"` `"bottom center"` `"left center"` `"right center"` |
-| `backgroundImageRepeat` | Responsive-Option | `{"value":"no-repeat"}` | `"no-repeat"` `"repeat"` `"repeat-x"` `"repeat-y"` |
+| `backgroundImageResolution` | Responsive-Option | unset | Picks one of the *uploaded image's own* registered sizes (e.g. `"thumbnail"`/`"medium"`/`"large"`/`"full"`) — the exact list varies per image, not a fixed enum. Leave unset to use the size `backgroundImage` itself was set with. |
+| `backgroundImageSize` | Responsive-Option | `{"value":"auto"}` | `"auto"` `"cover"` `"contain"` `"custom"` (use `backgroundImageSizeWidth` when `"custom"`) |
+| `backgroundImageSizeWidth` | Responsive | unset | Used when `backgroundImageSize` = `"custom"` |
+| `backgroundImagePosition` | Responsive-Option | `{"value":"top left"}` | `"top left"` `"top center"` `"top right"` `"center left"` `"center center"` `"center right"` `"bottom left"` `"bottom center"` `"bottom right"` `"custom"` (use `backgroundImagePositionHorizontal`/`Vertical` when `"custom"`) |
+| `backgroundImagePositionHorizontal` | Responsive | unset | Used when `backgroundImagePosition` = `"custom"` |
+| `backgroundImagePositionVertical` | Responsive | unset | Used when `backgroundImagePosition` = `"custom"` |
 | `backgroundImageAttachment` | Option | `{"value":"scroll"}` | `"scroll"` `"fixed"` |
+| `backgroundImageRepeat` | Responsive-Option | `{"value":"repeat"}` | `"repeat"` `"repeat-x"` `"repeat-y"` `"no-repeat"` |
+| `backgroundImageBlendMode` | Option (not responsive) | `{"value":"normal"}` | Same 16-value enum as Background Overlay's `blendMode` below |
 
 #### Shape: Background Overlay
 
@@ -187,7 +192,8 @@ Renders on top of the background, for darkening/tinting images.
 | `color` | Color | unset | Used when `type` = `"color"` |
 | `gradient` | Scalar (string, CSS gradient) | unset | Used when `type` = `"gradient"` |
 | `opacity` | Scalar (integer) | `100` | `0`–`100` |
-| `blendMode` | Option | `{"value":"normal"}` | `"normal"` `"multiply"` `"overlay"` `"screen"` `"darken"` `"lighten"` |
+| `filters` | **Stringified-JSON (CSS Filters), nested** | unset | A JSON-string-within-a-JSON-string — same shape as the CSS Filters block below, but `grayscale`/`invert`/`sepia` are not offered here (omit them; only `blur`/`brightness`/`contrast`/`saturate`/`hue-rotate` apply to the overlay) |
+| `blendMode` | Option | `{"value":"normal"}` | `"normal"` `"multiply"` `"screen"` `"overlay"` `"darken"` `"lighten"` `"color-dodge"` `"color-burn"` `"hard-light"` `"soft-light"` `"difference"` `"exclusion"` `"hue"` `"saturation"` `"color"` `"luminosity"` |
 
 #### Shape: Border
 
@@ -212,7 +218,7 @@ Per-side (only specify the sides you need):
 The value is a JSON **array** of shadow objects (not a single object). Default: `[]` (no shadow).
 
 ```json
-"[{\"x\":\"0px\",\"y\":\"4px\",\"blur\":\"16px\",\"spread\":\"0px\",\"color\":\"rgba(0,0,0,0.12)\",\"inset\":false}]"
+"[{\"x\":\"0px\",\"y\":\"4px\",\"blur\":\"16px\",\"spread\":\"0px\",\"color\":\"rgba(0,0,0,0.12)\",\"inset\":\"inset\"}]"
 ```
 
 Text shadow (no `spread`/`inset`):
@@ -227,7 +233,7 @@ Text shadow (no `spread`/`inset`):
 | `blur` | Scalar (length) | Blur radius |
 | `spread` | Scalar (length) | Box shadow only |
 | `color` | Color | |
-| `inset` | Scalar (boolean) | Box shadow only |
+| `inset` | Scalar (string) | Box shadow only. **Not a boolean** — the literal string `"inset"` to enable it, or `""`/omit for a normal outset shadow. |
 
 Add more objects to the array for multiple shadows.
 
@@ -239,16 +245,16 @@ Units are added automatically — pass raw numbers only. Default: `{}` (no filte
 "{\"blur\":0,\"brightness\":100,\"contrast\":100,\"saturate\":100,\"hue-rotate\":0,\"invert\":0,\"grayscale\":0,\"sepia\":0}"
 ```
 
-| Key | Unit added | No-op value |
-|---|---|---|
-| `blur` | `px` | `0` |
-| `brightness` | `%` | `100` |
-| `contrast` | `%` | `100` |
-| `saturate` | `%` | `100` |
-| `hue-rotate` | `deg` | `0` |
-| `invert` | `%` | `0` |
-| `grayscale` | `%` | `0` |
-| `sepia` | `%` | `0` |
+| Key | Unit added | No-op value | Editor slider range (sane bounds, not enforced) |
+|---|---|---|---|
+| `blur` | `px` | `0` | `0`–`10` |
+| `brightness` | `%` | `100` | `0`–`200` |
+| `contrast` | `%` | `100` | `0`–`200` |
+| `saturate` | `%` | `100` | `0`–`200` |
+| `hue-rotate` | `deg` | `0` | `0`–`360` |
+| `invert` | `%` | `0` | `0`–`100` |
+| `grayscale` | `%` | `0` | `0`–`200` |
+| `sepia` | `%` | `0` | `0`–`100` |
 
 #### Shape: Text Stroke
 
@@ -267,7 +273,7 @@ Default: `{}` (no stroke).
 
 ## 3. Transform attributes
 
-Individual top-level Responsive attributes (not a Stringified-JSON shape). Set only what you need; everything else defaults to unset/no-op. Pass raw numbers — units are added automatically.
+Individual top-level Responsive attributes (not a Stringified-JSON shape). Set only what you need; everything else defaults to unset/no-op. Pass raw numbers — units are added automatically. All of these are combined automatically into one CSS `transform` — you never compose the `transform` string yourself.
 
 | Attribute | Auto unit | No-op |
 |---|---|---|
@@ -276,20 +282,31 @@ Individual top-level Responsive attributes (not a Stringified-JSON shape). Set o
 | `rotateY` | `deg` | `0` |
 | `translateX` | as-is | `0` |
 | `translateY` | as-is | `0` |
-| `scale` | multiplier | `1` |
+| `translateZ` | as-is | `0` |
+| `scale` | multiplier (sets both X and Y) | `1` |
 | `scaleX` | multiplier | `1` |
 | `scaleY` | multiplier | `1` |
+| `scale3DX` | multiplier | `1` |
+| `scale3DY` | multiplier | `1` |
 | `skewX` | `deg` | `0` |
 | `skewY` | `deg` | `0` |
 | `perspective` | as-is | `1000px` |
 
-Hover variants use the same names with a `Hover` suffix (`rotateZHover`, `scaleHover`, etc.) — same defaults. `transformTransitionDuration` is a Scalar (number of seconds), default unset. You never need to set `applyTransform`/`applyTransformHover` — they default to `true` and apply automatically whenever you set any transform attribute.
+`transformOrigin` (Scalar string, default unset → browser default `50% 50%`): `"top left"` `"top center"` `"top right"` `"center left"` `"center center"` `"center right"` `"bottom left"` `"bottom center"` `"bottom right"` `"custom"`. Only when set to `"custom"`, also set `transformOriginX`/`transformOriginY` (Responsive, length/percentage) for a precise origin point.
+
+Hover variants use the same names with a `Hover` suffix (`rotateZHover`, `scaleHover`, `translateZHover`, `scale3DXHover`, etc.) — same defaults, same units. `transformTransitionDuration` is a Scalar (number of seconds), default unset.
+
+You never need to set `applyTransform`, `applyTransformHover`, or `applyTransformOriginCustom` — all three default to `true` and apply automatically whenever you set any transform/transformOrigin attribute above.
+
+**Do not use `transform` or `rotate`** (two separate legacy attributes, both Responsive, both doing a plain Z-axis `rotate({{VALUE}}deg)` directly on the CSS `transform` property). They exist for backwards compatibility and bypass the composable system entirely — mixing either of them with `rotateZ`/`scale`/etc. causes the two to fight over the same CSS property. Always use `rotateZ` for rotation, never `transform`/`rotate`.
+
+**`rotate3D`, `scaleSeparate`, `translate3D` are editor-UI-only toggles** (booleans with no CSS effect of their own — they just decide which input fields the visual inspector shows, e.g. one "Scale" slider vs. separate X/Y sliders). They have no effect through the API; don't set them. Just set whichever real attributes you need (`scale` vs. `scaleX`/`scaleY`, etc.) directly, regardless of these flags.
 
 ---
 
 ## 4. Global attributes (available on every block)
 
-Never set `blockClass` or `styles` — they are internal/auto-managed. Every attribute below defaults to **unset** unless noted — omitting it means no effect, the block/browser default applies.
+Never set `blockClass`, `styles`, or `preview` — all three are internal/auto-managed (`preview` only controls the static thumbnail shown in the block inserter UI, default `false`; it has no effect on a real instance and is never something you'd want `true`). Every attribute below defaults to **unset** unless noted — omitting it means no effect, the block/browser default applies.
 
 ### Layout & sizing
 
@@ -297,7 +314,7 @@ Never set `blockClass` or `styles` — they are internal/auto-managed. Every att
 |---|---|---|---|
 | `padding` | Spacing (Responsive) | unset | |
 | `margin` | Spacing (Responsive) | unset | |
-| `widthType` | Responsive-Option | unset | `{"value":"100%"}` · set `{"value":"custom"}` to enable `customWidth` — full enum not confirmed, see TODO |
+| `widthType` | Responsive-Option | unset | `"auto"` `"100%"` `"custom"` — set `{"value":"custom"}` to enable `customWidth` |
 | `customWidth` | Responsive | unset | Active when `widthType` = `"custom"` |
 | `minWidth` | Responsive | unset | |
 | `maxWidth` | Responsive | unset | |
@@ -425,9 +442,9 @@ The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 | `containerMinHeight` | Responsive | `{"Desktop":"0"}` | |
 | `overflow` | Responsive-Option | unset | `"visible"` `"hidden"` `"scroll"` `"auto"` |
 | `flexDirection` | Responsive-Option | `{"Desktop":{"label":"Row","value":"row"}}` | `Row`/`row` · `Column`/`column` · `Row Reverse`/`row-reverse` · `Column Reverse`/`column-reverse` |
-| `flexWrap` | Responsive-Option | unset | `No Wrap`/`nowrap` · `Wrap`/`wrap` · `Wrap Reverse`/`wrap-reverse` *(labels inferred, see TODO)* |
-| `justifyContent` | Responsive-Option | `{"Desktop":{"label":"Center","value":"center"}}` | `Flex Start`/`flex-start` · `Center`/`center` · `Flex End`/`flex-end` · `Space Between`/`space-between` · `Space Around`/`space-around` · `Space Evenly`/`space-evenly` *(non-default labels inferred, see TODO)* |
-| `alignItems` | Responsive-Option | `{"Desktop":{"label":"Center","value":"center"}}` | `Flex Start`/`flex-start` · `Center`/`center` · `Flex End`/`flex-end` · `Stretch`/`stretch` · `Baseline`/`baseline` *(non-default labels inferred, see TODO)* |
+| `flexWrap` | Responsive-Option | unset | `Wrap`/`wrap` · `No Wrap`/`nowrap` · `Reverse`/`wrap-reverse` |
+| `justifyContent` | Responsive-Option | `{"Desktop":{"label":"Center","value":"center"}}` | `Start`/`flex-start` · `End`/`flex-end` · `Center`/`center` · `Space Between`/`space-between` · `Space Around`/`space-around` · `Space Evenly`/`space-evenly` |
+| `alignItems` | Responsive-Option | `{"Desktop":{"label":"Center","value":"center"}}` | `Start`/`flex-start` · `End`/`flex-end` · `Center`/`center` · `Stretch`/`stretch` — **no `baseline` option** (despite the global `alignSelf` attribute supporting it) |
 | `columnGap` | Responsive | unset | |
 | `rowGap` | Responsive | unset | |
 | `gridLayoutType` | Scalar (string) | `"auto"` | `"auto"` (auto-fit columns) `"fixed"` (explicit count) |
@@ -466,7 +483,7 @@ A heading element with full text styling. **Accepts children: no.**
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
 | `content` | Scalar (string, HTML allowed) | `"Heading Text"` | |
-| `tag` | Option | `{"label":"H2","value":"h2"}` | `H1`/`h1` · `H2`/`h2` · `H3`/`h3` · `H4`/`h4` · `H5`/`h5` · `H6`/`h6` · `Div`/`div` · `Section`/`section` · `Article`/`article` · `Main`/`main` · `Aside`/`aside` · `Header`/`header` · `Footer`/`footer` · `p`/`span` *(p/span label text not confirmed, see TODO)* |
+| `tag` | Option | `{"label":"H2","value":"h2"}` | `H1`/`h1` · `H2`/`h2` · `H3`/`h3` · `H4`/`h4` · `H5`/`h5` · `H6`/`h6` · `P`/`p` · `Span`/`span` · `Div`/`div` — only these 9, no `section`/`article`/`main`/etc. (those belong to `blockish/container`'s `tagName`, a different attribute) |
 | `alignment` | Responsive | `{"Desktop":"left"}` | `"left"` `"center"` `"right"` |
 | `typography` | Stringified-JSON (Typography) | unset | |
 | `color` | Color | unset | Normal |
@@ -488,13 +505,15 @@ Minimal schema:
 
 A call-to-action link. **Accepts children: no.**
 
+**Hard rule — check this every single time you place a button:** does this button need to be centered, right-aligned, or anything other than flush-left in its parent? If yes, you **must** set `buttonPlacement` on the button itself. Setting `alignItems`/`justifyContent` on the parent `blockish/container` has **no effect** on a button's position — that is the single most common mistake when placing buttons. There is no other attribute, on any block, that positions a button. If a button looks stuck on the left when it should be centered, the fix is always `buttonPlacement`, never a parent attribute.
+
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
 | `text` | Scalar (string) | `"Click Here"` | |
 | `url` | Link | unset | |
 | `icon` | Icon | unset | |
 | `iconPosition` | Scalar (string) | `"row"` | `"row"` (icon before text) `"row-reverse"` (icon after) — order of icon vs. text inside the button |
-| `buttonPlacement` | Responsive-Option | unset | `"flex-start"` `"center"` `"flex-end"` — horizontal position of the **whole button** within its parent container. The parent's `alignItems`/`justifyContent` does NOT center a button; use this instead. Mobile-only centering: `{"Desktop":{"value":"flex-end"},"Mobile":{"value":"center"}}` |
+| `buttonPlacement` | Responsive-Option | unset | **Required whenever the button isn't meant to sit flush-left.** `"flex-start"` `"center"` `"flex-end"` — horizontal position of the **whole button** within its parent container. The parent's `alignItems`/`justifyContent` does NOT center a button; use this instead. Mobile-only centering: `{"Desktop":{"value":"flex-end"},"Mobile":{"value":"center"}}` |
 | `buttonAlignment` | Responsive-Option | unset | `"left"` `"center"` `"right"` — aligns the icon+text **inside** the button (text-align + justify-content on the inner link), independent of `buttonPlacement` |
 | `buttonContentSpacing` | Responsive | unset | Gap between icon and text inside the button |
 | `buttonTextColor` | Color | unset | Normal |
@@ -563,7 +582,7 @@ Minimal schema:
 | `imageWidth` | Responsive | unset | |
 | `imageMaxWidth` | Responsive | unset | |
 | `imageHeight` | Responsive | unset | |
-| `objectFit` | Responsive-Option | unset | `"fill"` `"contain"` `"cover"` `"none"` `"scale-down"` *(label text not confirmed, see TODO)* |
+| `objectFit` | Responsive-Option | unset | `None`/`none` · `Fill`/`fill` · `Cover`/`cover` · `Contain`/`contain` — only these 4, no `scale-down`. Only meaningful when `imageHeight` is also set for that device (object-fit needs a constrained box to fit into) |
 | `imageBorderRadiusNormal` | Border-Radius | unset | |
 | `imageBorderNormal` | Stringified-JSON (Border) | unset | |
 | `imageBoxShadowNormal` | Stringified-JSON (Box Shadow) | unset | |
@@ -607,7 +626,7 @@ Minimal schema:
 | `captions` | Scalar (boolean) | `false` | |
 | `privacyMode` | Scalar (boolean) | `false` | YouTube no-cookie domain |
 | `suggestedVideos` | Option | `{"label":"Current Channel","value":"currentChannel"}` | `Current Channel`/`currentChannel` · `Any Video`/`anyVideo` |
-| `videoAspectRatio` | Option | `{"label":"16:9","value":"16 / 9"}` | `16:9`/`"16 / 9"` · `4:3`/`"4 / 3"` · `1:1`/`"1 / 1"` · `9:16`/`"9 / 16"` *(label text inferred, see TODO)* |
+| `videoAspectRatio` | Option | `{"label":"16:9","value":"16 / 9"}` | `Auto`/`"auto"` · `16:9`/`"16 / 9"` · `4:3`/`"4 / 3"` · `1:1`/`"1 / 1"` · `21:9`/`"21 / 9"` — note `value` uses a spaced `" / "`, not a bare `/` |
 | `showOverlay` | Scalar (boolean) | `false` | |
 | `overlayImage` | Image | unset | |
 | `showOverlayPlayIcon` | Scalar (boolean) | `true` | |
@@ -732,10 +751,10 @@ An animated counting number. **Accepts children: no.**
 | `numberSuffix` | Scalar (string) | `""` | |
 | `animationDuration` | Scalar (number, seconds) | `2` | |
 | `thousandSeparator` | Scalar (boolean) | `true` | `true` → `1,000`; `false` → `1000` |
-| `separator` | Option | `{"label":"Default","value":"default"}` | Full enum not confirmed — see TODO |
+| `separator` | Option | `{"label":"Default","value":"default"}` | Only shown/used when `thousandSeparator` is `true`. `Default (,)`/`default` · `Dot (.)`/`dot` · `Space`/`space` · `Underscore (_)`/`underscore` · `Apostrophe (')`/`apostrophe` |
 | `title` | Scalar (string) | `"Cool Number"` | |
-| `titleTag` | Option | `{"label":"H3","value":"h3"}` | Same enum as heading's `tag` (§Heading) |
-| `titlePosition` | Scalar (string) | `"before"` | `"before"` (above number) `"after"` (below) |
+| `titleTag` | Option | `{"label":"H3","value":"h3"}` | Same enum as heading's `tag` (§Heading): `h1`–`h6`, `p`, `span`, `div` |
+| `titlePosition` | Scalar (string) | `"before"` | `"before"` (above number) `"after"` (below) `"start"` (left, in a row) `"end"` (right, in a row) — `"start"`/`"end"` also enable `titleVerticalAlignment` |
 | `titleHorizontalAlignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
 | `titleVerticalAlignment` | Responsive | `{"Desktop":"center"}` | `"top"` `"center"` `"bottom"` |
 | `titleGap` | Responsive | `{"Desktop":"8px"}` | |
@@ -974,6 +993,7 @@ Must be a child of `blockish/tab`. **Accepts children: yes** (any blocks — thi
       "attributes": {
         "text": "Get Started Free",
         "url": { "url": "/signup", "newTab": false },
+        "buttonPlacement": { "Desktop": { "value": "center" } },
         "buttonBackground": "{\"backgroundType\":\"classic\",\"backgroundColor\":\"#1a73e8\"}",
         "buttonTextColor": "#ffffff",
         "buttonPadding": { "top": "14px", "right": "28px", "bottom": "14px", "left": "28px" },
@@ -983,6 +1003,8 @@ Must be a child of `blockish/tab`. **Accepts children: yes** (any blocks — thi
   ]
 }
 ```
+
+`buttonPlacement` is set here even though the container's `alignItems` is already Center — that container setting only affects how the button's wrapper *box* is sized in the column, not where the visible button sits inside it (the wrapper is hard-width: 100% regardless). Without `buttonPlacement: {"Desktop":{"value":"center"}}`, this button would render flush-left despite the "centered" hero layout.
 
 Note what's omitted because it already matches the container's defaults: `display` (defaults `"flex"`), `alignItems`/`justifyContent` (both default Center), `containerWidth` (defaults `"alignfull"`). Only `isVariationPicked` (required override), `flexDirection`, `containerMinHeight`, `containerBackground`, and `padding` actually differ from default.
 
@@ -994,6 +1016,7 @@ Note what's omitted because it already matches the container's defaults: `displa
   "attributes": {
     "isVariationPicked": true,
     "display": "grid",
+    "gridLayoutType": "fixed",
     "gridColumns": { "Desktop": 3, "Tablet": 2, "Mobile": 1 },
     "columnGap": { "Desktop": "32px" }
   },
@@ -1005,7 +1028,7 @@ Note what's omitted because it already matches the container's defaults: `displa
 }
 ```
 
-`display: "grid"` is included because it differs from the container default (`"flex"`); `gridLayoutType` is omitted because `"fixed"` is implied by setting `gridColumns`... **actually `gridLayoutType` default is `"auto"`, and `gridColumns` only takes effect when `gridLayoutType` = `"fixed"` — this example should also set `"gridLayoutType": "fixed"` explicitly.** See TODO — flagging this rather than silently fixing, since it changes a worked example's correctness and you should know why.
+`display: "grid"` is included because it differs from the container default (`"flex"`). `gridLayoutType: "fixed"` must be set explicitly — its own default is `"auto"`, and `gridColumns`/`gridRows` only take effect when `gridLayoutType` = `"fixed"`; setting `gridColumns` alone (as an earlier version of this example did) silently has no effect.
 
 ### FAQ accordion
 
@@ -1032,17 +1055,7 @@ Note what's omitted because it already matches the container's defaults: `displa
 
 ## 9. TODO / needs verification
 
-Items below are flagged rather than guessed, per source ambiguity. Resolve against actual `block.json`/`utils.js`/inspector source before treating as authoritative:
-
-1. **`widthType` (global) full enum** — only `"100%"` and `"custom"` are confirmed; the full list of selectable width presets is not in the source reviewed.
-2. **`flexWrap`, non-default `justifyContent`/`alignItems` labels** (container) — values (`nowrap`, `flex-start`, etc.) are confirmed, but the exact `label` text for non-default options is inferred from naming convention, not read directly from the option-list source.
-3. **`tag`/Tag Object — labels for `p` and `span`** — values confirmed, label text (e.g. "Paragraph" vs "P") not confirmed.
-4. **`objectFit` (image)** — confirmed as Responsive-Option with values `fill/contain/cover/none/scale-down`, but unclear from source whether this control actually carries a `label` field at all (existing doc only ever showed `{"value":"cover"}`, no label).
-5. **`videoAspectRatio` label text** — values (`"16 / 9"` etc.) confirmed from prior doc; label text (`"16:9"` etc.) inferred from the pattern of the default, not individually confirmed.
-6. **`separator` (counter) full enum** — only the default (`{"label":"Default","value":"default"}`) is known. Other selectable separator styles are not documented anywhere reviewed.
-7. **`position` (global) enum completeness** — documented as `relative/absolute/fixed/sticky`. A parallel options list elsewhere in the codebase (Class Manager's own style controls) also includes `static` — unconfirmed whether the global block attribute's own control offers `static` too, or whether that's specific to the Class Manager UI only.
-8. **Stats-row composite example (§8)** sets `gridColumns` without also setting `gridLayoutType: "fixed"`. Per `gridLayoutType`'s default (`"auto"`), `gridColumns` has no effect unless `gridLayoutType` is explicitly `"fixed"`. Flagged here instead of silently corrected in the example — when applying this rewrite, either fix the example to include `"gridLayoutType": "fixed"`, or confirm `gridColumns` has some auto-mode effect that makes the omission intentional.
-9. **`sourceType` (video) value correction** — the previous version of this doc listed the self-hosted enum value as `"self-hosted"` (hyphenated) in the attribute table, but the block's own source (`video/utils.js`) defines it as `"selfHosted"` (camelCase). This rewrite uses `"selfHosted"` throughout as the confirmed-correct value — flagging the correction in case anything downstream still expects the old (wrong) hyphenated form.
+None open — every item previously flagged here (`flexWrap`/`justifyContent`/`alignItems` labels, `tag` p/span labels, `objectFit` enum, `videoAspectRatio` enum, `separator` enum, `position` enum, the stats-row `gridLayoutType` example bug) has been re-verified directly against the relevant `inspector.js`/`block.json` source and corrected in place above. If you add a new attribute reference without reading its inspector source, flag it here rather than guessing.
 
 ---
 
