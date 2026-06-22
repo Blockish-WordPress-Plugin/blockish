@@ -135,7 +135,8 @@ class StyleGenerator
         }
 
         $block_data['attrs']['blockClass'] = 'bb-' . \Blockish\Core\Utilities::generate_uniqueId(6);
-        $block_class = $block_data['attrs']['blockClass'].'.blockish-block-wrapper';
+        $block_css_class = $block_data['attrs']['blockClass'].'.blockish-block-wrapper';
+        $block_class = $block_data['attrs']['blockClass'];
         $name = str_replace('blockish/', '', $block_data['blockName']);
         $metadata = \Blockish\Core\Utilities::get_block_metadata($name);
         $block_meta_attributes = $metadata['attributes'] ?? [];
@@ -154,11 +155,11 @@ class StyleGenerator
             $attribute_value = $attributes[$meta_key];
 
             // Function to apply CSS to the rules
-            $apply_css = function ($device_slug, $value) use ($meta_attr, &$css_rules, $block_class) {
+            $apply_css = function ($device_slug, $value) use ($meta_attr, &$css_rules, $block_css_class) {
                 if (!empty($meta_attr['selectors'])) {
                     foreach ($meta_attr['selectors'] as $selector => $rule) {
                         $final_rule = Utilities::replace_css_placeholders($rule, $value);
-                        $selector = str_replace('{{WRAPPER}}', $block_class, $selector);
+                        $selector = str_replace('{{WRAPPER}}', $block_css_class, $selector);
                         $css_rules[$device_slug][$selector] = isset($css_rules[$device_slug][$selector])
                             ? $css_rules[$device_slug][$selector] . $final_rule
                             : $final_rule;
@@ -167,7 +168,7 @@ class StyleGenerator
 
                 if (!empty($meta_attr['groupSelector']['type'])) {
                     $type = $meta_attr['groupSelector']['type'];
-                    $selector = str_replace('{{WRAPPER}}', $block_class, $meta_attr['groupSelector']['selector']);
+                    $selector = str_replace('{{WRAPPER}}', $block_css_class, $meta_attr['groupSelector']['selector']);
 
                     switch ($type) {
                         case 'BlockishBackground':
@@ -313,7 +314,7 @@ class StyleGenerator
                 $custom_css = '';
             }
 
-            $selector   = '.' . $block_class;
+            $selector   = '.' . $block_css_class;
             $custom_css = preg_replace( '/\{\{\s*SELECTOR\s*\}\}/', $selector, $custom_css );
             $custom_css = preg_replace( '/\bSELECTOR\b/', $selector, $custom_css );
             $final_css .= $custom_css;

@@ -1,53 +1,28 @@
-name: Deploy Assets to WordPress.org
-
-# Runs only when .wordpress-org/ files change on main.
-# Deploys banner, icon, and screenshots to SVN assets/ without touching trunk/.
+name: Update WordPress.org Assets
 
 on:
   push:
     branches:
       - main
     paths:
-      - '.wordpress-org/**'
+      - '.wordpress-org/assets/**'
+      - 'readme.txt'
+  workflow_dispatch:
 
 jobs:
-  assets:
-    name: Deploy WordPress.org assets
+  update-assets:
+    name: Push Assets
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Deploy assets to SVN
+      - name: Deploy assets to WordPress.org
+        uses: 10up/action-wordpress-plugin-asset-update@stable
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-        run: |
-          SVN_URL="https://plugins.svn.wordpress.org/blockish"
-
-          svn checkout "$SVN_URL/assets" /tmp/svn-assets \
-            --username "$SVN_USERNAME" \
-            --password "$SVN_PASSWORD" \
-            --no-auth-cache \
-            --non-interactive \
-            --depth immediates
-
-          rsync -rc --delete --exclude=".gitkeep" .wordpress-org/ /tmp/svn-assets/
-
-          cd /tmp/svn-assets
-
-          svn add --force . --auto-props --parents --depth infinity -q
-
-          svn status | grep '^\!' | sed 's/! *//' | xargs -I% svn rm "%" 2>/dev/null || true
-
-          if svn status | grep -qE '^[AMD]'; then
-            svn commit -m "Update WordPress.org assets" \
-              --username "$SVN_USERNAME" \
-              --password "$SVN_PASSWORD" \
-              --no-auth-cache \
-              --non-interactive
-            echo "Assets deployed successfully."
-          else
-            echo "No asset changes to deploy."
-          fi
+          SLUG: blockish
+          ASSETS_DIR: .wordpress-org/assets
+          IGNORE_OTHER_FILES: true
