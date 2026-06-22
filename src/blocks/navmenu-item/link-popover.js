@@ -7,9 +7,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSuggestionsQuery } from './get-suggestion-query';
 
-// Mirrors gutenkit/nav-menu-item/link-url-popover/index.js (GkitLinkUrlPopover),
-// adapted to plain url/linkId/linkKind/linkType attributes instead of a
-// single link object.
+
 export default function LinkPopover( {
 	url,
 	label,
@@ -96,6 +94,8 @@ export default function LinkPopover( {
 				shift
 				ref={ popoverRef }
 				onClose={ () => {
+					console.log({url});
+					
 					// Dismissing without ever picking a link removes the empty
 					// item instead of leaving a dead "#" placeholder behind.
 					if ( ! url || url === '#' ) {

@@ -99,6 +99,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 										] }
 										help={ __( 'Animates how dropdown submenus open.', 'blockish' ) }
 										left="108px"
+										__next40pxDefaultSize
 									/>
 									<BlockishControl
 										type="ToggleControl"

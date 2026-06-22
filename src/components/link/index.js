@@ -113,7 +113,7 @@ const BlockishLink = ({ value, onChange, label, help = '' }) => {
                 <Flex gap={0}>
                     <FlexBlock className='blockish-link-input-wrapper'>
                         <TextControl
-                            __next40pxDefaultSize
+                            
                             __nextHasNoMarginBottom
                             placeholder="https://www.example.com"
                             type='url'
@@ -175,7 +175,7 @@ const BlockishLink = ({ value, onChange, label, help = '' }) => {
                 />
                 <TextControl
                     __nextHasNoMarginBottom
-                    __next40pxDefaultSize
+                    
                     className='blockish-link-settings-custom-attributes'
                     label={__('Custom Attributes', 'blockish')}
                     value={urlObject?.customAttributes}

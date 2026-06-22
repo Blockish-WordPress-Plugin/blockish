@@ -106,7 +106,7 @@ const ModalBody = ({
 
                             {category === 'custom' && (
                                 <FormFileUpload
-                                    __next40pxDefaultSize
+                                    
                                     icon={upload}
                                     accept="image/svg+xml"
                                     className="blockish-icon-picker-empty-notice-upload-btn"

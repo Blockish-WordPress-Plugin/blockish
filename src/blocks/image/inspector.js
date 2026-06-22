@@ -120,6 +120,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                                             { label: __('Attachment Caption', 'blockish'), value: 'attachment' },
                                                             { label: __('Custom Caption', 'blockish'), value: 'custom' },
                                                         ]}
+                                                        __next40pxDefaultSize
                                                     />
                                                     {
                                                         attributes?.captionType === 'custom' && (

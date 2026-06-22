@@ -93,6 +93,7 @@ const BlockishBoxShadowItem = ({ onChange, itemIndex, itemArray, exclude = [] })
                                             newArray[itemIndex] = { ...newArray[itemIndex], x: nextValue };
                                             onChange(JSON.stringify(newArray));
                                         }}
+                                        __next40pxDefaultSize
                                     />
                                 )}
                                 {!exclude.includes('y') && (
@@ -104,6 +105,7 @@ const BlockishBoxShadowItem = ({ onChange, itemIndex, itemArray, exclude = [] })
                                             newArray[itemIndex] = { ...newArray[itemIndex], y: nextValue };
                                             onChange(JSON.stringify(newArray));
                                         }}
+                                        __next40pxDefaultSize
                                     />
                                 )}
                                 {!exclude.includes('blur') && (
@@ -115,6 +117,7 @@ const BlockishBoxShadowItem = ({ onChange, itemIndex, itemArray, exclude = [] })
                                             newArray[itemIndex] = { ...newArray[itemIndex], blur: nextValue };
                                             onChange(JSON.stringify(newArray));
                                         }}
+                                        __next40pxDefaultSize
                                     />
                                 )}
                                 {!exclude.includes('spread') && (
@@ -126,6 +129,7 @@ const BlockishBoxShadowItem = ({ onChange, itemIndex, itemArray, exclude = [] })
                                             newArray[itemIndex] = { ...newArray[itemIndex], spread: nextValue };
                                             onChange(JSON.stringify(newArray));
                                         }}
+                                        __next40pxDefaultSize
                                     />
                                 )}
                             </Grid>

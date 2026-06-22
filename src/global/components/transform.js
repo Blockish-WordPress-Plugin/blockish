@@ -171,6 +171,7 @@ const TransformOriginControls = memo( function TransformOriginControls( {
 				type="SelectControl"
 				slug="transformOrigin"
 				options={ ORIGIN_OPTIONS }
+				__next40pxDefaultSize
 			/>
 			{ selectedOrigin === 'custom' && (
 				<>

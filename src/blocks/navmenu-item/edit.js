@@ -5,7 +5,7 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { link, linkOff, warning } from '@wordpress/icons';
+import { link, linkOff } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -136,7 +136,7 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 							className="blockish-navmenu-item-broken-link"
 							title={ __( 'This link points to content that no longer exists.', 'blockish' ) }
 						>
-							{ warning }
+							{ __( 'Broken link', 'blockish' ) }
 						</span>
 					) }
 					{ hasSubmenu && <SubmenuIndicator /> }
