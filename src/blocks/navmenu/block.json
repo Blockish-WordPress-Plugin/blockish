@@ -10,35 +10,21 @@
 	"keywords": ["nav", "menu", "navigation", "navbar"],
 	"allowedBlocks": [ "blockish/navmenu-item" ],
 	"attributes": {
+		"hasStarted": {
+			"type": "boolean",
+			"default": false
+		},
 		"menuBreakpoint": {
 			"type": "string",
 			"default": "tablet"
 		},
-		"menuBreakpointCustom": {
+		"menuCustomBreakpoint": {
 			"type": "number",
-			"default": 992
+			"default": 1024
 		},
 		"scrollLockOffcanvas": {
 			"type": "boolean",
-			"default": true
-		},
-		"justifyContent": {
-			"type": "object",
-			"default": {
-				"Desktop": "flex-start"
-			},
-			"selectors": {
-				".{{WRAPPER}} .blockish-block-navmenu-nav": "justify-content: {{VALUE}};"
-			}
-		},
-		"alignItems": {
-			"type": "object",
-			"default": {
-				"Desktop": "center"
-			},
-			"selectors": {
-				".{{WRAPPER}} .blockish-block-navmenu-nav": "align-items: {{VALUE}};"
-			}
+			"default": false
 		},
 		"menuAnimation": {
 			"type": "string",
@@ -47,6 +33,271 @@
 		"isVertical": {
 			"type": "boolean",
 			"default": false
+		},
+		"justifyContent": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-nav": "justify-content: {{VALUE}};"
+			}
+		},
+		"alignItems": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-nav": "align-items: {{VALUE}};"
+			}
+		},
+		"navGap": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-nav": "gap: {{VALUE}};"
+			}
+		},
+		"itemColorNormal": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "color: {{VALUE}};"
+			}
+		},
+		"itemColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item:hover": "color: {{VALUE}};"
+			}
+		},
+		"itemBgNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item"
+			}
+		},
+		"itemBgHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item:hover"
+			}
+		},
+		"itemTypography": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTypography",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item"
+			}
+		},
+		"itemBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"itemPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"itemColorActive": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item.is-active": "color: {{VALUE}};"
+			}
+		},
+		"itemBgActive": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item.is-active"
+			}
+		},
+		"navWrapperBg": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-wrapper"
+			}
+		},
+		"navWrapperPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-wrapper": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"navWrapperBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-wrapper": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"hamburgerIconPosition": {
+			"type": "string",
+			"default": "right"
+		},
+		"hamburgerIconSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-hamburger svg, .{{WRAPPER}} .blockish-navmenu-hamburger .blockish-navmenu-hamburger-bar": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"hamburgerBtnWidth": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-hamburger": "width: {{VALUE}};"
+			}
+		},
+		"hamburgerBtnHeight": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-hamburger": "height: {{VALUE}};"
+			}
+		},
+		"hamburgerBtnBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-hamburger": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"hamburgerBtnBgNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-hamburger"
+			}
+		},
+		"hamburgerBtnBgHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-hamburger:hover"
+			}
+		},
+		"hamburgerIconColorNormal": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-hamburger": "color: {{VALUE}};"
+			}
+		},
+		"hamburgerIconColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-hamburger:hover": "color: {{VALUE}};"
+			}
+		},
+		"hamburgerBtnBorderNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-hamburger"
+			}
+		},
+		"hamburgerBtnBorderColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-hamburger:hover": "border-color: {{VALUE}};"
+			}
+		},
+		"closeBtnIconSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-close svg": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"closeBtnMargin": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-close": "margin: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"closeBtnWidth": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-close": "width: {{VALUE}};"
+			}
+		},
+		"closeBtnHeight": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-close": "height: {{VALUE}};"
+			}
+		},
+		"closeBtnBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-close": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"closeBtnBgNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-close"
+			}
+		},
+		"closeBtnBgHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-close:hover"
+			}
+		},
+		"closeIconColorNormal": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-close": "color: {{VALUE}};"
+			}
+		},
+		"closeIconColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-close:hover": "color: {{VALUE}};"
+			}
+		},
+		"closeBtnBorderNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-close"
+			}
+		},
+		"closeBtnBorderColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-close:hover": "border-color: {{VALUE}};"
+			}
+		},
+		"mobileLogo": {
+			"type": "object"
+		},
+		"mobileLogoLinkType": {
+			"type": "string",
+			"default": "home"
+		},
+		"mobileLogoCustomLink": {
+			"type": "object"
+		},
+		"mobileLogoWidth": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-mobile-logo img": "width: {{VALUE}};"
+			}
+		},
+		"mobileLogoHeight": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-mobile-logo img": "height: {{VALUE}};"
+			}
+		},
+		"mobileLogoPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-mobile-logo": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"mobileLogoMargin": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-mobile-logo": "margin: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
 		}
 	},
 	"supports": {
@@ -58,6 +309,5 @@
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",
-	"viewScript": "file:./view.js",
-	"render": "file:./render.php"
+	"viewScript": "file:./view.js"
 }

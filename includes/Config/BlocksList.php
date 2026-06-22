@@ -153,6 +153,13 @@ class BlocksList extends ConfigList {
                 'status'      => 'active',
                 'parent'      => 'navmenu',
             ),
+            'navmenu-submenu' => array(
+                'name'        => __('Nav Menu Submenu', 'blockish'),
+                'description' => __('Dropdown submenu panel for a Nav Menu Item.', 'blockish'),
+                'package'     => 'free',
+                'status'      => 'active',
+                'parent'      => 'navmenu-item',
+            ),
         );
 
         $this->list = apply_filters( 'blockish/blocks/list', $this->list );

@@ -1,3 +1,36 @@
 .blockish-block-navmenu-item {
-	cursor: text;
+	.blockish-navmenu-item-link {
+		cursor: text;
+	}
+
+	.blockish-block-navmenu-item-submenu-slot {
+		min-width: 100px;
+	}
+
+	&.is-link-broken > .blockish-navmenu-item-link {
+		outline: 1px dashed #cc1818;
+		outline-offset: 2px;
+	}
+
+	.blockish-navmenu-item-broken-link {
+		display: inline-flex;
+		color: #cc1818;
+
+		svg {
+			width: 16px;
+			height: 16px;
+		}
+	}
 }
+
+// GutenKit relies on this class existing with real positioning (from their
+// own global stylesheet) to act as a full-canvas click-outside trap for the
+// link popover. It has no built-in styling anywhere in @wordpress/*, so
+// without this rule it renders as an empty, zero-size div that never
+// actually intercepts a click.
+.components-popover-pointer-events-trap {
+	position: fixed;
+	inset: 0;
+	z-index: 99998;
+}
+

@@ -7,11 +7,12 @@
 	"category": "blockish-framework",
 	"description": "Item for the Nav Menu block.",
 	"icon": "minus",
-	"parent": ["blockish/navmenu"],
+	"parent": ["blockish/navmenu", "blockish/navmenu-submenu"],
+	"allowedBlocks": ["blockish/navmenu-submenu"],
 	"attributes": {
 		"label": {
 			"type": "string",
-			"default": "Menu Item"
+			"default": ""
 		},
 		"url": {
 			"type": "string",
@@ -20,6 +21,57 @@
 		"openInNewTab": {
 			"type": "boolean",
 			"default": false
+		},
+		"linkId": {
+			"type": "number",
+			"default": 0
+		},
+		"linkKind": {
+			"type": "string",
+			"default": ""
+		},
+		"linkType": {
+			"type": "string",
+			"default": ""
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"rel": {
+			"type": "string",
+			"default": ""
+		},
+		"subMenuIndicatorIconSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-submenu-arrow": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"subMenuIndicatorLeftSpacing": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-submenu-arrow": "margin-left: {{VALUE}};"
+			}
+		},
+		"subMenuIndicatorBorder": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-submenu-arrow"
+			}
+		},
+		"subMenuIndicatorPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-submenu-arrow": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"subMenuIndicatorBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-submenu-arrow": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
 		}
 	},
 	"supports": {
