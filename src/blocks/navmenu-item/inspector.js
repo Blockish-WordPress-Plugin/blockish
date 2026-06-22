@@ -1,6 +1,6 @@
 import {
 	InspectorControls,
-	__experimentalLinkControl as LinkControl,
+	LinkControl,
 } from '@wordpress/block-editor';
 import { TextControl, ToggleControl, TextareaControl } from '@wordpress/components';
 import { memo } from '@wordpress/element';
@@ -38,7 +38,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls, hasSubmenu } 
 									label={ __( 'Text', 'blockish' ) }
 									value={ label }
 									onChange={ ( value ) => setAttributes( { label: value } ) }
-									
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 								/>
 								<div style={ { marginBottom: '16px' } }>
@@ -90,7 +90,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls, hasSubmenu } 
 									value={ rel }
 									onChange={ ( value ) => setAttributes( { rel: value } ) }
 									help={ __( 'The relationship of the linked URL as space-separated link types.', 'blockish' ) }
-									
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 								/>
 							</BlockishControl>

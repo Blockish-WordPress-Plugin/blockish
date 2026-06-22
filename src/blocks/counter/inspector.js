@@ -52,11 +52,13 @@ const Inspector = ({ attributes, advancedControls }) => {
 									type="TextControl"
 									label={__('Number Prefix', 'blockish')}
 									slug="numberPrefix"
+									__next40pxDefaultSize
 								/>
 								<BlockishControl
 									type="TextControl"
 									label={__('Number Suffix', 'blockish')}
 									slug="numberSuffix"
+									__next40pxDefaultSize
 								/>
 								<BlockishControl
 									type="BlockishRangeControl"
@@ -109,6 +111,7 @@ const Inspector = ({ attributes, advancedControls }) => {
 									type="TextControl"
 									label={__('Title', 'blockish')}
 									slug="title"
+									__next40pxDefaultSize
 								/>
 								<BlockishControl
 									type="BlockishSelect"

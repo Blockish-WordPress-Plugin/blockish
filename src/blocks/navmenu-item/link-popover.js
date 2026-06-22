@@ -1,5 +1,5 @@
 import { Popover } from '@wordpress/components';
-import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
+import { LinkControl } from '@wordpress/block-editor';
 import { useState, useRef, useEffect, createInterpolateElement } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { useResourcePermissions } from '@wordpress/core-data';

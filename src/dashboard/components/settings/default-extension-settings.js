@@ -54,6 +54,7 @@ export default function DefaultExtensionSettings({
 							label={__(control.label, 'blockish')}
 							value={(value ?? savedSettings[control.key]) || ''}
 							onChange={(next) => onChange(slug, control.key, next)}
+							__next40pxDefaultSize
 						/>
 					);
 				})}

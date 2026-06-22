@@ -36,6 +36,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 											type="TextControl"
 											label={ __( 'Title', 'blockish' ) }
 											slug="title"
+											__next40pxDefaultSize
 										/>
 										<BlockishControl
 											type="BlockishSelect"
@@ -82,6 +83,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="TextControl"
 									label={ __( 'Inner Text', 'blockish' ) }
 									slug="innerText"
+									__next40pxDefaultSize
 								/>
 							</BlockishControl>
 						) }

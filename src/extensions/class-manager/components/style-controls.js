@@ -809,6 +809,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         value={value?.transitionProperty?.[device] || 'all'}
                         onChange={(next) => onChangeResponsiveValue('transitionProperty', next)}
                         help={__('Example: all, opacity, transform', 'blockish')}
+                        __next40pxDefaultSize
                     />
                     <BlockishResponsive left="148px">
                         <RangeControl
