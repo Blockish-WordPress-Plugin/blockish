@@ -1,37 +1,16 @@
-const setOffcanvasOpen = ( nav, isOpen ) => {
-	const hamburger = nav.querySelector( '.blockish-navmenu-hamburger' );
-
-	nav.classList.toggle( 'is-offcanvas-open', isOpen );
-	hamburger?.setAttribute( 'aria-expanded', String( isOpen ) );
-
-	if ( nav.dataset.scrollLockOffcanvas === 'true' ) {
-		document.body.classList.toggle( 'blockish-navmenu-lock-scroll', isOpen );
-	}
+const setSubmenuOpen = ( item, isOpen ) => {
+	item.classList.toggle( 'is-submenu-open', isOpen );
+	item
+		.querySelector( ':scope > .blockish-navmenu-submenu-toggle' )
+		?.setAttribute( 'aria-expanded', String( isOpen ) );
 };
 
 const closeAllSubmenus = ( nav, exceptItem ) => {
 	nav.querySelectorAll( '.is-submenu-open' ).forEach( ( item ) => {
 		if ( item !== exceptItem ) {
-			item.classList.remove( 'is-submenu-open' );
-			item
-				.querySelector( ':scope > a' )
-				?.setAttribute( 'aria-expanded', 'false' );
+			setSubmenuOpen( item, false );
 		}
 	} );
-};
-
-const watchCustomBreakpoint = ( nav ) => {
-	const breakpoint = parseInt( nav.dataset.customBreakpoint, 10 );
-
-	if ( ! breakpoint ) {
-		return;
-	}
-
-	const mediaQuery = window.matchMedia( `(max-width: ${ breakpoint }px)` );
-	const sync = () => nav.classList.toggle( 'is-custom-collapsed', mediaQuery.matches );
-
-	sync();
-	mediaQuery.addEventListener( 'change', sync );
 };
 
 const getCurrentEntityId = () => {
@@ -68,65 +47,54 @@ const markActiveItems = ( nav ) => {
 };
 
 const mountNavmenu = ( nav ) => {
-	const hamburger = nav.querySelector( '.blockish-navmenu-hamburger' );
-	const closeBtn = nav.querySelector( '.blockish-navmenu-close' );
-	const overlay = nav.querySelector( '.blockish-navmenu-overlay' );
-
-	watchCustomBreakpoint( nav );
 	markActiveItems( nav );
 
-	hamburger?.addEventListener( 'click', () => {
-		setOffcanvasOpen( nav, ! nav.classList.contains( 'is-offcanvas-open' ) );
-	} );
-
-	closeBtn?.addEventListener( 'click', () => setOffcanvasOpen( nav, false ) );
-	overlay?.addEventListener( 'click', () => setOffcanvasOpen( nav, false ) );
-
-	document.addEventListener( 'keydown', ( event ) => {
-		if ( event.key !== 'Escape' ) {
-			return;
-		}
-
-		setOffcanvasOpen( nav, false );
-		closeAllSubmenus( nav, null );
-	} );
-
 	nav.querySelectorAll( '.blockish-block-navmenu-item' ).forEach( ( item ) => {
-		const trigger = item.querySelector( ':scope > a' );
+		const toggleButton = item.querySelector(
+			':scope > .blockish-navmenu-submenu-toggle'
+		);
 		const hasSubmenu = !! item.querySelector(
 			':scope > .blockish-navmenu-submenu'
 		);
 
-		if ( ! hasSubmenu || ! trigger ) {
+		if ( ! hasSubmenu || ! toggleButton ) {
 			return;
 		}
 
-		const indicator = item.querySelector(
-			':scope > a > .blockish-navmenu-submenu-arrow'
-		);
-
-		const toggle = ( event ) => {
-			event.preventDefault();
+		toggleButton.addEventListener( 'click', ( event ) => {
+			// Stop the document-level "click outside closes submenus"
+			// listener below from immediately undoing this toggle.
 			event.stopPropagation();
 
 			const willOpen = ! item.classList.contains( 'is-submenu-open' );
 
 			closeAllSubmenus( item.closest( '.blockish-navmenu-nav' ), item );
-			item.classList.toggle( 'is-submenu-open', willOpen );
-			trigger.setAttribute( 'aria-expanded', String( willOpen ) );
-		};
-
-		indicator?.addEventListener( 'click', toggle );
-	} );
-
-	document.addEventListener( 'click', ( event ) => {
-		if ( nav.contains( event.target ) ) {
-			return;
-		}
-
-		closeAllSubmenus( nav, null );
+			setSubmenuOpen( item, willOpen );
+		} );
 	} );
 };
+
+// Escape closes any open submenus, plus outside-click submenu closing, are
+// registered once here rather than once per nav instance — with multiple
+// menus on a page (e.g. header + footer), per-instance listeners would each
+// redundantly re-run the same global checks on every keystroke/click.
+document.addEventListener( 'keydown', ( event ) => {
+	if ( event.key !== 'Escape' ) {
+		return;
+	}
+
+	document.querySelectorAll( '.blockish-navmenu' ).forEach( ( nav ) => {
+		closeAllSubmenus( nav, null );
+	} );
+} );
+
+document.addEventListener( 'click', ( event ) => {
+	document.querySelectorAll( '.blockish-navmenu' ).forEach( ( nav ) => {
+		if ( ! nav.contains( event.target ) ) {
+			closeAllSubmenus( nav, null );
+		}
+	} );
+} );
 
 const initNavmenus = () => {
 	document

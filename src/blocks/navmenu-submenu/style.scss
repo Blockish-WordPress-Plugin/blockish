@@ -1,7 +1,26 @@
+// Sensible "looks like a dropdown" defaults — wrapped in :where() so they
+// have zero specificity. The panelBg/panelBorder/panelBoxShadow/
+// panelBorderRadius/panelPadding controls (block.json) generate normal,
+// higher-specificity selectors on this same element, so they always win
+// the moment a user sets any of them, regardless of stylesheet order.
+:where( .blockish-navmenu-submenu ) {
+	background: #fff;
+	border: 1px solid rgba( 0, 0, 0, 0.1 );
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.12 );
+}
+
 .blockish-navmenu-submenu {
 	display: flex;
 	flex-direction: column;
 	list-style: none;
 	margin: 0;
+	padding: 0;
 	min-width: 180px;
+}
+
+// Padding lives on each item instead of the panel itself — also overridable
+// via the subItemPadding control (block.json), same :where() pattern.
+:where( .blockish-navmenu-submenu .blockish-block-navmenu-item ) {
+	padding: 8px;
 }

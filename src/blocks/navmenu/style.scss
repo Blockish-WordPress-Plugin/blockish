@@ -1,193 +1,23 @@
-body.blockish-navmenu-lock-scroll {
-	overflow: hidden;
-}
-
 .blockish-navmenu {
-	position: relative;
-	display: flex;
-	align-items: center;
-
-	// Blockish's global attributes always emit a (default/identity) `transform`
-	// on every block's own wrapper class, even when unset. Per the CSS spec,
-	// any non-`none` transform on an ancestor creates a new containing block
-	// for `position: fixed` descendants — which silently turned the offcanvas
-	// panel's "fixed" positioning into something resolved against this nav's
-	// own (small) box instead of the real viewport. Neutralize it here so the
-	// offcanvas panel below is actually viewport-fixed.
-	&,
-	&:hover {
-		transform: none !important;
-	}
-
-	// Hamburger position only matters once the wrapper is taken out of flow
-	// (fixed/offcanvas) and the hamburger is the sole remaining flex child.
-	&.hamburger-position-left {
-		justify-content: flex-start;
-	}
-
-	&.hamburger-position-center {
-		justify-content: center;
-	}
-
-	&.hamburger-position-right {
-		justify-content: flex-end;
-	}
-
-	.blockish-navmenu-wrapper {
-		flex: 1 1 auto;
-		min-width: 0;
-	}
-
-	.blockish-navmenu-wrapper-header {
-		display: none;
-	}
-
-	.blockish-navmenu-mobile-logo {
-		display: inline-flex;
-		line-height: 0;
-
-		img {
-			display: block;
-			max-width: 100%;
-			height: auto;
-		}
-	}
+	z-index: 5;
 
 	.blockish-navmenu-nav {
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: flex-start;
 		align-items: center;
 		list-style: none;
 		margin: 0;
 		padding: 0;
-	}
 
-	&.is-vertical .blockish-navmenu-nav {
-		flex-direction: column;
-		align-items: stretch;
-	}
-
-	.blockish-navmenu-hamburger {
-		display: none;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 4px;
-		width: 45px;
-		padding: 8px;
-		border: 1px solid rgba( 0, 0, 0, 0.2 );
-		border-radius: 0.25rem;
-		background: transparent;
-		cursor: pointer;
-		transition: all 0.4s ease-in;
-
-		.blockish-navmenu-hamburger-bar {
-			display: block;
-			width: 100%;
-			height: 2px;
-			background: currentColor;
-			border-radius: 1px;
+		:where(&) {
+			gap: 12px;
 		}
 	}
 
-	.blockish-navmenu-overlay {
-		display: none;
-		position: fixed;
-		inset: 0;
-		background: rgba( 0, 0, 0, 0.45 );
-		opacity: 0;
-		visibility: hidden;
-		transition: opacity 0.25s ease;
-		z-index: 999998;
-	}
-
-	.blockish-navmenu-close {
-		display: none;
-		margin-left: auto;
-		border: none;
-		background: transparent;
-		cursor: pointer;
-		padding: 8px;
-		line-height: 0;
-	}
-
-	&.lock-scroll-for-offcanvas {
-		// applied to document.body by view.js, kept here for discoverability
-	}
-}
-
-// Shared offcanvas panel behavior, gated per breakpoint variant below.
-@mixin blockish-navmenu-offcanvas-panel {
-	.blockish-navmenu-hamburger,
-	.blockish-navmenu-overlay {
-		display: flex;
-	}
-
-	.blockish-navmenu-wrapper {
-		position: fixed;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		width: min( 320px, 85vw );
-		background: #fff;
-		z-index: 999999;
-		overflow-y: auto;
-		visibility: hidden;
-		pointer-events: none;
-		// The offcanvas panel's own open/close slide is fixed, not a user
-		// setting — `menuAnimation` controls submenu dropdown reveal instead
-		// (see navmenu-item/style.scss).
-		transform: translateX( 100% );
-		transition: transform 0.4s ease;
-	}
-
-	.blockish-navmenu-wrapper-header {
-		display: flex;
-		align-items: center;
-		padding: 12px;
-	}
-
-	.blockish-navmenu-close {
-		display: block;
-	}
-
-	.blockish-navmenu-nav {
-		flex-direction: column;
-		align-items: stretch;
-		padding: 0 16px 16px;
-	}
-
-	&.is-offcanvas-open {
-		.blockish-navmenu-overlay {
-			opacity: 1;
-			visibility: visible;
-		}
-
-		.blockish-navmenu-wrapper {
-			visibility: visible;
-			pointer-events: auto;
-			transform: none;
-			opacity: 1;
+	&.is-vertical {
+		.blockish-navmenu-nav {
+			flex-direction: column;
+			align-items: stretch;
 		}
 	}
-}
-
-.blockish-navmenu.is-breakpoint-tablet {
-	@media ( max-width: 1024px ) {
-		@include blockish-navmenu-offcanvas-panel;
-	}
-}
-
-.blockish-navmenu.is-breakpoint-mobile {
-	@media ( max-width: 768px ) {
-		@include blockish-navmenu-offcanvas-panel;
-	}
-}
-
-// "Custom" breakpoint can't be a static @media query (the px value is a
-// per-block attribute, not known at build time) — view.js watches it with
-// matchMedia and toggles this class instead.
-.blockish-navmenu.is-breakpoint-custom.is-custom-collapsed {
-	@include blockish-navmenu-offcanvas-panel;
 }

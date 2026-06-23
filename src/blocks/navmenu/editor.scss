@@ -1,17 +1,12 @@
 .blockish-navmenu {
 	.blockish-navmenu-nav {
-		// Default appender is positioned absolute/bottom-right (meant to float
-		// over a block's content) and only shows when selected — here it
-		// should sit inline after the last item instead, and stay visible by
-		// default so there's always an obvious way to add the next item. The
-		// button itself is untouched, still the real default appender style.
-		.block-list-appender {
+		> .block-list-appender {
 			position: relative !important;
-		}
 
-		.block-editor-inserter__toggle.components-button.has-icon,
-		.block-list-appender__toggle {
-			display: flex !important;
+			.block-editor-inserter__toggle.components-button.has-icon,
+			.block-list-appender__toggle {
+				display: flex !important;
+			}
 		}
 	}
 }

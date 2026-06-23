@@ -1,6 +1,6 @@
 import { Popover } from '@wordpress/components';
 import { LinkControl } from '@wordpress/block-editor';
-import { useState, useRef, useEffect, createInterpolateElement } from '@wordpress/element';
+import { useRef, useEffect, createInterpolateElement } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { useResourcePermissions } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -19,18 +19,16 @@ export default function LinkPopover( {
 	onReplace,
 	clientId,
 	popoverAnchor,
+	isAnchoredToSidebar,
 	setShowLinkPopover,
 	isEditingURL,
 } ) {
-	const [ showBackdrop, setShowBackdrop ] = useState( true );
 	const popoverRef = useRef( null );
 	const { selectPreviousBlock } = useDispatch( 'core/block-editor' );
 	const { saveEntityRecord } = useDispatch( 'core' );
 	const pagesPermissions = useResourcePermissions( 'pages' );
 	const postsPermissions = useResourcePermissions( 'posts' );
 
-	// New/empty items don't get focusOnMount (that's reserved for re-opening
-	// an *existing* link below) — focus the search field manually instead.
 	useEffect( () => {
 		const searchInput = popoverRef.current?.querySelector(
 			'.block-editor-url-input__input'
@@ -38,18 +36,14 @@ export default function LinkPopover( {
 		searchInput?.focus();
 	}, [] );
 
-	// The backdrop intercepts the *first* outside click to dismiss the
-	// popover without that same click also doing something else jarring
-	// (e.g. selecting a different block) — Popover's own onClose still
-	// handles the rest. Without it, clicking away from an empty/unset item
-	// could leave a dead "#" item behind instead of removing it.
-	useEffect( () => {
-		if ( ! showBackdrop && ! isEditingURL ) {
+	const closePopover = () => {
+		if ( ! url || url === '#' ) {
+			selectPreviousBlock( clientId, true );
 			onReplace( [] );
 		}
 
-		return () => setShowBackdrop( true );
-	}, [ showBackdrop, isEditingURL ] );
+		setShowLinkPopover( false );
+	};
 
 	let userCanCreate = false;
 	if ( ! linkType || linkType === 'page' ) {
@@ -76,39 +70,25 @@ export default function LinkPopover( {
 
 	return (
 		<>
-			{ showBackdrop && (
-				<div
-					className="components-popover-pointer-events-trap"
-					aria-hidden="true"
-					onClick={ () => {
-						setShowLinkPopover( false );
-						setShowBackdrop( false );
-					} }
-				/>
-			) }
+			<div
+				className="components-popover-pointer-events-trap"
+				aria-hidden="true"
+				onClick={ closePopover }
+			/>
 			<Popover
-				placement="bottom"
+				placement={ isAnchoredToSidebar ? 'left-start' : 'bottom' }
+				offset={ isAnchoredToSidebar ? 36 : 0 }
 				anchor={ popoverAnchor }
 				focusOnMount={ isEditingURL ? 'firstElement' : false }
 				__unstableSlotName={ '__unstable-block-tools-after' }
 				shift
 				ref={ popoverRef }
-				onClose={ () => {
-					console.log({url});
-					
-					// Dismissing without ever picking a link removes the empty
-					// item instead of leaving a dead "#" placeholder behind.
-					if ( ! url || url === '#' ) {
-						selectPreviousBlock( clientId, true );
-						onReplace( [] );
-					}
-
-					setShowLinkPopover( false );
-				} }
+				onClose={ closePopover }
 			>
 				<LinkControl
 					hasTextControl
-					hasRichPreviews
+					hasRichPreviews={ ! isAnchoredToSidebar }
+					forceIsEditingLink={ isAnchoredToSidebar ? true : undefined }
 					key={ `${ url }-${ linkId }` }
 					withCreateSuggestion={ userCanCreate }
 					createSuggestion={ handleCreate }
@@ -116,18 +96,14 @@ export default function LinkPopover( {
 						createInterpolateElement(
 							sprintf(
 								linkType === 'post'
-									? /* translators: %s: search term. */ __( 'Create draft post: <mark>%s</mark>', 'blockish' )
-									: /* translators: %s: search term. */ __( 'Create draft page: <mark>%s</mark>', 'blockish' ),
+									? __( 'Create draft post: <mark>%s</mark>', 'blockish' )
+									: __( 'Create draft page: <mark>%s</mark>', 'blockish' ),
 								searchTerm
 							),
 							{ mark: <mark /> }
 						)
 					}
 					value={ {
-						// "#" is just our internal placeholder for "no real
-						// link yet" — passing it through would make
-						// LinkControl render a rich-preview card for a
-						// literal "#" link instead of its proper empty state.
 						url: url && url !== '#' ? url : undefined,
 						title: label || undefined,
 						opensInNewTab: openInNewTab,
@@ -142,8 +118,6 @@ export default function LinkPopover( {
 							linkId: id || 0,
 							linkKind: kind || '',
 							linkType: type || '',
-							// Only auto-fill the first time — don't clobber a label
-							// someone already typed.
 							...( ! label && { label: title || newUrl || '' } ),
 						} );
 					} }

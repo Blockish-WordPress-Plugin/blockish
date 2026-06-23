@@ -4,6 +4,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import Inspector from './inspector';
+import SubmenuAppender from './submenu-appender';
 import './editor.scss';
 
 const TEMPLATE = [
@@ -11,6 +12,8 @@ const TEMPLATE = [
 ];
 
 export default function Edit( props ) {
+	const { clientId } = props;
+
 	const blockProps = useBlockProps( {
 		className: 'blockish-navmenu-submenu',
 	} );
@@ -18,6 +21,7 @@ export default function Edit( props ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 		orientation: 'vertical',
+		renderAppender: () => <SubmenuAppender rootClientId={ clientId } />,
 	} );
 
 	return (

@@ -6,7 +6,7 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { link, linkOff } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
@@ -22,34 +22,45 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 	const { label, url, openInNewTab, linkId, linkKind, linkType } = attributes;
 	const hasRealLink = !! url && url !== '#';
 
-	// New items have no real link yet — open the LinkControl immediately
-	// instead of leaving them sitting on a dead "#" until someone notices
-	// the toolbar button (matches GutenKit's nav-menu-item creation flow).
 	const [ showLinkPopover, setShowLinkPopover ] = useState( () => ! hasRealLink );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-
-	// LinkControl reports kind as "post-type"/"taxonomy" (matches its own
-	// suggestion API), but @wordpress/core-data's entity kind for posts and
-	// pages is the camelCased "postType" — translate before looking it up.
+	const [ linkPopoverAnchor, setLinkPopoverAnchor ] = useState( null );
 	const entityKind = linkKind === 'post-type' ? 'postType' : linkKind;
-	const { hasResolved, record } = useEntityRecord(
+	const { record } = useEntityRecord(
 		entityKind || 'postType',
 		linkType || 'page',
 		linkId || 0
 	);
-	const isBrokenLink = !! linkId && hasResolved && ! record;
+
+	const [ isOpen, setIsOpen ] = useState( false );
+
+	const { hasSubmenu, isSelectedOrHasSelectedChild } = useSelect(
+		( select ) => {
+			const { getBlockOrder, isBlockSelected, hasSelectedInnerBlock } =
+				select( 'core/block-editor' );
+			return {
+				hasSubmenu: getBlockOrder( clientId ).length > 0,
+				isSelectedOrHasSelectedChild:
+					isBlockSelected( clientId ) ||
+					hasSelectedInnerBlock( clientId, true ),
+			};
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		setIsOpen( isSelectedOrHasSelectedChild );
+	}, [ isSelectedOrHasSelectedChild ] );
+
+	const isSubmenuOpen = hasSubmenu && isOpen;
 
 	const blockProps = useBlockProps( {
 		className: clsx( 'blockish-block-navmenu-item', {
-			'is-link-broken': isBrokenLink,
+			'has-submenu': hasSubmenu,
+			'is-submenu-open': isSubmenuOpen,
 		} ),
 		ref: useMergeRefs( [ setPopoverAnchor ] ),
 	} );
-
-	const hasSubmenu = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlockOrder( clientId ).length > 0,
-		[ clientId ]
-	);
 
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 
@@ -69,6 +80,10 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 				setAttributes={ setAttributes }
 				advancedControls={ advancedControls }
 				hasSubmenu={ hasSubmenu }
+				hasRealLink={ hasRealLink }
+				record={ record }
+				setShowLinkPopover={ setShowLinkPopover }
+				setLinkPopoverAnchor={ setLinkPopoverAnchor }
 			/>
 			<BlockControls group="block">
 				<ToolbarGroup>
@@ -76,7 +91,10 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 						icon={ hasRealLink ? link : linkOff }
 						label={ __( 'Link', 'blockish' ) }
 						isActive={ hasRealLink }
-						onClick={ () => setShowLinkPopover( ( v ) => ! v ) }
+						onClick={ () => {
+							setLinkPopoverAnchor( null );
+							setShowLinkPopover( ( v ) => ! v );
+						} }
 					/>
 					{ ! hasSubmenu ? (
 						<ToolbarButton
@@ -109,7 +127,8 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 					setAttributes={ setAttributes }
 					onReplace={ onReplace }
 					clientId={ clientId }
-					popoverAnchor={ popoverAnchor }
+					popoverAnchor={ linkPopoverAnchor || popoverAnchor }
+					isAnchoredToSidebar={ !! linkPopoverAnchor }
 					setShowLinkPopover={ setShowLinkPopover }
 					isEditingURL={ hasRealLink }
 				/>
@@ -131,16 +150,18 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 						allowedFormats={ [ 'core/bold', 'core/italic' ] }
 						aria-label={ __( 'Navigation link text', 'blockish' ) }
 					/>
-					{ isBrokenLink && (
-						<span
-							className="blockish-navmenu-item-broken-link"
-							title={ __( 'This link points to content that no longer exists.', 'blockish' ) }
-						>
-							{ __( 'Broken link', 'blockish' ) }
-						</span>
-					) }
-					{ hasSubmenu && <SubmenuIndicator /> }
 				</a>
+				{ hasSubmenu && (
+					<button
+						type="button"
+						className="blockish-navmenu-submenu-toggle"
+						aria-expanded={ isSubmenuOpen }
+						aria-label={ __( 'Show submenu', 'blockish' ) }
+						onClick={ () => setIsOpen( ( open ) => ! open ) }
+					>
+						<SubmenuIndicator />
+					</button>
+				) }
 				{ hasSubmenu && <div { ...innerBlocksProps } /> }
 			</div>
 		</>

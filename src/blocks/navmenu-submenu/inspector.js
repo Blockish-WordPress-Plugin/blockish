@@ -3,8 +3,7 @@ import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const Inspector = ( { advancedControls } ) => {
-	const { BlockishControl, BlockishGroupControl, BlockishResponsiveControl } =
-		window?.blockish?.controls;
+	const { BlockishControl, BlockishGroupControl, BlockishResponsiveControl } = window?.blockish?.controls;
 
 	return (
 		<InspectorControls>

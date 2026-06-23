@@ -5,12 +5,18 @@ import {
 import { TextControl, ToggleControl, TextareaControl } from '@wordpress/components';
 import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import LinkPreviewCard from './link-preview-card';
 
-// Matches core/navigation-link's own Inspector — GutenKit's nav-menu-item
-// has no typography/color "Item" style panel at all (that styling lives at
-// the menu level only); the per-item sidebar is just Text / Link To / Open
-// in New Tab / Description / Rel Attribute.
-const Inspector = ( { attributes, setAttributes, advancedControls, hasSubmenu } ) => {
+const Inspector = ( {
+	attributes,
+	setAttributes,
+	advancedControls,
+	hasSubmenu,
+	hasRealLink,
+	record,
+	setShowLinkPopover,
+	setLinkPopoverAnchor,
+} ) => {
 	const { BlockishControl, BlockishGroupControl, BlockishResponsiveControl } =
 		window?.blockish?.controls;
 	const { label, url, openInNewTab, linkId, linkKind, linkType, description, rel } = attributes;
@@ -48,29 +54,43 @@ const Inspector = ( { attributes, setAttributes, advancedControls, hasSubmenu } 
 									<p style={ { margin: '0 0 8px', fontSize: '11px', fontWeight: 500, textTransform: 'uppercase' } }>
 										{ __( 'Link To', 'blockish' ) }
 									</p>
-									<LinkControl
-										hasRichPreviews
-										value={ {
-											url: url && url !== '#' ? url : undefined,
-											title: label || undefined,
-											opensInNewTab: openInNewTab,
-											id: linkId || undefined,
-											kind: linkKind || undefined,
-											type: linkType || undefined,
-										} }
-										onChange={ ( { url: newUrl, opensInNewTab, id, kind, type, title } ) => {
-											setAttributes( {
-												url: newUrl || '#',
-												openInNewTab: !! opensInNewTab,
-												linkId: id || 0,
-												linkKind: kind || '',
-												linkType: type || '',
-												...( ! label && { label: title || newUrl || '' } ),
-											} );
-										} }
-										showSuggestions
-										showInitialSuggestions
-									/>
+									{ hasRealLink ? (
+										<LinkPreviewCard
+											url={ url }
+											label={ label }
+											linkId={ linkId }
+											linkType={ linkType }
+											record={ record }
+											onClick={ ( anchor ) => {
+												setLinkPopoverAnchor( anchor );
+												setShowLinkPopover( true );
+											} }
+										/>
+									) : (
+										<LinkControl
+											hasRichPreviews
+											value={ {
+												url: url && url !== '#' ? url : undefined,
+												title: label || undefined,
+												opensInNewTab: openInNewTab,
+												id: linkId || undefined,
+												kind: linkKind || undefined,
+												type: linkType || undefined,
+											} }
+											onChange={ ( { url: newUrl, opensInNewTab, id, kind, type, title } ) => {
+												setAttributes( {
+													url: newUrl || '#',
+													openInNewTab: !! opensInNewTab,
+													linkId: id || 0,
+													linkKind: kind || '',
+													linkType: type || '',
+													...( ! label && { label: title || newUrl || '' } ),
+												} );
+											} }
+											showSuggestions
+											showInitialSuggestions
+										/>
+									) }
 								</div>
 								<ToggleControl
 									label={ __( 'Open in new tab', 'blockish' ) }
