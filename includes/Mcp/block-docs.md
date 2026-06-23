@@ -507,6 +507,8 @@ A call-to-action link. **Accepts children: no.**
 
 **Hard rule — check this every single time you place a button:** does this button need to be centered, right-aligned, or anything other than flush-left in its parent? If yes, you **must** set `buttonPlacement` on the button itself. Setting `alignItems`/`justifyContent` on the parent `blockish/container` has **no effect** on a button's position — that is the single most common mistake when placing buttons. There is no other attribute, on any block, that positions a button. If a button looks stuck on the left when it should be centered, the fix is always `buttonPlacement`, never a parent attribute.
 
+**The button's own wrapper is hard-coded `width: 100%`** in its stylesheet (unlike other blocks, where the global `widthType` defaults to unset/auto-sizing). This is harmless for `buttonPlacement` (which works regardless), but if you instead need to move the button using `position`/`margin`/transform-style attributes, the 100% wrapper width will fight you. In that case set the global `widthType` to `{"value":"auto"}` on the button first — that emits an explicit `width: auto` that overrides the hard-coded 100%, only then will positioning attributes move the visible button rather than just shifting empty space.
+
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
 | `text` | Scalar (string) | `"Click Here"` | |
