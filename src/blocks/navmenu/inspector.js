@@ -57,21 +57,6 @@ const Inspector = ( { advancedControls } ) => {
 									left="80px"
 								/>
 								<BlockishControl
-									type="SelectControl"
-									label={ __( 'Menu Animation', 'blockish' ) }
-									slug="menuAnimation"
-									options={ [
-										{ value: 'none', label: __( 'None', 'blockish' ) },
-										{ value: 'fadeInUp', label: __( 'Fade In Up', 'blockish' ) },
-										{ value: 'transform', label: __( 'Transform', 'blockish' ) },
-										{ value: 'transformPerspective', label: __( 'Transform Perspective', 'blockish' ) },
-										{ value: 'rotateY', label: __( 'Rotate Y', 'blockish' ) },
-									] }
-									help={ __( 'Animates how dropdown submenus open.', 'blockish' ) }
-									left="108px"
-									__next40pxDefaultSize
-								/>
-								<BlockishControl
 									type="ToggleControl"
 									label={ __( 'Vertical Menu', 'blockish' ) }
 									slug="isVertical"

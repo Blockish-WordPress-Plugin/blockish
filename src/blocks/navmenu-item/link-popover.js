@@ -37,7 +37,7 @@ export default function LinkPopover( {
 	}, [] );
 
 	const closePopover = () => {
-		if ( ! url || url === '#' ) {
+		if ( ! url ) {
 			selectPreviousBlock( clientId, true );
 			onReplace( [] );
 		}
@@ -104,7 +104,7 @@ export default function LinkPopover( {
 						)
 					}
 					value={ {
-						url: url && url !== '#' ? url : undefined,
+						url: url ? url : undefined,
 						title: label || undefined,
 						opensInNewTab: openInNewTab,
 						id: linkId || undefined,
@@ -113,7 +113,7 @@ export default function LinkPopover( {
 					} }
 					onChange={ ( { url: newUrl, opensInNewTab, id, kind, type, title } ) => {
 						setAttributes( {
-							url: newUrl || '#',
+							url: newUrl || '',
 							openInNewTab: !! opensInNewTab,
 							linkId: id || 0,
 							linkKind: kind || '',

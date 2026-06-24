@@ -8,16 +8,9 @@
 	"description": "Nav menu block for gutenberg.",
 	"icon": "menu",
 	"keywords": ["nav", "menu", "navigation", "navbar"],
+	"parent": [ "blockish/navigation" ],
 	"allowedBlocks": [ "blockish/navmenu-item" ],
 	"attributes": {
-		"hasStarted": {
-			"type": "boolean",
-			"default": false
-		},
-		"menuAnimation": {
-			"type": "string",
-			"default": "none"
-		},
 		"isVertical": {
 			"type": "boolean",
 			"default": false
@@ -107,6 +100,5 @@
 	"textdomain": "blockish",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css",
-	"viewScript": "file:./view.js"
+	"style": "file:./style-index.css"
 }

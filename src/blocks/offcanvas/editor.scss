@@ -1,0 +1,23 @@
+// While synced (templateLock: 'all'), the inner-block appender is hidden by
+// WordPress anyway — but when sync is off, keep the appender usable inside
+// the panel's nav list.
+.blockish-offcanvas {
+	.blockish-offcanvas-nav {
+		// Match the frontend's tight, flush list: the editor otherwise adds
+		// default block spacing between the inner items, which pushes the
+		// divider borders apart and makes the editor look different from the
+		// rendered offcanvas. Strip that spacing so both match.
+		> .blockish-block-navmenu-item {
+			margin: 0;
+		}
+
+		> .block-list-appender {
+			position: relative !important;
+
+			.block-editor-inserter__toggle.components-button.has-icon,
+			.block-list-appender__toggle {
+				display: flex !important;
+			}
+		}
+	}
+}

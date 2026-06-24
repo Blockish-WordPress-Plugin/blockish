@@ -1,17 +1,34 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
+use Blockish\Core\Utilities;
+
 $label        = $attributes['label'] ?? '';
 $url          = $attributes['url'] ?? '#';
 $open_new_tab = ! empty( $attributes['openInNewTab'] );
 $has_submenu  = ! empty( trim( $content ?? '' ) );
 $link_id      = absint( $attributes['linkId'] ?? 0 );
 
+$icon          = $attributes['icon'] ?? array();
+$icon_position = $attributes['iconPosition'] ?? 'left';
+$icon_svg      = Utilities::render_icon( $icon );
+$icon_markup   = $icon_svg
+	? '<span class="blockish-navmenu-item-icon" aria-hidden="true">' . $icon_svg . '</span>'
+	: '';
+
 $rel_parts = array_filter( [
 	trim( $attributes['rel'] ?? '' ),
 	$open_new_tab ? 'noopener noreferrer' : '',
 ] );
 $rel = implode( ' ', $rel_parts );
+
+$link_class = 'blockish-navmenu-item-link';
+if ( $icon_markup ) {
+	$link_class .= ' has-icon';
+	if ( 'right' === $icon_position ) {
+		$link_class .= ' icon-position-right';
+	}
+}
 
 $wrapper_attrs = get_block_wrapper_attributes( array_merge(
 	[ 'class' => 'blockish-block-navmenu-item' ],
@@ -22,7 +39,7 @@ $submenu_arrow = '<svg class="blockish-navmenu-submenu-arrow" width="10" height=
 ?>
 <div <?php echo $wrapper_attrs; ?>>
 	<a
-		class="blockish-navmenu-item-link"
+		class="<?php echo esc_attr( $link_class ); ?>"
 		href="<?php echo esc_url( $url ); ?>"
 		<?php if ( $open_new_tab ) : ?>
 			target="_blank"
@@ -31,7 +48,13 @@ $submenu_arrow = '<svg class="blockish-navmenu-submenu-arrow" width="10" height=
 			rel="<?php echo esc_attr( $rel ); ?>"
 		<?php endif; ?>
 	>
+		<?php if ( 'right' !== $icon_position ) {
+			echo $icon_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized in render_icon
+		} ?>
 		<span><?php echo wp_kses_post( $label ); ?></span>
+		<?php if ( 'right' === $icon_position ) {
+			echo $icon_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized in render_icon
+		} ?>
 	</a>
 	<?php if ( $has_submenu ) : ?>
 		<?php

@@ -8,7 +8,9 @@ import SubmenuAppender from './submenu-appender';
 import './editor.scss';
 
 const TEMPLATE = [
-	[ 'blockish/navmenu-item', { label: __( 'Submenu Item', 'blockish' ), url: '#' } ],
+	[ 'blockish/navmenu-item', { label: __( 'Submenu Item 1', 'blockish' ), url: '#' } ],
+	[ 'blockish/navmenu-item', { label: __( 'Submenu Item 2', 'blockish' ), url: '#' } ],
+	[ 'blockish/navmenu-item', { label: __( 'Submenu Item 3', 'blockish' ), url: '#' } ],
 ];
 
 export default function Edit( props ) {

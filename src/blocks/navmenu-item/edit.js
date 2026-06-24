@@ -1,26 +1,29 @@
 import {
 	useBlockProps,
-	useInnerBlocksProps,
 	RichText,
 	BlockControls,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { link, linkOff } from '@wordpress/icons';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityRecord } from '@wordpress/core-data';
-import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 import Inspector from './inspector';
-import SubmenuIndicator from './submenu-indicator';
 import LinkPopover from './link-popover';
 import './editor.scss';
 
 export default function Edit( { attributes, setAttributes, clientId, advancedControls, onReplace } ) {
-	const { label, url, openInNewTab, linkId, linkKind, linkType } = attributes;
-	const hasRealLink = !! url && url !== '#';
+	const { label, url, openInNewTab, linkId, linkKind, linkType, icon, iconPosition } = attributes;
+	const hasRealLink = !!url;
+
+	const { BlockishIcon } = window?.blockish?.helpers || {};
+	const iconMarkup = icon && BlockishIcon ? (
+		<span className="blockish-navmenu-item-icon" aria-hidden="true">
+			<BlockishIcon icon={ icon } width={ 18 } height={ 18 } fill="currentColor" />
+		</span>
+	) : null;
 
 	const [ showLinkPopover, setShowLinkPopover ] = useState( () => ! hasRealLink );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -32,46 +35,10 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 		linkId || 0
 	);
 
-	const [ isOpen, setIsOpen ] = useState( false );
-
-	const { hasSubmenu, isSelectedOrHasSelectedChild } = useSelect(
-		( select ) => {
-			const { getBlockOrder, isBlockSelected, hasSelectedInnerBlock } =
-				select( 'core/block-editor' );
-			return {
-				hasSubmenu: getBlockOrder( clientId ).length > 0,
-				isSelectedOrHasSelectedChild:
-					isBlockSelected( clientId ) ||
-					hasSelectedInnerBlock( clientId, true ),
-			};
-		},
-		[ clientId ]
-	);
-
-	useEffect( () => {
-		setIsOpen( isSelectedOrHasSelectedChild );
-	}, [ isSelectedOrHasSelectedChild ] );
-
-	const isSubmenuOpen = hasSubmenu && isOpen;
-
 	const blockProps = useBlockProps( {
-		className: clsx( 'blockish-block-navmenu-item', {
-			'has-submenu': hasSubmenu,
-			'is-submenu-open': isSubmenuOpen,
-		} ),
+		className: clsx( 'blockish-block-navmenu-item' ),
 		ref: useMergeRefs( [ setPopoverAnchor ] ),
 	} );
-
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-
-	const innerBlocksProps = useInnerBlocksProps(
-		{ className: 'blockish-block-navmenu-item-submenu-slot' },
-		{
-			allowedBlocks: [ 'blockish/navmenu-submenu' ],
-			renderAppender: false,
-			templateLock: false,
-		}
-	);
 
 	return (
 		<>
@@ -79,7 +46,6 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				advancedControls={ advancedControls }
-				hasSubmenu={ hasSubmenu }
 				hasRealLink={ hasRealLink }
 				record={ record }
 				setShowLinkPopover={ setShowLinkPopover }
@@ -96,24 +62,6 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 							setShowLinkPopover( ( v ) => ! v );
 						} }
 					/>
-					{ ! hasSubmenu ? (
-						<ToolbarButton
-							label={ __( 'Add Submenu', 'blockish' ) }
-							onClick={ () => {
-								const submenu = createBlock( 'blockish/navmenu-submenu' );
-								replaceInnerBlocks( clientId, [ submenu ] );
-							} }
-						>
-							{ __( 'Add Submenu', 'blockish' ) }
-						</ToolbarButton>
-					) : (
-						<ToolbarButton
-							label={ __( 'Remove Submenu', 'blockish' ) }
-							onClick={ () => replaceInnerBlocks( clientId, [] ) }
-						>
-							{ __( 'Remove Submenu', 'blockish' ) }
-						</ToolbarButton>
-					) }
 				</ToolbarGroup>
 			</BlockControls>
 			{ showLinkPopover && (
@@ -135,11 +83,15 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 			) }
 			<div { ...blockProps }>
 				<a
-					className="blockish-navmenu-item-link"
-					href={ url || '#' }
+					className={ clsx( 'blockish-navmenu-item-link', {
+						'has-icon': !! icon,
+						'icon-position-right': iconPosition === 'right',
+					} ) }
+					href={ url }
 					onClick={ ( e ) => e.preventDefault() }
 					rel={ openInNewTab ? 'noopener noreferrer' : undefined }
 				>
+					{ iconPosition !== 'right' && iconMarkup }
 					<RichText
 						tagName="span"
 						identifier="label"
@@ -150,19 +102,8 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 						allowedFormats={ [ 'core/bold', 'core/italic' ] }
 						aria-label={ __( 'Navigation link text', 'blockish' ) }
 					/>
+					{ iconPosition === 'right' && iconMarkup }
 				</a>
-				{ hasSubmenu && (
-					<button
-						type="button"
-						className="blockish-navmenu-submenu-toggle"
-						aria-expanded={ isSubmenuOpen }
-						aria-label={ __( 'Show submenu', 'blockish' ) }
-						onClick={ () => setIsOpen( ( open ) => ! open ) }
-					>
-						<SubmenuIndicator />
-					</button>
-				) }
-				{ hasSubmenu && <div { ...innerBlocksProps } /> }
 			</div>
 		</>
 	);

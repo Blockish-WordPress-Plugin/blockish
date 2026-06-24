@@ -16,9 +16,20 @@
 		transition: background 0.15s ease, color 0.15s ease;
 	}
 
-	// A real, focusable button — see render.php for why this can't just be
-	// a click handler on the arrow icon (that was unfocusable and had no
-	// keyboard equivalent, locking keyboard users out of every submenu).
+	.blockish-navmenu-item-icon {
+		display: inline-flex;
+		align-items: center;
+		line-height: 0;
+		flex-shrink: 0;
+
+		svg {
+			display: block;
+			width: 18px;
+			height: 18px;
+			fill: currentColor;
+		}
+	}
+
 	.blockish-navmenu-submenu-toggle {
 		display: inline-flex;
 		align-items: center;
@@ -39,120 +50,6 @@
 	.blockish-navmenu-submenu-arrow {
 		flex-shrink: 0;
 		transition: transform 0.15s ease;
-	}
-
-	// Everything submenu-related is gated under .has-submenu (set on the item
-	// whenever it has a submenu child — see navmenu-item/edit.js) instead of
-	// repeating the dual ".blockish-block-navmenu-item-submenu-slot" /
-	// ".blockish-navmenu-submenu" target selectors (editor wraps the submenu
-	// in the slot div via useInnerBlocksProps, the frontend doesn't) on every
-	// single rule below. Nesting `&:hover, &.is-submenu-open` together lets
-	// Sass generate the full trigger × target cross-product instead of us
-	// hand-writing all 4 combinations per rule.
-	&.has-submenu {
-		// Dropdown panel: hidden by default, anchored under this item. Uses
-		// opacity/visibility (not display:none) so it can actually transition —
-		// menuAnimation below layers a reveal style on top of this base.
-		> .blockish-block-navmenu-item-submenu-slot,
-		> .blockish-navmenu-submenu {
-			position: absolute;
-			top: 100%;
-			left: 0;
-			z-index: 9999;
-			opacity: 0;
-			visibility: hidden;
-			pointer-events: none;
-			transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-		}
-
-		&:hover,
-		&.is-submenu-open {
-			> .blockish-block-navmenu-item-submenu-slot,
-			> .blockish-navmenu-submenu {
-				opacity: 1;
-				visibility: visible;
-				pointer-events: auto;
-			}
-
-			> .blockish-navmenu-submenu-toggle > .blockish-navmenu-submenu-arrow {
-				transform: rotate( 180deg );
-			}
-		}
-
-		// menuAnimation (set on the ancestor .blockish-navmenu-nav) controls how
-		// the dropdown submenu reveals — matches GutenKit's nav-menu-item
-		// style.scss fadeInUp/transform/transformPerspective/rotateY variants.
-		.blockish-navmenu-nav.menu-animation-fadeInUp & {
-			> .blockish-block-navmenu-item-submenu-slot,
-			> .blockish-navmenu-submenu {
-				top: 120%;
-			}
-
-			&:hover,
-			&.is-submenu-open {
-				> .blockish-block-navmenu-item-submenu-slot,
-				> .blockish-navmenu-submenu {
-					top: 100%;
-				}
-			}
-		}
-
-		.blockish-navmenu-nav.menu-animation-transform & {
-			> .blockish-block-navmenu-item-submenu-slot,
-			> .blockish-navmenu-submenu {
-				transform-origin: top center;
-				transform: scaleY( 0 );
-			}
-
-			&:hover,
-			&.is-submenu-open {
-				> .blockish-block-navmenu-item-submenu-slot,
-				> .blockish-navmenu-submenu {
-					transform: scaleY( 1 );
-				}
-			}
-		}
-
-		.blockish-navmenu-nav.menu-animation-transformPerspective & {
-			> .blockish-block-navmenu-item-submenu-slot,
-			> .blockish-navmenu-submenu {
-				transform-origin: top;
-				transform: perspective( 300px ) rotateX( -18deg );
-				transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease-out;
-			}
-
-			&:hover,
-			&.is-submenu-open {
-				> .blockish-block-navmenu-item-submenu-slot,
-				> .blockish-navmenu-submenu {
-					transform: perspective( 300px ) rotateX( 0deg );
-				}
-			}
-		}
-
-		.blockish-navmenu-nav.menu-animation-rotateY & {
-			> .blockish-block-navmenu-item-submenu-slot,
-			> .blockish-navmenu-submenu {
-				transform-origin: top center;
-				perspective: 1000px;
-			}
-
-			&:hover,
-			&.is-submenu-open {
-				> .blockish-block-navmenu-item-submenu-slot,
-				> .blockish-navmenu-submenu {
-					animation: blockishSubmenuRotateY 500ms ease-in-out forwards;
-				}
-			}
-		}
-
-		// Nested (second-level+) submenus open to the side instead of stacking
-		// below — wins over the menuAnimation top-shift above via specificity.
-		.blockish-navmenu-submenu & > .blockish-block-navmenu-item-submenu-slot,
-		.blockish-navmenu-submenu & > .blockish-navmenu-submenu {
-			top: 0;
-			left: 100%;
-		}
 	}
 }
 

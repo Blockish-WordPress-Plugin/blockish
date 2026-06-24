@@ -3,19 +3,12 @@
 	.blockish-navmenu-item-link {
 		cursor: text;
 
-		// RichText sets its own inline `style="white-space: pre-wrap"` on the
-		// editable span, which (being inline) beats our class-based nowrap and
-		// makes long labels wrap inside the toolbar area. Force it to match
-		// the parent link's white-space instead of hardcoding one value here.
 		.rich-text {
 			white-space: inherit !important;
 		}
 	}
 }
 
-// This class has no built-in styling anywhere in @wordpress/*, so without
-// this rule the trap div in link-popover.js renders with zero size and
-// never actually intercepts a click.
 .components-popover-pointer-events-trap {
 	position: fixed;
 	inset: 0;

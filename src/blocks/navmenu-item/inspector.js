@@ -11,7 +11,6 @@ const Inspector = ( {
 	attributes,
 	setAttributes,
 	advancedControls,
-	hasSubmenu,
 	hasRealLink,
 	record,
 	setShowLinkPopover,
@@ -70,7 +69,7 @@ const Inspector = ( {
 										<LinkControl
 											hasRichPreviews
 											value={ {
-												url: url && url !== '#' ? url : undefined,
+												url: url ? url : undefined,
 												title: label || undefined,
 												opensInNewTab: openInNewTab,
 												id: linkId || undefined,
@@ -113,43 +112,76 @@ const Inspector = ( {
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 								/>
+								<BlockishControl type="BlockishDivider" />
+								<BlockishControl
+									type="BlockishIconPicker"
+									label={ __( 'Icon', 'blockish' ) }
+									slug="icon"
+								/>
+								{ attributes?.icon && (
+									<BlockishControl
+										type="BlockishToggleGroup"
+										label={ __( 'Icon Position', 'blockish' ) }
+										slug="iconPosition"
+										options={ [
+											{ value: 'left', label: __( 'Left', 'blockish' ) },
+											{ value: 'right', label: __( 'Right', 'blockish' ) },
+										] }
+										left="60px"
+									/>
+								) }
 							</BlockishControl>
 						) }
-						{ tabName === 'style' && hasSubmenu && (
+						{ tabName === 'style' && (
 							<BlockishControl
 								type="BlockishPanelBody"
-								title={ __( 'Submenu Indicator', 'blockish' ) }
+								title={ __( 'Item', 'blockish' ) }
 								initialOpen={ true }
+								help={ __(
+									'Override this single item — handy for turning the last item into a button (combine with the Advanced tab for background, border and padding).',
+									'blockish'
+								) }
 							>
-								<BlockishResponsiveControl
-									type="BlockishRangeUnit"
-									label={ __( 'Icon Size', 'blockish' ) }
-									slug="subMenuIndicatorIconSize"
-									left="60px"
-								/>
-								<BlockishResponsiveControl
-									type="BlockishRangeUnit"
-									label={ __( 'Left Spacing', 'blockish' ) }
-									slug="subMenuIndicatorLeftSpacing"
-									left="75px"
-								/>
+								<BlockishControl
+									type="BlockishTab"
+									tabs={ [
+										{ name: 'text-normal', title: 'Normal' },
+										{ name: 'text-hover', title: 'Hover' },
+									] }
+								>
+									{ ( { name } ) => (
+										<>
+											{ name === 'text-normal' && (
+												<BlockishControl
+													type="BlockishColor"
+													label={ __( 'Text Color', 'blockish' ) }
+													slug="itemTextColor"
+												/>
+											) }
+											{ name === 'text-hover' && (
+												<BlockishControl
+													type="BlockishColor"
+													label={ __( 'Text Color', 'blockish' ) }
+													slug="itemTextColorHover"
+												/>
+											) }
+										</>
+									) }
+								</BlockishControl>
+								<BlockishControl type="BlockishDivider" />
 								<BlockishGroupControl
-									type="BlockishBorder"
-									label={ __( 'Border', 'blockish' ) }
-									slug="subMenuIndicatorBorder"
+									type="BlockishTypography"
+									label={ __( 'Typography', 'blockish' ) }
+									slug="itemTypography"
 								/>
-								<BlockishResponsiveControl
-									type="BlockishSpacingSizes"
-									label={ __( 'Padding', 'blockish' ) }
-									slug="subMenuIndicatorPadding"
-									left="52px"
-								/>
-								<BlockishResponsiveControl
-									type="BlockishBorderRadius"
-									label={ __( 'Border Radius', 'blockish' ) }
-									slug="subMenuIndicatorBorderRadius"
-									left="44px"
-								/>
+								{ attributes?.icon && (
+									<BlockishResponsiveControl
+										type="BlockishRangeUnit"
+										label={ __( 'Icon Size', 'blockish' ) }
+										slug="iconSize"
+										left="60px"
+									/>
+								) }
 							</BlockishControl>
 						) }
 						{ tabName === 'advanced' && advancedControls }

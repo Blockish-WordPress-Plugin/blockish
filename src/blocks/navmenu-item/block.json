@@ -7,16 +7,14 @@
 	"category": "blockish-framework",
 	"description": "Item for the Nav Menu block.",
 	"icon": "minus",
-	"parent": ["blockish/navmenu", "blockish/navmenu-submenu"],
-	"allowedBlocks": ["blockish/navmenu-submenu"],
+	"parent": ["blockish/navmenu", "blockish/offcanvas"],
 	"attributes": {
 		"label": {
 			"type": "string",
 			"default": ""
 		},
 		"url": {
-			"type": "string",
-			"default": "#"
+			"type": "string"
 		},
 		"openInNewTab": {
 			"type": "boolean",
@@ -41,6 +39,38 @@
 		"rel": {
 			"type": "string",
 			"default": ""
+		},
+		"icon": {
+			"type": "object"
+		},
+		"iconPosition": {
+			"type": "string",
+			"default": "left"
+		},
+		"iconSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-item-icon svg": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"itemTextColor": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-item-link": "color: {{VALUE}};"
+			}
+		},
+		"itemTextColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-item-link:hover": "color: {{VALUE}};"
+			}
+		},
+		"itemTypography": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTypography",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-item-link"
+			}
 		},
 		"subMenuIndicatorIconSize": {
 			"type": "object",
@@ -83,5 +113,6 @@
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js",
 	"render": "file:./render.php"
 }

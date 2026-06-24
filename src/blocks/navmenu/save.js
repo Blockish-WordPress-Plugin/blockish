@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 
 export default function Save( { attributes } ) {
-	const { isVertical, menuAnimation } = attributes;
+	const { isVertical } = attributes;
 
 	const blockProps = useBlockProps.save( {
 		className: clsx( 'blockish-navmenu', {
@@ -12,7 +12,7 @@ export default function Save( { attributes } ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps.save( {
-		className: clsx( 'blockish-navmenu-nav', `menu-animation-${ menuAnimation || 'none' }` ),
+		className: 'blockish-navmenu-nav',
 	} );
 
 	return (
