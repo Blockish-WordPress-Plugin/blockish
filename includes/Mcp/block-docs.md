@@ -296,7 +296,18 @@ Individual top-level Responsive attributes (not a Stringified-JSON shape). Set o
 
 Hover variants use the same names with a `Hover` suffix (`rotateZHover`, `scaleHover`, `translateZHover`, `scale3DXHover`, etc.) — same defaults, same units. `transformTransitionDuration` is a Scalar (number of seconds), default unset.
 
-You never need to set `applyTransform`, `applyTransformHover`, or `applyTransformOriginCustom` — all three default to `true` and apply automatically whenever you set any transform/transformOrigin attribute above.
+**You must turn transforms on explicitly — this is the single easiest transform mistake to make.** `applyTransform` (normal state) and `applyTransformHover` (hover state) are booleans that both default to **`false`**. If you set any transform attribute above but leave the matching enable flag off, the transform is **emitted as nothing — it has zero effect**. So:
+
+- Set `"applyTransform": true` whenever you use **any** normal-state transform or `transformOrigin` attribute (`rotateZ`, `rotateX`, `scale`, `translateX`, `perspective`, `skewY`, `transformOrigin`, etc.).
+- Set `"applyTransformHover": true` whenever you use **any** `*Hover` transform attribute (`scaleHover`, `rotateZHover`, …).
+
+`applyTransformOriginCustom` is the one exception you still never set — it defaults `true` and auto-applies when `transformOrigin` is `"custom"`.
+
+```json
+"attributes": { "rotateZ": { "Desktop": "6" }, "scale": { "Desktop": "1.05" }, "applyTransform": true }
+```
+
+(Why it's off by default: when always-on, the global transform put a `perspective(...)` on every block wrapper, which made every block a containing block for `position: fixed` descendants and broke fixed/sticky overlays. It's now opt-in.)
 
 **Do not use `transform` or `rotate`** (two separate legacy attributes, both Responsive, both doing a plain Z-axis `rotate({{VALUE}}deg)` directly on the CSS `transform` property). They exist for backwards compatibility and bypass the composable system entirely — mixing either of them with `rotateZ`/`scale`/etc. causes the two to fight over the same CSS property. Always use `rotateZ` for rotation, never `transform`/`rotate`.
 
@@ -415,14 +426,21 @@ Workflow: call `blockish/get-classes` to check for an existing class → if need
 
 "Accepts children" tells you whether `innerBlocks` is valid for that block. Leaf blocks (no) must not have `innerBlocks`.
 
-### 7.1 WP-core `anchor` / `align` (not in each block's own attribute list)
+### 7.1 WP-core `anchor` / `align` / `metadata` (not in each block's own attribute list)
 
-These two are not custom Blockish attributes — they come from WordPress core's block "supports" system, but they're real, settable attributes via your schema's `attributes` object just like any other.
+These are not custom Blockish attributes — they come from WordPress core, but they're real, settable attributes via your schema's `attributes` object just like any other.
 
 - `anchor` (Scalar string) — sets the block wrapper's HTML `id`. Supported by **every Blockish block except `blockish/button`**.
-- `align` (Scalar string, `"wide"` or `"full"`) — WP-core wide/full-width alignment (theme-dependent visual effect). Supported by top-level/standalone blocks (container, heading, image, video, icon, rating, counter, progress-bar, google-map, icon-list, social-icons, tab, accordion) — **not** supported by child-only blocks (`accordion-item`, `icon-list-item`, `social-icon-item`, `tab-item`) or by `blockish/button`.
+- `align` (Scalar string, `"wide"` or `"full"`) — WP-core wide/full-width alignment (theme-dependent visual effect). Supported by top-level/standalone blocks (container, heading, image, video, icon, rating, counter, progress-bar, google-map, icon-list, social-icons, tab, accordion, navigation) — **not** supported by child-only blocks (`accordion-item`, `icon-list-item`, `social-icon-item`, `tab-item`, `navmenu`, `offcanvas`, `navmenu-item`) or by `blockish/button`. (`navmenu`/`offcanvas` still support `anchor`; `navmenu-item` does not.)
+- `metadata` (object) — set `{ "name": "..." }` to give the block a human-readable label in the editor's List View. Supported by **every block**; it changes the editor label only, never the rendered output.
 
-Each block's table below calls these out only where relevant (container, button); assume `anchor` works everywhere else unless noted.
+Each block's table below calls `anchor`/`align` out only where relevant (container, button); assume `anchor` works everywhere else unless noted.
+
+**Name every meaningful block via `metadata.name` — do this by default, on every block you emit.** Give each a short, descriptive, page-unique name (`"Hero Section"`, `"Pricing Card – Pro"`, `"Header Nav"`, `"Footer CTA Button"`). This is the mechanism that makes later edits reliable: when a human later asks to change one section, you read the post's content and locate the exact block by its name instead of guessing from attributes (see §10). Keep names readable and unique within a page; only reuse a name when two blocks are genuinely interchangeable. A repeated structure can be numbered (`"Feature Card 1"`, `"Feature Card 2"`).
+
+```json
+"metadata": { "name": "Primary CTA Button" }
+```
 
 ---
 
@@ -971,6 +989,143 @@ Must be a child of `blockish/tab`. **Accepts children: yes** (any blocks — thi
 
 ---
 
+### The navigation family (`navigation` → `navmenu` + `offcanvas` → `navmenu-item`)
+
+A site nav menu is **never** a single block — it's a fixed nesting tree, and the blocks are parent-locked so they only validate in this exact arrangement:
+
+```
+blockish/navigation              (top-level wrapper — the only one you place directly)
+├── blockish/navmenu             (the desktop horizontal menu)
+│   └── blockish/navmenu-item …  (each link)
+└── blockish/offcanvas           (the mobile slide-in drawer + hamburger)
+    └── blockish/navmenu-item …  (auto-mirrored from navmenu — usually leave empty)
+```
+
+Hard rules:
+- **Always start from `blockish/navigation`.** `navmenu` and `offcanvas` are `parent`-locked to `navigation`; `navmenu-item` is locked to `navmenu`/`offcanvas`. Emitting any of them at the top level (or in any other parent) produces an invalid block.
+- **Set `"hasStarted": true` on `blockish/navigation`** (same idea as container's `isVariationPicked` — without it the block can render its empty "Start Blank" placeholder instead of your menu).
+- **The `offcanvas` mirrors the `navmenu` automatically** when its `syncWithMenu` is `true` (the default): leave its `innerBlocks` empty `[]` and it copies the navmenu's items as the mobile menu. Only set `syncWithMenu: false` and give it its own `navmenu-item` children if you deliberately want a *different* mobile menu. Never duplicate the same items into both by hand while sync is on — they'll be overwritten.
+- The `navigation` block's breakpoint controls when desktop↔mobile swap happens; the `offcanvas` is hidden on desktop and the `navmenu` is hidden on mobile automatically.
+
+Minimal working menu (this is the canonical shape — copy it):
+```json
+{
+  "name": "blockish/navigation",
+  "attributes": { "hasStarted": true },
+  "innerBlocks": [
+    {
+      "name": "blockish/navmenu",
+      "attributes": {},
+      "innerBlocks": [
+        { "name": "blockish/navmenu-item", "attributes": { "label": "Home", "url": "/" } },
+        { "name": "blockish/navmenu-item", "attributes": { "label": "About", "url": "/about" } },
+        { "name": "blockish/navmenu-item", "attributes": { "label": "Contact", "url": "/contact" } }
+      ]
+    },
+    { "name": "blockish/offcanvas", "attributes": {}, "innerBlocks": [] }
+  ]
+}
+```
+
+---
+
+### `blockish/navigation`
+
+Top-level navigation wrapper. **Accepts children: yes** (only `blockish/navmenu` and `blockish/offcanvas`).
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `hasStarted` | Scalar (boolean) | `false` | **Always set to `true`.** |
+| `menuBreakpoint` | Scalar (string) | `"tablet"` | `"tablet"` (collapse ≤1024px) `"mobile"` (collapse ≤768px) `"custom"` (use `menuCustomBreakpoint`) — below this width the desktop `navmenu` hides and the `offcanvas` hamburger shows |
+| `menuCustomBreakpoint` | Scalar (number, px) | `1024` | Max-width threshold, used when `menuBreakpoint` = `"custom"` |
+| `justifyContent` | Responsive-Option | unset | `"flex-start"` `"center"` `"flex-end"` `"space-between"` — horizontal placement of the menu/hamburger row |
+| `anchor` | Scalar (string) | unset | WP-core HTML `id`. See §7.1. |
+| `align` | Scalar (string) | unset | `"wide"` `"full"`. See §7.1. |
+
+---
+
+### `blockish/navmenu`
+
+The desktop menu row. Must be a child of `blockish/navigation`. **Accepts children: yes** (only `blockish/navmenu-item`).
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `isVertical` | Scalar (boolean) | `false` | Stack items vertically instead of in a row |
+| `justifyContent` | Responsive-Option | unset | `"flex-start"` `"center"` `"flex-end"` `"space-between"` `"space-around"` `"space-evenly"` |
+| `alignItems` | Responsive-Option | unset | `"flex-start"` `"center"` `"flex-end"` `"stretch"` |
+| `navGap` | Responsive (length) | unset | Gap between items |
+| `itemColorNormal` | Color | unset | Link text, normal |
+| `itemColorHover` | Color | unset | Link text, hover |
+| `itemColorActive` | Color | unset | Link text, current-page item |
+| `itemBgNormal` | Stringified-JSON (Background) | unset | Normal |
+| `itemBgHover` | Stringified-JSON (Background) | unset | Hover |
+| `itemBgActive` | Stringified-JSON (Background) | unset | Current-page item |
+| `itemTypography` | Stringified-JSON (Typography) | unset | Applies to all items |
+| `itemBorderRadius` | Border-Radius | unset | |
+| `itemPadding` | Spacing | unset | |
+
+---
+
+### `blockish/navmenu-item`
+
+A single menu link. Must be a child of `blockish/navmenu` or `blockish/offcanvas`. **Accepts children: no.** Does **not** support `anchor`.
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `label` | Scalar (string, HTML allowed) | `""` | Link text (bold/italic allowed) |
+| `url` | Scalar (string, URL) | unset | Plain href, e.g. `"/about"` or `"https://…"`. (Internal `linkId`/`linkKind`/`linkType` exist for WP-entity links set via the editor UI — don't set them yourself; just use `url`.) |
+| `openInNewTab` | Scalar (boolean) | `false` | |
+| `rel` | Scalar (string) | `""` | `rel` attribute, space-separated |
+| `description` | Scalar (string) | `""` | Optional sub-text (theme-dependent) |
+| `icon` | Icon | unset | Optional icon next to the label |
+| `iconPosition` | Scalar (string) | `"left"` | `"left"` (before label) `"right"` (after) |
+| `iconSize` | Responsive (length) | unset | |
+| `itemTextColor` | Color | unset | Per-item text override (normal) — use to style one item as a button (combine with the global Advanced `background`/`border`/`padding`) |
+| `itemTextColorHover` | Color | unset | Per-item text override (hover) |
+| `itemTypography` | Stringified-JSON (Typography) | unset | Per-item typography override |
+
+---
+
+### `blockish/offcanvas`
+
+The mobile slide-in drawer + hamburger trigger. Must be a child of `blockish/navigation`. **Accepts children: yes** (only `blockish/navmenu-item`) — but with `syncWithMenu: true` (default) leave `innerBlocks` empty; it mirrors the sibling `navmenu`.
+
+| Attribute | Type | Default | Notes/enum |
+|---|---|---|---|
+| `syncWithMenu` | Scalar (boolean) | `true` | When `true`, items are an auto-copied, locked mirror of the sibling `navmenu` — leave `innerBlocks` empty. Set `false` to give the drawer its own `navmenu-item` children. |
+| `offcanvasSide` | Scalar (string) | `"left"` | `"left"` `"right"` — edge the panel slides from |
+| `offcanvasAnimation` | Scalar (string) | `"slide"` | `"slide"` `"fade"` `"slideFade"` `"scale"` |
+| `hamburgerIcon` | Icon | unset | Custom trigger icon; unset = default three-bar icon |
+| `hamburgerAlign` | Scalar (string) | `"left"` | `"left"` `"center"` `"right"` — position of the hamburger button |
+| `hamburgerColor` | Color | unset | |
+| `hamburgerSize` | Responsive (length) | unset | Sets button width+height |
+| `headerType` | Scalar (string) | `"siteTitle"` | Panel header content: `"none"` `"siteTitle"` (live WP title) `"siteLogo"` (live theme logo) `"customImage"` (use `headerImage`) `"customText"` (use `headerText`) |
+| `headerText` | Scalar (string) | `""` | Used when `headerType` = `"customText"` |
+| `headerImage` | Image | unset | Used when `headerType` = `"customImage"` |
+| `headerLogoWidth` | Responsive (length) | unset | For `siteLogo`/`customImage` |
+| `headerBg` | Stringified-JSON (Background) | unset | Panel header |
+| `headerPadding` | Spacing | unset | Panel header |
+| `headerBorder` | Stringified-JSON (Border) | unset | Panel header divider |
+| `headerTitleColor` | Color | unset | Title/text color |
+| `headerTitleTypography` | Stringified-JSON (Typography) | unset | |
+| `panelBg` | Stringified-JSON (Background) | unset | Drawer panel |
+| `panelWidth` | Responsive (length) | unset | Drawer width (default `min(320px, 85vw)`) |
+| `panelPadding` | Spacing | unset | |
+| `overlayBg` | Color | unset | Dimmed backdrop |
+| `closeIconColor` | Color | unset | Close button, normal |
+| `closeIconColorHover` | Color | unset | Close button, hover |
+| `closeBgNormal` | Stringified-JSON (Background) | unset | |
+| `closeBgHover` | Stringified-JSON (Background) | unset | |
+| `closeSize` | Responsive (length) | unset | Close button width+height |
+| `closeIconSize` | Responsive (length) | unset | Close glyph font-size |
+| `closeBorderRadius` | Border-Radius | unset | |
+| `itemColorNormal` | Color | unset | Drawer item text, normal |
+| `itemColorHover` | Color | unset | Drawer item text, hover |
+| `itemTypography` | Stringified-JSON (Typography) | unset | |
+| `itemPadding` | Spacing | unset | |
+
+---
+
 ## 8. Composite examples
 
 ### Hero section (nested container + heading + button)
@@ -1053,6 +1208,43 @@ Note what's omitted because it already matches the container's defaults: `displa
 }
 ```
 
+### Site header (logo container + navigation menu)
+
+A header is a `blockish/container` (row, space-between) holding a logo on the left and the navigation on the right. The `offcanvas` is left empty so it mirrors the desktop menu for mobile automatically.
+
+```json
+{
+  "name": "blockish/container",
+  "attributes": {
+    "isVariationPicked": true,
+    "tagName": { "label": "Header", "value": "header" },
+    "justifyContent": { "Desktop": { "label": "Space Between", "value": "space-between" } },
+    "alignItems": { "Desktop": { "label": "Center", "value": "center" } },
+    "padding": { "top": "16px", "right": "40px", "bottom": "16px", "left": "40px" }
+  },
+  "innerBlocks": [
+    { "name": "blockish/image", "attributes": { "image": { "id": 0, "url": "https://example.com/logo.png" }, "alt": "Logo", "imageWidth": { "Desktop": "140px" } } },
+    {
+      "name": "blockish/navigation",
+      "attributes": { "hasStarted": true, "menuBreakpoint": "tablet" },
+      "innerBlocks": [
+        {
+          "name": "blockish/navmenu",
+          "attributes": { "navGap": { "Desktop": "28px" } },
+          "innerBlocks": [
+            { "name": "blockish/navmenu-item", "attributes": { "label": "Home", "url": "/" } },
+            { "name": "blockish/navmenu-item", "attributes": { "label": "Features", "url": "/features" } },
+            { "name": "blockish/navmenu-item", "attributes": { "label": "Pricing", "url": "/pricing" } },
+            { "name": "blockish/navmenu-item", "attributes": { "label": "Contact", "url": "/contact" } }
+          ]
+        },
+        { "name": "blockish/offcanvas", "attributes": { "offcanvasSide": "right" }, "innerBlocks": [] }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ## 9. TODO / needs verification
@@ -1068,6 +1260,7 @@ These are behaviors confirmed by actually using the abilities end-to-end, not ju
 - **`block_schema` REPLACES the staged schema, it does not merge or append.** Calling `blockish/manage-post` with `block_schema` again before the previous one has been applied in the editor discards the old pending schema entirely. There is no "add to the pending schema" — always submit the complete schema you want staged.
 - **`get-posts`' `content` field reflects only what's already been *applied* in the editor**, not whatever schema is currently pending/staged. Read it to know the real, live state of a post before building an edit — it will not show you what an unapplied pending schema would add.
 - **There is no single-attribute patch for an already-applied block.** To correct something a human already approved into real blocks: read the post's current `content`, find the block in question, build a corrected replacement schema for that block/section (reproducing every attribute they already have — not just the one you're changing, or you will silently revert their other edits), stage it, then have the human select the old block in the editor and apply via **Replace**. Never write raw `<!-- wp:blockish/... -->` markup into `post_content` directly — that bypasses the whole apply flow and produces invalid/empty blocks (see earlier sections on why hand-written markup fails).
+- **Naming blocks up front is what makes that "find the block in question" step reliable.** Every block you emit should carry a `metadata.name` (see §7.1). The saved markup records it as `{"metadata":{"name":"Hero Section"}}` in the block delimiter, so when you read a post's `content` later you can match the exact block by its readable name instead of inferring it from a pile of attributes — and tell the human precisely which named block to select before applying a **Replace**. Unnamed blocks force you to guess, which is where wrong-block edits happen.
 - **Very large or deeply nested schemas (~4+ levels deep) can fail with a misleading error** like `name is a required property of block_schema[0]` — this is a size/depth limit being hit, not an actual schema mistake. If you see this error on a structurally-correct schema: flatten unnecessary wrapper levels (e.g. put an icon directly on a card-like block instead of wrapping it in an extra container "chip"), and split a large page into multiple `manage-post` calls (e.g. stage and apply one section at a time) rather than one giant nested tree.
 - **Featured image is two calls, in order:** `blockish/get-media` first (check if a suitable image already exists) → `blockish/upload-media` only if needed (public, direct `.jpg`/`.jpeg`/`.png`/`.gif`/`.webp` URL) → pass the resulting `attachment_id` as `featured_media` to `blockish/manage-post`.
 - **Global Styles are reachable through `blockish/manage-post` too** — they're an ordinary post of type `wp_global_styles`, one per active theme, with the style overrides stored as JSON in `post_content`. This lets you override theme.json-level settings (which you otherwise cannot touch via any ability) without modifying any file — fully reversible the same way. No ability reports which theme is active or which `wp_global_styles` post belongs to it; infer it as the most-recently-modified `wp_global_styles` post (via `blockish/get-posts` with `post_type: "wp_global_styles"`), or ask. Example payload to remove block gap site-wide:
