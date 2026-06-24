@@ -171,6 +171,7 @@ const TransformOriginControls = memo( function TransformOriginControls( {
 				type="SelectControl"
 				slug="transformOrigin"
 				options={ ORIGIN_OPTIONS }
+				__next40pxDefaultSize
 			/>
 			{ selectedOrigin === 'custom' && (
 				<>
@@ -230,25 +231,40 @@ const Transform = ( { attributes, setAttributes } ) => {
 			>
 				{ ( { name: tabName } ) => {
 					const isHover = tabName === 'transform-hover';
+					const enableSlug = isHover ? 'applyTransformHover' : 'applyTransform';
+					const isEnabled = !! attributes?.[ enableSlug ];
 					const resetSlugs = getResetSlugs( isHover );
 					const canReset = hasAnyValueSet( attributes, resetSlugs );
 					return (
 						<>
-							<TransformDropdown
-								isHover={ isHover }
-								BlockishResponsiveControl={ BlockishResponsiveControl }
-								onReset={ () => handleReset( isHover ) }
-								canReset={ canReset }
+							<BlockishControl
+								type="ToggleControl"
+								slug={ enableSlug }
+								label={ __( 'Enable Transform', 'blockish' ) }
+								help={ __(
+									'Transform styles only take effect once enabled.',
+									'blockish'
+								) }
 							/>
+							{ isEnabled && (
+								<TransformDropdown
+									isHover={ isHover }
+									BlockishResponsiveControl={ BlockishResponsiveControl }
+									onReset={ () => handleReset( isHover ) }
+									canReset={ canReset }
+								/>
+							) }
 						</>
 					);
 				} }
 			</BlockishControl>
-			<TransformOriginControls
-				attributes={ attributes }
-				BlockishControl={ BlockishControl }
-				BlockishResponsiveControl={ BlockishResponsiveControl }
-			/>
+			{ ( attributes?.applyTransform || attributes?.applyTransformHover ) && (
+				<TransformOriginControls
+					attributes={ attributes }
+					BlockishControl={ BlockishControl }
+					BlockishResponsiveControl={ BlockishResponsiveControl }
+				/>
+			) }
 		</BlockishControl>
 	);
 };

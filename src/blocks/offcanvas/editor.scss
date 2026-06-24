@@ -1,0 +1,18 @@
+.blockish-offcanvas {
+	.blockish-offcanvas-nav {
+		// Match the frontend's tight, flush list: strip the editor's default
+		// block spacing between items so the divider borders sit flush.
+		> .blockish-block-navmenu-item {
+			margin: 0;
+		}
+
+		> .block-list-appender {
+			position: relative !important;
+
+			.block-editor-inserter__toggle.components-button.has-icon,
+			.block-list-appender__toggle {
+				display: flex !important;
+			}
+		}
+	}
+}

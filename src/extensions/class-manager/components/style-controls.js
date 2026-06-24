@@ -586,7 +586,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
             <div className="blockish-class-manager-effect-panel">
             <BlockishResponsive left="50px">
                 <RangeControl
-                    __next40pxDefaultSize
+                    
                     __nextHasNoMarginBottom
                     label={__('Opacity', 'blockish')}
                     value={typeof value?.opacity?.[device] === 'number' ? value?.opacity?.[device] : 1}
@@ -634,7 +634,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="44px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Rotate', 'blockish')}
                                 value={typeof value?.rotate?.[device] === 'number' ? value?.rotate?.[device] : 0}
@@ -646,7 +646,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="55px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Rotate X', 'blockish')}
                                 value={typeof value?.rotateX?.[device] === 'number' ? value?.rotateX?.[device] : 0}
@@ -658,7 +658,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="55px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Rotate Y', 'blockish')}
                                 value={typeof value?.rotateY?.[device] === 'number' ? value?.rotateY?.[device] : 0}
@@ -670,7 +670,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="55px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Rotate Z', 'blockish')}
                                 value={typeof value?.rotateZ?.[device] === 'number' ? value?.rotateZ?.[device] : 0}
@@ -682,7 +682,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="44px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Scale', 'blockish')}
                                 value={typeof value?.scale?.[device] === 'number' ? value?.scale?.[device] : 1}
@@ -694,7 +694,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="80px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Scale X (3D)', 'blockish')}
                                 value={typeof value?.scale3DX?.[device] === 'number' ? value?.scale3DX?.[device] : 1}
@@ -706,7 +706,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="80px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Scale Y (3D)', 'blockish')}
                                 value={typeof value?.scale3DY?.[device] === 'number' ? value?.scale3DY?.[device] : 1}
@@ -718,7 +718,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="80px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Scale Z (3D)', 'blockish')}
                                 value={typeof value?.scale3DZ?.[device] === 'number' ? value?.scale3DZ?.[device] : 1}
@@ -730,7 +730,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="45px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Skew X', 'blockish')}
                                 value={typeof value?.skewX?.[device] === 'number' ? value?.skewX?.[device] : 0}
@@ -742,7 +742,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         </BlockishResponsive>
                         <BlockishResponsive left="45px">
                             <RangeControl
-                                __next40pxDefaultSize
+                                
                                 __nextHasNoMarginBottom
                                 label={__('Skew Y', 'blockish')}
                                 value={typeof value?.skewY?.[device] === 'number' ? value?.skewY?.[device] : 0}
@@ -809,10 +809,11 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                         value={value?.transitionProperty?.[device] || 'all'}
                         onChange={(next) => onChangeResponsiveValue('transitionProperty', next)}
                         help={__('Example: all, opacity, transform', 'blockish')}
+                        __next40pxDefaultSize
                     />
                     <BlockishResponsive left="148px">
                         <RangeControl
-                            __next40pxDefaultSize
+                            
                             __nextHasNoMarginBottom
                             label={__('Transition Duration (s)', 'blockish')}
                             value={typeof value?.transitionDuration?.[device] === 'number' ? value?.transitionDuration?.[device] : 0.2}
@@ -824,7 +825,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                     </BlockishResponsive>
                     <BlockishResponsive left="126px">
                         <RangeControl
-                            __next40pxDefaultSize
+                            
                             __nextHasNoMarginBottom
                             label={__('Transition Delay (s)', 'blockish')}
                             value={typeof value?.transitionDelay?.[device] === 'number' ? value?.transitionDelay?.[device] : 0}

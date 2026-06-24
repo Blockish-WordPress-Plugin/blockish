@@ -1,0 +1,104 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/navmenu",
+	"version": "1.0.0",
+	"title": "Nav Menu",
+	"category": "blockish-framework",
+	"description": "Nav menu block for gutenberg.",
+	"icon": "menu",
+	"keywords": ["nav", "menu", "navigation", "navbar"],
+	"parent": [ "blockish/navigation" ],
+	"allowedBlocks": [ "blockish/navmenu-item" ],
+	"attributes": {
+		"isVertical": {
+			"type": "boolean",
+			"default": false
+		},
+		"justifyContent": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-nav": "justify-content: {{VALUE}};"
+			}
+		},
+		"alignItems": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-nav": "align-items: {{VALUE}};"
+			}
+		},
+		"navGap": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-nav": "gap: {{VALUE}};"
+			}
+		},
+		"itemColorNormal": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "color: {{VALUE}};"
+			}
+		},
+		"itemColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item:hover": "color: {{VALUE}};"
+			}
+		},
+		"itemBgNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item"
+			}
+		},
+		"itemBgHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item:hover"
+			}
+		},
+		"itemTypography": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTypography",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item"
+			}
+		},
+		"itemBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"itemPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"itemColorActive": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item.is-active": "color: {{VALUE}};"
+			}
+		},
+		"itemBgActive": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item.is-active"
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": ["wide", "full"]
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}

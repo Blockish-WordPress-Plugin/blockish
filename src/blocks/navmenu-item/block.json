@@ -1,0 +1,118 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/navmenu-item",
+	"version": "1.0.0",
+	"title": "Nav Menu Item",
+	"category": "blockish-framework",
+	"description": "Item for the Nav Menu block.",
+	"icon": "minus",
+	"parent": ["blockish/navmenu", "blockish/offcanvas"],
+	"attributes": {
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"url": {
+			"type": "string"
+		},
+		"openInNewTab": {
+			"type": "boolean",
+			"default": false
+		},
+		"linkId": {
+			"type": "number",
+			"default": 0
+		},
+		"linkKind": {
+			"type": "string",
+			"default": ""
+		},
+		"linkType": {
+			"type": "string",
+			"default": ""
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"rel": {
+			"type": "string",
+			"default": ""
+		},
+		"icon": {
+			"type": "object"
+		},
+		"iconPosition": {
+			"type": "string",
+			"default": "left"
+		},
+		"iconSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-item-icon svg": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"itemTextColor": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-item-link": "color: {{VALUE}};"
+			}
+		},
+		"itemTextColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-item-link:hover": "color: {{VALUE}};"
+			}
+		},
+		"itemTypography": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTypography",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-item-link"
+			}
+		},
+		"subMenuIndicatorIconSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-submenu-arrow": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"subMenuIndicatorLeftSpacing": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-submenu-arrow": "margin-left: {{VALUE}};"
+			}
+		},
+		"subMenuIndicatorBorder": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-navmenu-submenu-arrow"
+			}
+		},
+		"subMenuIndicatorPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-submenu-arrow": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"subMenuIndicatorBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-submenu-arrow": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": false,
+		"reusable": false
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
+}

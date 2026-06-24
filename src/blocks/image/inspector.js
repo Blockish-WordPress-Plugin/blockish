@@ -82,6 +82,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                                     onChange={(newValue) => {
                                                         setAttributes({ image: { url: newValue } });
                                                     }}
+                                                    __next40pxDefaultSize
                                                 />
                                             )
                                         }
@@ -99,6 +100,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                                                 alt: newValue
                                                             });
                                                         }}
+                                                        __next40pxDefaultSize
                                                     />
                                                     <BlockishControl
                                                         label={__('Title', 'blockish')}
@@ -110,6 +112,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                                                 title: newValue
                                                             });
                                                         }}
+                                                        __next40pxDefaultSize
                                                     />
                                                     <BlockishControl
                                                         label={__('Caption Type', 'blockish')}
@@ -120,6 +123,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                                             { label: __('Attachment Caption', 'blockish'), value: 'attachment' },
                                                             { label: __('Custom Caption', 'blockish'), value: 'custom' },
                                                         ]}
+                                                        __next40pxDefaultSize
                                                     />
                                                     {
                                                         attributes?.captionType === 'custom' && (
@@ -127,6 +131,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                                                 label={__('Caption', 'blockish')}
                                                                 slug="customCaption"
                                                                 type="TextControl"
+                                                                __next40pxDefaultSize
                                                             />
                                                         )
                                                     }

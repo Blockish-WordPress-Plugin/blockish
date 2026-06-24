@@ -3,9 +3,11 @@
 **Stack:** WordPress Gutenberg blocks plugin | PHP 7.4+ | WP 6.1+ | Namespace: `Blockish\`  
 **Version:** 1.0.3 | **Text Domain:** `blockish` | **Author:** wowdevs
 
+> **Maintenance:** This file is the canonical context doc for the plugin. Whenever you make a structural change — new/removed block, extension, REST route, DB option key, or a shift in architecture/conventions — update the relevant section below in the same session, not as a follow-up.
+
 ## Rules
 - Edit `src/` (JS/SCSS) and `includes/` (PHP) only — never touch `build/`
-- Run `npm run build` after changes; `npm run start` for watch mode
+- Don't run `npm run build` / `wp-scripts build` manually — the user runs a watch-mode dev server that rebuilds automatically
 - New PHP classes go in `includes/`, instantiate in `Blockish::plugins_loaded()`
 - All PHP classes use `SingletonTrait` — access via `ClassName::get_instance()`
 
@@ -27,7 +29,6 @@ build/                 # Compiled webpack output — DO NOT edit
 1. `src/blocks/[name]/` — `block.json`, `index.js`, `edit.js`, `save.js`, `inspector.js`, `*.scss`
 2. Name: `blockish/[name]` | Category: `blockish-framework`
 3. Register in `includes/Config/BlocksList.php`
-4. `npm run build`
 
 ## block.json CSS Patterns
 ```json
@@ -48,7 +49,6 @@ build/                 # Compiled webpack output — DO NOT edit
 ## New Extension Checklist
 1. `src/extensions/[name]/` — `block.json` (with `include`/`exclude` block list), `index.js`
 2. Register in `includes/Config/ExtensionList.php`
-3. `npm run build`
 
 ## Global Attributes
 All blocks auto-receive 100+ attributes from `build/global/block.json` — padding, margin, zIndex, position, width, flexbox, typography, colors, shadows, transforms, transitions, filters, customCss. Don't re-declare these in individual blocks.

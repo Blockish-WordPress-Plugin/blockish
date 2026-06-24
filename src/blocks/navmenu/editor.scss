@@ -1,0 +1,12 @@
+.blockish-navmenu {
+	.blockish-navmenu-nav {
+		> .block-list-appender {
+			position: relative !important;
+
+			.block-editor-inserter__toggle.components-button.has-icon,
+			.block-list-appender__toggle {
+				display: flex !important;
+			}
+		}
+	}
+}

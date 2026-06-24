@@ -39,6 +39,7 @@ const Inspector = ({ attributes, advancedControls }) => {
 											type="TextControl"
 											label={__('Text', 'blockish')}
 											slug="text"
+											__next40pxDefaultSize
 										/>
 										<BlockishControl
 											type="BlockishLink"

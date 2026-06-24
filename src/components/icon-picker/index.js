@@ -206,7 +206,7 @@ const BlockishIconPicker = ({ label, value, onChange }) => {
 
                     <div className="blockish-icon-picker-modal-footer">
                         <FormFileUpload
-                            __next40pxDefaultSize
+                            
                             icon={upload}
                             accept="image/svg+xml"
                             className='blockish-icon-picker-footer-btn'

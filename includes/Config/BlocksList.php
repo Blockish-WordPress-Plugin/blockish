@@ -140,6 +140,40 @@ class BlocksList extends ConfigList {
                 'status'  => 'active',
                 'parent'  => 'tab',
             ),
+            'navigation' => array(
+                'name'        => __('Navigation', 'blockish'),
+                'description' => __('Navigation wrapper pairing a desktop menu with a mobile offcanvas.', 'blockish'),
+                'package'     => 'free',
+                'status'      => 'active',
+            ),
+            'navmenu' => array(
+                'name'        => __('Nav Menu', 'blockish'),
+                'description' => __('Navigation menu block for headers and footers.', 'blockish'),
+                'package'     => 'free',
+                'status'      => 'active',
+                'parent'      => 'navigation',
+            ),
+            'navmenu-item' => array(
+                'name'        => __('Nav Menu Item', 'blockish'),
+                'description' => __('Item for the Nav Menu block.', 'blockish'),
+                'package'     => 'free',
+                'status'      => 'active',
+                'parent'      => 'navmenu',
+            ),
+            'offcanvas' => array(
+                'name'        => __('Off Canvas', 'blockish'),
+                'description' => __('Slide-in offcanvas panel that mirrors a nav menu.', 'blockish'),
+                'package'     => 'free',
+                'status'      => 'active',
+                'parent'      => 'navigation',
+            ),
+            // 'navmenu-submenu' => array(
+            //     'name'        => __('Nav Menu Submenu', 'blockish'),
+            //     'description' => __('Dropdown submenu panel for a Nav Menu Item.', 'blockish'),
+            //     'package'     => 'free',
+            //     'status'      => 'inactive',
+            //     'parent'      => 'navmenu-item',
+            // ),
         );
 
         $this->list = apply_filters( 'blockish/blocks/list', $this->list );

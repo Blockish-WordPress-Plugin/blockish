@@ -1,0 +1,201 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/offcanvas",
+	"version": "1.0.0",
+	"title": "Off Canvas",
+	"category": "blockish-framework",
+	"description": "Slide-in offcanvas panel with a hamburger trigger. Mirrors a sibling Nav Menu's items as real blocks.",
+	"icon": "menu-alt",
+	"keywords": ["offcanvas", "drawer", "mobile menu", "hamburger"],
+	"parent": ["blockish/navigation"],
+	"allowedBlocks": ["blockish/navmenu-item"],
+	"attributes": {
+		"syncWithMenu": {
+			"type": "boolean",
+			"default": true
+		},
+		"offcanvasAnimation": {
+			"type": "string",
+			"default": "slide"
+		},
+		"offcanvasSide": {
+			"type": "string",
+			"default": "left"
+		},
+		"hamburgerIcon": {
+			"type": "object"
+		},
+		"hamburgerAlign": {
+			"type": "string",
+			"default": "left"
+		},
+		"headerType": {
+			"type": "string",
+			"default": "siteTitle"
+		},
+		"headerText": {
+			"type": "string",
+			"default": ""
+		},
+		"headerImage": {
+			"type": "object"
+		},
+		"headerLogoWidth": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-branding img": "width: {{VALUE}};"
+			}
+		},
+		"headerBg": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-offcanvas-header"
+			}
+		},
+		"headerPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-header": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"headerBorder": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-offcanvas-header"
+			}
+		},
+		"headerTitleColor": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-branding .blockish-offcanvas-site-title": "color: {{VALUE}};"
+			}
+		},
+		"headerTitleTypography": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTypography",
+				"selector": ".{{WRAPPER}} .blockish-offcanvas-branding .blockish-offcanvas-site-title"
+			}
+		},
+		"closeIconColor": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-close": "color: {{VALUE}};"
+			}
+		},
+		"closeIconColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-close:hover": "color: {{VALUE}};"
+			}
+		},
+		"closeBgNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-offcanvas-close"
+			}
+		},
+		"closeBgHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-offcanvas-close:hover"
+			}
+		},
+		"closeSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-close": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"closeIconSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-close": "font-size: {{VALUE}};"
+			}
+		},
+		"closeBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-close": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"panelBg": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-offcanvas-panel"
+			}
+		},
+		"panelWidth": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-panel": "width: {{VALUE}};"
+			}
+		},
+		"panelPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-panel": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"overlayBg": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-overlay": "background: {{VALUE}};"
+			}
+		},
+		"hamburgerColor": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-hamburger": "color: {{VALUE}};"
+			}
+		},
+		"hamburgerSize": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-offcanvas-hamburger": "width: {{VALUE}}; height: {{VALUE}};"
+			}
+		},
+		"itemColorNormal": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "color: {{VALUE}};"
+			}
+		},
+		"itemColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item:hover": "color: {{VALUE}};"
+			}
+		},
+		"itemTypography": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTypography",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item"
+			}
+		},
+		"itemPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"reusable": false
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
+}

@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/navigation",
+	"version": "1.0.0",
+	"title": "Navigation",
+	"category": "blockish-framework",
+	"description": "Navigation wrapper that pairs a desktop Nav Menu with a mobile Offcanvas, switching between them at a breakpoint.",
+	"icon": "menu",
+	"keywords": ["nav", "navigation", "menu", "navbar", "header"],
+	"allowedBlocks": ["blockish/navmenu", "blockish/offcanvas"],
+	"attributes": {
+		"hasStarted": {
+			"type": "boolean",
+			"default": false
+		},
+		"menuBreakpoint": {
+			"type": "string",
+			"default": "tablet"
+		},
+		"menuCustomBreakpoint": {
+			"type": "number",
+			"default": 1024
+		},
+		"justifyContent": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navigation-inner": "justify-content: {{VALUE}};"
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": ["wide", "full"]
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js"
+}

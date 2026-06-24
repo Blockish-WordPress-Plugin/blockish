@@ -1,0 +1,23 @@
+.blockish-navmenu {
+	z-index: 5;
+
+	.blockish-navmenu-nav {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		:where(&) {
+			gap: 12px;
+		}
+	}
+
+	&.is-vertical {
+		.blockish-navmenu-nav {
+			flex-direction: column;
+			align-items: stretch;
+		}
+	}
+}

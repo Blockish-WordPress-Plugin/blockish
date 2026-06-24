@@ -64,7 +64,7 @@ const BlockishResponsiveControl = ({ type = "TextControl", slug, label = "", val
                 label={label || "Write your label here"}
                 value={controlValue?.[device]}
                 onChange={handleChange}
-                __next40pxDefaultSize={true}
+               
                 {...props}
             />
         </BlockishResponsive>

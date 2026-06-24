@@ -16,7 +16,6 @@ const BlockishBorder = ({ label = __('Borders', 'blockish'), value, onChange, ..
                     onChange={(nextValue) => {
                         onChange(createValue(value, nextValue, device));
                     }}
-                    __next40pxDefaultSize={true}
                     {...props}
                 />
             </BlockishResponsive>

@@ -62,7 +62,7 @@ const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = 
                                     className={
                                         !value?.id ? 'blockish-media-uploader-toggle' : 'blockish-media-uploader-preview'
                                     }
-                                    __next40pxDefaultSize
+                                    
                                     onClick={open}
                                     aria-label={
                                         !value?.id

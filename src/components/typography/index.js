@@ -156,7 +156,7 @@ const BlockishTypography = ({
 								<div className="blockish-typography-line-height">
 									<BlockishResponsive left='70px'>
 										<LineHeightControl
-											__next40pxDefaultSize
+											
 											__unstableInputWidth="100%"
 											value={typographyValue?.lineHeight?.[device]}
 											onChange={(value) => handleChange('lineHeight', {
@@ -193,6 +193,7 @@ const BlockishTypography = ({
 													label: 'rem',
 												}
 											]}
+											__next40pxDefaultSize
 										/>
 									</BlockishResponsive>	
 								</div>
