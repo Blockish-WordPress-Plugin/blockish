@@ -40,6 +40,12 @@ const Inspector = ( { attributes, advancedControls } ) => {
 											'blockish'
 										) }
 									/>
+									<BlockishControl
+										type="BlockishIconPicker"
+										label={ __( 'Hamburger Icon', 'blockish' ) }
+										slug="hamburgerIcon"
+										help={ __( 'Leave empty for the default bars icon.', 'blockish' ) }
+									/>
 									<BlockishControl type="BlockishDivider" />
 									<BlockishControl
 										type="BlockishToggleGroup"
@@ -241,12 +247,6 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									title={ __( 'Hamburger', 'blockish' ) }
 									initialOpen={ false }
 								>
-									<BlockishControl
-										type="BlockishIconPicker"
-										label={ __( 'Icon', 'blockish' ) }
-										slug="hamburgerIcon"
-										help={ __( 'Leave empty for the default bars icon.', 'blockish' ) }
-									/>
 									<BlockishControl
 										type="BlockishToggleGroup"
 										label={ __( 'Alignment', 'blockish' ) }

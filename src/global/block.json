@@ -504,14 +504,14 @@
 		},
 		"applyTransform": {
 			"type": "boolean",
-			"default": true,
+			"default": false,
 			"selectors": {
 				".{{WRAPPER}}": "transform: perspective(var(--perspective, 1000px)) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) rotateZ(var(--rotate-z, 0deg)) translateX(var(--translate-x, 0px)) translateY(var(--translate-y, 0px)) translateZ(var(--translate-z, 0px)) scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1)) scale3d(var(--scale-3d-x, 1), var(--scale-3d-y, 1), 1) skewX(var(--skew-x, 0deg)) skewY(var(--skew-y, 0deg));"
 			}
 		},
 		"applyTransformHover": {
 			"type": "boolean",
-			"default": true,
+			"default": false,
 			"selectors": {
 				".{{WRAPPER}}:hover": "transform: perspective(var(--perspective-hover, var(--perspective, 1000px))) rotateX(var(--rotate-x-hover, var(--rotate-x, 0deg))) rotateY(var(--rotate-y-hover, var(--rotate-y, 0deg))) rotateZ(var(--rotate-z-hover, var(--rotate-z, 0deg))) translateX(var(--translate-x-hover, var(--translate-x, 0px))) translateY(var(--translate-y-hover, var(--translate-y, 0px))) translateZ(var(--translate-z-hover, var(--translate-z, 0px))) scaleX(var(--scale-x-hover, var(--scale-x, 1))) scaleY(var(--scale-y-hover, var(--scale-y, 1))) scale3d(var(--scale-3d-x-hover, var(--scale-3d-x, 1)), var(--scale-3d-y-hover, var(--scale-3d-y, 1)), 1) skewX(var(--skew-x-hover, var(--skew-x, 0deg))) skewY(var(--skew-y-hover, var(--skew-y, 0deg)));"
 			}
