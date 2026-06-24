@@ -1,0 +1,104 @@
+.blockish-block-navmenu-item {
+	z-index: 100;
+	.blockish-navmenu-item-link {
+		cursor: text;
+
+		.rich-text {
+			white-space: inherit !important;
+		}
+	}
+}
+
+.components-popover-pointer-events-trap {
+	position: fixed;
+	inset: 0;
+	z-index: 99998;
+}
+
+.blockish-link-preview-card {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 2px;
+
+	&:hover,
+	&:focus-within {
+		border-color: #949494;
+	}
+
+	&__trigger {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 8px;
+		width: 100%;
+		padding: 12px;
+		background: none;
+		border: none;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	&__main {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		min-width: 0;
+	}
+
+	&__title {
+		font-weight: 600;
+		font-size: 13px;
+	}
+
+	&__url {
+		color: #757575;
+		font-size: 12px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__badges {
+		display: flex;
+		gap: 6px;
+		margin-top: 4px;
+	}
+
+	&__badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 2px;
+		padding: 2px 8px;
+		border-radius: 2px;
+		font-size: 12px;
+		background: #f0f0f0;
+		color: #1e1e1e;
+
+		&--status {
+			background: #edfaef;
+			color: #00450c;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		gap: 16px;
+		padding: 8px 12px;
+		border-top: 1px solid #ddd;
+	}
+
+	&__action {
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		color: var(--wp-admin-theme-color, #2271b1);
+		font-size: 13px;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+

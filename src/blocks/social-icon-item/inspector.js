@@ -101,6 +101,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="TextControl"
 									label={ __( 'Label', 'blockish' ) }
 									slug="label"
+									__next40pxDefaultSize
 								/>
 								<BlockishControl
 									type="BlockishIconPicker"

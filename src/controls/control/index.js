@@ -41,7 +41,7 @@ const BlockishControl = ({ type = "TextControl", slug, label = "", value: userDe
             checked={controlValue}
             value={controlValue}
             onChange={handleChange}
-            __next40pxDefaultSize={true}
+           
             {...props}
         />
     );

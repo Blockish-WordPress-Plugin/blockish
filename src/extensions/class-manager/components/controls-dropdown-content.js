@@ -268,6 +268,7 @@ const ControlsDropdownContent = ({
                                                     hideLabelFromVision
                                                     value={editInput}
                                                     onChange={setEditInput}
+                                                    __next40pxDefaultSize
                                                 />
                                             </FlexItem>
                                             <FlexItem>

@@ -353,6 +353,7 @@ export default function ClassManagerSettings({ isOpen, onRequestClose }) {
 										label={__('Class name', 'blockish')}
 										value={draft.title}
 										onChange={(next) => setDraft((prev) => ({ ...prev, title: next }))}
+										__next40pxDefaultSize
 									/>
 									<BlockishCodeEditor
 										label={__('Custom CSS', 'blockish')}

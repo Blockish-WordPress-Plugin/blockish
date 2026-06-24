@@ -554,4 +554,60 @@ class Utilities
     {
         return is_array($attribute) && array_intersect_key($attribute, array_flip(array_column($breakpoints, 'slug')));
     }
+
+    /**
+     * Renders a Blockish icon attribute (the object stored by BlockishIconPicker)
+     * to an SVG string. Mirrors the editor's helpers/icon.js: a normal icon has
+     * a numeric viewBox array + path; a custom uploaded icon has viewBox 'custom'
+     * + raw svg markup. Returns '' when there's no icon set.
+     */
+    public static function render_icon($icon, $class = 'blockish-icon')
+    {
+        if (empty($icon) || !is_array($icon)) {
+            return '';
+        }
+
+        // Custom uploaded SVG.
+        if (($icon['viewBox'] ?? '') === 'custom' && !empty($icon['svg'])) {
+            return self::sanitize_inline_svg($icon['svg']);
+        }
+
+        if (empty($icon['path']) || empty($icon['viewBox'])) {
+            return '';
+        }
+
+        $view_box = is_array($icon['viewBox'])
+            ? implode(' ', array_map('floatval', $icon['viewBox']))
+            : $icon['viewBox'];
+
+        return sprintf(
+            '<svg class="%s" viewBox="%s" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="%s" /></svg>',
+            esc_attr($class),
+            esc_attr($view_box),
+            esc_attr($icon['path'])
+        );
+    }
+
+    /**
+     * Restricted wp_kses for inline SVG markup — same allowlist shape used by
+     * the SVG uploader route.
+     */
+    public static function sanitize_inline_svg($svg)
+    {
+        $allowed_tags = [
+            'svg'            => ['xmlns' => true, 'width' => true, 'height' => true, 'viewbox' => true, 'fill' => true, 'class' => true, 'aria-hidden' => true, 'role' => true, 'preserveaspectratio' => true, 'focusable' => true],
+            'g'              => ['fill' => true, 'transform' => true],
+            'path'           => ['d' => true, 'fill' => true, 'class' => true, 'stroke' => true, 'stroke-width' => true],
+            'rect'           => ['x' => true, 'y' => true, 'width' => true, 'height' => true, 'fill' => true, 'rx' => true],
+            'circle'         => ['cx' => true, 'cy' => true, 'r' => true, 'fill' => true],
+            'polygon'        => ['points' => true, 'fill' => true],
+            'line'           => ['x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true],
+            'defs'           => [],
+            'linearGradient' => ['id' => true, 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'gradientunits' => true],
+            'radialGradient' => ['id' => true, 'cx' => true, 'cy' => true, 'r' => true],
+            'stop'           => ['offset' => true, 'stop-color' => true, 'stop-opacity' => true],
+        ];
+
+        return wp_kses(preg_replace('/<!--.*?-->/s', '', $svg), $allowed_tags);
+    }
 }

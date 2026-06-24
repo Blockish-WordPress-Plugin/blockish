@@ -15,6 +15,27 @@ class Dashboard {
     private function __construct() {
         add_action( 'admin_menu', array( $this, 'register_menu_page' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+        add_action( 'current_screen', array( $this, 'suppress_notices' ) );
+    }
+
+    public function suppress_notices( $screen ) {
+        if ( $screen->id !== 'toplevel_page_' . self::PAGE_SLUG ) {
+            return;
+        }
+
+        // Remove any notices already registered at this point.
+        remove_all_actions( 'admin_notices' );
+        remove_all_actions( 'all_admin_notices' );
+        remove_all_actions( 'user_admin_notices' );
+        remove_all_actions( 'network_admin_notices' );
+
+        // Re-hook at the earliest priority so anything added after current_screen
+        // (e.g. from admin_init or late plugins) also gets wiped before rendering.
+        foreach ( [ 'admin_notices', 'all_admin_notices', 'user_admin_notices', 'network_admin_notices' ] as $hook ) {
+            add_action( $hook, function() use ( $hook ) {
+                remove_all_actions( $hook );
+            }, -PHP_INT_MAX );
+        }
     }
 
     public function register_menu_page() {

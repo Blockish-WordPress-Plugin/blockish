@@ -99,7 +99,7 @@ export default function BlockishRangeUnit({
                         onUnitChange={handleUnitChange}
                         label={label}
                         hideLabelFromVision
-                        __next40pxDefaultSize={true}
+                       __next40pxDefaultSize
                     />
                 </FlexItem>
                 <FlexItem isBlock>
@@ -112,7 +112,7 @@ export default function BlockishRangeUnit({
                             withInputField={false}
                             onChange={handleSliderChange}
                             __nextHasNoMarginBottom
-                            __next40pxDefaultSize={true}
+                           
                             label={label}
                             hideLabelFromVision
                         />

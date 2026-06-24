@@ -1,0 +1,151 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/navmenu-submenu",
+	"version": "1.0.0",
+	"title": "Nav Menu Submenu",
+	"category": "blockish-framework",
+	"description": "Dropdown submenu panel for a Nav Menu Item.",
+	"icon": "menu",
+	"parent": [ "blockish/navmenu-item" ],
+	"allowedBlocks": [ "blockish/navmenu-item" ],
+	"attributes": {
+		"containerWidth": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "width: {{VALUE}};"
+			}
+		},
+		"alignment": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-navmenu-item-link": "justify-content: {{VALUE}};"
+			}
+		},
+		"itemGap": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "gap: {{VALUE}};"
+			}
+		},
+		"panelBg": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}}"
+			}
+		},
+		"panelBorder": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}}"
+			}
+		},
+		"panelBoxShadow": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBoxShadow",
+				"selector": ".{{WRAPPER}}"
+			}
+		},
+		"panelBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		},
+		"panelPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}}": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"subItemTypography": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishTypography",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item"
+			}
+		},
+		"subItemColorNormal": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "color: {{VALUE}};"
+			}
+		},
+		"subItemBgNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item"
+			}
+		},
+		"subItemBorderNormal": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBorder",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item"
+			}
+		},
+		"subItemColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item:hover": "color: {{VALUE}};"
+			}
+		},
+		"subItemBgHover": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item:hover"
+			}
+		},
+		"subItemBorderColorHover": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item:hover": "border-color: {{VALUE}};"
+			}
+		},
+		"subItemColorActive": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item.is-active": "color: {{VALUE}};"
+			}
+		},
+		"subItemBgActive": {
+			"type": "string",
+			"groupSelector": {
+				"type": "BlockishBackground",
+				"selector": ".{{WRAPPER}} .blockish-block-navmenu-item.is-active"
+			}
+		},
+		"subItemBorderColorActive": {
+			"type": "string",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item.is-active": "border-color: {{VALUE}};"
+			}
+		},
+		"subItemPadding": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+			}
+		},
+		"subItemBorderRadius": {
+			"type": "object",
+			"selectors": {
+				".{{WRAPPER}} .blockish-block-navmenu-item": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": false,
+		"reusable": false
+	},
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}

@@ -65,6 +65,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 											type="TextControl"
 											label={ currentSource?.label }
 											slug={ `${ sourceType }Url` }
+											__next40pxDefaultSize
 										/>
 									) }
 								</BlockishControl>
