@@ -418,7 +418,7 @@ Classes created via `blockish/manage-class` (see `class-manager-docs.md`) attach
 "classManagerSubselector": [{"id": 67, "title": "featured", "parent": 45}]
 ```
 
-Workflow: call `blockish/get-classes` to check for an existing class → if needed, `blockish/manage-class` (action `create`) → use the returned `post_id`/`name` in `classManager`/`classManagerSubselector`. Writing the CSS for a class is a separate concern, fully covered in `class-manager-docs.md` — it is unrelated to block markup generation.
+Workflow: call `blockish/get-classes` to check for an existing class → if needed, `blockish/manage-class` (action `create`) → use the returned `post_id`/`name` in `classManager`/`classManagerSubselector`. Defining a class's styles is a separate concern (you write a JSON **style object**, not CSS — never raw CSS/meta), fully covered in `class-manager-docs.md`; it is unrelated to block markup generation.
 
 ---
 

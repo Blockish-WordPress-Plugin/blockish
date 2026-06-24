@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Get CSS Classes', 'blockish'),
-            'description'         => __('Returns all CSS classes registered in the Blockish Class Manager. Each entry includes post_id, name, css_selector (the exact selector used in CSS), parent_id (set if this is a subselector/child class), and css (the stored CSS rules). Use this before creating or updating classes to avoid duplicates.', 'blockish'),
+            'description'         => __('Returns all classes registered in the Blockish Class Manager. Each entry includes post_id, name, css_selector (the selector the class targets), parent_id (set if this is a child/subselector class), content (the editable style object — use this when updating), and css (the read-only compiled CSS the frontend uses). Use this before creating or updating classes to avoid duplicates.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -27,7 +27,8 @@ class Config
                         'name'         => ['type' => 'string'],
                         'css_selector' => ['type' => 'string'],
                         'parent_id'    => ['type' => ['integer', 'null']],
-                        'css'          => ['type' => 'string'],
+                        'content'      => ['type' => 'object', 'description' => 'The editable style object (post content). Use this when updating.'],
+                        'css'          => ['type' => 'string', 'description' => 'Read-only compiled CSS generated from content.'],
                     ],
                 ],
             ],

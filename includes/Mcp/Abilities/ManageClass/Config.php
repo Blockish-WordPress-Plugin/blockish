@@ -12,37 +12,22 @@ class Config
     {
         return [
             'label'               => __('Create, Update or Delete CSS Class', 'blockish'),
-            'description'         => __('Manages CSS classes in the Blockish Class Manager. Each class is a custom post of type "blockish-classes".
+            'description'         => __('Manages reusable styling classes in the Blockish Class Manager. Each class is a custom post of type "blockish-classes".
 
-RULE: Only use this for CSS that has no equivalent block attribute. If a block attribute or control already produces the style (background, border, padding, typography, box-shadow, etc. — see blockish/get-block-docs), set that attribute directly instead of creating a class for it.
+RULE: Only use this for styling that has no equivalent block attribute. If a block attribute or control already produces the style (background, border, padding, typography, box-shadow, etc. — see blockish/get-block-docs), set that attribute on the block directly instead of creating a class for it.
 
-HOW IT WORKS:
-- "name" becomes the CSS class name applied to blocks. It is auto-normalized: lowercase, spaces become hyphens, only a-z / 0-9 / hyphens / underscores allowed, must start with a letter or underscore.
-- "css" stores raw CSS in post meta. It is output to the page exactly as stored — no selector is added automatically. You MUST write complete CSS rules including the selector. Use the "css_selector" value returned in the response as the root selector.
-- "parent_id": set this to create a child class that is a variation of an existing parent. Child classes get the selector ".blockish-cm-{post_id}" (returned in the response).
-
-WRITING CSS:
-Parent class (e.g. name="hero-card", css_selector=".hero-card"):
-  .hero-card { background: #fff; border-radius: 12px; padding: 32px; }
-  .hero-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.12); transform: translateY(-2px); }
-  .hero-card h2 { font-size: 1.5rem; color: #111; }
-
-Child class (css_selector=".blockish-cm-67"):
-  .blockish-cm-67 { border: 2px solid #1a73e8; }
-  .blockish-cm-67:hover { background: #e8f0fe; }
-
-Rules:
-- Always use the css_selector from the response as the root. Nest child selectors under it.
-- Standard CSS only — no SCSS/Less. Pseudo-classes (:hover, :focus), pseudo-elements (::before, ::after), and child/descendant combinators are all valid.
-- For transitions write them in the same rule: ".hero-card { transition: box-shadow 0.3s ease, transform 0.3s ease; }"
-- The CSS is global — keep selectors specific enough to avoid collisions.
+HOW STORAGE WORKS (read blockish/get-class-manager-docs for the full format):
+- The post TITLE ("name") is the CSS class name. It is auto-normalized: lowercase, spaces → hyphens, only a-z / 0-9 / hyphen / underscore, must start with a letter or underscore.
+- The post CONTENT ("content") is a JSON *style object* — a structured map of style properties (padding, background, border, fontSize, transform, customCss, etc., each optionally responsive). This is the single source of truth you write.
+- You do NOT write CSS and you do NOT write to meta. The compiled CSS is generated from the style object automatically by the editor; the frontend reads that generated CSS. Writing raw CSS to meta is wrong — it gets overwritten the moment the class is opened in the editor.
+- "parent_id": set this to create a child/variation class of an existing parent. Children apply via the ".blockish-cm-{post_id}" selector (returned as css_selector); parents apply via ".{class-name}".
 
 ACTIONS:
-- "create": omit post_id. Required: name. Optional: css, parent_id.
-- "update": provide post_id. Any combination of name, css can be updated.
-- "delete": provide post_id. Permanently deletes the class.
+- "create": omit post_id. Required: name. Optional: content (style object), parent_id.
+- "update": provide post_id. Update name and/or content. Re-send the COMPLETE style object you want — content REPLACES the stored object, it is not merged.
+- "delete": provide post_id. Permanently deletes the class (and its child classes).
 
-IMPORTANT: Always call blockish/get-class-manager-docs before your first class operation in a session. Always call blockish/get-classes before creating to avoid duplicates.', 'blockish'),
+ALWAYS call blockish/get-class-manager-docs before your first class operation in a session (it defines every style-object key and its value shape). ALWAYS call blockish/get-classes before creating, to avoid duplicates.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -60,13 +45,13 @@ IMPORTANT: Always call blockish/get-class-manager-docs before your first class o
                         'type'        => 'string',
                         'description' => 'The CSS class name. Lowercase, hyphens/underscores allowed, must start with a letter or underscore.',
                     ],
-                    'css'       => [
-                        'type'        => 'string',
-                        'description' => 'Full CSS including selector. Use the css_selector returned in the response (e.g. ".my-button { color: red; }").',
+                    'content'   => [
+                        'type'        => 'object',
+                        'description' => 'The style object (JSON) stored as the post content — see blockish/get-class-manager-docs for every key and value shape. Compiled to CSS automatically; do not write raw CSS.',
                     ],
                     'parent_id' => [
                         'type'        => 'integer',
-                        'description' => 'Set to make this a subselector/child class of an existing parent class.',
+                        'description' => 'Set to make this a child/variation class of an existing parent class.',
                     ],
                 ],
                 'required' => [],
@@ -76,9 +61,9 @@ IMPORTANT: Always call blockish/get-class-manager-docs before your first class o
                 'properties' => [
                     'post_id'      => [ 'type' => 'integer' ],
                     'name'         => [ 'type' => 'string' ],
-                    'css_selector' => [ 'type' => 'string', 'description' => 'The exact CSS selector to use when writing CSS rules for this class.' ],
+                    'css_selector' => [ 'type' => 'string', 'description' => 'The CSS selector this class produces — its style object targets this selector. Use it when applying the class to blocks.' ],
                     'parent_id'    => [ 'type' => [ 'integer', 'null' ] ],
-                    'css'          => [ 'type' => 'string' ],
+                    'content'      => [ 'type' => 'object', 'description' => 'The stored style object.' ],
                     'deleted'      => [ 'type' => 'boolean' ],
                     'error'        => [ 'type' => 'string' ],
                 ],

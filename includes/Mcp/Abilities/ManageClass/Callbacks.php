@@ -30,6 +30,16 @@ class Callbacks
             'post_title'  => sanitize_text_field( $input['name'] ?? '' ),
         ];
 
+        // The style object is stored as JSON in post_content — the editor
+        // compiles it to the blockishClassManagerStyles meta automatically.
+        if ( array_key_exists( 'content', $input ) ) {
+            $content = $input['content'];
+            if ( is_array( $content ) ) {
+                $content = wp_json_encode( $content );
+            }
+            $args['post_content'] = wp_slash( is_string( $content ) ? $content : '' );
+        }
+
         if ( ! empty( $input['parent_id'] ) ) {
             $args['post_parent'] = absint( $input['parent_id'] );
         }
@@ -50,21 +60,18 @@ class Callbacks
 
         $id = (int) $result;
 
-        if ( isset( $input['css'] ) ) {
-            update_post_meta( $id, 'blockishClassManagerStyles', wp_strip_all_tags( $input['css'] ) );
-        }
+        $post         = get_post( $id );
+        $is_child     = (int) ( $post->post_parent ?? 0 ) > 0;
+        $css_selector = GetClassesCallbacks::build_selector( $id, $post->post_title ?? '', $post->post_parent ?? 0 );
 
-        $post      = get_post( $id );
-        $is_child  = (int) ( $post->post_parent ?? 0 ) > 0;
-        $slug      = GetClassesCallbacks::normalize_slug( $post->post_title ?? '' );
-        $css_selector = $is_child ? '.blockish-cm-' . $id : ( $slug ? '.' . $slug : '' );
+        $stored_content = json_decode( (string) ( $post->post_content ?? '' ), true );
 
         return [
             'post_id'      => $id,
             'name'         => $post->post_title,
             'css_selector' => $css_selector,
             'parent_id'    => $is_child ? (int) $post->post_parent : null,
-            'css'          => get_post_meta( $id, 'blockishClassManagerStyles', true ),
+            'content'      => is_array( $stored_content ) ? $stored_content : new \stdClass(),
         ];
     }
 }
