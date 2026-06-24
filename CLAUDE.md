@@ -53,6 +53,8 @@ build/                 # Compiled webpack output — DO NOT edit
 ## Global Attributes
 All blocks auto-receive 100+ attributes from `build/global/block.json` — padding, margin, zIndex, position, width, flexbox, typography, colors, shadows, transforms, transitions, filters, customCss. Don't re-declare these in individual blocks.
 
+**Button wrapper width:** `.blockish-button` wrapper has `width: 100%` by default (`src/blocks/button/style.scss`). To move/position the button (e.g. via Advanced position/margin), set the global `widthType` to `auto` first — otherwise the 100% width fights the positioning.
+
 ## Key Files
 | Task | File |
 |---|---|

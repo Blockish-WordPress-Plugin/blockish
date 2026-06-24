@@ -44,8 +44,12 @@
 		},
 		"containerMinHeight": {
 			"type": "object",
+			"default": {
+				"Desktop": "0"
+			},
 			"selectors": {
-				".{{WRAPPER}}": "--container-min-height: {{VALUE}};"
+				".{{WRAPPER}}": "min-height: {{VALUE}};",
+				".{{WRAPPER}} > .block-list-appender": "min-height: {{VALUE}};"
 			}
 		},
 		"display": {
