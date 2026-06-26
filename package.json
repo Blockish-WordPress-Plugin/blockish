@@ -14,7 +14,8 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
 		"start-hot": "wp-scripts start --hot",
-		"make-pot": "npx @wp-blocks/make-pot --exclude=node_modules,build,vendor,src"
+		"make-pot": "npx @wp-blocks/make-pot --exclude=node_modules,build,vendor,src",
+		"publish": "npm run build && npm run make-pot && npm run plugin-zip"
 	},
 	"files": [
 		"blockish.php",
