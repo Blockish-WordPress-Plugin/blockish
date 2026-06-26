@@ -4,8 +4,8 @@ Author URI: https://wowdevs.com/
 Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: blocks, gutenberg blocks, page builder, gutenberg, block editor
-Tested up to: 6.9
-Stable tag: 1.0.4
+Tested up to: 7.0
+Stable tag: 1.0.5
 Requires at least: 6.1
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -124,6 +124,11 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 9. Creative Video Block
 
 == Changelog ==
+
+= 1.0.5 [25th June 2026] =
+
+* Added: MCP extension
+* Improved: Overall UI/UX improvements
 
 = 1.0.4 [8th June 2026] =
 
