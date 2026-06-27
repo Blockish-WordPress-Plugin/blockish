@@ -5,7 +5,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: blocks, gutenberg, block editor, page builder, ai
 Tested up to: 7.0
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 Requires at least: 6.1
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -124,11 +124,16 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 
 == Changelog ==
 
+= 1.0.7 [27th June 2026] =
+
+* Fixed: Icon block folder casing for compatibility with case-sensitive file systems
+
+
 = 1.0.6 [27th June 2026] =
 
 * Added: WordPress Playground Blueprint support for live interactive previews
 
-= 1.0.5 [27th June 2026] =
+= 1.0.5 [25th June 2026] =
 
 * Added: MCP AI extension
 * Improved: Overall UI/UX improvements

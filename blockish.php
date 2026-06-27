@@ -5,7 +5,7 @@
  * Description:       A collection of creative Gutenberg blocks to help you build beautiful websites.
  * Requires at least: 6.1
  * Requires PHP:      7.4
- * Version:           1.0.6
+ * Version:           1.0.7
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * License:           GPL-2.0-or-later
@@ -45,7 +45,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.0.6';
+    const VERSION = '1.0.7';
 
     /**
      * Holds the instance of this class.

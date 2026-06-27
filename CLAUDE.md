@@ -1,7 +1,7 @@
 # Blockish — Claude Guide
 
 **Stack:** WordPress Gutenberg blocks plugin | PHP 7.4+ | WP 6.1+ | Namespace: `Blockish\`  
-**Version:** 1.0.6 | **Text Domain:** `blockish` | **Author:** wowdevs
+**Version:** 1.0.7 | **Text Domain:** `blockish` | **Author:** wowdevs
 
 > **Maintenance:** This file is the canonical context doc for the plugin. Whenever you make a structural change — new/removed block, extension, REST route, DB option key, or a shift in architecture/conventions — update the relevant section below in the same session, not as a follow-up.
 
