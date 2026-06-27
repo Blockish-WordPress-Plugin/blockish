@@ -3,7 +3,7 @@ Author: wowdevs
 Author URI: https://wowdevs.com/
 Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
-Tags: blocks, gutenberg blocks, page builder, gutenberg, block editor
+Tags: blocks, gutenberg, block editor, page builder, ai
 Tested up to: 7.0
 Stable tag: 1.0.5
 Requires at least: 6.1
@@ -11,44 +11,45 @@ Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Blockish gives you 15 creative Gutenberg blocks and a Class Manager extension to build beautiful websites — no page builder required.
+Blockish gives you 16 creative Gutenberg blocks and powerful extensions like Class Manager and MCP AI to build beautiful websites — no page builder required.
 
 == Description ==
 
-**Blockish** is a lightweight Gutenberg blocks plugin that gives you full design freedom inside the WordPress block editor. Whether you're building a landing page, portfolio, or business website, Blockish has the blocks you need — all with rich styling controls and no bloat.
+**Blockish** is a lightweight, feature-rich Gutenberg blocks plugin that gives you full design freedom inside the WordPress block editor. Whether you're building a landing page, portfolio, or a fully-fledged business website, Blockish has the blocks you need — all with comprehensive styling controls, incredible performance, and zero bloat.
 
-== Blocks Included (15 Blocks) ==
+== Blocks Included (16 Blocks) ==
 
 = Layout =
-* **Container** — Flexible section wrapper with background, spacing, and layout controls
+* **Container** — Flexible section wrapper with background, spacing, flexbox, and layout controls.
 
 = Typography =
-* **Heading** — Highly customizable headings with advanced typography options
+* **Heading** — Highly customizable headings with advanced typography, colors, and shadow options.
 
 = Media =
-* **Image** — Enhanced image block with overlay, border, and alignment controls
-* **Video** — Embed and style videos with custom controls
-* **Icon** — Add scalable SVG icons with color and size controls
+* **Image** — Enhanced image block with overlay, border, mask, and alignment controls.
+* **Video** — Embed and style videos with custom play buttons and wrapper controls.
+* **Icon** — Add scalable SVG icons with custom color, size, and hover effects.
 
 = Interactive =
-* **Accordion** — Collapsible content sections for FAQs and more
-* **Tab** — Tabbed content panels for organized information
-* **Nav Menu** — Custom navigation menu block for headers and footers
+* **Accordion** — Collapsible content sections for FAQs, features, and more.
+* **Tab** — Tabbed content panels for organizing large amounts of information.
+* **Navigation** — Advanced, flexible navigation block for building complex headers.
+* **Nav Menu** — Custom navigation menu block for headers and footers with dropdown support.
 
 = Data & Stats =
-* **Counter** — Animated number counter for statistics and metrics
-* **Progress Bar** — Stylish progress bars with labels and animations
-* **Rating** — Star rating display for reviews and testimonials
+* **Counter** — Animated number counter for statistics, milestones, and metrics.
+* **Progress Bar** — Stylish progress bars with customizable labels, colors, and animations.
+* **Rating** — Star rating display for reviews, testimonials, and product features.
 
 = Lists & Icons =
-* **Icon List** — Beautiful icon-based lists to replace plain bullet points
+* **Icon List** — Beautiful icon-based lists to replace standard bullet points with SVG icons.
 
 = Social & CTA =
-* **Social Icons** — Social media icon links with color and size controls
-* **Button** — Fully styled call-to-action buttons
+* **Social Icons** — Social media icon links with customizable shapes, colors, and sizes.
+* **Button** — Fully styled call-to-action buttons with hover effects and icons.
 
 = Maps =
-* **Google Map** — Embed Google Maps with custom zoom and height
+* **Google Map** — Embed Google Maps with custom zoom, height, and location settings.
 
 == Extensions ==
 
@@ -56,53 +57,50 @@ Blockish gives you 15 creative Gutenberg blocks and a Class Manager extension to
 
 Blockish adds a **Class Manager** panel to every block in the editor — including core WordPress blocks. Define styles once for a CSS class, then reuse that class across any block on any page. It's the easiest way to keep your design consistent without writing CSS files or editing your theme. Sub-selector support lets you target child elements within a class too.
 
+= MCP AI Extension =
+
+Blockish integrates an advanced **MCP (Model Context Protocol) AI Extension**, bringing next-generation AI capabilities directly into your block editor for enhanced workflow and smart generation.
+
 == Why Blockish? ==
 
-- **15 creative blocks** — everything you need for professional pages
-- **Class Manager** — define styles once, reuse them across any block on any page
-- **Lightweight** — no jQuery, no bloat, fast-loading
-- **Responsive** — every block is fully responsive out of the box
-- **Easy to use** — works natively inside the WordPress block editor
-- **Highly customizable** — rich styling controls for colors, spacing, typography, and more
-- **Free** — 100% free, no upsells or locked features
+- **16 Creative Blocks** — Everything you need for professional page building.
+- **Class Manager** — Define styles once, reuse them across any block on any page.
+- **MCP AI Ready** — Modern AI integration to supercharge your design process.
+- **Lightweight** — No jQuery, no unnecessary bloat, incredibly fast-loading.
+- **Responsive** — Every block is fully responsive out of the box with device-specific controls.
+- **Native Experience** — Blends seamlessly into the WordPress block editor UI.
+- **Highly Customizable** — Rich styling controls for colors, spacing, typography, and more.
+- **Free** — 100% free, no upsells or locked features.
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
 1. Upload the plugin files to the `/wp-content/plugins/blockish` directory, or install the plugin through the WordPress plugins screen directly.
-2. Activate the plugin through the 'Plugins' screen in WordPress & Enjoy!
+2. Activate the plugin through the 'Plugins' screen in WordPress.
+3. Start building! Open any page or post and add a Blockish block from the block inserter.
 
 == Frequently Asked Questions ==
 
 = Is this plugin free? =
 
-Yes, the Blockish plugin is free to use.
+Yes, the Blockish plugin is 100% free to use.
 
 = Can I use this plugin on my client's website? =
 
-Yes, you can use this plugin on your client's website.
+Absolutely! You can use this plugin on as many personal or client websites as you like.
 
 = How do I get support for this plugin? =
 
-You can get support for this plugin by creating a support ticket on the WordPress support forum.
-
-== External services ==
-
-A JSON Schema for block.json [https://schemas.wp.org/trunk/block.json](https://schemas.wp.org/trunk/block.json) can be used by code editors to provide things like tooltips, autocomplete, and validation while editing block.json.
-
+You can get support for this plugin by creating a support ticket on the WordPress support forum for Blockish.
 
 == External Services ==
 
-This plugin connects to one external services under the conditions described below. No data is ever sent without a clear user action or explicit opt-in.
+This plugin connects to external services under the conditions described below. No data is ever sent without a clear user action or explicit opt-in.
 
 = 1. Usage Analytics / Data Insights (dashboard.wowdevs.com) =
 
 **What it does:** Sends non-sensitive plugin usage data to help improve the plugin. This is part of the optional Data Insights program powered by the DCI SDK.
 
-**When it connects:** **Only if you explicitly opt in** when prompted. No data is ever sent without your consent. You can opt out at any time from the Sky Addons dashboard.
+**When it connects:** **Only if you explicitly opt in** when prompted. No data is ever sent without your consent. You can opt out at any time from the Blockish dashboard.
 
 **Data sent:** Plugin version, WordPress version, active theme, site language, and similar non-personal environment data. No passwords, user content, or personally identifiable information is transmitted.
 
@@ -113,21 +111,22 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 
 == Screenshots ==
 
-1. Creative Container Block
-2. Creative Heading Block
-3. Creative Image Block
-4. Creative List Block
-5. Creative Paragraph Block
-6. Creative Quote Block
-7. Creative Separator Block
-8. Creative Spacer Block
-9. Creative Video Block
+1. Container Block Options
+2. Advanced Heading Styling
+3. Image and Video Blocks
+4. Accordions and Tabs for Content
+5. Navigation and Menus
+6. Data Visualization (Counters, Progress Bars, Ratings)
+7. Icon Lists and Social Icons
+8. Interactive Buttons
+9. Google Map Integration
+10. Class Manager Extension Panel
 
 == Changelog ==
 
 = 1.0.5 [25th June 2026] =
 
-* Added: MCP extension
+* Added: MCP AI extension
 * Improved: Overall UI/UX improvements
 
 = 1.0.4 [8th June 2026] =
@@ -136,20 +135,20 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 
 = 1.0.3 [27th April 2026] =
 
-* Accordion block added
-* Button block added
-* Counter block added
-* Google Map block added
-* Heading block added
-* Icon block added
-* Image block added
-* List block added
-* Progress Bar block added
-* Rating block added
-* Social Icons block added
-* Tab block added
-* Video block added
-* Improved: System improved
+* Added: Accordion block
+* Added: Button block
+* Added: Counter block
+* Added: Google Map block
+* Added: Heading block
+* Added: Icon block
+* Added: Image block
+* Added: Icon List block
+* Added: Progress Bar block
+* Added: Rating block
+* Added: Social Icons block
+* Added: Tab block
+* Added: Video block
+* Improved: System architecture and performance enhancements
 
 = 1.0.0 [19th Jan 2025] =
 

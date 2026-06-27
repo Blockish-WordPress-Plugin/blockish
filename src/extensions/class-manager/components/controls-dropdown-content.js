@@ -133,6 +133,11 @@ const ControlsDropdownContent = ({
         }));
     }, [subSelectorsRaw, subSelectorsEditedById]);
 
+    const attachedSubSelectors = useMemo(() => {
+        const attachedIds = new Set((attributes?.classManagerSubselector || []).map(s => s.id));
+        return mergedSubSelectors.filter((item) => attachedIds.has(item?.id));
+    }, [mergedSubSelectors, attributes?.classManagerSubselector]);
+
     const selectedClassTitle = getEntityTitle(selectedClassEdited?.title || selectedClassRecord?.title || selectedClass?.title);
     const selectedSubSelectorTitle = getEntityTitle(selectedSubSelector?.title);
     const panelTitle = selectedSubSelectorTitle || selectedClassTitle;
@@ -313,7 +318,7 @@ const ControlsDropdownContent = ({
                 </Flex>
 
                 <div className="controls-dropdown-content-subselectors">
-                    {mergedSubSelectors
+                    {attachedSubSelectors
                         .filter((item) => item?.parent === classId)
                         .map((item) => (
                             <Button

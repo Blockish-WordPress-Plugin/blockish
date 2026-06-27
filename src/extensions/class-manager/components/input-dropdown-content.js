@@ -36,12 +36,40 @@ const InputDropdownContent = ({ attributes, setAttributes }) => {
         });
     }, [records, selectedClasses]);
 
-    const toggleClassSelection = (item) => {
-        setAttributes({
-            classManager: item?.isSelected
-                ? removeClassById(selectedClasses, item?.id)
-                : addClassItem(selectedClasses, item),
-        });
+    const toggleClassSelection = async (item) => {
+        if (item?.isSelected) {
+            const nextClasses = removeClassById(selectedClasses, item?.id);
+            const nextSubSelectors = (attributes?.classManagerSubselector || []).filter(
+                (selectorItem) => selectorItem?.parent !== item?.id
+            );
+            setAttributes({
+                classManager: nextClasses,
+                classManagerSubselector: nextSubSelectors,
+            });
+        } else {
+            const nextClasses = addClassItem(selectedClasses, item);
+            let nextSubSelectors = attributes?.classManagerSubselector || [];
+            
+            const { resolveSelect } = wp.data;
+            const subSelectors = await resolveSelect('core').getEntityRecords('postType', CLASS_POST_TYPE, { per_page: -1, parent: item?.id });
+            
+            if (subSelectors && subSelectors.length > 0) {
+                const subSelectorItems = subSelectors.map(subItem => ({
+                    id: subItem.id,
+                    title: getEntityTitle(subItem?.title),
+                    parent: subItem.parent
+                }));
+                // Filter out any that might already exist just in case
+                const existingIds = new Set(nextSubSelectors.map(s => s.id));
+                const newSubSelectors = subSelectorItems.filter(s => !existingIds.has(s.id));
+                nextSubSelectors = [...nextSubSelectors, ...newSubSelectors];
+            }
+            
+            setAttributes({
+                classManager: nextClasses,
+                classManagerSubselector: nextSubSelectors,
+            });
+        }
     };
 
     return (
