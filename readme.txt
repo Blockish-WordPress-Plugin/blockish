@@ -11,7 +11,7 @@ Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Blockish gives you 16 creative Gutenberg blocks and powerful extensions like Class Manager and MCP AI to build beautiful websites — no page builder required.
+Build beautiful websites with 16 creative Gutenberg blocks and powerful extensions like Class Manager and MCP AI — no page builder required.
 
 == Description ==
 
