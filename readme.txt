@@ -124,10 +124,11 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 
 == Changelog ==
 
-= 1.0.5 [25th June 2026] =
+= 1.0.5 [27th June 2026] =
 
 * Added: MCP AI extension
 * Improved: Overall UI/UX improvements
+* Fixed: Class Manager subselector UI detachment issues
 
 = 1.0.4 [8th June 2026] =
 
