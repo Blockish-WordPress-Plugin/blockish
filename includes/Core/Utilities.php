@@ -69,7 +69,7 @@ class Utilities
             }
         }
 
-        if ('gradient' === $background_type && 'Desktop' === $device) {
+        if ('gradient' === $background_type && 'Desktop' === $device && isset($json_background['gradient'])) {
             $gradient = strpos($json_background['gradient'], '|') !== false ? explode('|', $json_background['gradient']) : $json_background['gradient'];
             if (! empty($gradient)) {
                 $styles .= 'background: ' . (is_array($gradient) ? 'var(' . esc_attr($gradient[0]) . ', ' . esc_attr($gradient[1]) . ')' : esc_attr($gradient)) . ';';
