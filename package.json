@@ -1,6 +1,6 @@
 {
 	"name": "blockish",
-	"version": "1.0.4",
+	"version": "1.0.6",
 	"description": "Example block scaffolded with Create Block tool.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,13 +27,13 @@
 		"dci"
 	],
 	"devDependencies": {
-		"@wordpress/scripts": "^30.26.0"
+		"@wordpress/scripts": "^32.5.0"
 	},
 	"dependencies": {
-		"@wordpress/icons": "^11.0.0",
+		"@wordpress/icons": "^15.0.0",
 		"clsx": "^2.1.1",
+		"history": "^5.3.0",
 		"html-react-parser": "^5.2.10",
-		"react-select": "^5.8.3",
-		"history": "^5.3.0"
+		"react-select": "^5.8.3"
 	}
 }
