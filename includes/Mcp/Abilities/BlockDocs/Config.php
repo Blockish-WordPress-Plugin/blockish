@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Get Block Docs', 'blockish'),
-            'description'         => __('Returns the full Blockish block reference — all blocks, their attributes, formats (responsive object, typography, background, border, spacing, icon, image), and markup examples. Call this before writing any block content so you know the exact attribute structure for each block.', 'blockish'),
+            'description'         => __('Returns the full Blockish block reference — all blocks, their attributes, formats (responsive object, typography, background, border, spacing, icon, image) and markup examples.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -28,6 +28,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
+                'usage_notes' => 'Call this before writing any block content (e.g. building a block_schema for blockish/manage-post) so you know the exact attribute structure for each block.',
             ],
         ];
     }

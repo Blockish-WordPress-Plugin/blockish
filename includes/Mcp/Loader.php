@@ -40,6 +40,9 @@ class Loader
         Abilities\UploadMedia\Config::class,
         Abilities\GetMedia\Config::class,
         Abilities\GetPosts\Config::class,
+        Abilities\GetTemplates\Config::class,
+        Abilities\ManageTemplate\Config::class,
+        Abilities\WriteBlog\Config::class,
     ];
 
     public function register_abilities()

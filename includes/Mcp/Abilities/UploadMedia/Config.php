@@ -12,11 +12,7 @@ class Config
     {
         return [
             'label'               => __('Upload Media', 'blockish'),
-            'description'         => __('Downloads an image from a public URL and adds it to the WordPress Media Library as a new attachment. Use this when you need an attachment_id for a featured image or a block image attribute and no suitable image already exists (check blockish/get-media first to avoid duplicate uploads).
-
-The URL must be publicly reachable and end with a recognized image extension (jpg, jpeg, png, gif, webp) before any query string. This ability only handles images — it cannot upload video or other file types.
-
-Returns an attachment_id plus the resulting WordPress URL, width and height — the same shape as the "Image" object used in block attributes (see blockish/get-block-docs), so you can plug the result almost directly into an image-type block attribute.', 'blockish'),
+            'description'         => __('Uploads an image (provide a public url, a local absolute file_path, or base64_data) to the WordPress Media Library and returns its attachment id, url, width and height. Images only — cannot upload video or other file types.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -24,6 +20,18 @@ Returns an attachment_id plus the resulting WordPress URL, width and height — 
                     'url'      => [
                         'type'        => 'string',
                         'description' => 'Public URL of the image to download. Must end in .jpg, .jpeg, .png, .gif, or .webp (before any query string).',
+                    ],
+                    'file_path' => [
+                        'type'        => 'string',
+                        'description' => 'Absolute path to a local file on the server. Useful if the image is already on the local filesystem.',
+                    ],
+                    'base64_data' => [
+                        'type'        => 'string',
+                        'description' => 'Base64 encoded string of the image data. Useful for images uploaded directly in chat.',
+                    ],
+                    'filename' => [
+                        'type'        => 'string',
+                        'description' => 'Required if using base64_data, optional for file_path. The name of the file (e.g. "image.png").',
                     ],
                     'title'    => [
                         'type'        => 'string',
@@ -38,7 +46,7 @@ Returns an attachment_id plus the resulting WordPress URL, width and height — 
                         'description' => 'Optional. Post ID to attach this media item to as a child/parent association.',
                     ],
                 ],
-                'required'   => [ 'url' ],
+                'required'   => [],
             ],
             'output_schema'       => [
                 'type'       => 'object',
@@ -54,6 +62,7 @@ Returns an attachment_id plus the resulting WordPress URL, width and height — 
             'permission_callback' => fn() => current_user_can('upload_files'),
             'meta'                => [
                 'mcp' => ['public' => true],
+                'usage_notes' => 'Use this to obtain an attachment_id for a featured image (blockish/manage-post featured_media) or an image-type block attribute when no suitable image already exists — call blockish/get-media first to avoid duplicate uploads. The returned {id, url, width, height} matches the Image object shape used in block attributes (see blockish/get-block-docs), so it can be plugged almost directly into an image-type attribute.',
             ],
         ];
     }

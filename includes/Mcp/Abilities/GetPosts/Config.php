@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Get Posts', 'blockish'),
-            'description'         => __('Reads existing posts/pages (or any registered post type). Use this to find a post by title or ID before editing it with blockish/manage-post, to check whether content already exists, or to list recent content. Provide post_id to fetch a single specific post — all other filters are ignored when post_id is set.', 'blockish'),
+            'description'         => __('Reads existing posts, pages or any registered post type, filterable by post_type, search, status and pagination, or fetch one by post_id.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -52,6 +52,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
+                'usage_notes' => 'Use this to find a post by title or ID before editing it with blockish/manage-post, to check whether content already exists, or to list recent content.',
             ],
         ];
     }
