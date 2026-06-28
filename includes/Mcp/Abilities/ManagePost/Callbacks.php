@@ -10,16 +10,31 @@ class Callbacks
 {
     public static function manage_post( $input ): array
     {
-        $args = array_filter( [
-            'ID'           => $input['post_id']      ?? null,
-            'post_type'    => $input['post_type']    ?? 'post',
-            'post_title'   => $input['post_title']   ?? '',
-            'post_content' => !empty($input['post_content']) ? wp_slash( $input['post_content'] ) : '',
-            'post_status'  => $input['post_status']  ?? 'publish',
-            'post_excerpt' => $input['post_excerpt'] ?? '',
-        ], fn( $v ) => $v !== null && $v !== '' );
+        $editing = ! empty( $input['post_id'] );
+        $args = [];
 
-        $editing = ! empty( $args['ID'] );
+        if ( $editing ) {
+            $existing_post = get_post( $input['post_id'], ARRAY_A );
+            if ( ! $existing_post ) {
+                return [ 'error' => 'Post not found.' ];
+            }
+            $args['ID'] = $existing_post['ID'];
+            $args['post_type'] = isset( $input['post_type'] ) ? $input['post_type'] : $existing_post['post_type'];
+            $args['post_title'] = isset( $input['post_title'] ) ? $input['post_title'] : $existing_post['post_title'];
+            $args['post_content'] = isset( $input['post_content'] ) ? wp_slash( $input['post_content'] ) : wp_slash( $existing_post['post_content'] );
+            $args['post_status'] = isset( $input['post_status'] ) ? $input['post_status'] : $existing_post['post_status'];
+            $args['post_excerpt'] = isset( $input['post_excerpt'] ) ? $input['post_excerpt'] : $existing_post['post_excerpt'];
+        } else {
+            if ( empty( $input['post_type'] ) ) {
+                return [ 'error' => 'post_type is required when creating a post.' ];
+            }
+            $args['post_type'] = $input['post_type'];
+            $args['post_title'] = $input['post_title'] ?? '';
+            $args['post_content'] = isset( $input['post_content'] ) ? wp_slash( $input['post_content'] ) : '';
+            $args['post_status'] = $input['post_status'] ?? 'draft';
+            $args['post_excerpt'] = $input['post_excerpt'] ?? '';
+        }
+
         $post_id = $editing ? wp_update_post( $args, true ) : wp_insert_post( $args, true );
 
         if ( is_wp_error( $post_id ) ) {
@@ -31,7 +46,6 @@ class Callbacks
             $encoded     = empty( $input['block_schema'] ) ? '' : wp_json_encode( $input['block_schema'] );
             $schema_json = BlockSchemaMeta::sanitize( false === $encoded ? '' : $encoded );
             $slushed     = wp_slash( $schema_json );
-            error_log( print_r( $slushed, true ) );
             update_post_meta( $post_id, BlockSchemaMeta::META_KEY, $slushed );
             $schema_staged = '' !== $slushed;
         }
