@@ -53,6 +53,42 @@
 	}
 }
 
+.blockish-navmenu-submenu-wrapper {
+	position: fixed;
+	top: var(--megamenu-top, auto);
+	left: var(--megamenu-left, auto);
+	width: var(--megamenu-width, auto);
+	z-index: 99999;
+	
+	/* Minimal styling */
+	background-color: #ffffff;
+	border-radius: 8px;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+	border: 1px solid rgba(0, 0, 0, 0.06);
+	
+	/* Hidden by default for animation */
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	
+	transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+	transform: translateY(10px);
+
+	&.is-empty {
+		height: 0;
+		overflow: hidden;
+	}
+}
+
+.blockish-block-navmenu-item:hover > .blockish-navmenu-submenu-wrapper,
+.blockish-block-navmenu-item:focus-within > .blockish-navmenu-submenu-wrapper,
+.blockish-block-navmenu-item.is-selected > .blockish-navmenu-submenu-wrapper {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	transform: translateY(0);
+}
+
 @keyframes blockishSubmenuRotateY {
 	0% {
 		transform: rotateY( 90deg );

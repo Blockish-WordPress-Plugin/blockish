@@ -26,7 +26,7 @@ class Blocks
         }
 
         foreach ($active_blocks as $slug => $block) {
-            $path = BLOCKISH_BLOCKS_DIR . $slug;
+            $path = $block['path'] ?? BLOCKISH_BLOCKS_DIR . $slug;
 
             if (is_readable($path)) {
                 register_block_type_from_metadata($path);

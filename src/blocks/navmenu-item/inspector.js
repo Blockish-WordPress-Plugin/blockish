@@ -2,8 +2,8 @@ import {
 	InspectorControls,
 	LinkControl,
 } from '@wordpress/block-editor';
-import { TextControl, ToggleControl, TextareaControl } from '@wordpress/components';
 import { memo } from '@wordpress/element';
+import { getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import LinkPreviewCard from './link-preview-card';
 
@@ -19,7 +19,9 @@ const Inspector = ( {
 	const { BlockishControl, BlockishGroupControl, BlockishResponsiveControl } =
 		window?.blockish?.controls;
 	const { label, url, openInNewTab, linkId, linkKind, linkType, description, rel } = attributes;
-
+	
+	const isMegamenuAvailable = !!getBlockType('blockish-addon/megamenu');
+	
 	return (
 		<InspectorControls>
 			<BlockishControl
@@ -39,10 +41,10 @@ const Inspector = ( {
 								title={ __( 'Settings', 'blockish' ) }
 								initialOpen={ true }
 							>
-								<TextControl
+								<BlockishControl
+									type="TextControl"
 									label={ __( 'Text', 'blockish' ) }
-									value={ label }
-									onChange={ ( value ) => setAttributes( { label: value } ) }
+									slug="label"
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 								/>
@@ -91,23 +93,23 @@ const Inspector = ( {
 										/>
 									) }
 								</div>
-								<ToggleControl
+								<BlockishControl
+									type="BlockishToggle"
 									label={ __( 'Open in new tab', 'blockish' ) }
-									checked={ !! openInNewTab }
-									onChange={ ( value ) => setAttributes( { openInNewTab: value } ) }
+									slug="openInNewTab"
 									__nextHasNoMarginBottom
 								/>
-								<TextareaControl
+								<BlockishControl
+									type="BlockishTextareaControl"
 									label={ __( 'Description', 'blockish' ) }
-									value={ description }
-									onChange={ ( value ) => setAttributes( { description: value } ) }
+									slug="description"
 									help={ __( 'The description will be displayed in the menu if the current theme supports it.', 'blockish' ) }
 									__nextHasNoMarginBottom
 								/>
-								<TextControl
+								<BlockishControl
+									type="TextControl"
 									label={ __( 'Rel attribute', 'blockish' ) }
-									value={ rel }
-									onChange={ ( value ) => setAttributes( { rel: value } ) }
+									slug="rel"
 									help={ __( 'The relationship of the linked URL as space-separated link types.', 'blockish' ) }
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom

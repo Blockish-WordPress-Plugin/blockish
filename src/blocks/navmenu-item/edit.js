@@ -2,12 +2,15 @@ import {
 	useBlockProps,
 	RichText,
 	BlockControls,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { link, linkOff } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { useEntityRecord } from '@wordpress/core-data';
+import { getBlockType } from '@wordpress/blocks';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 import Inspector from './inspector';
@@ -17,6 +20,8 @@ import './editor.scss';
 export default function Edit( { attributes, setAttributes, clientId, advancedControls, onReplace, isSelected } ) {
 	const { label, url, openInNewTab, linkId, linkKind, linkType, icon, iconPosition } = attributes;
 	const hasRealLink = !!url;
+	
+	const isMegamenuAvailable = !!getBlockType('blockish-addon/megamenu');
 
 	const { BlockishIcon } = window?.blockish?.helpers || {};
 	const iconMarkup = icon && BlockishIcon ? (
@@ -35,10 +40,29 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 		linkId || 0
 	);
 
+	const hasChildren = useSelect( ( select ) => {
+		const { getBlockOrder } = select( 'core/block-editor' );
+		return getBlockOrder( clientId ).length > 0;
+	}, [ clientId ] );
+
+	const { insertBlock } = useDispatch( 'core/block-editor' );
+
 	const blockProps = useBlockProps( {
 		className: clsx( 'blockish-block-navmenu-item' ),
 		ref: useMergeRefs( [ setPopoverAnchor ] ),
 	} );
+
+	const innerBlocksProps = useInnerBlocksProps( 
+		{ 
+			className: clsx( 'blockish-navmenu-submenu-wrapper', {
+				'is-empty': ! hasChildren
+			} )
+		}, 
+		{
+			allowedBlocks: ['blockish-addon/megamenu'],
+			renderAppender: false,
+		} 
+	);
 
 	return (
 		<>
@@ -62,6 +86,17 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 							setShowLinkPopover( ( v ) => ! v );
 						} }
 					/>
+					{ isMegamenuAvailable && ! hasChildren && (
+						<ToolbarButton
+							title={ __( 'Add Megamenu', 'blockish' ) }
+							onClick={ () => {
+								const { createBlock } = wp.blocks;
+								insertBlock( createBlock( 'blockish-addon/megamenu' ), 0, clientId );
+							} }
+						>
+							{ __( 'Add Megamenu', 'blockish' ) }
+						</ToolbarButton>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			{ isSelected && showLinkPopover && (
@@ -104,6 +139,9 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 					/>
 					{ iconPosition === 'right' && iconMarkup }
 				</a>
+				{ isMegamenuAvailable && (
+					<div { ...innerBlocksProps } />
+				) }
 			</div>
 		</>
 	);
