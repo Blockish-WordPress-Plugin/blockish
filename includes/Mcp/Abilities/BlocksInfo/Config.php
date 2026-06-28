@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Get Blocks Info', 'blockish'),
-            'description'         => __('Returns all Blockish blocks with their status. Each block entry may have a "parent" key — those are child/inner blocks. When reporting how many blocks exist, count only blocks without a "parent" key unless the user specifically asks about child blocks.', 'blockish'),
+            'description'         => __('Returns all Blockish blocks keyed by name, each with its status and an optional "parent" key marking child/inner blocks.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -27,7 +27,7 @@ class Config
                         'description' => ['type' => 'string'],
                         'package'     => ['type' => 'string'],
                         'status'      => ['type' => 'string'],
-                        'parent'      => ['type' => 'string'],
+                        'parent'      => ['type' => 'string', 'description' => 'Present only on child/inner blocks; names the parent block. Top-level blocks omit this key.'],
                     ],
                 ],
             ],
@@ -35,6 +35,7 @@ class Config
             'permission_callback' => fn() => current_user_can('manage_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
+                'usage_notes' => 'When reporting how many blocks exist, count only top-level blocks (those without a "parent" key) unless the user specifically asks about child blocks.',
             ],
         ];
     }

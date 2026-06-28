@@ -12,11 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create or Edit Template', 'blockish'),
-            'description'         => __('Creates, updates, or deletes a Full Site Editing (FSE) template or template part. 
-            
-IMPORTANT: Like manage-post, block_schema is staged as pending data on the template. A human must open the template in the Site Editor and click "Apply AI Layout". Do not pass raw HTML into block_schema, build a block schema (array of {name, attributes, innerBlocks}).
-
-LINK SHARING RULE: When you stage a schema for human approval, you MUST share the `edit_url` with the user so they can approve it. Do NOT share the preview link by default. If the user explicitly insists on seeing the preview link, you may share it, but you MUST warn them that the page will appear empty or unchanged until they approve the pending layout in the editor.', 'blockish'),
+            'description'         => __('Creates, updates or deletes a Full Site Editing (FSE) template or template part (set delete to remove); returns id, slug, edit_url and action. Pass Blockish layouts as block_schema, never raw HTML. When a schema is staged, share edit_url (not the preview link) so the user can approve.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -28,7 +24,7 @@ LINK SHARING RULE: When you stage a schema for human approval, you MUST share th
                     'delete'       => ['type' => 'boolean', 'description' => 'Set to true to delete this template customization, falling back to the theme default.'],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'Array of Blockish block schema nodes ({name, attributes, innerBlocks}) to stage on this template. Pass an empty array to clear previously staged schema.',
+                        'description' => 'Array of Blockish block schema nodes ({name, attributes, innerBlocks}) to stage on this template. Build it from blockish/get-block-docs; do not pass raw HTML. Stored as pending data for a human to review and apply in the Site Editor — never written directly into the template. Pass an empty array to clear previously staged schema.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [
@@ -57,6 +53,7 @@ LINK SHARING RULE: When you stage a schema for human approval, you MUST share th
             'permission_callback' => fn() => current_user_can('edit_theme_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
+                'usage_notes' => 'block_schema is never written into the template — it is staged as pending data that a human must review by opening edit_url and clicking "Apply AI Layout" in the Site Editor, so AI-generated layouts are always reviewed before going live. Call blockish/get-block-docs first to learn each block\'s attributes before building block_schema. After staging, share edit_url so the user can approve; do not share the preview link by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
             ],
         ];
     }

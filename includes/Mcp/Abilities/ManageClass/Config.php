@@ -12,22 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create, Update or Delete CSS Class', 'blockish'),
-            'description'         => __('Manages reusable styling classes in the Blockish Class Manager. Each class is a custom post of type "blockish-classes".
-
-RULE: Only use this for styling that has no equivalent block attribute. If a block attribute or control already produces the style (background, border, padding, typography, box-shadow, etc. — see blockish/get-block-docs), set that attribute on the block directly instead of creating a class for it.
-
-HOW STORAGE WORKS (read blockish/get-class-manager-docs for the full format):
-- The post TITLE ("name") is the CSS class name. It is auto-normalized: lowercase, spaces → hyphens, only a-z / 0-9 / hyphen / underscore, must start with a letter or underscore.
-- The post CONTENT ("content") is a JSON *style object* — a structured map of style properties (padding, background, border, fontSize, transform, customCss, etc., each optionally responsive). This is the single source of truth you write.
-- You do NOT write CSS and you do NOT write to meta. The compiled CSS is generated from the style object automatically by the editor; the frontend reads that generated CSS. Writing raw CSS to meta is wrong — it gets overwritten the moment the class is opened in the editor.
-- "parent_id": set this to create a child/variation class of an existing parent. Children apply via the ".blockish-cm-{post_id}" selector (returned as css_selector); parents apply via ".{class-name}".
-
-ACTIONS:
-- "create": omit post_id. Required: name. Optional: content (style object), parent_id.
-- "update": provide post_id. Update name and/or content. Re-send the COMPLETE style object you want — content REPLACES the stored object, it is not merged.
-- "delete": provide post_id. Permanently deletes the class (and its child classes).
-
-ALWAYS call blockish/get-class-manager-docs before your first class operation in a session (it defines every style-object key and its value shape). ALWAYS call blockish/get-classes before creating, to avoid duplicates.', 'blockish'),
+            'description'         => __('Creates, updates or deletes a reusable Blockish Class Manager class (a "blockish-classes" custom post) selected by the action param; returns post_id, name, css_selector and content. You write only name and the JSON style object (content) — never raw CSS, and on update content fully replaces the stored object (not merged). Only create a class for styling that has no equivalent block attribute.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -35,7 +20,7 @@ ALWAYS call blockish/get-class-manager-docs before your first class operation in
                     'action'    => [
                         'type'        => 'string',
                         'enum'        => [ 'create', 'update', 'delete' ],
-                        'description' => 'create (default), update, or delete.',
+                        'description' => 'create (default; omit post_id, requires name), update (provide post_id), or delete (provide post_id; also deletes child classes).',
                     ],
                     'post_id'   => [
                         'type'        => 'integer',
@@ -43,15 +28,15 @@ ALWAYS call blockish/get-class-manager-docs before your first class operation in
                     ],
                     'name'      => [
                         'type'        => 'string',
-                        'description' => 'The CSS class name. Lowercase, hyphens/underscores allowed, must start with a letter or underscore.',
+                        'description' => 'The CSS class name; becomes the post title and is auto-normalized (lowercase, spaces → hyphens, only a-z/0-9/hyphen/underscore, must start with a letter or underscore).',
                     ],
                     'content'   => [
                         'type'        => 'object',
-                        'description' => 'The style object (JSON) stored as the post content — see blockish/get-class-manager-docs for every key and value shape. Compiled to CSS automatically; do not write raw CSS.',
+                        'description' => 'The style object (JSON) stored as the post content and the single source of truth — a structured map of style properties (padding, background, border, fontSize, transform, customCss, etc., each optionally responsive); see blockish/get-class-manager-docs for every key and value shape. Compiled to CSS automatically; do not write raw CSS and do not write to meta (raw CSS in meta is overwritten when the class opens in the editor). On update it REPLACES the stored object (not merged) — re-send the complete object.',
                     ],
                     'parent_id' => [
                         'type'        => 'integer',
-                        'description' => 'Set to make this a child/variation class of an existing parent class.',
+                        'description' => 'Set to make this a child/variation class of an existing parent class. Children apply via the ".blockish-cm-{post_id}" selector (returned as css_selector); parents apply via ".{class-name}".',
                     ],
                 ],
                 'required' => [],
@@ -72,6 +57,7 @@ ALWAYS call blockish/get-class-manager-docs before your first class operation in
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
+                'usage_notes' => 'Always call blockish/get-class-manager-docs before your first class operation in a session (it defines every style-object key and its value shape), and call blockish/get-classes before creating to avoid duplicates. Only use this ability for styling that has no equivalent block attribute or control (background, border, padding, typography, box-shadow, etc. — see blockish/get-block-docs); if an attribute already produces the style, set it on the block directly instead of creating a class.',
             ],
         ];
     }

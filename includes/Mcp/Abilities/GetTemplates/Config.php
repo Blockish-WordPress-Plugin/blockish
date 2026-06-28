@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Get Site Editor Templates', 'blockish'),
-            'description'         => __('Fetches existing Full Site Editing (FSE) templates (wp_template) and template parts (wp_template_part) for the active theme. Use this to discover which templates exist before managing them.', 'blockish'),
+            'description'         => __('Fetches existing Full Site Editing (FSE) templates (wp_template) and template parts (wp_template_part) for the active theme, optionally filtered by type.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -49,6 +49,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_theme_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
+                'usage_notes' => 'Use this to discover which templates exist before managing them with blockish/manage-template.',
             ],
         ];
     }

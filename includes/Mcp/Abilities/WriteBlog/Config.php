@@ -12,12 +12,7 @@ class Config
     {
         return [
             'label'               => __('Write Blog Post', 'blockish'),
-            'description'         => __('Writes or edits a blog post using WordPress core blocks. Provide post_id to edit, omit it to create. Uses "post" as the default post type.
-
-IMPORTANT: Use WordPress core blocks ONLY (e.g., core/paragraph, core/heading, core/image, core/list, core/quote). Do NOT use blockish custom blocks.
-Like manage-post, do not pass hand-written HTML comments as post_content. Build a block schema (array of {name, attributes, innerBlocks}) and pass it as block_schema. It is staged as pending data so a human must open the post in the editor and click "Apply AI Layout" to approve it.
-
-LINK SHARING RULE: When you stage a schema for human approval, you MUST share the `edit_url` with the user so they can approve it. Do NOT share the `post_url` (preview link) by default. If the user explicitly insists on seeing the preview link, you may share it, but you MUST warn them that the page will appear empty or unchanged until they approve the pending layout in the editor.', 'blockish'),
+            'description'         => __('Writes or edits a blog post (omit post_id to create, provide it to edit; defaults to post type "post") using WordPress CORE blocks only — never blockish custom blocks. Pass the layout as block_schema, not raw HTML comments. When a schema is staged, share edit_url (not post_url) so the user can approve.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -34,7 +29,7 @@ LINK SHARING RULE: When you stage a schema for human approval, you MUST share th
                     ],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'Array of block schema nodes using CORE blocks (e.g. core/paragraph, core/heading). Stored as pending data for human review.',
+                        'description' => 'Array of block schema nodes ({name, attributes, innerBlocks}) using WordPress CORE blocks only (e.g. core/paragraph, core/heading, core/image, core/list, core/quote) — do not use blockish custom blocks and do not pass hand-written HTML comments. Stored as pending data for a human to review and apply in the editor; never written directly into post_content.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [
@@ -63,6 +58,7 @@ LINK SHARING RULE: When you stage a schema for human approval, you MUST share th
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
+                'usage_notes' => 'Use WordPress core blocks only (core/paragraph, core/heading, core/image, core/list, core/quote, etc.) — do not use blockish custom blocks. block_schema is never written into post_content — it is staged as pending data that a human must review by opening edit_url and clicking "Apply AI Layout" in the editor to approve. After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
             ],
         ];
     }

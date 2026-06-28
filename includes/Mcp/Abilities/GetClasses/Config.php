@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Get CSS Classes', 'blockish'),
-            'description'         => __('Returns all classes registered in the Blockish Class Manager. Each entry includes post_id, name, css_selector (the selector the class targets), parent_id (set if this is a child/subselector class), content (the editable style object — use this when updating), and css (the read-only compiled CSS the frontend uses). Use this before creating or updating classes to avoid duplicates.', 'blockish'),
+            'description'         => __('Returns all classes registered in the Blockish Class Manager, keyed by name, each with its post_id, css_selector, parent_id, editable content and compiled css. Call this before creating or updating classes to avoid duplicates.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -25,8 +25,8 @@ class Config
                     'properties' => [
                         'post_id'      => ['type' => 'integer'],
                         'name'         => ['type' => 'string'],
-                        'css_selector' => ['type' => 'string'],
-                        'parent_id'    => ['type' => ['integer', 'null']],
+                        'css_selector' => ['type' => 'string', 'description' => 'The selector this class targets.'],
+                        'parent_id'    => ['type' => ['integer', 'null'], 'description' => 'Set if this is a child/subselector class; null for top-level classes.'],
                         'content'      => ['type' => 'object', 'description' => 'The editable style object (post content). Use this when updating.'],
                         'css'          => ['type' => 'string', 'description' => 'Read-only compiled CSS generated from content.'],
                     ],
@@ -36,6 +36,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
+                'usage_notes' => 'Call this before creating or updating classes to avoid duplicates. When updating a class, edit its content object; css is read-only compiled output and cannot be set directly.',
             ],
         ];
     }
