@@ -8,6 +8,7 @@ import { link, linkOff } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { useEntityRecord } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 import Inspector from './inspector';
@@ -33,6 +34,11 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 		entityKind || 'postType',
 		linkType || 'page',
 		linkId || 0
+	);
+
+	const isSelected = useSelect(
+		( select ) => select( 'core/block-editor' ).isBlockSelected( clientId ),
+		[ clientId ]
 	);
 
 	const blockProps = useBlockProps( {
@@ -64,7 +70,7 @@ export default function Edit( { attributes, setAttributes, clientId, advancedCon
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			{ showLinkPopover && (
+			{ isSelected && showLinkPopover && (
 				<LinkPopover
 					url={ url }
 					label={ label }
