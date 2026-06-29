@@ -62,8 +62,24 @@ const useHeaderSettingsNode = () => {
 };
 
 const ApplyPendingSchema = () => {
-    const postType = useSelect((select) => select('core/editor').getCurrentPostType(), []);
+    const { postType, slug, isTemplateOrPart } = useSelect((select) => {
+        const editor = select('core/editor');
+        const currentPost = editor.getCurrentPost();
+        const type = editor.getCurrentPostType();
+        return {
+            postType: type,
+            slug: currentPost?.slug || currentPost?.post_name,
+            isTemplateOrPart: type === 'wp_template' || type === 'wp_template_part'
+        };
+    }, []);
+
+    // Post meta for normal posts/pages
     const [meta, setMeta] = useEntityProp('postType', postType, 'meta');
+    
+    // Global settings for templates and template parts
+    const [stagedTemplate, setStagedTemplate] = useEntityProp('root', 'site', 'blockish_mcp_staged_template');
+    const [stagedTemplatePart, setStagedTemplatePart] = useEntityProp('root', 'site', 'blockish_mcp_staged_template_part');
+
     const { insertBlocks, replaceBlocks } = useDispatch('core/block-editor');
 
     const { selectedClientId, rootClientId, selectedIndex, topLevelCount } = useSelect((select) => {
@@ -79,21 +95,45 @@ const ApplyPendingSchema = () => {
     }, []);
 
     const headerSettingsNode = useHeaderSettingsNode();
-    const pendingSchema = meta && meta[META_KEY] ? meta[META_KEY] : null;
+
+    // Determine pending schema based on post type
+    let pendingSchema = null;
+    if (isTemplateOrPart) {
+        if (postType === 'wp_template') {
+            pendingSchema = stagedTemplate?.[slug];
+        } else {
+            pendingSchema = stagedTemplatePart?.[slug];
+        }
+    } else {
+        pendingSchema = meta && meta[META_KEY] ? meta[META_KEY] : null;
+    }
 
     if (!headerSettingsNode || !pendingSchema) {
         return null;
     }
 
-    const clearPendingSchema = () => setMeta({ ...meta, [META_KEY]: '' });
+    const clearPendingSchema = () => {
+        if (postType === 'wp_template') {
+            const newData = { ...stagedTemplate };
+            delete newData[slug];
+            setStagedTemplate(newData);
+        } else if (postType === 'wp_template_part') {
+            const newData = { ...stagedTemplatePart };
+            delete newData[slug];
+            setStagedTemplatePart(newData);
+        } else {
+            setMeta({ ...meta, [META_KEY]: '' });
+        }
+    };
 
     const getBlocks = () => {
         try {
-            const schema = JSON.parse(pendingSchema);
+            // Options theke asle data already object hobe, meta theke asle JSON string.
+            const schema = typeof pendingSchema === 'string' ? JSON.parse(pendingSchema) : pendingSchema;
             const schemaArray = Array.isArray(schema) ? schema : [schema];
             return schemaArray.map(schemaNodeToBlock).filter(Boolean);
         } catch (e) {
-            console.error(e);
+            console.error('Schema parse korte somossa hoyeche:', e);
             return [];
         }
     };

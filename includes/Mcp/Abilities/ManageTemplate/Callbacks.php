@@ -48,6 +48,14 @@ class Callbacks
                 return ['error' => 'Template not found for deletion.'];
             }
             wp_delete_post($existing->ID, true);
+
+            $option_name = $type === 'wp_template' ? 'blockish_mcp_staged_template' : 'blockish_mcp_staged_template_part';
+            $staged_data = get_option($option_name, []);
+            if (is_array($staged_data) && isset($staged_data[$slug])) {
+                unset($staged_data[$slug]);
+                update_option($option_name, $staged_data, false);
+            }
+
             return [
                 'id' => $existing->ID,
                 'slug' => $slug,
@@ -85,11 +93,19 @@ class Callbacks
 
         $schema_staged = false;
         if (array_key_exists('block_schema', $input) && is_array($input['block_schema'])) {
-            $encoded = empty($input['block_schema']) ? '' : wp_json_encode($input['block_schema']);
-            $schema_json = BlockSchemaMeta::sanitize(false === $encoded ? '' : $encoded);
-            $slushed = wp_slash($schema_json);
-            update_post_meta($post_id, BlockSchemaMeta::META_KEY, $slushed);
-            $schema_staged = '' !== $slushed;
+            $option_name = $type === 'wp_template' ? 'blockish_mcp_staged_template' : 'blockish_mcp_staged_template_part';
+            $staged_data = get_option($option_name, []);
+            if (!is_array($staged_data)) {
+                $staged_data = [];
+            }
+            
+            if (empty($input['block_schema'])) {
+                unset($staged_data[$slug]);
+            } else {
+                $staged_data[$slug] = $input['block_schema'];
+                $schema_staged = true;
+            }
+            update_option($option_name, $staged_data, false);
         }
 
         return [
