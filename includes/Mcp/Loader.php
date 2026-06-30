@@ -73,6 +73,9 @@ class Loader
         Abilities\ManageThemeJson\Config::class,
         Abilities\GetThemeJsonDocs\Config::class,
         Abilities\WriteBlog\Config::class,
+        Abilities\GetTaxonomies\Config::class,
+        Abilities\ManageTerm\Config::class,
+        Abilities\GetDesignerWorkflow\Config::class,
     ];
 
     public function register_abilities()

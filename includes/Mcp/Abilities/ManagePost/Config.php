@@ -18,8 +18,8 @@ class Config
                 'type'       => 'object',
                 'properties' => [
                     'post_id'      => ['type' => 'integer', 'description' => 'Provide to edit an existing post. Omit to create a new one.'],
-                    'post_type'    => ['type' => 'string',  'description' => 'Post type slug. Required when creating a post (e.g., "post", "page").'],
-                    'post_title'   => ['type' => 'string'],
+                    'post_type'    => ['type' => 'string',  'description' => 'Post type slug (e.g., "post", "page").'],
+                    'post_title'   => ['type' => 'string',  'description' => 'The title of the post.'],
                     'post_content' => ['type' => 'string'],
                     'post_status'  => ['type' => 'string',  'description' => 'draft, publish, private, etc. Defaults to "draft".'],
                     'post_excerpt' => ['type' => 'string'],
@@ -41,6 +41,7 @@ class Config
                         ],
                     ],
                 ],
+                'required'   => [ 'post_title', 'post_type' ],
             ],
             'output_schema'       => [
                 'type'       => 'object',
@@ -58,7 +59,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'block_schema is never written into post_content — it is staged as pending data that a human must review by opening edit_url and clicking "Apply AI Layout" in the editor header (visible only when a pending schema exists), so AI-generated layouts are always reviewed before going live. Call blockish/get-block-docs first to learn block attributes before building block_schema. After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
+                'usage_notes' => 'CRITICAL RULES: 1) block_schema is never written into post_content — it is staged as pending data that a human must review by opening edit_url and clicking "Apply AI Layout" in the editor header (visible only when a pending schema exists), so AI-generated layouts are always reviewed before going live. 2) Submitting a block_schema REPLACES any previously staged schema; it does not merge. 3) There is no single-attribute patch for an already-applied block. To patch something, read the post content, rebuild the full block schema, stage it, and tell the human to select the old block and use "Replace". 4) Deeply nested schemas (~4+ levels) can fail with misleading errors; flatten schemas where possible or split large pages into multiple calls. 5) Call blockish/get-block-docs first to learn block attributes. 6) After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
             ],
         ];
     }

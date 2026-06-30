@@ -28,8 +28,11 @@ class Callbacks
             if ( empty( $input['post_type'] ) ) {
                 return [ 'error' => 'post_type is required when creating a post.' ];
             }
+            if ( empty( $input['post_title'] ) ) {
+                return [ 'error' => 'post_title is required when creating a post.' ];
+            }
             $args['post_type'] = $input['post_type'];
-            $args['post_title'] = $input['post_title'] ?? '';
+            $args['post_title'] = $input['post_title'];
             $args['post_content'] = isset( $input['post_content'] ) ? wp_slash( $input['post_content'] ) : '';
             $args['post_status'] = $input['post_status'] ?? 'draft';
             $args['post_excerpt'] = $input['post_excerpt'] ?? '';

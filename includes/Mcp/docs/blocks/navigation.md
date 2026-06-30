@@ -1,6 +1,6 @@
 ### `blockish/navigation`
 
-Top-level navigation wrapper. **Accepts children: yes** (only `blockish/navmenu` and `blockish/offcanvas`).
+Top-level navigation wrapper that orchestrates a responsive site header. It handles the structural switching between a desktop navigation menu (`blockish/navmenu`) and a mobile-friendly slide-in offcanvas drawer (`blockish/offcanvas`) based on a specified breakpoint. This block acts as the primary container ensuring seamless transition between desktop and mobile layouts for site navigation. **Accepts children: yes** (only `blockish/navmenu` and `blockish/offcanvas`).
 
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
