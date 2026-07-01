@@ -1,80 +1,127 @@
-// Styles for the AI/MCP pending-schema review UI.
+// Styles for the AI in-canvas preview UI.
 // Deliberately not WP-default-looking — these need to read as "something the
-// AI is asking you to review," not a normal toolbar action, and pulse
-// continuously so they don't get mistaken for static chrome.
+// AI is asking you to review," and visually distinct from static chrome.
 
-@keyframes blockish-mcp-ai-approve-pulse {
+@keyframes blockish-ai-neon-pulse {
 	0%, 100% {
-		box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.55);
+		box-shadow: 
+            0 0 10px rgba(138, 43, 226, 0.4), 
+            0 0 20px rgba(138, 43, 226, 0.2), 
+            inset 0 0 10px rgba(138, 43, 226, 0.1);
+		border-color: rgba(138, 43, 226, 0.6);
 	}
 	50% {
-		box-shadow: 0 0 0 7px rgba(102, 126, 234, 0);
+		box-shadow: 
+            0 0 15px rgba(138, 43, 226, 0.8), 
+            0 0 35px rgba(168, 85, 247, 0.5), 
+            inset 0 0 15px rgba(138, 43, 226, 0.25);
+		border-color: rgba(168, 85, 247, 1);
 	}
 }
 
-@keyframes blockish-mcp-ai-cancel-pulse {
-	0%, 100% {
-		box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+.blockish-ai-preview-wrapper {
+	position: relative;
+	border: 2px solid transparent; // Falls back to animation color
+	border-radius: 12px;
+	margin: 24px 0;
+	animation: blockish-ai-neon-pulse 2.5s ease-in-out infinite;
+
+	// Add a subtle futuristic background tint
+	background: linear-gradient(180deg, rgba(138, 43, 226, 0.03) 0%, rgba(138, 43, 226, 0.01) 100%);
+
+	// Hide actions by default until hover
+	.blockish-ai-preview-actions {
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(4px);
+		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 	}
-	50% {
-		box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+
+	&:hover,
+	&:focus-within {
+		.blockish-ai-preview-actions {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
 	}
 }
 
-.blockish-mcp-ai-pending-actions {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	order: -1;
-	padding: 0 6px;
+.blockish-ai-preview-actions {
+	position: absolute;
+	top: -20px; // Float slightly above the border
+	right: 16px;
+	z-index: 100000;
+	
+	.blockish-ai-button-group {
+		background: rgba(255, 255, 255, 0.85);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		border: 1px solid rgba(138, 43, 226, 0.15);
+		border-radius: 20px;
+		box-shadow: 
+            0 4px 15px rgba(0, 0, 0, 0.08), 
+            0 0 0 1px rgba(255,255,255,0.8) inset;
+		padding: 4px;
+		display: flex;
+		gap: 6px;
+	}
 
 	.components-button {
-		width: 32px;
 		height: 32px;
-		min-width: 32px; // WP core sets .components-button.has-icon to min-width: 36px by default.
-		border-radius: 999px;
+		padding: 0 12px;
+		border-radius: 16px;
+		font-weight: 600;
+		font-size: 13px;
+		transition: all 0.2s ease;
+
+		// WordPress overrides
+		display: flex;
+		align-items: center;
 		justify-content: center;
+		gap: 4px; // Explicitly control the gap between icon and text
 
 		svg {
-			width: 18px;
-			height: 18px;
-		}
-	}
-
-	.blockish-mcp-ai-approve {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: #fff;
-		border: none;
-		animation: blockish-mcp-ai-approve-pulse 1.8s ease-out infinite;
-
-		svg {
-			fill: #fff;
+			width: 16px;
+			height: 16px;
+			margin: 0 !important; // Remove WP core margins that cause extra gaps
 		}
 
-		&:hover,
-		&:focus:not(:disabled) {
-			background: linear-gradient(135deg, #5a6fdb 0%, #6a3f96 100%);
+		&.is-primary {
+			background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
 			color: #fff;
-		}
-	}
-
-	.blockish-mcp-ai-cancel {
-		background: #fff;
-		color: #ef4444;
-		border: 1.5px dashed #ef4444;
-		animation: blockish-mcp-ai-cancel-pulse 1.8s ease-out infinite;
-
-		svg {
-			fill: #ef4444;
-		}
-
-		&:hover,
-		&:focus:not(:disabled) {
-			background: rgba(239, 68, 68, 0.08);
-			color: #dc2626;
+			border: none !important;
+			box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3) !important;
 
 			svg {
-				fill: #dc2626;
+				fill: #fff;
+			}
+
+			&:hover,
+			&:focus:not(:disabled) {
+				background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+				box-shadow: 0 4px 12px rgba(168, 85, 247, 0.5) !important;
+				transform: translateY(-1px);
+				color: #fff;
+			}
+		}
+
+		&.is-destructive {
+			background: transparent;
+			color: #ef4444;
+			border: 1px solid rgba(239, 68, 68, 0.4) !important; // Restored outline
+			box-shadow: none !important;
+
+			svg {
+				fill: #ef4444;
+			}
+
+			&:hover,
+			&:focus:not(:disabled) {
+				background: rgba(239, 68, 68, 0.08);
+				border-color: #ef4444 !important; // Darken outline on hover
+				color: #dc2626;
+				transform: translateY(-1px);
 			}
 		}
 	}

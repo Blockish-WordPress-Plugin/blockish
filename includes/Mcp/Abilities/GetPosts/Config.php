@@ -52,7 +52,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use this to find a post by title or ID before editing it with blockish/manage-post, to check whether content already exists, or to list recent content.',
+                'usage_notes' => 'Use this to find a post by title or ID before editing it with blockish/manage-post, to check whether content already exists, or to list recent content. NOTE: The returned `content` field reflects only what has already been *applied* in the editor by a human. It will not show you the contents of an unapplied pending schema.',
             ],
         ];
     }

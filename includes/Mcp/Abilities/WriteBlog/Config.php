@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Write Blog Post', 'blockish'),
-            'description'         => __('Writes or edits a blog post (omit post_id to create, provide it to edit; defaults to post type "post") using WordPress CORE blocks only — never blockish custom blocks. Pass the layout as block_schema, not raw HTML comments. When a schema is staged, share edit_url (not post_url) so the user can approve.', 'blockish'),
+            'description'         => __('Writes or edits a blog post (omit post_id to create, provide it to edit; defaults to post type "post") using WordPress CORE blocks only — never blockish custom blocks. Pass the layout as block_schema, not raw HTML comments. When a schema is staged, share edit_url (not post_url) so the user can review it in the canvas and accept it.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -58,7 +58,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use WordPress core blocks only (core/paragraph, core/heading, core/image, core/list, core/quote, etc.) — do not use blockish custom blocks. block_schema is never written into post_content — it is staged as pending data that a human must review by opening edit_url and clicking "Apply AI Layout" in the editor to approve. After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
+                'usage_notes' => 'Use WordPress core blocks only (core/paragraph, core/heading, core/image, core/list, core/quote, etc.) — do not use blockish custom blocks. block_schema is never written into post_content — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself to approve. After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
             ],
         ];
     }

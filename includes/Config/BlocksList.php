@@ -142,38 +142,31 @@ class BlocksList extends ConfigList {
             ),
             'navigation' => array(
                 'name'        => __('Navigation', 'blockish'),
-                'description' => __('Navigation wrapper pairing a desktop menu with a mobile offcanvas.', 'blockish'),
+                'description' => __('A top-level responsive navigation wrapper that automatically switches between a desktop navigation menu and a mobile-friendly slide-in offcanvas drawer based on a breakpoint. Acts as the primary container for site headers. Contains navmenu and offcanvas child blocks.', 'blockish'),
                 'package'     => 'free',
                 'status'      => 'active',
             ),
             'navmenu' => array(
                 'name'        => __('Nav Menu', 'blockish'),
-                'description' => __('Navigation menu block for headers and footers.', 'blockish'),
+                'description' => __('A desktop navigation menu block that acts as the primary layout for headers and footers. Supports horizontal and vertical layouts, custom item styling, typography, spacing, and hover states. Must be placed inside a Navigation block.', 'blockish'),
                 'package'     => 'free',
                 'status'      => 'active',
                 'parent'      => 'navigation',
             ),
             'navmenu-item' => array(
                 'name'        => __('Nav Menu Item', 'blockish'),
-                'description' => __('Item for the Nav Menu block.', 'blockish'),
+                'description' => __('A single navigation item link inside a Nav Menu block. Defines the link URL, text, and active state styling. Can be nested to create dropdown submenus when supported. Must be placed inside a Nav Menu block.', 'blockish'),
                 'package'     => 'free',
                 'status'      => 'active',
                 'parent'      => 'navmenu',
             ),
             'offcanvas' => array(
                 'name'        => __('Off Canvas', 'blockish'),
-                'description' => __('Slide-in offcanvas panel that mirrors a nav menu.', 'blockish'),
+                'description' => __('A mobile slide-in drawer panel with a hamburger menu trigger. Can automatically mirror the sibling Nav Menu items or have custom content. Supports left/right side sliding, custom header, overlay styling, and close button configurations. Must be placed inside a Navigation block.', 'blockish'),
                 'package'     => 'free',
                 'status'      => 'active',
                 'parent'      => 'navigation',
             ),
-            // 'navmenu-submenu' => array(
-            //     'name'        => __('Nav Menu Submenu', 'blockish'),
-            //     'description' => __('Dropdown submenu panel for a Nav Menu Item.', 'blockish'),
-            //     'package'     => 'free',
-            //     'status'      => 'inactive',
-            //     'parent'      => 'navmenu-item',
-            // ),
         );
 
         $this->list = apply_filters( 'blockish/blocks/list', $this->list );

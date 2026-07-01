@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create or Edit Template', 'blockish'),
-            'description'         => __('Creates, updates or deletes a Full Site Editing (FSE) template or template part (set delete to remove); returns id, slug, edit_url and action. Pass Blockish layouts as block_schema, never raw HTML. When a schema is staged, share edit_url (not the preview link) so the user can approve.', 'blockish'),
+            'description'         => __('Creates, updates or deletes a Full Site Editing (FSE) template or template part (set delete to remove); returns id, slug, edit_url and action. Pass Blockish layouts as block_schema, never raw HTML. When a schema is staged, share edit_url (not the preview link) so the user can review it in the canvas and accept it.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -53,7 +53,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_theme_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'block_schema is never written into the template — it is staged as pending data that a human must review by opening edit_url and clicking "Apply AI Layout" in the Site Editor, so AI-generated layouts are always reviewed before going live. Call blockish/get-block-docs first to learn each block\'s attributes before building block_schema. After staging, share edit_url so the user can approve; do not share the preview link by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
+                'usage_notes' => 'block_schema is never written into the template — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself before it goes live. Call blockish/get-block-docs first to learn each block\'s attributes before building block_schema. After staging, share edit_url so the user can approve; do not share the preview link by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
             ],
         ];
     }
