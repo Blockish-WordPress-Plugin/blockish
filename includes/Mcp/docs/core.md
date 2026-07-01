@@ -13,13 +13,13 @@ You (the AI) build a **schema**: a JSON tree of `{ name, attributes, innerBlocks
 **CRITICAL RULE: Naming Top-Level Blocks**
 Every top-level layout block you emit MUST carry a unique and meaningful `metadata.name` attribute (e.g., `"attributes": { "metadata": { "name": "Hero Section" } }`). This allows the editor UI to instantly detect whether a layout is new or an update to an existing section, preventing wrong-block edits. If you do not name your blocks, the human user is forced to guess what you meant.
 
-**Your schema is staged for human review, not written live.** Passing `block_schema` to `blockish/manage-post` does not put anything into `post_content`. It saves the schema as pending data on the post. A human must open that post in the block editor, where an "Apply AI Layout" control appears in the editor header only while a pending schema exists, and explicitly apply it (choosing where: end of content, or — if a block is selected — before/after/inside it) before it becomes real content. Never pass a schema as `post_content` directly, and never expect it to appear on the live post without that manual step.
+**Your schema is staged for human review, not written live.** Passing `block_schema` to `blockish/manage-post` does not put anything into `post_content`. It saves the schema as pending data on the post. When a human opens that post in the block editor, a styled AI Preview Wrapper block (with a neon border) will automatically appear in the canvas containing your layout. The user must review it visually and click the "Accept" or "Discard" button on the block itself to commit it to the real content. Never pass a schema as `post_content` directly, and never expect it to appear on the live post without that manual step.
 
 Workflow:
 1. Read this doc (and `class-manager-docs.md` if you need reusable CSS classes).
 2. Build the schema tree for the page: an array of `{ name, attributes, innerBlocks }` nodes.
 3. Call `blockish/manage-post` with `post_id` (or omit to create a new post) and `block_schema` set to that array. Do not set `post_content` to anything schema- or markup-related in the same call.
-4. Tell the user the post is ready for review and link them to the returned `edit_url` — they need to open it and click "Apply AI Layout" to turn the schema into real blocks.
+4. Tell the user the post is ready for review and link them to the returned `edit_url` — they need to open it and click "Accept" on the preview block in the canvas to turn the schema into real blocks.
 
 ---
 
