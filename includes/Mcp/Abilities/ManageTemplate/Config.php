@@ -24,7 +24,7 @@ class Config
                     'delete'       => ['type' => 'boolean', 'description' => 'Set to true to delete this template customization, falling back to the theme default.'],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'Array of Blockish block schema nodes ({name, attributes, innerBlocks}) to stage on this template. Build it from blockish/get-block-docs; do not pass raw HTML. Stored as pending data for a human to review and apply in the Site Editor — never written directly into the template. Pass an empty array to clear previously staged schema.',
+                        'description' => 'Array of Blockish block schema nodes ({name, attributes, innerBlocks}) to stage on this template. Build it from blockish/get-block-docs; do not pass raw HTML. When adding a header or footer to a template layout, use {"name": "core/template-part", "attributes": {"slug": "header", "theme": "twentytwentyfive"}} (or "footer"). Stored as pending data for a human to review and apply in the Site Editor — never written directly into the template. Pass an empty array to clear previously staged schema.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [

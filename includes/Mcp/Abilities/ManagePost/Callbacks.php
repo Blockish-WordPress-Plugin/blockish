@@ -10,6 +10,11 @@ class Callbacks
 {
     public static function manage_post( $input ): array
     {
+        // Check if this might be a payload size issue (JSON truncated/dropped)
+        if (empty($input) && isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 0) {
+            return ['error' => 'Payload too large or invalid JSON. The request body was dropped or truncated before reaching the handler. Try chunking your layout or simplifying styles to reduce payload size.'];
+        }
+
         $editing = ! empty( $input['post_id'] );
         $args = [];
 

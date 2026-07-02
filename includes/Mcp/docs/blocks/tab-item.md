@@ -24,7 +24,7 @@ blockish/navigation              (top-level wrapper — the only one you place d
 
 Hard rules:
 - **Always start from `blockish/navigation`.** `navmenu` and `offcanvas` are `parent`-locked to `navigation`; `navmenu-item` is locked to `navmenu`/`offcanvas`. Emitting any of them at the top level (or in any other parent) produces an invalid block.
-- **Set `"hasStarted": true` on `blockish/navigation`** (same idea as container's `isVariationPicked` — without it the block can render its empty "Start Blank" placeholder instead of your menu).
+
 - **The `offcanvas` mirrors the `navmenu` automatically** when its `syncWithMenu` is `true` (the default): leave its `innerBlocks` empty `[]` and it copies the navmenu's items as the mobile menu. Only set `syncWithMenu: false` and give it its own `navmenu-item` children if you deliberately want a *different* mobile menu. Never duplicate the same items into both by hand while sync is on — they'll be overwritten.
 - The `navigation` block's breakpoint controls when desktop↔mobile swap happens; the `offcanvas` is hidden on desktop and the `navmenu` is hidden on mobile automatically.
 
@@ -32,7 +32,7 @@ Minimal working menu (this is the canonical shape — copy it):
 ```json
 {
   "name": "blockish/navigation",
-  "attributes": { "hasStarted": true },
+  "attributes": {},
   "innerBlocks": [
     {
       "name": "blockish/navmenu",

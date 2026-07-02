@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 
 registerBlockType('blockish/ai-preview', {
     title: __('AI Preview Wrapper', 'blockish'),
+    apiVersion: 3,
     category: 'design',
     icon: 'admin-appearance',
     supports: {

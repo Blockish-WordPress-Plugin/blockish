@@ -32,6 +32,25 @@ class Callbacks
             $query_args['s'] = sanitize_text_field( $input['search'] );
         }
 
+        if ( ! empty( $input['tax_query'] ) && is_array( $input['tax_query'] ) ) {
+            $tax_query = ['relation' => 'AND'];
+            foreach ( $input['tax_query'] as $tax_item ) {
+                if ( ! empty( $tax_item['taxonomy'] ) && ! empty( $tax_item['terms'] ) && is_array( $tax_item['terms'] ) ) {
+                    $field = is_int( $tax_item['terms'][0] ) ? 'term_id' : 'slug';
+                    $tax_query[] = [
+                        'taxonomy' => sanitize_key( $tax_item['taxonomy'] ),
+                        'field'    => $field,
+                        'terms'    => array_map( function($term) use ($field) {
+                            return $field === 'term_id' ? absint($term) : sanitize_text_field($term);
+                        }, $tax_item['terms'] ),
+                    ];
+                }
+            }
+            if ( count( $tax_query ) > 1 ) {
+                $query_args['tax_query'] = $tax_query;
+            }
+        }
+
         $posts = get_posts( $query_args );
 
         return [ 'items' => array_map( [ self::class, 'format_post' ], $posts ) ];
@@ -55,6 +74,8 @@ class Callbacks
         // matching post's full content — only included when fetching one post by ID.
         if ( $with_content ) {
             $data['content'] = $post->post_content;
+            $parsed_blocks   = parse_blocks( $post->post_content );
+            $data['schema']  = \Blockish\Mcp\SchemaUtils::convert_to_js_schema( $parsed_blocks );
         }
 
         return $data;

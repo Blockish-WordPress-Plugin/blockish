@@ -18,27 +18,27 @@ class Config
                 'type'       => 'object',
                 'properties' => [
                     'url'      => [
-                        'type'        => 'string',
-                        'description' => 'Public URL of the image to download. Must end in .jpg, .jpeg, .png, .gif, or .webp (before any query string).',
+                        'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
+                        'description' => 'Public URL of the image to download, or an array of URLs for batch processing. Must end in .jpg, .jpeg, .png, .gif, or .webp (before any query string).',
                     ],
                     'file_path' => [
-                        'type'        => 'string',
-                        'description' => 'Absolute path to a local file on the server. Useful if the image is already on the local filesystem.',
+                        'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
+                        'description' => 'Absolute path to a local file on the server, or an array of paths.',
                     ],
                     'base64_data' => [
-                        'type'        => 'string',
-                        'description' => 'Base64 encoded string of the image data. Useful for images uploaded directly in chat.',
+                        'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
+                        'description' => 'Base64 encoded string of the image data, or array of strings.',
                     ],
                     'filename' => [
-                        'type'        => 'string',
-                        'description' => 'Required if using base64_data, optional for file_path. The name of the file (e.g. "image.png").',
+                        'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
+                        'description' => 'Required if using base64_data, optional for file_path. The name of the file (e.g. "image.png"). If passing an array for base64_data, pass an array of filenames.',
                     ],
                     'title'    => [
-                        'type'        => 'string',
+                        'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
                         'description' => 'Attachment title/description. Defaults to the file name if omitted.',
                     ],
                     'alt_text' => [
-                        'type'        => 'string',
+                        'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
                         'description' => 'Alt text to store on the attachment.',
                     ],
                     'post_id'  => [
@@ -51,11 +51,19 @@ class Config
             'output_schema'       => [
                 'type'       => 'object',
                 'properties' => [
-                    'id'     => [ 'type' => 'integer', 'description' => 'Attachment ID. Use this as featured_media in blockish/manage-post or in an Image-type block attribute.' ],
-                    'url'    => [ 'type' => 'string' ],
-                    'width'  => [ 'type' => 'integer' ],
-                    'height' => [ 'type' => 'integer' ],
-                    'error'  => [ 'type' => 'string' ],
+                    'items' => [
+                        'type' => 'array',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'id'     => [ 'type' => 'integer', 'description' => 'Attachment ID. Use this as featured_media in blockish/manage-post or in an Image-type block attribute.' ],
+                                'url'    => [ 'type' => 'string' ],
+                                'width'  => [ 'type' => 'integer' ],
+                                'height' => [ 'type' => 'integer' ],
+                                'error'  => [ 'type' => 'string' ],
+                            ],
+                        ]
+                    ]
                 ],
             ],
             'execute_callback'    => [Callbacks::class, 'upload_media'],

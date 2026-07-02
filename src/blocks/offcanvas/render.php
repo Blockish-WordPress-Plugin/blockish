@@ -55,18 +55,18 @@ $wrapper_attrs = get_block_wrapper_attributes( array(
 	) ),
 ) );
 ?>
-<div <?php echo $wrapper_attrs; ?>>
+<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper attributes generated safely by core. ?>>
 	<button type="button" class="<?php echo esc_attr( $hamburger_class ); ?>" aria-label="<?php esc_attr_e( 'Toggle menu', 'blockish' ); ?>" aria-expanded="false">
 		<?php echo $hamburger_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized in render_icon ?>
 	</button>
 	<div class="blockish-offcanvas-overlay" aria-hidden="true"></div>
 	<div class="blockish-offcanvas-panel">
 		<div class="blockish-offcanvas-header">
-			<div class="blockish-offcanvas-branding"><?php echo $branding; ?></div>
+			<div class="blockish-offcanvas-branding"><?php echo $branding; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Contains SVG. ?></div>
 			<button type="button" class="blockish-offcanvas-close" aria-label="<?php esc_attr_e( 'Close menu', 'blockish' ); ?>">&times;</button>
 		</div>
 		<nav class="blockish-offcanvas-nav" aria-label="<?php esc_attr_e( 'Mobile navigation', 'blockish' ); ?>">
-			<?php echo $content; ?>
+			<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Inner blocks content. ?>
 		</nav>
 	</div>
 </div>

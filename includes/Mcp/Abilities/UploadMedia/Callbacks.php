@@ -8,24 +8,48 @@ class Callbacks
 {
     public static function upload_media( $input ): array
     {
-        $url         = isset( $input['url'] ) ? trim( (string) $input['url'] ) : '';
-        $file_path   = isset( $input['file_path'] ) ? trim( (string) $input['file_path'] ) : '';
-        $base64_data = isset( $input['base64_data'] ) ? trim( (string) $input['base64_data'] ) : '';
-        $filename    = isset( $input['filename'] ) ? trim( (string) $input['filename'] ) : '';
+        $urls         = isset( $input['url'] ) ? (array) $input['url'] : [];
+        $file_paths   = isset( $input['file_path'] ) ? (array) $input['file_path'] : [];
+        $base64_datas = isset( $input['base64_data'] ) ? (array) $input['base64_data'] : [];
+        $filenames    = isset( $input['filename'] ) ? (array) $input['filename'] : [];
+        $titles       = isset( $input['title'] ) ? (array) $input['title'] : [];
+        $alt_texts    = isset( $input['alt_text'] ) ? (array) $input['alt_text'] : [];
+        
+        $post_id      = ! empty( $input['post_id'] ) ? absint( $input['post_id'] ) : 0;
 
-        if ( '' === $url && '' === $file_path && '' === $base64_data ) {
-            return [ 'error' => 'One of "url", "file_path", or "base64_data" is required.' ];
+        if ( empty( $urls ) && empty( $file_paths ) && empty( $base64_datas ) ) {
+            return [ 'items' => [[ 'error' => 'One of "url", "file_path", or "base64_data" is required.' ]] ];
         }
 
-        // media_sideload_image() and its dependencies (wp_handle_sideload,
-        // wp_generate_attachment_metadata) live in wp-admin-only includes that
-        // are not loaded during a REST/MCP request by default.
         require_once ABSPATH . 'wp-admin/includes/file.php';
         require_once ABSPATH . 'wp-admin/includes/media.php';
         require_once ABSPATH . 'wp-admin/includes/image.php';
 
-        $post_id = ! empty( $input['post_id'] ) ? absint( $input['post_id'] ) : 0;
-        $title   = isset( $input['title'] ) ? sanitize_text_field( $input['title'] ) : null;
+        $max_count = max( count( $urls ), count( $file_paths ), count( $base64_datas ) );
+        $results = [];
+
+        for ( $i = 0; $i < $max_count; $i++ ) {
+            $url         = $urls[$i] ?? ( count($urls) === 1 ? $urls[0] : '' );
+            $file_path   = $file_paths[$i] ?? ( count($file_paths) === 1 ? $file_paths[0] : '' );
+            $base64_data = $base64_datas[$i] ?? ( count($base64_datas) === 1 ? $base64_datas[0] : '' );
+            $filename    = $filenames[$i] ?? ( count($filenames) === 1 ? $filenames[0] : '' );
+            $title       = $titles[$i] ?? ( count($titles) === 1 ? $titles[0] : null );
+            $alt_text    = $alt_texts[$i] ?? ( count($alt_texts) === 1 ? $alt_texts[0] : '' );
+
+            if ( '' === $url && '' === $file_path && '' === $base64_data ) {
+                continue;
+            }
+
+            $results[] = self::process_single_upload(
+                $url, $file_path, $base64_data, $filename, $title, $alt_text, $post_id
+            );
+        }
+
+        return [ 'items' => $results ];
+    }
+
+    private static function process_single_upload( $url, $file_path, $base64_data, $filename, $title, $alt_text, $post_id ): array
+    {
         $attachment_id = 0;
 
         if ( '' !== $base64_data || '' !== $file_path ) {
@@ -34,7 +58,6 @@ class Callbacks
                 if ( '' === $filename ) {
                     return [ 'error' => '"filename" is required when using base64_data.' ];
                 }
-                // Check if there is a data URI scheme, e.g. "data:image/png;base64,"
                 if ( strpos( $base64_data, 'data:image' ) === 0 && strpos( $base64_data, 'base64,' ) !== false ) {
                     $base64_parts = explode( 'base64,', $base64_data );
                     $base64_data  = $base64_parts[1];
@@ -45,7 +68,7 @@ class Callbacks
                 }
             } elseif ( '' !== $file_path ) {
                 if ( ! file_exists( $file_path ) ) {
-                    return [ 'error' => 'File not found at file_path.' ];
+                    return [ 'error' => 'File not found at file_path: ' . $file_path ];
                 }
                 $file_content = file_get_contents( $file_path );
                 if ( '' === $filename ) {
@@ -81,8 +104,8 @@ class Callbacks
             }
         }
 
-        if ( ! empty( $input['alt_text'] ) ) {
-            update_post_meta( $attachment_id, '_wp_attachment_image_alt', sanitize_text_field( $input['alt_text'] ) );
+        if ( ! empty( $alt_text ) ) {
+            update_post_meta( $attachment_id, '_wp_attachment_image_alt', sanitize_text_field( $alt_text ) );
         }
 
         $metadata = wp_get_attachment_metadata( $attachment_id );

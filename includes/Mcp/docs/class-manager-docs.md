@@ -63,7 +63,7 @@ The `name` is auto-normalized; the response's `name`/`css_selector` tells you th
 ## 5. Workflow
 
 1. **`blockish/get-classes`** — list existing classes (each returns `post_id`, `name`, `css_selector`, `parent_id`, `content` = the editable style object, `css` = read-only compiled output). Avoid duplicates; reuse an existing class when one already fits.
-2. **`blockish/manage-class`** — `action: "create"` (or `"update"` with `post_id`). Pass `name` and the `content` style object. To make a child, also pass `parent_id`. **On update, `content` REPLACES the stored object** — read the current `content` from `get-classes` first, reproduce it, change what you need, and send the whole object back.
+2. **`blockish/manage-class`** — `action: "create"` (or `"update"` with `post_id`). Pass `name` and the `content` style object. To make a child, also pass `parent_id`. **On update, `content` MERGES recursively with the stored object**. Only send the properties you want to add or change. To remove a specific property, set its value to `null`. To completely clear all styles and reset the class, pass an empty object `{}`.
 3. **Apply it** to blocks via the block schema's `classManager` / `classManagerSubselector` attributes (§6).
 
 You do not need to know the compiled selector to write the style object — your object targets the class's own selector automatically. `css_selector` is only needed for reference and for nested/`customCss` cases.
@@ -89,7 +89,7 @@ Example block node applying both:
 {
   "name": "blockish/container",
   "attributes": {
-    "isVariationPicked": true,
+
     "classManager": [{ "id": 45, "title": "hero-card" }],
     "classManagerSubselector": [{ "id": 67, "title": "featured", "parent": 45 }]
   },
@@ -312,7 +312,7 @@ Apply both children alongside the parent on a block:
 
 ## 10. Notes / gotchas
 
-- **`content` replaces, never merges.** On update, always send the complete style object (read the current one from `get-classes` first).
+- **`content` merges on update.** Only send the fields you want to change. Set a field to `null` to delete it, or send `{}` to completely clear the class.
 - **You write the style object, not CSS.** The compiled CSS is produced automatically. If a class isn't styling anything on the frontend yet, it's because the compile step (run in the editor) hasn't happened for it — that's expected; your job is only the correct `content` object.
 - **Hover / pseudo-elements / descendant selectors** are not plain style-object keys — do them with a **child class** whose name *is* the sub-selector (`:hover`, `::before`, `h2`, `.title` — §3), or with the parent's **`customCss`** + `{{SELECTOR}}` (§7). A parent's normal style object only targets the block's own element. Never name a child a plain word (`dark`, `featured`) — it becomes a dead `... dark` element selector.
 - **Reuse beats create.** Always `get-classes` first and apply an existing class when one fits, rather than creating near-duplicates.

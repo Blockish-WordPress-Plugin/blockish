@@ -22,6 +22,10 @@ class Config
                         'description' => 'Optional filter. Either "wp_template" or "wp_template_part". If omitted, returns both.',
                         'enum' => ['wp_template', 'wp_template_part']
                     ],
+                    'slug' => [
+                        'type' => 'string',
+                        'description' => 'Optional slug to fetch a specific template and its schema.',
+                    ],
                 ],
             ],
             'output_schema'       => [
@@ -38,7 +42,12 @@ class Config
                                 'title'         => ['type' => 'string'],
                                 'type'          => ['type' => 'string'],
                                 'area'          => ['type' => 'string'],
+                                'source'        => ['type' => 'string', 'description' => 'Origin of the template: "theme" (default file) or "custom" (user modified).'],
+                                'is_custom'     => ['type' => 'boolean', 'description' => 'True if this template has been customized in the database.'],
+                                'has_theme_file'=> ['type' => 'boolean', 'description' => 'True if a default physical file exists for this template.'],
                                 'schema_staged' => ['type' => 'boolean'],
+                                'content'       => ['type' => 'string', 'description' => 'Raw post_content. Only included when fetching via slug.'],
+                                'schema'        => ['type' => 'array', 'description' => 'Native JS block schema array for this template. Modify this directly to edit layout. Only included when fetching via slug.'],
                             ],
                         ],
                     ],

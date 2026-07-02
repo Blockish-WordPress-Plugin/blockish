@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create, Update or Delete CSS Class', 'blockish'),
-            'description'         => __('Creates, updates or deletes a reusable Blockish Class Manager class (a "blockish-classes" custom post) selected by the action param; returns post_id, name, css_selector and content. You write only name and the JSON style object (content) — never raw CSS, and on update content fully replaces the stored object (not merged). Only create a class for styling that has no equivalent block attribute.', 'blockish'),
+            'description'         => __('Creates, updates or deletes a reusable Blockish Class Manager class (a "blockish-classes" custom post) selected by the action param; returns post_id, name, css_selector and content. You write only name and the JSON style object (content) — never raw CSS, and on update content merges recursively; send null to remove a key, {} to clear. Only create a class for styling that has no equivalent block attribute.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -32,7 +32,7 @@ class Config
                     ],
                     'content'   => [
                         'type'        => 'object',
-                        'description' => 'The style object (JSON) stored as the post content and the single source of truth — a structured map of style properties (padding, background, border, fontSize, transform, customCss, etc., each optionally responsive); see blockish/get-class-manager-docs for every key and value shape. Compiled to CSS automatically; do not write raw CSS and do not write to meta (raw CSS in meta is overwritten when the class opens in the editor). On update it REPLACES the stored object (not merged) — re-send the complete object.',
+                        'description' => 'The style object (JSON) stored as the post content and the single source of truth — a structured map of style properties (padding, background, border, fontSize, transform, customCss, etc., each optionally responsive); see blockish/get-class-manager-docs for every key and value shape. Compiled to CSS automatically; do not write raw CSS and do not write to meta. On update, it MERGES recursively with the existing styles — only send the properties you want to add or change. To remove a specific property, explicitly set its value to null. To completely clear all styles and reset the class, pass an empty object {}.',
                     ],
                     'parent_id' => [
                         'type'        => 'integer',

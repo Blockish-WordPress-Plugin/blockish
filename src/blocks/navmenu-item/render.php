@@ -37,7 +37,7 @@ $wrapper_attrs = get_block_wrapper_attributes( array_merge(
 
 $submenu_arrow = '<svg class="blockish-navmenu-submenu-arrow" width="10" height="10" viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M0 9.6c0-0.205 0.078-0.409 0.234-0.566 0.312-0.312 0.819-0.312 1.131 0l13.834 13.834 13.834-13.834c0.312-0.312 0.819-0.312 1.131 0s0.312 0.819 0 1.131l-14.4 14.4c-0.312 0.312-0.819 0.312-1.131 0l-14.4-14.4c-0.156-0.156-0.234-0.361-0.234-0.566z"></path></svg>';
 ?>
-<div <?php echo $wrapper_attrs; ?>>
+<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper attributes generated safely by core. ?>>
 	<a
 		class="<?php echo esc_attr( $link_class ); ?>"
 		href="<?php echo esc_url( $url ); ?>"
@@ -75,8 +75,8 @@ $submenu_arrow = '<svg class="blockish-navmenu-submenu-arrow" width="10" height=
 				wp_strip_all_tags( $label )
 			) ); ?>"
 		>
-			<?php echo $submenu_arrow; ?>
+			<?php echo $submenu_arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Contains SVG. ?>
 		</button>
-		<?php echo $content; ?>
+		<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Inner blocks content. ?>
 	<?php endif; ?>
 </div>

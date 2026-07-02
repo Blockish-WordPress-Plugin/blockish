@@ -76,6 +76,7 @@ class Loader
         Abilities\GetTaxonomies\Config::class,
         Abilities\ManageTerm\Config::class,
         Abilities\GetDesignerWorkflow\Config::class,
+        Abilities\GetIcons\Config::class,
     ];
 
     public function register_abilities()

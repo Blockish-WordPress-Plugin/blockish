@@ -6,7 +6,7 @@
 |---|---|---|---|
 | `shape` | Scalar (string) | `"circle"` | `"circle"` `"square"` `"rounded"` |
 | `alignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
-| `columns` | Responsive | `{"Desktop":"auto-fit"}` | `"auto-fit"` or an integer |
+| `columns` | Responsive | `{"Desktop":"auto-fit"}` | `"auto-fit"` or an integer. <br>**Warning:** If placed inside a `blockish/container` with auto grid layout (`gridLayoutType: "auto"`), `"auto-fit"` will cause the icons to collapse. Set `columns` to an explicit integer instead. |
 | `iconColorMode` | Scalar (string) | `"official"` | `"official"` (brand colors) `"custom"` (use `iconColor`) |
 | `iconColor` | Color | unset | Active when `iconColorMode` = `"custom"` |
 | `iconSecondaryColor` | Color | `"#FFFFFF"` | |

@@ -16,7 +16,7 @@ import CustomCss from './components/custom-css';
 const BlockishBlocksAdvancedControls = createHigherOrderComponent(
     (BlockEdit) =>
         memo((props) => {
-            if (props?.name?.includes('blockish/')) {
+            if (props?.name?.includes('blockish')) {
                 // Preview mode
                 if (props?.attributes?.preview) {
                     const { blockNameCamelcase } = window?.blockish?.helpers;
@@ -68,7 +68,7 @@ addFilter(
     'blocks.registerBlockType',
     'blockish/addCustomCssAttribute',
     (settings, name) => {
-        if (!name?.includes('blockish/')) {
+        if (!name?.includes('blockish')) {
             return settings;
         }
 

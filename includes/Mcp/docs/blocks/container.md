@@ -2,12 +2,11 @@
 
 The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 
-**Hard requirement:** `isVariationPicked` defaults to `false` but must always be set to `true` in `attributes`. Without it, the block renders its empty layout-picker placeholder instead of any content — this is the one attribute that breaks the omit-if-default rule.
 
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
-| `isVariationPicked` | Scalar (boolean) | `false` | **Always set to `true`.** |
-| `tagName` | Option | `{"label":"Div","value":"div"}` | `Div`/`div` · `Section`/`section` · `Article`/`article` · `Main`/`main` · `Aside`/`aside` · `Header`/`header` · `Footer`/`footer` |
+
+| `tagName` | Option | `{"label":"Div","value":"div"}` | `Div`/`div` · `Section`/`section` · `Article`/`article` · `Main`/`main` · `Aside`/`aside` · `Header`/`header` · `Footer`/`footer` <br>**Note:** Do not use `header` or `footer` when building inside a Template Part, to avoid double `<header>`/`<footer>` tags. |
 | `display` | Scalar (string) | `"flex"` | `"flex"` `"grid"` |
 | `containerWidth` | Scalar (string) | `"alignfull"` | `"alignfull"` `"alignwide"` `"align-custom-width"` (with `customWidthContainer`) — **the custom option's value is the literal string `"align-custom-width"`, not `"custom"`** |
 | `customWidthContainer` | Responsive | `{"Desktop":"100%"}` | Active when `containerWidth` = `"align-custom-width"` |
@@ -41,7 +40,7 @@ Minimal schema:
 ```json
 {
   "name": "blockish/container",
-  "attributes": { "isVariationPicked": true },
+  "attributes": {},
   "innerBlocks": []
 }
 ```

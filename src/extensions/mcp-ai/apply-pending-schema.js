@@ -35,12 +35,27 @@ const findTargetBlock = (blocks, targetName) => {
 
 const ApplyPendingSchema = () => {
     const { postType, slug, isTemplateOrPart } = useSelect((select) => {
+        // Post/Page Editor
         const editor = select('core/editor');
-        const currentPost = editor.getCurrentPost();
-        const type = editor.getCurrentPostType();
+        const currentPost = editor ? editor.getCurrentPost() : null;
+        let type = editor ? editor.getCurrentPostType() : null;
+        let currentSlug = currentPost?.slug || currentPost?.post_name;
+
+        // Site Editor (FSE)
+        const siteEditor = select('core/edit-site');
+        if (!type && siteEditor) {
+            type = siteEditor.getEditedPostType();
+            currentSlug = siteEditor.getEditedPostId();
+            // getEditedPostId usually returns something like "twentytwentyfour//header"
+            // We need to extract just the slug part (e.g. "header")
+            if (currentSlug && currentSlug.includes('//')) {
+                currentSlug = currentSlug.split('//')[1];
+            }
+        }
+
         return {
             postType: type,
-            slug: currentPost?.slug || currentPost?.post_name,
+            slug: currentSlug,
             isTemplateOrPart: type === 'wp_template' || type === 'wp_template_part'
         };
     }, []);
@@ -106,34 +121,72 @@ const ApplyPendingSchema = () => {
         const aiBlocks = getParsedBlocks();
         if (!aiBlocks.length) return;
 
+        let hasInjected = false;
         let targetName = aiBlocks[0]?.attributes?.metadata?.name;
-        let targetBlock = null;
 
-        if (targetName) {
+        const tryInject = (force = false) => {
+            if (hasInjected) return;
+
             const allEditorBlocks = getBlocks();
-            targetBlock = findTargetBlock(allEditorBlocks, targetName);
-        }
+            let targetBlock = null;
 
-        // Wrap the incoming blocks in our custom preview block instead of core/group
-        const wrapperBlock = createBlock('blockish/ai-preview', {
-            targetClientId: targetBlock ? targetBlock.clientId : ''
-        }, aiBlocks);
+            if (targetName) {
+                targetBlock = findTargetBlock(allEditorBlocks, targetName);
+            }
 
-        if (targetBlock) {
-            const targetRoot = getBlockRootClientId(targetBlock.clientId);
-            const targetIndex = getBlockIndex(targetBlock.clientId);
+            // If we are not forcing, and we have a targetName but it's not loaded in the editor yet, wait!
+            // This perfectly avoids the race condition where Gutenberg hasn't finished fetching the template.
+            if (!force && targetName && !targetBlock) {
+                return;
+            }
+
+            // Ensure the DOM canvas is ready to receive inserts
+            const canvas = document.querySelector('.block-editor-block-list__layout');
+            const iframe = document.querySelector('iframe[name="editor-canvas"]');
+            let isDomReady = false;
+            if (iframe) {
+                isDomReady = !!iframe.contentDocument?.querySelector('.block-editor-block-list__layout');
+            } else if (canvas) {
+                isDomReady = true;
+            }
+
+            if (!isDomReady) {
+                return; // Wait for canvas to mount
+            }
+
+            hasInjected = true;
             
-            // Insert AFTER the target block to show side-by-side preview
-            insertBlocks([wrapperBlock], targetIndex + 1, targetRoot);
-        } else {
-            // Append to end
-            const topLevelCount = getBlockOrder().length;
-            insertBlocks([wrapperBlock], topLevelCount, undefined);
-        }
-        
-        // Immediately clear the schema from DB/Meta so we don't re-inject on next load
-        clearPendingSchema();
+            const wrapperBlock = createBlock('blockish/ai-preview', {
+                targetClientId: targetBlock ? targetBlock.clientId : ''
+            }, aiBlocks);
 
+            if (targetBlock) {
+                const targetRoot = getBlockRootClientId(targetBlock.clientId);
+                const targetIndex = getBlockIndex(targetBlock.clientId);
+                insertBlocks([wrapperBlock], targetIndex + 1, targetRoot);
+            } else {
+                const topLevelCount = getBlockOrder().length;
+                insertBlocks([wrapperBlock], topLevelCount, undefined);
+            }
+            
+            clearPendingSchema();
+        };
+
+        const { subscribe } = window.wp.data;
+        const unsubscribe = subscribe(() => {
+            tryInject(false);
+        });
+
+        // Fallback timer: If after 2 seconds the target block still hasn't appeared 
+        // (e.g. it was deleted, hallucinated, or it's a completely blank new post), force inject.
+        const fallbackTimer = setTimeout(() => {
+            tryInject(true);
+        }, 2000);
+
+        return () => {
+            unsubscribe();
+            clearTimeout(fallbackTimer);
+        };
     }, [pendingSchema, getParsedBlocks, getBlocks, getBlockIndex, getBlockRootClientId, getBlockOrder, insertBlocks, clearPendingSchema]);
 
     // The component itself renders nothing to the DOM now. 

@@ -104,13 +104,22 @@ const RenderClassManagerStyles = () => {
 
     const classStylesRef = useRef({});
     const hasClassStylesInitialized = useRef(false);
+    const styleLength = editorSettings?.styles?.length || 0;
+
     useEffect(() => {
-        const styleIndex = editorSettings?.styles?.findIndex((style) => style?.__unstableType === 'blockish-classes-styles');
+        if(!editorSettings?.styles) return;
+
+        const stylesArray = editorSettings?.styles || [];
+        const styleIndex = stylesArray.findIndex((style) => style?.__unstableType === 'blockish-classes-styles');
+
+        if (!generateStyles) return;
+
         if (styleIndex === -1) {
+            
             updateEditorSettings({
                 ...editorSettings,
                 styles: [
-                    ...editorSettings?.styles,
+                    ...stylesArray,
                     {
                         isGlobalStyles: true,
                         __unstableType: 'blockish-classes-styles',
@@ -121,7 +130,7 @@ const RenderClassManagerStyles = () => {
         } else {
             updateEditorSettings({
                 ...editorSettings,
-                styles: editorSettings?.styles?.map((style, index) => {
+                styles: stylesArray.map((style, index) => {
                     if (index === styleIndex) {
                         return {
                             ...style,
@@ -148,7 +157,7 @@ const RenderClassManagerStyles = () => {
             classStylesRef.current = cssByClassId;
         }
 
-    }, [generateStyles, cssByClassId, classStyles, editedClassIds]);
+    }, [generateStyles, cssByClassId, classStyles, editedClassIds, styleLength]);
 
     return <></>;
 };

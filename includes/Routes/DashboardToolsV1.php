@@ -75,6 +75,18 @@ class DashboardToolsV1 extends WP_REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/seo-settings',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'update_seo_settings' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+			)
+		);
 	}
 
 	public function permissions_check() {
@@ -84,12 +96,30 @@ class DashboardToolsV1 extends WP_REST_Controller {
 	public function get_tools_data() {
 		$schemas = $this->get_saved_schemas();
 		$class_manager = $this->get_class_manager_items();
+		$seo_settings = array(
+			'global_meta_description' => get_option( 'blockish_global_meta_description', '' ),
+		);
 
 		return rest_ensure_response(
 			array(
-				'status' => 'success',
-				'schemas' => $schemas,
+				'status'       => 'success',
+				'schemas'      => $schemas,
 				'classManager' => $class_manager,
+				'seoSettings'  => $seo_settings,
+			)
+		);
+	}
+
+	public function update_seo_settings( WP_REST_Request $request ) {
+		$global_meta_description = sanitize_text_field( (string) $request->get_param( 'global_meta_description' ) );
+		update_option( 'blockish_global_meta_description', $global_meta_description, false );
+
+		return rest_ensure_response(
+			array(
+				'status'      => 'success',
+				'seoSettings' => array(
+					'global_meta_description' => get_option( 'blockish_global_meta_description', '' ),
+				),
 			)
 		);
 	}

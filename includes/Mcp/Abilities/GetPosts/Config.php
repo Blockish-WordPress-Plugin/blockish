@@ -20,6 +20,23 @@ class Config
                     'post_id'   => [ 'type' => 'integer', 'description' => 'Fetch this exact post, ignoring all other filters.' ],
                     'post_type' => [ 'type' => 'string',  'description' => 'Post type slug. Defaults to "post".' ],
                     'search'    => [ 'type' => 'string',  'description' => 'Search term matched against title/content.' ],
+                    'tax_query' => [
+                        'type' => 'array',
+                        'description' => 'Array of taxonomy query objects. Each object must have "taxonomy" (e.g. "category" or "post_tag") and "terms" (array of term slugs or IDs). Example: [{"taxonomy":"category", "terms":["news"]}]',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'taxonomy' => [ 'type' => 'string' ],
+                                'terms'    => [ 
+                                    'type' => 'array', 
+                                    'items' => [ 
+                                        'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'integer' ] ]
+                                    ] 
+                                ],
+                            ],
+                            'required' => ['taxonomy', 'terms']
+                        ]
+                    ],
                     'status'    => [ 'type' => 'string',  'description' => 'Comma-separated post statuses (publish, draft, private, pending, future). Defaults to "publish,draft,pending,future,private".' ],
                     'number'    => [ 'type' => 'integer', 'description' => 'Max items to return. Defaults to 20.' ],
                     'page'      => [ 'type' => 'integer', 'description' => 'Page number for pagination. Defaults to 1.' ],
@@ -36,6 +53,7 @@ class Config
                                 'id'             => [ 'type' => 'integer' ],
                                 'title'          => [ 'type' => 'string' ],
                                 'content'        => [ 'type' => 'string', 'description' => 'Raw post_content. Only included when fetching a single post via post_id, not in list queries.' ],
+                                'schema'         => [ 'type' => 'array', 'description' => 'Native JS block schema array for this post. Modify this directly to edit layout. Only included when fetching via post_id.' ],
                                 'status'         => [ 'type' => 'string' ],
                                 'type'           => [ 'type' => 'string' ],
                                 'url'            => [ 'type' => 'string' ],

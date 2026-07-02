@@ -34,6 +34,7 @@ class Extensions
         // so extension attributes are available during block_type_metadata filtering.
         add_action('init', [$this, 'register_extensions'], 9);
         add_action('enqueue_block_editor_assets', [$this, 'enqueue_editor_assets']);
+        add_action('enqueue_block_assets', [$this, 'enqueue_editor_styles']);
     }
 
     /**
@@ -185,7 +186,7 @@ class Extensions
     }
 
     /**
-     * Enqueue extension editor assets only.
+     * Enqueue extension editor scripts only.
      *
      * @return void
      */
@@ -193,6 +194,20 @@ class Extensions
     {
         foreach ($this->active_extensions as $slug => $metadata) {
             $this->maybe_enqueue_handle($slug, 'editorScript');
+        }
+    }
+
+    /**
+     * Enqueue extension editor styles to ensure they load in the Site Editor iframe.
+     *
+     * @return void
+     */
+    public function enqueue_editor_styles()
+    {
+        if (!is_admin()) {
+            return;
+        }
+        foreach ($this->active_extensions as $slug => $metadata) {
             $this->maybe_enqueue_handle($slug, 'editorStyle');
         }
     }

@@ -15,6 +15,10 @@ class Callbacks
         $slug = $input['slug'] ?? '';
         
         if (empty($slug)) {
+            // Check if this might be a payload size issue (JSON truncated/dropped)
+            if (empty($input) && isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 0) {
+                return ['error' => 'Payload too large or invalid JSON. The request body was dropped or truncated before reaching the handler. Try chunking your layout or simplifying styles to reduce payload size.'];
+            }
             return ['error' => 'slug is required.'];
         }
 
@@ -102,7 +106,7 @@ class Callbacks
             if (empty($input['block_schema'])) {
                 unset($staged_data[$slug]);
             } else {
-                $staged_data[$slug] = $input['block_schema'];
+                $staged_data[$slug] = \Blockish\Mcp\BlockSchemaMeta::force_required_attributes($input['block_schema']);
                 $schema_staged = true;
             }
             update_option($option_name, $staged_data, false);

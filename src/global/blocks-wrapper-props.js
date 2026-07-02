@@ -7,7 +7,7 @@ const BlockishBlocksWrapperProps = createHigherOrderComponent(
     (BlockListBlock) => (props) => {
         const { attributes, name, clientId } = props;
 
-        if (name?.includes('blockish/')) {
+        if (name?.includes('blockish')) {
             const hash = useMemo(() => {
                 return clientId?.slice(-6);
             }, [clientId]);

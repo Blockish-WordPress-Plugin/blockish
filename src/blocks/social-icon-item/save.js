@@ -1,4 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor';
+import { NETWORKS } from './networks';
 
 export default function Save( { attributes } ) {
 	const { BlockishIcon, getLinkProps } = window.blockish.helpers;
@@ -22,7 +23,7 @@ export default function Save( { attributes } ) {
 			>
 				<span className="blockish-social-icon-item__icon" aria-hidden="true">
 					<BlockishIcon
-						icon={ attributes?.icon }
+						icon={ attributes.icon === undefined && attributes.network ? NETWORKS[attributes.network?.value || attributes.network]?.icon : attributes?.icon }
 						width={ 18 }
 						height={ 18 }
 						fill="currentColor"

@@ -6,7 +6,6 @@
 {
   "name": "blockish/container",
   "attributes": {
-    "isVariationPicked": true,
     "flexDirection": { "Desktop": { "label": "Column", "value": "column" } },
     "containerMinHeight": { "Desktop": "100vh" },
     "containerBackground": "{\"backgroundType\":\"classic\",\"backgroundColor\":\"#0f172a\"}",
@@ -35,7 +34,7 @@
 
 `buttonPlacement` is set here even though the container's `alignItems` is already Center — that container setting only affects how the button's wrapper *box* is sized in the column, not where the visible button sits inside it (the wrapper is hard-width: 100% regardless). Without `buttonPlacement: {"Desktop":{"value":"center"}}`, this button would render flush-left despite the "centered" hero layout.
 
-Note what's omitted because it already matches the container's defaults: `display` (defaults `"flex"`), `alignItems`/`justifyContent` (both default Center), `containerWidth` (defaults `"alignfull"`). Only `isVariationPicked` (required override), `flexDirection`, `containerMinHeight`, `containerBackground`, and `padding` actually differ from default.
+Note what's omitted because it already matches the container's defaults: `display` (defaults `"flex"`), `alignItems`/`justifyContent` (both default Center), `containerWidth` (defaults `"alignfull"`). Only `flexDirection`, `containerMinHeight`, `containerBackground`, and `padding` actually differ from default.
 
 ### Stats row (grid container with three counters)
 
@@ -43,7 +42,6 @@ Note what's omitted because it already matches the container's defaults: `displa
 {
   "name": "blockish/container",
   "attributes": {
-    "isVariationPicked": true,
     "display": "grid",
     "gridLayoutType": "fixed",
     "gridColumns": { "Desktop": 3, "Tablet": 2, "Mobile": 1 },
@@ -80,16 +78,29 @@ Note what's omitted because it already matches the container's defaults: `displa
 }
 ```
 
-### Site header (logo container + navigation menu)
+### Site header / Template parts
 
-A header is a `blockish/container` (row, space-between) holding a logo on the left and the navigation on the right. The `offcanvas` is left empty so it mirrors the desktop menu for mobile automatically.
+**CRITICAL RULE FOR HEADERS & FOOTERS:**
+1. **When adding a header/footer to a page layout:** Do NOT build a custom `blockish/container` with `"tagName": {"value": "header"}`. Headers and footers are global. You MUST use the WordPress native `core/template-part` block so it remains reusable.
+```json
+{
+  "name": "core/template-part",
+  "attributes": {
+    "slug": "header",
+    "theme": "twentytwentyfive" 
+  }
+}
+```
+*(Use `"slug": "footer"` for footers).*
+
+2. **When DESIGNING a header/footer template part itself:** If you are asked to design the actual header layout (e.g. logo + navigation), you will use `blockish/container`, but **DO NOT set `"tagName": {"label": "Header", "value": "header"}`**. WordPress already wraps the entire template part in a `<header>` tag natively on the frontend. If you set `tagName` to `header` on your container, it will render double `<header>` tags. Leave it as the default `div`.
+
+Example of designing the inside of a header template part (logo + navigation):
 
 ```json
 {
   "name": "blockish/container",
   "attributes": {
-    "isVariationPicked": true,
-    "tagName": { "label": "Header", "value": "header" },
     "justifyContent": { "Desktop": { "label": "Space Between", "value": "space-between" } },
     "alignItems": { "Desktop": { "label": "Center", "value": "center" } },
     "padding": { "top": "16px", "right": "40px", "bottom": "16px", "left": "40px" }
@@ -98,7 +109,7 @@ A header is a `blockish/container` (row, space-between) holding a logo on the le
     { "name": "blockish/image", "attributes": { "image": { "id": 0, "url": "https://example.com/logo.png" }, "alt": "Logo", "imageWidth": { "Desktop": "140px" } } },
     {
       "name": "blockish/navigation",
-      "attributes": { "hasStarted": true, "menuBreakpoint": "tablet" },
+      "attributes": { "menuBreakpoint": "tablet" },
       "innerBlocks": [
         {
           "name": "blockish/navmenu",

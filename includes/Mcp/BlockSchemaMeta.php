@@ -51,8 +51,42 @@ class BlockSchemaMeta
             return '';
         }
 
-        json_decode($value);
+        $decoded = json_decode($value, true);
 
-        return JSON_ERROR_NONE === json_last_error() ? $value : '';
+        if (JSON_ERROR_NONE !== json_last_error() || !is_array($decoded)) {
+            return '';
+        }
+
+        $decoded = self::force_required_attributes($decoded);
+
+        return wp_json_encode($decoded);
+    }
+
+    /**
+     * Recursively forces non-obvious required attributes that default to false.
+     * e.g., isVariationPicked on blockish/container, hasStarted on blockish/navigation.
+     */
+    public static function force_required_attributes(array $blocks): array
+    {
+        foreach ($blocks as &$block) {
+            if (isset($block['name'])) {
+                if ($block['name'] === 'blockish/container') {
+                    if (!isset($block['attributes']) || !is_array($block['attributes'])) {
+                        $block['attributes'] = [];
+                    }
+                    $block['attributes']['isVariationPicked'] = true;
+                } elseif ($block['name'] === 'blockish/navigation') {
+                    if (!isset($block['attributes']) || !is_array($block['attributes'])) {
+                        $block['attributes'] = [];
+                    }
+                    $block['attributes']['hasStarted'] = true;
+                }
+            }
+
+            if (!empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
+                $block['innerBlocks'] = self::force_required_attributes($block['innerBlocks']);
+            }
+        }
+        return $blocks;
     }
 }

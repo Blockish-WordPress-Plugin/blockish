@@ -1,4 +1,4 @@
-=== Blockish ===
+=== Blockish – AI Site Builder & Creative Gutenberg Blocks ===
 Author: wowdevs
 Author URI: https://wowdevs.com/
 Plugin URI: https://blockish.wowdevs.com/
@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: blocks, gutenberg, block editor, page builder, ai
 Tested up to: 7.0
-Stable tag: 1.0.9
+Stable tag: 1.1.0
 Requires at least: 6.1
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -135,6 +135,15 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 10. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.1.0 [2nd July 2026] =
+
+* Added: Global SEO Meta Description setting in the dashboard
+* Added: Batch upload support in UploadMedia MCP ability
+* Added: Taxonomy query filtering support in GetPosts MCP ability
+* Added: Active plugin detection in GetSiteInfo MCP ability
+* Improved: Escaped block render outputs to meet strict security standards
+* Improved: Updated plugin description for better WP.org discovery
 
 = 1.0.9 [1st July 2026] =
 

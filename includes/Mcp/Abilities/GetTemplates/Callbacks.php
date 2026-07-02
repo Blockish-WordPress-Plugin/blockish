@@ -2,7 +2,6 @@
 
 namespace Blockish\Mcp\Abilities\GetTemplates;
 
-use WP_Query;
 use Blockish\Mcp\BlockSchemaMeta;
 
 defined('ABSPATH') || exit;
@@ -18,35 +17,46 @@ class Callbacks
             $post_type = [$post_type];
         }
 
-        $args = [
-            'post_type'      => $post_type,
-            'post_status'    => 'publish',
-            'posts_per_page' => -1,
-            'tax_query'      => [
-                [
-                    'taxonomy' => 'wp_theme',
-                    'field'    => 'name',
-                    'terms'    => $theme_slug,
-                ],
-            ],
-        ];
-
-        $query = new WP_Query($args);
         $templates = [];
 
-        foreach ($query->posts as $post) {
-            $has_schema = (bool) get_post_meta($post->ID, BlockSchemaMeta::META_KEY, true);
-            $area = wp_get_post_terms($post->ID, 'wp_template_part_area', ['fields' => 'names']);
-            $area = (!empty($area) && !is_wp_error($area)) ? $area[0] : '';
-            
-            $templates[] = [
-                'id'            => $post->ID,
-                'slug'          => $post->post_name,
-                'title'         => $post->post_title,
-                'type'          => $post->post_type,
-                'area'          => $area,
-                'schema_staged' => $has_schema,
-            ];
+        foreach ($post_type as $pt) {
+            $query_args = [];
+            if (!empty($input['slug'])) {
+                $query_args['slug__in'] = [$input['slug']];
+            }
+
+            $block_templates = get_block_templates($query_args, $pt);
+
+            foreach ($block_templates as $template) {
+                $has_schema = false;
+                if ($template->wp_id) {
+                    $has_schema = (bool) get_post_meta($template->wp_id, BlockSchemaMeta::META_KEY, true);
+                } else {
+                    $option_name = $pt === 'wp_template' ? 'blockish_mcp_staged_template' : 'blockish_mcp_staged_template_part';
+                    $staged_data = get_option($option_name, []);
+                    $has_schema = isset($staged_data[$template->slug]);
+                }
+
+                $template_data = [
+                    'id'            => $template->wp_id ?? 0,
+                    'slug'          => $template->slug,
+                    'title'         => $template->title,
+                    'type'          => $template->type,
+                    'area'          => $template->area ?? '',
+                    'source'        => $template->source,
+                    'is_custom'     => $template->is_custom,
+                    'has_theme_file'=> $template->has_theme_file,
+                    'schema_staged' => $has_schema,
+                ];
+
+                if (!empty($input['slug'])) {
+                    $template_data['content'] = $template->content;
+                    $parsed_blocks = parse_blocks($template->content);
+                    $template_data['schema']  = \Blockish\Mcp\SchemaUtils::convert_to_js_schema($parsed_blocks);
+                }
+
+                $templates[] = $template_data;
+            }
         }
 
         return [

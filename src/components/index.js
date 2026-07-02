@@ -34,6 +34,7 @@ import BlockishCSSFilters from "./css-filters";
 import BlockishDivider from "./divider";
 import BlockishTextStroke from "./text-stroke";
 import BlockishCodeEditor from "./code-editor";
+import BlockishRepeater from "./repeater";
 
 if (window?.blockish?.screen) {
     window.blockish.components = {
@@ -72,5 +73,6 @@ if (window?.blockish?.screen) {
         BlockishDivider,
         BlockishTextStroke,
         BlockishCodeEditor,
+        BlockishRepeater,
     }
 }

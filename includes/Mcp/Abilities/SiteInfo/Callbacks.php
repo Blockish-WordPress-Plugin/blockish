@@ -8,12 +8,32 @@ class Callbacks
 {
     public static function get_site_info($_input): array
     {
+        if ( ! function_exists( 'get_plugin_data' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $active_plugins = get_option( 'active_plugins', [] );
+        $plugins_data = [];
+
+        foreach ( $active_plugins as $plugin_path ) {
+            $full_path = WP_PLUGIN_DIR . '/' . $plugin_path;
+            if ( file_exists( $full_path ) ) {
+                $data = get_plugin_data( $full_path, false, false );
+                $plugins_data[] = [
+                    'name'        => $data['Name'] ?? '',
+                    'version'     => $data['Version'] ?? '',
+                    'description' => wp_strip_all_tags( $data['Description'] ?? '' )
+                ];
+            }
+        }
+
         return [
-            'name'        => get_bloginfo('name'),
-            'description' => get_bloginfo('description'),
-            'url'         => home_url(),
-            'wp_version'  => get_bloginfo('version'),
-            'theme_info'  => self::get_site_theme_info(),
+            'name'           => get_bloginfo('name'),
+            'description'    => get_bloginfo('description'),
+            'url'            => home_url(),
+            'version'        => get_bloginfo('version'),
+            'theme_info'     => self::get_site_theme_info(),
+            'active_plugins' => $plugins_data,
         ];
     }
 

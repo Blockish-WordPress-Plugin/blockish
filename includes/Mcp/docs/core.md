@@ -15,11 +15,18 @@ Every top-level layout block you emit MUST carry a unique and meaningful `metada
 
 **Your schema is staged for human review, not written live.** Passing `block_schema` to `blockish/manage-post` does not put anything into `post_content`. It saves the schema as pending data on the post. When a human opens that post in the block editor, a styled AI Preview Wrapper block (with a neon border) will automatically appear in the canvas containing your layout. The user must review it visually and click the "Accept" or "Discard" button on the block itself to commit it to the real content. Never pass a schema as `post_content` directly, and never expect it to appear on the live post without that manual step.
 
-Workflow:
-1. Read this doc (and `class-manager-docs.md` if you need reusable CSS classes).
-2. Build the schema tree for the page: an array of `{ name, attributes, innerBlocks }` nodes.
-3. Call `blockish/manage-post` with `post_id` (or omit to create a new post) and `block_schema` set to that array. Do not set `post_content` to anything schema- or markup-related in the same call.
-4. Tell the user the post is ready for review and link them to the returned `edit_url` — they need to open it and click "Accept" on the preview block in the canvas to turn the schema into real blocks.
+**CRITICAL RULE: Nesting Depth and Payload Size**
+While the block engine technically supports deep nesting (e.g., depth 5 or more), deep nesting exponentially increases the JSON payload size because you must inline all styles for every block in a headless build. If your JSON payload becomes too large, it may hit server limits (`post_max_size`) and get dropped, resulting in a "Payload too large" or "slug is required" error. **Keep your layouts as flat as practically possible.** If you must build a deeply nested structure (like a mega-footer), consider chunking it or using reusable Class Manager classes to aggressively reduce style repetition.
+
+### Core Workflow (Fetch, Modify, Update)
+
+**Do NOT build complex schema structures from scratch unless explicitly asked to create a brand new design.** It leads to hallucinated attributes and malformed layouts. Always prefer modifying existing schemas.
+
+1. **Fetch**: Call `blockish/get-posts` (for posts/pages) or `blockish/get-templates` (for templates/template parts) with the specific `post_id` or `slug`.
+2. **Inspect**: Look at the returned `schema` array. This is the exact live block structure of that post.
+3. **Modify**: Locate the specific block node you need to change (using its `metadata.name` or position) and surgically update its `attributes` or `innerBlocks` in memory.
+4. **Update**: Send the fully modified schema array back to `blockish/manage-post` or `blockish/manage-template` as the `block_schema` argument.
+5. **Review**: Provide the returned `edit_url` to the user so they can review and accept the AI Preview in the editor.
 
 ---
 
@@ -91,6 +98,11 @@ Use `"50%"` on all four corners for a pill/circle.
 ```json
 { "viewBox": [0, 0, 576, 512], "path": "M288 32 L576 480 L0 480 Z" }
 ```
+
+**Icon Fallback Strategy:**
+1. Try to use `blockish/get-icons` to find the exact icon. You can pass an array of search terms (e.g. `["arrow", "user"]`) to batch-search multiple icons in a single call.
+2. If you cannot find the icon in the library, try to write the SVG path yourself (e.g. for simple UI shapes).
+3. If you cannot confidently generate the SVG yourself, use a simple placeholder SVG (like a circle or square) and **explicitly inform the user** in your final response where you left placeholders so they can manually fix them.
 
 ### Link
 

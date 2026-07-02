@@ -2,10 +2,10 @@
 
 /**
  * Plugin Name:       Blockish
- * Description:       A collection of creative Gutenberg blocks to help you build beautiful websites.
+ * Description:       An AI-powered site building toolkit for WordPress. Includes creative Gutenberg blocks, an advanced Class Manager, and native Model Context Protocol (MCP) integration for autonomous AI design.
  * Requires at least: 6.1
  * Requires PHP:      7.4
- * Version:           1.0.9
+ * Version:           1.1.0
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/
@@ -21,6 +21,7 @@ use Blockish\Config\ExtensionList;
 use Blockish\Core\Blocks;
 use Blockish\Core\Dashboard;
 use Blockish\Core\Enqueue;
+use Blockish\Core\SEO;
 use Blockish\Core\StyleGenerator;
 use Blockish\Extensions\ExtensionsLoader;
 use Blockish\Mcp\Loader;
@@ -46,7 +47,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.0.9';
+    const VERSION = '1.1.0';
 
     /**
      * Holds the instance of this class.
@@ -152,6 +153,7 @@ final class Blockish
         SVGUploaderV1::get_instance();
         Blocks::get_instance();
         ExtensionsLoader::get_instance();
+        SEO::get_instance();
 
         if (! class_exists('WP\MCP\Core\McpAdapter')) {
             // MCP Adapter is not active — show an admin notice or return early.
