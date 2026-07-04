@@ -1,62 +1,85 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "blockish/google-map",
-	"version": "1.0.0",
-	"title": "Google Map",
-	"category": "blockish-framework",
-	"description": "Embed a Google Map location on your page.",
-	"icon": "location-alt",
-	"keywords": [ "blockish", "map", "google maps", "location" ],
-	"example": {
-		"attributes": {
-			"preview": true
-		}
-	},
-	"attributes": {
-		"location": {
-			"type": "string",
-			"default": "New York, NY"
-		},
-		"zoom": {
-			"type": "number",
-			"default": 14
-		},
-		"mapHeight": {
-			"type": "string",
-			"default": "360px",
-			"selectors": {
-				".{{WRAPPER}} .blockish-google-map__iframe": "height: {{VALUE}};"
-			}
-		},
-		"mapCSSFiltersNormal": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishCSSFilters",
-				"selector": ".{{WRAPPER}} .blockish-google-map__iframe"
-			}
-		},
-		"mapCSSFiltersHover": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishCSSFilters",
-				"selector": ".{{WRAPPER}} .blockish-google-map__iframe:hover"
-			}
-		},
-		"mapHoverTransition": {
-			"type": "number",
-			"selectors": {
-				".{{WRAPPER}}": "--blockish-google-map-hover-transition: {{VALUE}}s;"
-			}
-		}
-	},
-	"supports": {
-		"html": true,
-		"anchor": true,
-		"align": [ "wide", "full" ]
-	},
-	"textdomain": "blockish",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/google-map",
+  "version": "1.0.0",
+  "title": "Google Map",
+  "category": "blockish-framework",
+  "description": "Embed a Google Map location on your page.",
+  "icon": "location-alt",
+  "keywords": [
+    "blockish",
+    "map",
+    "google maps",
+    "location"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "location": {
+      "type": "string",
+      "default": "New York, NY"
+    },
+    "zoom": {
+      "type": "number",
+      "default": 14
+    },
+    "mapHeight": {
+      "type": "string",
+      "default": "360px",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-google-map__iframe": "height: {{VALUE}};"
+      }
+    },
+    "mapCSSFiltersNormal": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishCSSFilters",
+        "selector": ".{{WRAPPER}} .blockish-google-map__iframe"
+      }
+    },
+    "mapCSSFiltersHover": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishCSSFilters",
+        "selector": ".{{WRAPPER}} .blockish-google-map__iframe:hover"
+      }
+    },
+    "mapHoverTransition": {
+      "type": "number",
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-google-map-hover-transition: {{VALUE}}s;"
+      }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "text": [
+          {
+            "slug": "location",
+            "title": "Location"
+          }
+        ]
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

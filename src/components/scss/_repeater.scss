@@ -24,20 +24,19 @@
 
         /* The action buttons overlay */
         .blockish-repeater-item-header-actions {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 48px;
-            pointer-events: none;
-            display: flex;
             align-items: center;
+            display: flex;
+            gap: 0px;
             justify-content: flex-end;
-            gap: 4px;
-            padding-right: 48px; /* space for the chevron */
-            z-index: 2;
             opacity: 0;
-            transition: opacity 0.2s ease;
+            pointer-events: none;
+            position: absolute;
+            right: 0;
+            top: -18px;
+            transition: opacity .2s ease;
+            z-index: 2;
+            border-radius: 4px;
+            overflow: hidden;
 
             .blockish-repeater-action-button {
                 pointer-events: auto;
@@ -49,7 +48,9 @@
                 align-items: center;
                 justify-content: center;
                 color: #757575;
-                background: transparent;
+                background: #f0f0f0;
+                border: none;
+                transition: all 0.2s ease;
 
                 svg {
                     width: 16px;
@@ -58,13 +59,15 @@
 
                 &:hover {
                     color: #1e1e1e;
-                    background: rgba(0, 0, 0, 0.05);
+                    background: #e0e0e0;
                 }
 
                 &.is-destructive {
+                    color: #d94f4f;
+                    background: #fbeaea;
                     &:hover {
-                        color: #d94f4f;
-                        background: #fbeaea;
+                        color: #cc1818;
+                        background: #f5c6c6;
                     }
                 }
             }
@@ -99,7 +102,7 @@
 
                 .components-panel__body-toggle {
                     padding-left: 16px;
-                    padding-right: 110px; /* space for clone + trash + chevron */
+                    padding-right: 60px; /* space for clone + trash + chevron */
                     font-weight: 600;
                     color: #1e1e1e;
                     border: none;
@@ -116,7 +119,7 @@
     .blockish-repeater-item-content {
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 0;
         padding-top: 8px;
     }
 

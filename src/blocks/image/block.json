@@ -74,14 +74,14 @@
         ".{{WRAPPER}} .blockish-image": "object-fit: {{VALUE}};"
       },
       "condition": {
-				"rules": [
-					{
-						"condition": "not_empty",
-						"key": "imageHeight",
-						"value": ""
-					}
-				]
-			}
+        "rules": [
+          {
+            "condition": "not_empty",
+            "key": "imageHeight",
+            "value": ""
+          }
+        ]
+      }
     },
     "imageOpacityNormal": {
       "type": "number",
@@ -92,43 +92,43 @@
     "imageBorderNormal": {
       "type": "string",
       "groupSelector": {
-				"type": "BlockishBorder",
-				"selector": ".{{WRAPPER}} .blockish-image"
-			}
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-image"
+      }
     },
     "imageBorderRadiusNormal": {
       "type": "object",
       "selectors": {
-				".{{WRAPPER}} .blockish-image": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
-			}
+        ".{{WRAPPER}} .blockish-image": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
     },
     "imageBoxShadowNormal": {
       "type": "string",
       "groupSelector": {
-				"type": "BlockishBoxShadow",
-				"selector": ".{{WRAPPER}} .blockish-image"
-			}
+        "type": "BlockishBoxShadow",
+        "selector": ".{{WRAPPER}} .blockish-image"
+      }
     },
     "imageCSSFiltersNormal": {
       "type": "string",
       "groupSelector": {
-				"type": "BlockishCSSFilters",
-				"selector": ".{{WRAPPER}} .blockish-image"
-			}
+        "type": "BlockishCSSFilters",
+        "selector": ".{{WRAPPER}} .blockish-image"
+      }
     },
     "imageCSSFiltersHover": {
       "type": "string",
       "groupSelector": {
-				"type": "BlockishCSSFilters",
-				"selector": ".{{WRAPPER}} .blockish-image:hover"
-			}
+        "type": "BlockishCSSFilters",
+        "selector": ".{{WRAPPER}} .blockish-image:hover"
+      }
     },
     "imageBoxShadowHover": {
       "type": "string",
       "groupSelector": {
-				"type": "BlockishBoxShadow",
-				"selector": ".{{WRAPPER}} .blockish-image:hover"
-			}
+        "type": "BlockishBoxShadow",
+        "selector": ".{{WRAPPER}} .blockish-image:hover"
+      }
     },
     "imageBorderRadiusHover": {
       "type": "object",
@@ -139,9 +139,9 @@
     "imageBorderHover": {
       "type": "string",
       "groupSelector": {
-					"type": "BlockishBorder",
-					"selector": ".{{WRAPPER}} .blockish-image:hover"
-				}
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-image:hover"
+      }
     },
     "imageOpacityHover": {
       "type": "number",
@@ -192,6 +192,29 @@
       "selectors": {
         ".{{WRAPPER}} .blockish-image-caption": "margin-block-start: {{VALUE}};"
       }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "image": [
+          {
+            "slug": "image",
+            "title": "Image"
+          }
+        ],
+        "url": [
+          {
+            "slug": "url",
+            "title": "Link URL"
+          }
+        ],
+        "text": [
+          {
+            "slug": "alt",
+            "title": "Alt Text"
+          }
+        ]
+      }
     }
   },
   "supports": {
@@ -205,5 +228,9 @@
   "textdomain": "blockish",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

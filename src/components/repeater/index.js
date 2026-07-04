@@ -57,7 +57,11 @@ const BlockishRepeater = ({ repeaterItems = [], children, onChange, itemLabelNam
     const RepeaterItemsWrapper = sortable ? ReactSortable : 'div';
     const wrapperProps = sortable ? {
         list: itemsList,
-        setList: onChange,
+        setList: (newList) => {
+            if (JSON.stringify(newList) !== JSON.stringify(itemsList)) {
+                onChange(newList);
+            }
+        },
         animation: 200,
         className: "blockish-repeater-items-wrapper"
     } : {

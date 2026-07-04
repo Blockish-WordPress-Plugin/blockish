@@ -27,7 +27,7 @@ registerBlockType('blockish/ai-preview', {
         const { getBlock } = useSelect((select) => select('core/block-editor'), []);
 
         const blockProps = useBlockProps({
-            className: 'blockish-ai-preview-wrapper',
+            className: 'blockish-ai-preview-wrapper alignfull',
         });
 
         const handleApprove = () => {

@@ -1,53 +1,69 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "blockish/accordion-item",
-	"version": "1.0.0",
-	"title": "Accordion Item",
-	"category": "blockish-framework",
-	"description": "Item for the Accordion block.",
-	"icon": "excerpt-view",
-	"parent": [ "blockish/accordion" ],
-	"attributes": {
-		"title": {
-			"type": "string",
-			"default": "Accordion item"
-		},
-		"itemId": {
-			"type": "string"
-		},
-		"defaultOpen": {
-			"type": "boolean",
-			"default": false
-		},
-		"expandIcon": {
-			"type": "object",
-			"default": {
-				"viewBox": [ 0, 0, 448, 512 ],
-				"path": "M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"
-			}
-		},
-		"collapseIcon": {
-			"type": "object",
-			"default": {
-				"viewBox": [ 0, 0, 448, 512 ],
-				"path": "M0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32z"
-			}
-		},
-		"titleTag": {
-			"type": "object",
-			"default": {
-				"label": "H3",
-				"value": "h3"
-			}
-		}
-	},
-	"supports": {
-		"html": false,
-		"anchor": true
-	},
-	"textdomain": "blockish",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/accordion-item",
+  "version": "1.0.0",
+  "title": "Accordion Item",
+  "category": "blockish-framework",
+  "description": "Item for the Accordion block.",
+  "icon": "excerpt-view",
+  "parent": [
+    "blockish/accordion"
+  ],
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "Accordion item"
+    },
+    "itemId": {
+      "type": "string"
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "default": false
+    },
+    "expandIcon": {
+      "type": "object",
+      "default": {
+        "viewBox": [
+          0,
+          0,
+          448,
+          512
+        ],
+        "path": "M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"
+      }
+    },
+    "collapseIcon": {
+      "type": "object",
+      "default": {
+        "viewBox": [
+          0,
+          0,
+          448,
+          512
+        ],
+        "path": "M0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32z"
+      }
+    },
+    "titleTag": {
+      "type": "object",
+      "default": {
+        "label": "H3",
+        "value": "h3"
+      }
+    }
+  },
+  "supports": {
+    "html": false,
+    "anchor": true
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

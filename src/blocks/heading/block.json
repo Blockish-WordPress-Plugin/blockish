@@ -23,6 +23,10 @@
       "type": "string",
       "default": "Heading Text"
     },
+    "link": {
+      "type": "string",
+      "default": "#"
+    },
     "tag": {
       "type": "object",
       "default": {
@@ -71,15 +75,33 @@
         "type": "BlockishTextShadow",
         "selector": ".{{WRAPPER}}:hover"
       }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "text": [
+          {
+            "slug": "content",
+            "title": "Content"
+          }
+        ]
+      }
     }
   },
   "supports": {
     "html": true,
     "anchor": true,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   },
   "textdomain": "blockish",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

@@ -47,17 +47,14 @@
 
 	&__control {
 		border-radius: 3px !important;
-		min-height: 25px !important;
+		min-height: 30px !important;
+		height: auto !important;
 		box-shadow: none;
-		padding: 0 5px;
+		padding: 2px 5px !important;
 		cursor: pointer !important;
-		box-shadow: none !important;
 		border-color: #DADADD;
 		transition: 0.3s;
-
-		&:hover {
-			border-color: #397FE9 !important;
-		}
+		align-items: center;
 
 		&:focus {
 			border-color: #397FE9 !important;
@@ -65,8 +62,9 @@
 	}
 
 	&__value-container {
-		padding: 0 !important;
+		padding: 2px !important;
 		font-size: 12px;
+		gap: 4px;
 	}
 
 	&__input-container {
@@ -94,8 +92,24 @@
 		}
 	}
 
+	&__multi-value {
+		margin: 2px !important;
+		background-color: #f0f0f0 !important;
+		border-radius: 3px !important;
+	}
+
 	&__multi-value__label {
-		padding-left: 3px !important;
+		padding: 2px 6px !important;
+	}
+
+	&__multi-value__remove {
+		padding: 2px !important;
+		cursor: pointer;
+		
+		&:hover {
+			background-color: #e0e0e0 !important;
+			color: #d32f2f !important;
+		}
 	}
 
 	&__option {

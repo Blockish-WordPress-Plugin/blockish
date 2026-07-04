@@ -1,91 +1,119 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "blockish/icon-list-item",
-	"version": "1.0.0",
-	"title": "Icon List Item",
-	"category": "blockish-framework",
-	"description": "Item for the Icon List block.",
-	"icon": "marker",
-	"parent": [ "blockish/icon-list" ],
-	"example": {
-		"attributes": {
-			"preview": true
-		}
-	},
-	"attributes": {
-		"text": {
-			"type": "string",
-			"default": "Icon list item"
-		},
-		"icon": {
-			"type": "object",
-			"default": {
-				"viewBox": [ 0, 0, 576, 512 ],
-				"path": "M287.9 17.8L354 150.2 499.2 171.5C522.2 174.9 531.5 203.7 514.9 220.5L409.5 329.5 434.4 476.3C438.3 499 415.5 516.6 394.8 506.5L287.9 448.7 181 506.5C160.3 516.6 137.5 499 141.4 476.3L166.3 329.5 60.9 220.5C44.3 203.7 53.6 174.9 76.6 171.5L221.8 150.2 287.9 17.8z"
-			}
-		},
-		"link": {
-			"type": "object"
-		},
-		"iconSize": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}}.blockish-icon-list-item .blockish-icon-list-item-link .blockish-icon-list-item-icon svg": "width: {{VALUE}}; height: {{VALUE}};"
-			}
-		},
-		"iconColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}}.blockish-icon-list-item .blockish-icon-list-item-link .blockish-icon-list-item-icon svg": "fill: {{VALUE}};"
-			}
-		},
-		"iconHoverColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}}.blockish-icon-list-item:hover .blockish-icon-list-item-link .blockish-icon-list-item-icon svg": "fill: {{VALUE}};"
-			}
-		},
-		"iconHoverTransition": {
-			"type": "number",
-			"default": 0.2,
-			"selectors": {
-				".{{WRAPPER}}.blockish-icon-list-item": "--blockish-icon-list-item-icon-hover-transition: {{VALUE}}s;"
-			}
-		},
-		"textColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}}.blockish-icon-list-item .blockish-icon-list-item-link .blockish-icon-list-item-text": "color: {{VALUE}};"
-			}
-		},
-		"textHoverColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}}.blockish-icon-list-item:hover .blockish-icon-list-item-link .blockish-icon-list-item-text": "color: {{VALUE}};"
-			}
-		},
-		"textHoverTransition": {
-			"type": "number",
-			"default": 0.2,
-			"selectors": {
-				".{{WRAPPER}}.blockish-icon-list-item": "--blockish-icon-list-item-text-hover-transition: {{VALUE}}s;"
-			}
-		},
-		"textTypography": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTypography",
-				"selector": ".{{WRAPPER}}.blockish-icon-list-item .blockish-icon-list-item-link .blockish-icon-list-item-text"
-			}
-		}
-	},
-	"supports": {
-		"html": true,
-		"anchor": true
-	},
-	"textdomain": "blockish",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/icon-list-item",
+  "version": "1.0.0",
+  "title": "Icon List Item",
+  "category": "blockish-framework",
+  "description": "Item for the Icon List block.",
+  "icon": "marker",
+  "parent": [
+    "blockish/icon-list"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "text": {
+      "type": "string",
+      "default": "Icon list item"
+    },
+    "icon": {
+      "type": "object",
+      "default": {
+        "viewBox": [
+          0,
+          0,
+          576,
+          512
+        ],
+        "path": "M287.9 17.8L354 150.2 499.2 171.5C522.2 174.9 531.5 203.7 514.9 220.5L409.5 329.5 434.4 476.3C438.3 499 415.5 516.6 394.8 506.5L287.9 448.7 181 506.5C160.3 516.6 137.5 499 141.4 476.3L166.3 329.5 60.9 220.5C44.3 203.7 53.6 174.9 76.6 171.5L221.8 150.2 287.9 17.8z"
+      }
+    },
+    "link": {
+      "type": "object"
+    },
+    "iconSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}.blockish-icon-list-item .blockish-icon-list-item-link .blockish-icon-list-item-icon svg": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "iconColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}.blockish-icon-list-item .blockish-icon-list-item-link .blockish-icon-list-item-icon svg": "fill: {{VALUE}};"
+      }
+    },
+    "iconHoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}.blockish-icon-list-item:hover .blockish-icon-list-item-link .blockish-icon-list-item-icon svg": "fill: {{VALUE}};"
+      }
+    },
+    "iconHoverTransition": {
+      "type": "number",
+      "default": 0.2,
+      "selectors": {
+        ".{{WRAPPER}}.blockish-icon-list-item": "--blockish-icon-list-item-icon-hover-transition: {{VALUE}}s;"
+      }
+    },
+    "textColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}.blockish-icon-list-item .blockish-icon-list-item-link .blockish-icon-list-item-text": "color: {{VALUE}};"
+      }
+    },
+    "textHoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}.blockish-icon-list-item:hover .blockish-icon-list-item-link .blockish-icon-list-item-text": "color: {{VALUE}};"
+      }
+    },
+    "textHoverTransition": {
+      "type": "number",
+      "default": 0.2,
+      "selectors": {
+        ".{{WRAPPER}}.blockish-icon-list-item": "--blockish-icon-list-item-text-hover-transition: {{VALUE}}s;"
+      }
+    },
+    "textTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}}.blockish-icon-list-item .blockish-icon-list-item-link .blockish-icon-list-item-text"
+      }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "url": [
+          {
+            "slug": "link",
+            "title": "Link URL"
+          }
+        ],
+        "text": [
+          {
+            "slug": "text",
+            "title": "Text"
+          }
+        ]
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

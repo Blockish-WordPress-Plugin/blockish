@@ -1,160 +1,181 @@
 {
-    "$schema": "https://schemas.wp.org/trunk/block.json",
-    "apiVersion": 3,
-    "name": "blockish/button",
-    "title": "Button",
-    "category": "blockish-framework",
-    "keywords": [
-        "button",
-        "btn",
-        "link",
-        "call to action"
-    ],
-    "version": "1.0.0",
-    "icon": "button",
-    "description": "Call-to-action button with style options.",
-    "textdomain": "blockish",
-    "attributes": {
-        "text": {
-            "type": "string",
-            "default": "Click Here"
-        },
-        "url": {
-            "type": "object"
-        },
-        "icon": {
-            "type": "object"
-        },
-        "iconPosition": {
-            "type": "string",
-            "default": "row",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link": "flex-direction: {{VALUE}};"
-            }
-        },
-        "buttonPlacement": {
-            "type": "object",
-            "selectors": {
-                ".{{WRAPPER}}": "justify-content: {{VALUE}};"
-            }
-        },
-        "buttonAlignment": {
-            "type": "object",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link": "text-align: {{VALUE}}; justify-content: {{VALUE}};"
-            }
-        },
-        "buttonContentSpacing": {
-            "type": "object",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link": "gap: {{VALUE}};"
-            }
-        },
-        "buttonWidth": {
-            "type": "object",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link": "width: {{VALUE}};"
-            }
-        },
-        "buttonMinHeight": {
-            "type": "object",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link": "min-height: {{VALUE}};"
-            }
-        },
-        "buttonTypography": {
-            "type": "string",
-            "groupSelector": {
-                "type": "BlockishTypography",
-                "selector": ".{{WRAPPER}} .blockish-button-link"
-            }
-        },
-        "buttonTextShadow": {
-            "type": "string",
-            "groupSelector": {
-                "type": "BlockishTextShadow",
-                "selector": ".{{WRAPPER}} .blockish-button-link"
-            }
-        },
-        "buttonTextColor": {
-            "type": "string",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link": "color: {{VALUE}};"
-            }
-        },
-        "buttonBackground": {
-            "type": "string",
-            "groupSelector": {
-                "type": "BlockishBackground",
-                "selector": ".{{WRAPPER}} .blockish-button-link"
-            }
-        },
-        "buttonBoxShadow": {
-            "type": "string",
-            "groupSelector": {
-                "type": "BlockishBoxShadow",
-                "selector": ".{{WRAPPER}} .blockish-button-link"
-            }
-        },
-        "buttonHoverTextColor": {
-            "type": "string",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link:hover": "color: {{VALUE}};"
-            }
-        },
-        "buttonHoverBackground": {
-            "type": "string",
-            "groupSelector": {
-                "type": "BlockishBackground",
-                "selector": ".{{WRAPPER}} .blockish-button-link:hover"
-            }
-        },
-        "buttonHoverBoxShadow": {
-            "type": "string",
-            "groupSelector": {
-                "type": "BlockishBoxShadow",
-                "selector": ".{{WRAPPER}} .blockish-button-link:hover"
-            }
-        },
-        "buttonHoverTransition": {
-            "type": "number",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link": "--blockish-button-hover-transition: {{VALUE}}s;"
-            }
-        },
-        "buttonHoverBorderColor": {
-            "type": "string",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link:hover": "border-color: {{VALUE}};"
-            }
-        },
-        "buttonBorder": {
-            "type": "string",
-            "groupSelector": {
-                "type": "BlockishBorder",
-                "selector": ".{{WRAPPER}} .blockish-button-link"
-            }
-        },
-        "buttonBorderRadius": {
-            "type": "object",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
-            }
-        },
-        "buttonPadding": {
-            "type": "object",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
-            }
-        },
-        "buttonIconSize": {
-            "type": "object",
-            "selectors": {
-                ".{{WRAPPER}} .blockish-button-link .blockish-button-icon": "width: {{VALUE}}; height: {{VALUE}};"
-            }
-        }
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/button",
+  "title": "Button",
+  "category": "blockish-framework",
+  "keywords": [
+    "button",
+    "btn",
+    "link",
+    "call to action"
+  ],
+  "version": "1.0.0",
+  "icon": "button",
+  "description": "Call-to-action button with style options.",
+  "textdomain": "blockish",
+  "attributes": {
+    "text": {
+      "type": "string",
+      "default": "Click Here"
     },
-    "editorScript": "file:./index.js",
-    "editorStyle": "file:./index.css",
-    "style": "file:./style-index.css"
+    "url": {
+      "type": "object"
+    },
+    "icon": {
+      "type": "object"
+    },
+    "iconPosition": {
+      "type": "string",
+      "default": "row",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link": "flex-direction: {{VALUE}};"
+      }
+    },
+    "buttonPlacement": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}": "justify-content: {{VALUE}};"
+      }
+    },
+    "buttonAlignment": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link": "text-align: {{VALUE}}; justify-content: {{VALUE}};"
+      }
+    },
+    "buttonContentSpacing": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link": "gap: {{VALUE}};"
+      }
+    },
+    "buttonWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link": "width: {{VALUE}};"
+      }
+    },
+    "buttonMinHeight": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link": "min-height: {{VALUE}};"
+      }
+    },
+    "buttonTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-button-link"
+      }
+    },
+    "buttonTextShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}} .blockish-button-link"
+      }
+    },
+    "buttonTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link": "color: {{VALUE}};"
+      }
+    },
+    "buttonBackground": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-button-link"
+      }
+    },
+    "buttonBoxShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBoxShadow",
+        "selector": ".{{WRAPPER}} .blockish-button-link"
+      }
+    },
+    "buttonHoverTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link:hover": "color: {{VALUE}};"
+      }
+    },
+    "buttonHoverBackground": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-button-link:hover"
+      }
+    },
+    "buttonHoverBoxShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBoxShadow",
+        "selector": ".{{WRAPPER}} .blockish-button-link:hover"
+      }
+    },
+    "buttonHoverTransition": {
+      "type": "number",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link": "--blockish-button-hover-transition: {{VALUE}}s;"
+      }
+    },
+    "buttonHoverBorderColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link:hover": "border-color: {{VALUE}};"
+      }
+    },
+    "buttonBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-button-link"
+      }
+    },
+    "buttonBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "buttonPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "buttonIconSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-button-link .blockish-button-icon": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "url": [
+          {
+            "slug": "url",
+            "title": "Link URL"
+          }
+        ],
+        "text": [
+          {
+            "slug": "text",
+            "title": "Text"
+          }
+        ]
+      }
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

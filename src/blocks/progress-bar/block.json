@@ -1,141 +1,167 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "blockish/progress-bar",
-	"version": "1.0.0",
-	"title": "Progress Bar",
-	"category": "blockish-framework",
-	"description": "Progress bar showing completion status.",
-	"icon": "chart-bar",
-	"keywords": [ "blockish", "progress", "bar" ],
-	"example": {
-		"attributes": {
-			"preview": true
-		}
-	},
-	"attributes": {
-		"showTitle": {
-			"type": "boolean",
-			"default": true
-		},
-		"title": {
-			"type": "string",
-			"default": "Progress"
-		},
-		"titleTag": {
-			"type": "object",
-			"default": {
-				"label": "H4",
-				"value": "h4"
-			}
-		},
-		"percentage": {
-			"type": "number",
-			"default": 50,
-			"selectors": {
-				".{{WRAPPER}} .blockish-progress-bar__fill": "width: {{VALUE}}%;"
-			}
-		},
-		"percentageFillColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-progress-bar__fill": "background: {{VALUE}};"
-			}
-		},
-		"percentageBackgroundColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-progress-bar__track": "background: {{VALUE}};"
-			}
-		},
-		"percentageHeight": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}} .blockish-progress-bar__track": "height: {{VALUE}};"
-			}
-		},
-		"percentageBorderRadius": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}} .blockish-progress-bar__track": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};",
-				".{{WRAPPER}} .blockish-progress-bar__fill": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
-			}
-		},
-		"animationDuration": {
-			"type": "number",
-			"default": 2
-		},
-		"displayPercentage": {
-			"type": "boolean",
-			"default": true
-		},
-		"innerText": {
-			"type": "string",
-			"default": "Web Deigner"
-		},
-		"titleTextColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-progress-bar__title": "color: {{VALUE}};"
-			}
-		},
-		"titleTypography": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTypography",
-				"selector": ".{{WRAPPER}} .blockish-progress-bar__title"
-			}
-		},
-		"titleTextStroke": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTextStroke",
-				"selector": ".{{WRAPPER}} .blockish-progress-bar__title"
-			}
-		},
-		"titleTextShadow": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTextShadow",
-				"selector": ".{{WRAPPER}} .blockish-progress-bar__title"
-			}
-		},
-		"innerTextColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-progress-bar__inner-text, .{{WRAPPER}} .blockish-progress-bar__percentage": "color: {{VALUE}};"
-			}
-		},
-		"innerTextTypography": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTypography",
-				"selector": ".{{WRAPPER}} .blockish-progress-bar__inner-text, .{{WRAPPER}} .blockish-progress-bar__percentage"
-			}
-		},
-		"innerTextStroke": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTextStroke",
-				"selector": ".{{WRAPPER}} .blockish-progress-bar__inner-text"
-			}
-		},
-		"innerTextShadow": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTextShadow",
-				"selector": ".{{WRAPPER}} .blockish-progress-bar__inner-text, .{{WRAPPER}} .blockish-progress-bar__percentage"
-			}
-		}
-	},
-	"supports": {
-		"html": true,
-		"anchor": true,
-		"align": [ "wide", "full" ]
-	},
-	"textdomain": "blockish",
-	"editorScript": "file:./index.js",
-	"viewScript": "file:./view.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/progress-bar",
+  "version": "1.0.0",
+  "title": "Progress Bar",
+  "category": "blockish-framework",
+  "description": "Progress bar showing completion status.",
+  "icon": "chart-bar",
+  "keywords": [
+    "blockish",
+    "progress",
+    "bar"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "showTitle": {
+      "type": "boolean",
+      "default": true
+    },
+    "title": {
+      "type": "string",
+      "default": "Progress"
+    },
+    "titleTag": {
+      "type": "object",
+      "default": {
+        "label": "H4",
+        "value": "h4"
+      }
+    },
+    "percentage": {
+      "type": "number",
+      "default": 50,
+      "selectors": {
+        ".{{WRAPPER}} .blockish-progress-bar__fill": "width: {{VALUE}}%;"
+      }
+    },
+    "percentageFillColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-progress-bar__fill": "background: {{VALUE}};"
+      }
+    },
+    "percentageBackgroundColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-progress-bar__track": "background: {{VALUE}};"
+      }
+    },
+    "percentageHeight": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-progress-bar__track": "height: {{VALUE}};"
+      }
+    },
+    "percentageBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-progress-bar__track": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};",
+        ".{{WRAPPER}} .blockish-progress-bar__fill": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "animationDuration": {
+      "type": "number",
+      "default": 2
+    },
+    "displayPercentage": {
+      "type": "boolean",
+      "default": true
+    },
+    "innerText": {
+      "type": "string",
+      "default": "Web Deigner"
+    },
+    "titleTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-progress-bar__title": "color: {{VALUE}};"
+      }
+    },
+    "titleTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-progress-bar__title"
+      }
+    },
+    "titleTextStroke": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextStroke",
+        "selector": ".{{WRAPPER}} .blockish-progress-bar__title"
+      }
+    },
+    "titleTextShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}} .blockish-progress-bar__title"
+      }
+    },
+    "innerTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-progress-bar__inner-text, .{{WRAPPER}} .blockish-progress-bar__percentage": "color: {{VALUE}};"
+      }
+    },
+    "innerTextTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-progress-bar__inner-text, .{{WRAPPER}} .blockish-progress-bar__percentage"
+      }
+    },
+    "innerTextStroke": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextStroke",
+        "selector": ".{{WRAPPER}} .blockish-progress-bar__inner-text"
+      }
+    },
+    "innerTextShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}} .blockish-progress-bar__inner-text, .{{WRAPPER}} .blockish-progress-bar__percentage"
+      }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "text": [
+          {
+            "slug": "title",
+            "title": "Title"
+          },
+          {
+            "slug": "percentage",
+            "title": "Percentage"
+          }
+        ]
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "viewScript": "file:./view.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

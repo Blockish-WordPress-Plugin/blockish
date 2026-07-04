@@ -1,164 +1,198 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "blockish/counter",
-	"version": "1.0.0",
-	"title": "Counter",
-	"category": "blockish-framework",
-	"description": "Animated number counter for stats.",
-	"icon": "editor-ol",
-	"keywords": [ "blockish", "counter", "number" ],
-	"example": {
-		"attributes": {
-			"preview": true
-		}
-	},
-	"attributes": {
-		"startNumber": {
-			"type": "number",
-			"default": 0
-		},
-		"endNumber": {
-			"type": "number",
-			"default": 100
-		},
-		"numberPrefix": {
-			"type": "string",
-			"default": ""
-		},
-		"numberSuffix": {
-			"type": "string",
-			"default": ""
-		},
-		"animationDuration": {
-			"type": "number",
-			"default": 2
-		},
-		"thousandSeparator": {
-			"type": "boolean",
-			"default": true
-		},
-		"separator": {
-			"type": "object",
-			"default": {
-				"label": "Default",
-				"value": "default"
-			}
-		},
-		"title": {
-			"type": "string",
-			"default": "Cool Number"
-		},
-		"titleTag": {
-			"type": "object",
-			"default": {
-				"label": "H3",
-				"value": "h3"
-			}
-		},
-		"titlePosition": {
-			"type": "string",
-			"default": "before"
-		},
-		"titleHorizontalAlignment": {
-			"type": "object",
-			"default": {
-				"Desktop": "center"
-			},
-			"selectors": {
-				".{{WRAPPER}}": "--blockish-counter-title-horizontal: {{VALUE}};"
-			}
-		},
-		"titleVerticalAlignment": {
-			"type": "object",
-			"default": {
-				"Desktop": "center"
-			},
-			"selectors": {
-				".{{WRAPPER}}": "--blockish-counter-title-vertical: {{VALUE}};"
-			}
-		},
-		"titleGap": {
-			"type": "object",
-			"default": {
-				"Desktop": "8px"
-			},
-			"selectors": {
-				".{{WRAPPER}} .blockish-counter__inner": "gap: {{VALUE}};"
-			}
-		},
-		"numberPosition": {
-			"type": "object",
-			"default": {
-				"Desktop": "center"
-			},
-			"selectors": {
-				".{{WRAPPER}} .blockish-counter__number": "align-self: {{VALUE}};"
-			}
-		},
-		"numberTextColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-counter__number": "color: {{VALUE}};"
-			}
-		},
-		"numberTypography": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTypography",
-				"selector": ".{{WRAPPER}} .blockish-counter__number"
-			}
-		},
-		"numberTextStroke": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTextStroke",
-				"selector": ".{{WRAPPER}} .blockish-counter__number"
-			}
-		},
-		"numberTextShadow": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTextShadow",
-				"selector": ".{{WRAPPER}} .blockish-counter__number"
-			}
-		},
-		"titleTextColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-counter__title": "color: {{VALUE}};"
-			}
-		},
-		"titleTypography": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTypography",
-				"selector": ".{{WRAPPER}} .blockish-counter__title"
-			}
-		},
-		"titleTextStroke": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTextStroke",
-				"selector": ".{{WRAPPER}} .blockish-counter__title"
-			}
-		},
-		"titleTextShadow": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTextShadow",
-				"selector": ".{{WRAPPER}} .blockish-counter__title"
-			}
-		}
-	},
-	"supports": {
-		"html": true,
-		"anchor": true,
-		"align": [ "wide", "full" ]
-	},
-	"textdomain": "blockish",
-	"editorScript": "file:./index.js",
-	"viewScript": "file:./view.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/counter",
+  "version": "1.0.0",
+  "title": "Counter",
+  "category": "blockish-framework",
+  "description": "Animated number counter for stats.",
+  "icon": "editor-ol",
+  "keywords": [
+    "blockish",
+    "counter",
+    "number"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "startNumber": {
+      "type": "number",
+      "default": 0
+    },
+    "endNumber": {
+      "type": "number",
+      "default": 100
+    },
+    "numberPrefix": {
+      "type": "string",
+      "default": ""
+    },
+    "numberSuffix": {
+      "type": "string",
+      "default": ""
+    },
+    "animationDuration": {
+      "type": "number",
+      "default": 2
+    },
+    "thousandSeparator": {
+      "type": "boolean",
+      "default": true
+    },
+    "separator": {
+      "type": "object",
+      "default": {
+        "label": "Default",
+        "value": "default"
+      }
+    },
+    "title": {
+      "type": "string",
+      "default": "Cool Number"
+    },
+    "titleTag": {
+      "type": "object",
+      "default": {
+        "label": "H3",
+        "value": "h3"
+      }
+    },
+    "titlePosition": {
+      "type": "string",
+      "default": "before"
+    },
+    "titleHorizontalAlignment": {
+      "type": "object",
+      "default": {
+        "Desktop": "center"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-counter-title-horizontal: {{VALUE}};"
+      }
+    },
+    "titleVerticalAlignment": {
+      "type": "object",
+      "default": {
+        "Desktop": "center"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-counter-title-vertical: {{VALUE}};"
+      }
+    },
+    "titleGap": {
+      "type": "object",
+      "default": {
+        "Desktop": "8px"
+      },
+      "selectors": {
+        ".{{WRAPPER}} .blockish-counter__inner": "gap: {{VALUE}};"
+      }
+    },
+    "numberPosition": {
+      "type": "object",
+      "default": {
+        "Desktop": "center"
+      },
+      "selectors": {
+        ".{{WRAPPER}} .blockish-counter__number": "align-self: {{VALUE}};"
+      }
+    },
+    "numberTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-counter__number": "color: {{VALUE}};"
+      }
+    },
+    "numberTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-counter__number"
+      }
+    },
+    "numberTextStroke": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextStroke",
+        "selector": ".{{WRAPPER}} .blockish-counter__number"
+      }
+    },
+    "numberTextShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}} .blockish-counter__number"
+      }
+    },
+    "titleTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-counter__title": "color: {{VALUE}};"
+      }
+    },
+    "titleTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-counter__title"
+      }
+    },
+    "titleTextStroke": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextStroke",
+        "selector": ".{{WRAPPER}} .blockish-counter__title"
+      }
+    },
+    "titleTextShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}} .blockish-counter__title"
+      }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "text": [
+          {
+            "slug": "startNumber",
+            "title": "StartNumber"
+          },
+          {
+            "slug": "endNumber",
+            "title": "EndNumber"
+          },
+          {
+            "slug": "numberPrefix",
+            "title": "NumberPrefix"
+          },
+          {
+            "slug": "numberSuffix",
+            "title": "NumberSuffix"
+          }
+        ]
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "viewScript": "file:./view.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

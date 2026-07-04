@@ -1,118 +1,129 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "blockish/icon-list",
-	"version": "1.0.0",
-	"title": "Icon List",
-	"category": "blockish-framework",
-	"description": "List of icons with supporting text.",
-	"icon": "editor-ul",
-	"keywords": [ "blockish", "icon list", "list" ],
-	"example": {
-		"attributes": {
-			"preview": true
-		}
-	},
-	"attributes": {
-		"layout": {
-			"type": "string",
-			"default": "column",
-			"selectors": {
-				".{{WRAPPER}}": "flex-direction: {{VALUE}};"
-			}
-		},
-		"rowGap": {
-			"type": "object",
-			"default": {
-				"Desktop": "12px"
-			},
-			"selectors": {
-				".{{WRAPPER}}": "row-gap: {{VALUE}};"
-			}
-		},
-		"columnGap": {
-			"type": "object",
-			"default": {
-				"Desktop": "12px"
-			},
-			"selectors": {
-				".{{WRAPPER}}": "column-gap: {{VALUE}};"
-			}
-		},
-		"itemPadding": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}} .blockish-icon-list-item-link": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
-			}
-		},
-		"itemContentSpacing": {
-			"type": "object",
-			"default": {
-				"Desktop": "10px"
-			},
-			"selectors": {
-				".{{WRAPPER}} .blockish-icon-list-item-link": "column-gap: {{VALUE}};"
-			}
-		},
-		"itemIconSize": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}} .blockish-icon-list-item-icon svg": "width: {{VALUE}}; height: {{VALUE}};"
-			}
-		},
-		"itemIconColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-icon-list-item-icon svg": "fill: {{VALUE}};"
-			}
-		},
-		"itemIconHoverColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-icon-list-item:hover .blockish-icon-list-item-icon svg": "fill: {{VALUE}};"
-			}
-		},
-		"itemTextColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-icon-list-item-text": "color: {{VALUE}};"
-			}
-		},
-		"itemTextHoverColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}} .blockish-icon-list-item:hover .blockish-icon-list-item-text": "color: {{VALUE}};"
-			}
-		},
-		"itemTextTypography": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishTypography",
-				"selector": ".{{WRAPPER}} .blockish-icon-list-item-text"
-			}
-		},
-		"itemIconHoverTransition": {
-			"type": "number",
-			"default": 0.2,
-			"selectors": {
-				".{{WRAPPER}}": "--blockish-icon-list-icon-hover-transition: {{VALUE}}s;"
-			}
-		},
-		"itemTextHoverTransition": {
-			"type": "number",
-			"default": 0.2,
-			"selectors": {
-				".{{WRAPPER}}": "--blockish-icon-list-text-hover-transition: {{VALUE}}s;"
-			}
-		}
-	},
-	"supports": {
-		"html": true,
-		"anchor": true,
-		"align": [ "wide", "full" ]
-	},
-	"textdomain": "blockish",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/icon-list",
+  "version": "1.0.0",
+  "title": "Icon List",
+  "category": "blockish-framework",
+  "description": "List of icons with supporting text.",
+  "icon": "editor-ul",
+  "keywords": [
+    "blockish",
+    "icon list",
+    "list"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "layout": {
+      "type": "string",
+      "default": "column",
+      "selectors": {
+        ".{{WRAPPER}}": "flex-direction: {{VALUE}};"
+      }
+    },
+    "rowGap": {
+      "type": "object",
+      "default": {
+        "Desktop": "12px"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "row-gap: {{VALUE}};"
+      }
+    },
+    "columnGap": {
+      "type": "object",
+      "default": {
+        "Desktop": "12px"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "column-gap: {{VALUE}};"
+      }
+    },
+    "itemPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-icon-list-item-link": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "itemContentSpacing": {
+      "type": "object",
+      "default": {
+        "Desktop": "10px"
+      },
+      "selectors": {
+        ".{{WRAPPER}} .blockish-icon-list-item-link": "column-gap: {{VALUE}};"
+      }
+    },
+    "itemIconSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-icon-list-item-icon svg": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "itemIconColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-icon-list-item-icon svg": "fill: {{VALUE}};"
+      }
+    },
+    "itemIconHoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-icon-list-item:hover .blockish-icon-list-item-icon svg": "fill: {{VALUE}};"
+      }
+    },
+    "itemTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-icon-list-item-text": "color: {{VALUE}};"
+      }
+    },
+    "itemTextHoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-icon-list-item:hover .blockish-icon-list-item-text": "color: {{VALUE}};"
+      }
+    },
+    "itemTextTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-icon-list-item-text"
+      }
+    },
+    "itemIconHoverTransition": {
+      "type": "number",
+      "default": 0.2,
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-icon-list-icon-hover-transition: {{VALUE}}s;"
+      }
+    },
+    "itemTextHoverTransition": {
+      "type": "number",
+      "default": 0.2,
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-icon-list-text-hover-transition: {{VALUE}}s;"
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

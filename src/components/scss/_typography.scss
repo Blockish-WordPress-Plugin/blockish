@@ -170,16 +170,18 @@
 		}
 	}
 }
-.blockish-select__control,
-.blockish-select__control--is-focused,
-.blockish-select__control--is-menu-open {
-	height: 40px !important;
-	border: 1px solid #e4e4e7 !important;
+.blockish-typography-control {
+	.blockish-select__control,
+	.blockish-select__control--is-focused,
+	.blockish-select__control--is-menu-open {
+		height: 40px !important;
+		border: 1px solid #e4e4e7 !important;
 
-	&:focus {
-		border-color: #4141d5 !important;
-		outline: none !important;
-		box-shadow: none !important;
+		&:focus {
+			border-color: #4141d5 !important;
+			outline: none !important;
+			box-shadow: none !important;
+		}
 	}
 }
 

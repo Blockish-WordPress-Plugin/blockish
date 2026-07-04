@@ -1,116 +1,127 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "blockish/social-icons",
-	"version": "1.0.0",
-	"title": "Social Icons",
-	"category": "blockish-framework",
-	"description": "Social icon list for profile links.",
-	"icon": "share",
-	"keywords": [ "blockish", "social", "icons" ],
-	"example": {
-		"attributes": {
-			"preview": true
-		}
-	},
-	"attributes": {
-		"shape": {
-			"type": "string",
-			"default": "circle"
-		},
-		"columns": {
-			"type": "object",
-			"default": {
-				"Desktop": "auto-fit"
-			},
-			"selectors": {
-				".{{WRAPPER}}": "--blockish-social-icons-columns: {{VALUE}};"
-			}
-		},
-		"alignment": {
-			"type": "object",
-			"default": {
-				"Desktop": "center"
-			},
-			"selectors": {
-				".{{WRAPPER}}": "justify-content: {{VALUE}};"
-			}
-		},
-		"iconColorMode": {
-			"type": "string",
-			"default": "official"
-		},
-		"iconColor": {
-			"type": "string",
-			"selectors": {
-				".{{WRAPPER}}": "--blockish-social-icons-primary-color: {{VALUE}};"
-			}
-		},
-		"iconSecondaryColor": {
-			"type": "string",
-			"default": "#FFFFFF",
-			"selectors": {
-				".{{WRAPPER}}": "--blockish-social-icons-secondary-color: {{VALUE}};"
-			}
-		},
-		"iconSize": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}} .blockish-social-icon-item__icon svg": "width: {{VALUE}}; height: {{VALUE}};"
-			}
-		},
-		"iconPadding": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}} .blockish-social-icon-item__link": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
-			}
-		},
-		"iconSpacing": {
-			"type": "object",
-			"default": {
-				"Desktop": "12px"
-			},
-			"selectors": {
-				".{{WRAPPER}}": "column-gap: {{VALUE}};"
-			}
-		},
-		"iconRowsGap": {
-			"type": "object",
-			"default": {
-				"Desktop": "12px"
-			},
-			"selectors": {
-				".{{WRAPPER}}": "row-gap: {{VALUE}};"
-			}
-		},
-		"iconBorder": {
-			"type": "string",
-			"groupSelector": {
-				"type": "BlockishBorder",
-				"selector": ".{{WRAPPER}} .blockish-social-icon-item__link"
-			}
-		},
-		"iconBorderRadius": {
-			"type": "object",
-			"selectors": {
-				".{{WRAPPER}} .blockish-social-icon-item__link": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
-			}
-		},
-		"hoverAnimation": {
-			"type": "string",
-			"default": "none",
-			"selectors": {
-				".{{WRAPPER}} .blockish-social-icon-item__link:hover": "animation-name: {{VALUE}};"
-			}
-		}
-	},
-	"supports": {
-		"html": true,
-		"anchor": true,
-		"align": [ "wide", "full" ]
-	},
-	"textdomain": "blockish",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/social-icons",
+  "version": "1.0.0",
+  "title": "Social Icons",
+  "category": "blockish-framework",
+  "description": "Social icon list for profile links.",
+  "icon": "share",
+  "keywords": [
+    "blockish",
+    "social",
+    "icons"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "shape": {
+      "type": "string",
+      "default": "circle"
+    },
+    "columns": {
+      "type": "object",
+      "default": {
+        "Desktop": "auto-fit"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-social-icons-columns: {{VALUE}};"
+      }
+    },
+    "alignment": {
+      "type": "object",
+      "default": {
+        "Desktop": "center"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "justify-content: {{VALUE}};"
+      }
+    },
+    "iconColorMode": {
+      "type": "string",
+      "default": "official"
+    },
+    "iconColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-social-icons-primary-color: {{VALUE}};"
+      }
+    },
+    "iconSecondaryColor": {
+      "type": "string",
+      "default": "#FFFFFF",
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-social-icons-secondary-color: {{VALUE}};"
+      }
+    },
+    "iconSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-social-icon-item__icon svg": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "iconPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-social-icon-item__link": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "iconSpacing": {
+      "type": "object",
+      "default": {
+        "Desktop": "12px"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "column-gap: {{VALUE}};"
+      }
+    },
+    "iconRowsGap": {
+      "type": "object",
+      "default": {
+        "Desktop": "12px"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "row-gap: {{VALUE}};"
+      }
+    },
+    "iconBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-social-icon-item__link"
+      }
+    },
+    "iconBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-social-icon-item__link": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "hoverAnimation": {
+      "type": "string",
+      "default": "none",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-social-icon-item__link:hover": "animation-name: {{VALUE}};"
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

@@ -314,7 +314,18 @@ class Utilities
 
         global $wp_filesystem;
 
-        $block_metadata_path = BLOCKISH_DIR . '/build/blocks/' . $block_name . '/block.json';
+        $slug = $block_name;
+        if (strpos($slug, '/') !== false) {
+            $parts = explode('/', $slug);
+            $slug = end($parts);
+        }
+
+        $blocks = apply_filters('blockish/blocks/list', array());
+        if (isset($blocks[$slug]) && !empty($blocks[$slug]['path'])) {
+            $block_metadata_path = $blocks[$slug]['path'] . '/block.json';
+        } else {
+            $block_metadata_path = BLOCKISH_DIR . '/build/blocks/' . $block_name . '/block.json';
+        }
 
         if (!is_readable($block_metadata_path)) {
             return false;

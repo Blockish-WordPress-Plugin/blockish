@@ -1,44 +1,67 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "blockish/social-icon-item",
-	"version": "1.0.0",
-	"title": "Social Icon Item",
-	"category": "blockish-framework",
-	"description": "Item for the Social Icons block.",
-	"icon": "share-alt2",
-	"parent": [ "blockish/social-icons" ],
-	"example": {
-		"attributes": {
-			"preview": true
-		}
-	},
-	"attributes": {
-		"network": {
-			"type": "string",
-			"default": "facebook"
-		},
-		"label": {
-			"type": "string",
-			"default": "Facebook"
-		},
-		"icon": {
-			"type": "object"
-		},
-		"officialColor": {
-			"type": "string",
-			"default": "#1877F2"
-		},
-		"link": {
-			"type": "object"
-		}
-	},
-	"supports": {
-		"html": true,
-		"anchor": true
-	},
-	"textdomain": "blockish",
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/social-icon-item",
+  "version": "1.0.0",
+  "title": "Social Icon Item",
+  "category": "blockish-framework",
+  "description": "Item for the Social Icons block.",
+  "icon": "share-alt2",
+  "parent": [
+    "blockish/social-icons"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "network": {
+      "type": "string",
+      "default": "facebook"
+    },
+    "label": {
+      "type": "string",
+      "default": "Facebook"
+    },
+    "icon": {
+      "type": "object"
+    },
+    "officialColor": {
+      "type": "string",
+      "default": "#1877F2"
+    },
+    "link": {
+      "type": "object"
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "url": [
+          {
+            "slug": "link",
+            "title": "Link URL"
+          }
+        ],
+        "text": [
+          {
+            "slug": "network",
+            "title": "Network"
+          }
+        ]
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }
