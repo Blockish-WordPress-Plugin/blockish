@@ -16,7 +16,24 @@ class Callbacks
         }
 
         $editing = ! empty( $input['post_id'] );
+        $deleting = ! empty( $input['delete'] ) && $editing;
         $args = [];
+
+        if ( $deleting ) {
+            $existing_post = get_post( $input['post_id'] );
+            if ( ! $existing_post ) {
+                return [ 'error' => 'Post not found.' ];
+            }
+            wp_delete_post( $input['post_id'], true );
+            return [
+                'post_id'            => $input['post_id'],
+                'post_status'        => 'deleted',
+                'post_url'           => '',
+                'edit_url'           => '',
+                'schema_staged'      => false,
+                'featured_media_set' => false,
+            ];
+        }
 
         if ( $editing ) {
             $existing_post = get_post( $input['post_id'], ARRAY_A );

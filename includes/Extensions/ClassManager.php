@@ -397,7 +397,7 @@ class ClassManager {
 			return false;
 		}
 
-		return str_starts_with( $block_name, 'blockish/' );
+		return str_starts_with( $block_name, 'blockish' );
 	}
 
 	private function normalize_class_slug( $value ) {

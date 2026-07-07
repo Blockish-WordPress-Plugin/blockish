@@ -23,9 +23,8 @@
       "type": "string",
       "default": "Heading Text"
     },
-    "link": {
-      "type": "string",
-      "default": "#"
+    "url": {
+      "type": "object"
     },
     "tag": {
       "type": "object",
@@ -83,6 +82,12 @@
           {
             "slug": "content",
             "title": "Content"
+          }
+        ],
+        "url": [
+          {
+            "slug": "url",
+            "title": "Link URL"
           }
         ]
       }

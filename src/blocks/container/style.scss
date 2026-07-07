@@ -33,4 +33,9 @@
     .wp-block-blockish-container{
         width: 100%;
     }
+
+    &.align-custom-width {
+        margin-left: auto;
+        margin-right: auto;
+    }
 }

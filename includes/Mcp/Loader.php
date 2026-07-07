@@ -77,6 +77,10 @@ class Loader
         Abilities\ManageTerm\Config::class,
         Abilities\GetDesignerWorkflow\Config::class,
         Abilities\GetIcons\Config::class,
+        Abilities\GetFonts\Config::class,
+        Abilities\ManageFonts\Config::class,
+        Abilities\ManageOptions\Config::class,
+        Abilities\ManageComments\Config::class,
     ];
 
     public function register_abilities()

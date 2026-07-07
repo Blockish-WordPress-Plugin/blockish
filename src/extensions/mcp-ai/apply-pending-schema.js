@@ -1,7 +1,7 @@
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType, serialize } from '@wordpress/blocks';
 
 const META_KEY = '_blockish_block_schema';
 
@@ -17,20 +17,16 @@ const schemaNodeToBlock = (node) => {
     return createBlock(node.name, node.attributes || {}, innerBlocks);
 };
 
-// Recursive function to find a block by metadata name
-const findTargetBlock = (blocks, targetName) => {
-    if (!targetName || !blocks || !blocks.length) return null;
-    for (let i = 0; i < blocks.length; i++) {
-        const block = blocks[i];
-        if (block.attributes?.metadata?.name === targetName) {
-            return block;
-        }
-        if (block.innerBlocks && block.innerBlocks.length > 0) {
-            const found = findTargetBlock(block.innerBlocks, targetName);
-            if (found) return found;
-        }
-    }
-    return null;
+/**
+ * Serialize a block tree to a lightweight JSON-serializable snapshot.
+ * We store name, attributes, and innerBlocks (recursively).
+ */
+const blockToSnapshot = (block) => {
+    return {
+        name: block.name,
+        attributes: block.attributes,
+        innerBlocks: (block.innerBlocks || []).map(blockToSnapshot),
+    };
 };
 
 const ApplyPendingSchema = () => {
@@ -46,8 +42,6 @@ const ApplyPendingSchema = () => {
         if (!type && siteEditor) {
             type = siteEditor.getEditedPostType();
             currentSlug = siteEditor.getEditedPostId();
-            // getEditedPostId usually returns something like "twentytwentyfour//header"
-            // We need to extract just the slug part (e.g. "header")
             if (currentSlug && currentSlug.includes('//')) {
                 currentSlug = currentSlug.split('//')[1];
             }
@@ -64,14 +58,12 @@ const ApplyPendingSchema = () => {
     const [stagedTemplate, setStagedTemplate] = useEntityProp('root', 'site', 'blockish_mcp_staged_template');
     const [stagedTemplatePart, setStagedTemplatePart] = useEntityProp('root', 'site', 'blockish_mcp_staged_template_part');
 
-    const { insertBlocks } = useDispatch('core/block-editor');
+    const { insertBlocks, removeBlocks } = useDispatch('core/block-editor');
 
-    const { getBlocks, getBlockIndex, getBlockRootClientId, getBlockOrder } = useSelect((select) => {
+    const { getBlocks, getBlockOrder } = useSelect((select) => {
         const editor = select('core/block-editor');
         return {
             getBlocks: editor.getBlocks,
-            getBlockIndex: editor.getBlockIndex,
-            getBlockRootClientId: editor.getBlockRootClientId,
             getBlockOrder: editor.getBlockOrder,
         };
     }, []);
@@ -122,23 +114,9 @@ const ApplyPendingSchema = () => {
         if (!aiBlocks.length) return;
 
         let hasInjected = false;
-        let targetName = aiBlocks[0]?.attributes?.metadata?.name;
 
         const tryInject = (force = false) => {
             if (hasInjected) return;
-
-            const allEditorBlocks = getBlocks();
-            let targetBlock = null;
-
-            if (targetName) {
-                targetBlock = findTargetBlock(allEditorBlocks, targetName);
-            }
-
-            // If we are not forcing, and we have a targetName but it's not loaded in the editor yet, wait!
-            // This perfectly avoids the race condition where Gutenberg hasn't finished fetching the template.
-            if (!force && targetName && !targetBlock) {
-                return;
-            }
 
             // Ensure the DOM canvas is ready to receive inserts
             const canvas = document.querySelector('.block-editor-block-list__layout');
@@ -150,25 +128,40 @@ const ApplyPendingSchema = () => {
                 isDomReady = true;
             }
 
-            if (!isDomReady) {
-                return; // Wait for canvas to mount
+            if (!isDomReady && !force) {
+                return;
+            }
+
+            const allEditorBlocks = getBlocks();
+
+            // If editor blocks haven't loaded yet and we're not forcing, wait.
+            if (!force && allEditorBlocks.length === 0) {
+                return;
             }
 
             hasInjected = true;
-            
-            const wrapperBlock = createBlock('blockish/ai-preview', {
-                targetClientId: targetBlock ? targetBlock.clientId : ''
-            }, aiBlocks);
 
-            if (targetBlock) {
-                const targetRoot = getBlockRootClientId(targetBlock.clientId);
-                const targetIndex = getBlockIndex(targetBlock.clientId);
-                insertBlocks([wrapperBlock], targetIndex + 1, targetRoot);
-            } else {
-                const topLevelCount = getBlockOrder().length;
-                insertBlocks([wrapperBlock], topLevelCount, undefined);
+            // 1. Snapshot the current editor content into a serializable array
+            const previousBlocksSnapshot = allEditorBlocks.map(blockToSnapshot);
+
+            // 2. Create the AI preview wrapper, carrying the snapshot as an attribute
+            const wrapperBlock = createBlock(
+                'blockish/ai-preview',
+                {
+                    previousBlocks: JSON.stringify(previousBlocksSnapshot),
+                },
+                aiBlocks
+            );
+
+            // 3. Remove all existing top-level blocks
+            const allClientIds = allEditorBlocks.map(b => b.clientId);
+            if (allClientIds.length > 0) {
+                removeBlocks(allClientIds);
             }
-            
+
+            // 4. Insert the AI preview block
+            insertBlocks([wrapperBlock], 0, undefined);
+
             clearPendingSchema();
         };
 
@@ -177,8 +170,7 @@ const ApplyPendingSchema = () => {
             tryInject(false);
         });
 
-        // Fallback timer: If after 2 seconds the target block still hasn't appeared 
-        // (e.g. it was deleted, hallucinated, or it's a completely blank new post), force inject.
+        // Fallback timer: force inject after 2 seconds if the editor still appears empty.
         const fallbackTimer = setTimeout(() => {
             tryInject(true);
         }, 2000);
@@ -187,10 +179,9 @@ const ApplyPendingSchema = () => {
             unsubscribe();
             clearTimeout(fallbackTimer);
         };
-    }, [pendingSchema, getParsedBlocks, getBlocks, getBlockIndex, getBlockRootClientId, getBlockOrder, insertBlocks, clearPendingSchema]);
+    }, [pendingSchema, getParsedBlocks, getBlocks, getBlockOrder, insertBlocks, removeBlocks, clearPendingSchema]);
 
-    // The component itself renders nothing to the DOM now. 
-    // The UI is entirely handled by the blockish/ai-preview block.
+    // This component renders nothing — UI is handled by blockish/ai-preview block.
     return null;
 };
 

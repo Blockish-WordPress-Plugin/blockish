@@ -5,7 +5,7 @@
  * Description:       An AI-powered site building toolkit for WordPress. Includes creative Gutenberg blocks, an advanced Class Manager, and native Model Context Protocol (MCP) integration for autonomous AI design.
  * Requires at least: 6.1
  * Requires PHP:      7.4
- * Version:           1.1.0
+ * Version:           1.1.1
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/

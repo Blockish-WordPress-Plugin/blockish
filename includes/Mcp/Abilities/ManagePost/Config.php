@@ -11,15 +11,15 @@ class Config
     public static function get(): array
     {
         return [
-            'label'               => __('Create or Edit Post', 'blockish'),
-            'description'         => __('Creates a post (omit post_id) or edits one (provide post_id) of any registered post type; returns post_id, post_url, edit_url and post_status. Pass Blockish layouts as block_schema, never raw "<!-- wp:... -->" markup. When a schema is staged, share edit_url (not post_url) so the user can approve.', 'blockish'),
+            'label'               => __('Create, Edit or Delete Post', 'blockish'),
+            'description'         => __('Creates, edits, or deletes a post. To CREATE: omit post_id but provide post_title and post_type. To EDIT: provide post_id. To DELETE: provide post_id and set delete to true. Pass Blockish layouts as block_schema, never raw "<!-- wp:... -->" markup. When a schema is staged, share edit_url (not post_url) so the user can approve. CRITICAL WARNING: Before calling this tool to design a layout, you MUST call blockish/get-designer-workflow and blockish/get-block-docs, otherwise your design will fail. NOTE: If you are asked to "write a blog post", DO NOT use this tool. Use blockish/write-blog instead. This tool is strictly for publishing layout schemas or deleting/editing posts.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
                 'properties' => [
-                    'post_id'      => ['type' => 'integer', 'description' => 'Provide to edit an existing post. Omit to create a new one.'],
-                    'post_type'    => ['type' => 'string',  'description' => 'Post type slug (e.g., "post", "page").'],
-                    'post_title'   => ['type' => 'string',  'description' => 'The title of the post.'],
+                    'post_id'      => ['type' => 'integer', 'description' => 'Required to edit or delete an existing post. Omit to create a new post.'],
+                    'post_type'    => ['type' => 'string',  'description' => 'Post type slug (e.g., "post", "page"). Required only when creating a new post.'],
+                    'post_title'   => ['type' => 'string',  'description' => 'The title of the post. Required only when creating a new post.'],
                     'post_content' => ['type' => 'string'],
                     'post_status'  => ['type' => 'string',  'description' => 'draft, publish, private, etc. Defaults to "draft".'],
                     'post_excerpt' => ['type' => 'string'],
@@ -40,8 +40,15 @@ class Config
                             'required'   => [ 'name' ],
                         ],
                     ],
+                    'delete' => [
+                        'type'        => 'boolean',
+                        'description' => 'If true, deletes the post specified by post_id. Defaults to false.',
+                    ],
                 ],
-                'required'   => [ 'post_title', 'post_type' ],
+                'anyOf' => [
+                    [ 'required' => ['post_id'] ],
+                    [ 'required' => ['post_title', 'post_type'] ]
+                ]
             ],
             'output_schema'       => [
                 'type'       => 'object',

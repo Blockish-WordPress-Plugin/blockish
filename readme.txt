@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: blocks, gutenberg, block editor, page builder, ai
 Tested up to: 7.0
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 Requires at least: 6.1
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -135,6 +135,14 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 10. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.1.1 [7th July 2026] =
+
+* Added: `ManageOptions` MCP AI ability to read and update WordPress core settings and Blockish options.
+* Added: `ManageComments` MCP AI ability for autonomous comment moderation (approve, hold, spam, trash) and creation.
+* Improved: `ManageThemeJson` MCP AI ability now properly merges custom typography and layouts using recursive replacement.
+* Improved: AI is now guided to automatically install fonts via `ManageFonts` before applying typography via `ManageThemeJson`.
+* Improved: Discovered Blockish-specific options are now exposed dynamically to the AI.
 
 = 1.1.0 [2nd July 2026] =
 

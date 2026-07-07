@@ -10,13 +10,14 @@ class Callbacks
     {
         return [
             'workflow' => [
-                '1. Clarify the Vision & Structure: Understand the goal, aesthetic, and brand identity.',
-                '2. Set the Foundation (Global Styles): Use blockish/manage-theme-json to establish global colors, typography, and spacing.',
-                '3. Plan Layouts & Sections: Map out which pages and how many sections each page needs before coding.',
-                '4. Build Templates & Template Parts First: Design Header, Footer, and Home/Frontpage templates before any content pages. CRITICAL: While designing, actively look for duplicated styling and use the Blockish Class Manager to create reusable CSS classes for a DRY design system.',
-                '5. Design Content Pages: Once global styles, templates, and classes are established, create and stage layouts for individual pages (About, Contact, etc.) using blockish/manage-post.',
-                '6. Handoff for Review: Provide the user with edit_url so they can review, apply the AI layout, and provide feedback.',
-                '7. On-Demand Tasks: Handle dynamic content (posts), media management, and mobile-responsive fine-tuning when necessary.',
+                '1. Read the Manual: Before writing any schema, call blockish/get-block-docs. This document is your source of truth—it details all available Blockish blocks, their exact attribute schemas, dynamic bindings, and critical framework defaults (e.g., containers default to row layout).',
+                '2. Clarify the Vision & Structure: Understand the goal, aesthetic, and brand identity.',
+                '3. Set the Foundation (Global Styles): Call blockish/get-theme-json-docs to check existing global styles. Only use blockish/manage-theme-json to update global colors, typography, and spacing IF they are not already set or if the current settings do not match the requested design. Do not overwrite them unnecessarily.',
+                '4. Plan Layouts & Sections: Map out which pages and how many sections each page needs before coding.',
+                '5. Build Templates & Template Parts First: Design necessary FSE templates (like home, single, archive) and template parts (like header, footer) before building individual content pages. Actively use the Blockish Class Manager for reusable CSS classes to maintain a DRY design system.',
+                '6. Handle Queries and Dynamic Content Conditionally: Whenever you need to query posts/data in any template, page, or post, check if the "Blockish Dynamicity" plugin blocks (like query-builder, loop) are available in the docs. If yes, you MUST use them for custom queries and bind dynamic data using the dynamicData attribute. If not available, fallback to standard WordPress core blocks (e.g., core/query).',
+                '7. Design Content Pages: Create and stage layouts for individual pages (About, Contact, etc.) using blockish/manage-post.',
+                '8. Handoff for Review: Provide the user with edit_url so they can review, apply the AI layout, and provide feedback.',
             ]
         ];
     }

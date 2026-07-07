@@ -134,10 +134,11 @@ class StyleGenerator
             }
         }
 
-        $block_data['attrs']['blockClass'] = 'bb-' . \Blockish\Core\Utilities::generate_uniqueId(6);
+        $attr_hash = md5($block_data['blockName'] . wp_json_encode($block_data['attrs'] ?? []));
+        $block_data['attrs']['blockClass'] = 'bb-' . substr($attr_hash, 0, 6);
         $block_css_class = $block_data['attrs']['blockClass'].'.blockish-block-wrapper';
         $block_class = $block_data['attrs']['blockClass'];
-        $name = str_replace('blockish/', '', $block_data['blockName']);
+        $name = str_replace(['blockish-dynamicity/', 'blockish/'], '', $block_data['blockName']);
         $metadata = \Blockish\Core\Utilities::get_block_metadata($name);
         $block_meta_attributes = $metadata['attributes'] ?? [];
         $global_meta_attributes = Utilities::get_global_metadata()['attributes'] ?? [];
