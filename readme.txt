@@ -1,10 +1,10 @@
-=== Blockish – AI Site Builder & Creative Gutenberg Blocks ===
+=== Blockish – MCP AI Site Builder (Cursor, Claude & More) ===
 Author: wowdevs
 Author URI: https://wowdevs.com/
 Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
-Tags: blocks, gutenberg, block editor, page builder, ai
+Tags: mcp, ai, ai site builder, ai page builder, ai web design
 Tested up to: 7.0
 Stable tag: 1.1.1
 Requires at least: 6.1
@@ -12,97 +12,109 @@ Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Build beautiful websites with 15+ creative Gutenberg blocks and powerful extensions like Class Manager and MCP AI — no page builder required.
+Connect WordPress to Cursor, Claude, Windsurf, and other AI clients via MCP. Let AI build pixel-perfect layouts using 15+ specially engineered, AI-friendly Gutenberg blocks.
 
 == Description ==
 
-**Blockish** is a powerful, feature-rich Gutenberg plugin that combines 15+ creative layout blocks with an advanced **MCP AI Integration**. Design completely custom pages by hand using our lightweight blocks and Class Manager, or simply prompt the AI to instantly generate and insert fully-styled, complex layouts directly into your WordPress canvas!
+**Blockish is a powerful WordPress MCP Server built specifically for AI-driven web design inside the native Gutenberg Editor.** 
 
-== Blocks Included (15+ Blocks) ==
+While other generic MCP plugins let AI read posts or perform basic admin tasks, Blockish turns any MCP-compatible AI assistant (such as Claude Desktop, Cursor, Windsurf, and others) into an autonomous web designer directly inside your Gutenberg Block Editor.
+
+Currently, AI struggles to build beautiful WordPress pages because standard core blocks generate messy HTML and lack structured styling systems. We solved this by building **15+ AI-Optimized Gutenberg Blocks** and a unified **Class Manager**. 
+
+You don't just drag and drop blocks manually anymore (though you can!). You connect Blockish to your AI and simply say: *"Build a dark-mode pricing page with 3 tiers."* The AI will use Blockish's clean structural blocks and Class Manager to instantly generate a pixel-perfect, fully responsive layout right in your Gutenberg canvas.
+
+= 🚀 The AI Site Building Workflow =
+1. **Connect:** Use our 1-click config wizard in the dashboard to connect your site to any MCP-enabled AI client (Cursor, Claude, Windsurf, etc.).
+2. **Prompt:** Tell your AI what kind of page or section you need.
+3. **Generate:** The AI acts as a designer, leveraging Blockish blocks to construct the layout natively directly inside the Gutenberg editor.
+4. **Refine:** Accept the inline preview, or ask the AI to tweak colors, spacing, and typography on the fly.
+
+== Why Blockish Blocks are Different ==
+
+Unlike traditional block libraries built exclusively for human clicks, Blockish is engineered for AI comprehension:
+
+* **Clean Architecture:** Semantic, predictable block structures that LLMs easily understand.
+
+* **Class Manager System:** Instead of writing messy inline CSS for every block, the AI is trained to create reusable CSS classes (just like a real web developer). This keeps your site fast and code incredibly clean.
+
+* **Theme.json Integration:** AI can natively update your global typography and colors via our custom MCP abilities.
+
+* **Human-Friendly:** Once the AI builds it, you have full visual control to edit everything via standard Gutenberg sidebars.
+
+== 15+ AI-Optimized Blocks ==
+
+Even though they are built for AI to understand, they are incredibly powerful for manual site building:
 
 = Layout =
+
 * **Container** — Flexible section wrapper with background, spacing, flexbox, and layout controls.
 
 = Typography =
-* **Heading** — Highly customizable headings with advanced typography, colors, and shadow options.
+
+* **Heading** — Highly customizable headings with powerful typography, colors, and shadow options.
 
 = Media =
+
 * **Image** — Enhanced image block with overlay, border, mask, and alignment controls.
+
 * **Video** — Embed and style videos with custom play buttons and wrapper controls.
+
 * **Icon** — Add scalable SVG icons with custom color, size, and hover effects.
 
 = Interactive =
+
 * **Accordion** — Collapsible content sections for FAQs, features, and more.
+
 * **Tab** — Tabbed content panels for organizing large amounts of information.
-* **Navigation** — Advanced, flexible navigation block for building complex headers.
+
+* **Navigation** — Robust, flexible navigation block for building complex headers.
 
 = Data & Stats =
+
 * **Counter** — Animated number counter for statistics, milestones, and metrics.
+
 * **Progress Bar** — Stylish progress bars with customizable labels, colors, and animations.
+
 * **Rating** — Star rating display for reviews, testimonials, and product features.
 
 = Lists & Icons =
+
 * **Icon List** — Beautiful icon-based lists to replace standard bullet points with SVG icons.
 
 = Social & CTA =
+
 * **Social Icons** — Social media icon links with customizable shapes, colors, and sizes.
+
 * **Button** — Fully styled call-to-action buttons with hover effects and icons.
 
 = Maps =
+
 * **Google Map** — Embed Google Maps with custom zoom, height, and location settings.
-
-== Extensions ==
-
-= Class Manager =
-
-Blockish adds a **Class Manager** panel to every block in the editor — including core WordPress blocks. Define styles once for a CSS class, then reuse that class across any block on any page. It's the easiest way to keep your design consistent without writing CSS files or editing your theme. Sub-selector support lets you target child elements within a class too.
-
-= MCP AI Extension =
-
-Blockish integrates an advanced **MCP (Model Context Protocol) AI Extension**. Instead of just generating simple text, the Blockish AI acts as a professional web designer right inside your editor:
-* **Inline Canvas Previews:** AI-generated layouts appear directly inside your editor canvas in a stylish neon preview wrapper. Review the design visually and click "Accept" to instantly apply it!
-* **Native Gutenberg Blocks:** The AI understands and builds real Blockish and WordPress core blocks, complete with complex styling, padding, flexbox, and nested structures.
-* **Smart Styling:** The AI reads your active theme's colors and spacing, and integrates perfectly with the Blockish Class Manager to reuse CSS classes intelligently.
-* **Full Site Editing (FSE):** You can even ask the AI to modify or build complete FSE templates and template parts!
-
-== Why Blockish? ==
-
-- **15+ Creative Blocks** — Everything you need for professional page building.
-- **Class Manager** — Define styles once, reuse them across any block on any page.
-- **Advanced MCP AI** — Generate entire page sections and layouts via AI with beautiful inline visual previews.
-- **Lightweight** — No jQuery, no unnecessary bloat, incredibly fast-loading.
-- **Responsive** — Every block is fully responsive out of the box with device-specific controls.
-- **Native Experience** — Blends seamlessly into the WordPress block editor UI.
-- **Highly Customizable** — Rich styling controls for colors, spacing, typography, and more.
-- **Free** — 100% free, no upsells or locked features.
 
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/blockish` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Start building! Open any page or post and add a Blockish block from the block inserter.
+3. Navigate to **Blockish -> MCP Server** in your dashboard to generate your AI connection command!
 
 == Frequently Asked Questions ==
 
 = What is the MCP AI Engine? =
 
-Blockish includes a native MCP (Model Context Protocol) server. This means you can connect AI agents like Claude, Cursor, or other AI tools to instantly generate and style complex Gutenberg layouts in your editor using simple natural language commands.
+Blockish includes a native MCP (Model Context Protocol) server. This means you can connect any MCP-compatible AI agent (like Claude Desktop, Cursor, Windsurf, and many more) to instantly generate and style complex Gutenberg layouts using simple natural language commands.
 
 = Do I need a separate page builder? =
 
-No! Blockish extends the native WordPress Gutenberg editor with advanced layout blocks and styling controls, giving you the power of a page builder without the bloat or performance hit.
+No! Blockish extends the native WordPress Gutenberg editor with powerful layout blocks and styling controls. When paired with your AI assistant, it completely replaces the need for bloated page builders like Elementor or Divi.
 
 = What is the Class Manager? =
 
-The built-in Class Manager lets you create, edit, and apply reusable CSS classes directly within the editor. This guarantees a consistent design system across your entire website and speeds up your workflow.
+The built-in Class Manager lets you (and the AI) create, edit, and apply reusable CSS classes directly within the editor. This guarantees a consistent design system across your entire website and speeds up workflow.
 
 = Is this plugin free? =
 
 Yes, the core Blockish plugin is 100% free to use on unlimited personal or client websites.
-
-= Where can I get support or report a bug? =
-
-You can get support by creating a topic on the WordPress support forum for Blockish, or by reaching out to us through our website at wowdevs.com.
 
 == External Services ==
 
@@ -123,84 +135,65 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 
 == Screenshots ==
 
-1. Container Block Options
-2. Advanced Heading Styling
-3. Image and Video Blocks
-4. Accordions and Tabs for Content
-5. Navigation and Menus
+1. One-Click MCP Connection Wizard
+2. AI generating layouts directly in the Gutenberg canvas
+3. Container Block Options
+4. Heading Styling Options
+5. Interactive Accordions and Tabs
 6. Data Visualization (Counters, Progress Bars, Ratings)
-7. Icon Lists and Social Icons
-8. Interactive Buttons
-9. Google Map Integration
-10. Class Manager Extension Panel
+7. Class Manager Extension Panel
 
 == Changelog ==
 
-= 1.1.1 [7th July 2026] =
+= 1.1.1 =
 
-* Added: `ManageOptions` MCP AI ability to read and update WordPress core settings and Blockish options.
-* Added: `ManageComments` MCP AI ability for autonomous comment moderation (approve, hold, spam, trash) and creation.
-* Improved: `ManageThemeJson` MCP AI ability now properly merges custom typography and layouts using recursive replacement.
-* Improved: AI is now guided to automatically install fonts via `ManageFonts` before applying typography via `ManageThemeJson`.
-* Improved: Discovered Blockish-specific options are now exposed dynamically to the AI.
+* Added: Automated MCP Connection Wizard with 1-click command generation
+* Added: `ManageOptions` MCP AI ability to read and update WordPress core settings.
+* Added: `ManageComments` MCP AI ability for autonomous comment moderation.
+* Improved: `ManageThemeJson` MCP AI ability now properly merges custom typography.
 
-= 1.1.0 [2nd July 2026] =
+= 1.1.0 =
 
 * Added: Global SEO Meta Description setting in the dashboard
 * Added: Batch upload support in UploadMedia MCP ability
 * Added: Taxonomy query filtering support in GetPosts MCP ability
 * Added: Active plugin detection in GetSiteInfo MCP ability
 * Improved: Escaped block render outputs to meet strict security standards
-* Improved: Updated plugin description for better WP.org discovery
 
-= 1.0.9 [1st July 2026] =
+= 1.0.9 =
 
 * Added: 3 new MCP AI abilities
 * Added: Inline AI preview block for MCP schema approval
 * Improved: MCP AI documentation and approval workflow
 
-
-= 1.0.8 [28th June 2026] =
+= 1.0.8 =
 
 * Added: New MCP AI abilities
 * Improved: Existing MCP AI abilities to reduce token cost
 
-= 1.0.7 [27th June 2026] =
+= 1.0.7 =
 
 * Fixed: Icon block folder casing for compatibility with case-sensitive file systems
 
-
-= 1.0.6 [27th June 2026] =
+= 1.0.6 =
 
 * Added: WordPress Playground Blueprint support for live interactive previews
 
-= 1.0.5 [25th June 2026] =
+= 1.0.5 =
 
 * Added: MCP AI extension
 * Improved: Overall UI/UX improvements
 * Fixed: Class Manager subselector UI detachment issues
 
-= 1.0.4 [8th June 2026] =
+= 1.0.4 =
 
 * Improved: Overall UI/UX improvements
 
-= 1.0.3 [27th April 2026] =
+= 1.0.3 =
 
-* Added: Accordion block
-* Added: Button block
-* Added: Counter block
-* Added: Google Map block
-* Added: Heading block
-* Added: Icon block
-* Added: Image block
-* Added: Icon List block
-* Added: Progress Bar block
-* Added: Rating block
-* Added: Social Icons block
-* Added: Tab block
-* Added: Video block
+* Added: Accordion, Button, Counter, Google Map, Heading, Icon, Image, Icon List, Progress Bar, Rating, Social Icons, Tab, and Video blocks.
 * Improved: System architecture and performance enhancements
 
-= 1.0.0 [19th Jan 2025] =
+= 1.0.0 =
 
 * Initial release

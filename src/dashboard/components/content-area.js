@@ -6,6 +6,7 @@ import PlaceholderSection from './placeholder-section';
 import SettingsPage from './settings-page';
 import IntegrationsPage from './integrations-page';
 import AddonsPage from './addons-page';
+import McpConfigPage from './mcp-config-page';
 
 export default function ContentArea({
 	activeMenu,
@@ -55,6 +56,10 @@ export default function ContentArea({
 
 	if (activeMenu === 'addons') {
 		return <AddonsPage blocks={data?.blocks} extensions={data?.extensions} />;
+	}
+
+	if (activeMenu === 'mcp-config') {
+		return <McpConfigPage />;
 	}
 
 	return (

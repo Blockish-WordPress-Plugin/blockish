@@ -87,6 +87,18 @@ class DashboardToolsV1 extends WP_REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/generate-mcp-password',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'generate_mcp_password' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+			)
+		);
 	}
 
 	public function permissions_check() {
@@ -341,5 +353,37 @@ class DashboardToolsV1 extends WP_REST_Controller {
 		}
 
 		return $value;
+	}
+
+	public function generate_mcp_password( WP_REST_Request $request ) {
+		if ( ! class_exists( 'WP_Application_Passwords' ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Application Passwords are not supported on this site.',
+				)
+			);
+		}
+
+		$user_id = get_current_user_id();
+		$name    = 'Blockish MCP (' . gmdate( 'Y-m-d H:i:s' ) . ')';
+
+		list( $password, $item ) = \WP_Application_Passwords::create_new_application_password( $user_id, array( 'name' => $name ) );
+
+		if ( is_wp_error( $password ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => $password->get_error_message(),
+				)
+			);
+		}
+
+		return rest_ensure_response(
+			array(
+				'status'   => 'success',
+				'password' => $password,
+			)
+		);
 	}
 }

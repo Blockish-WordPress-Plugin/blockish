@@ -4,6 +4,7 @@ import {
 	layoutDashboard,
 	plugIcon,
 	settingsIcon,
+	zap,
 } from '../../components/icons/block-icons';
 
 export const SIDEBAR_MENUS = [
@@ -11,6 +12,7 @@ export const SIDEBAR_MENUS = [
 	{ key: 'blocks', label: 'Blocks', icon: blocksIcon },
 	{ key: 'extensions', label: 'Extensions', icon: plugIcon },
 	{ key: 'addons', label: 'Addons', icon: plugIcon },
+	{ key: 'mcp-config', label: 'MCP Server', icon: zap },
 	{ key: 'settings', label: 'Settings', icon: settingsIcon },
 	// { key: 'integrations', label: 'Integrations', icon: plugIcon },
 	// { key: 'license', label: 'License', icon: keyIcon },
