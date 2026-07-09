@@ -12,7 +12,7 @@ Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Connect WordPress to Cursor, Claude, Windsurf, and other AI clients via MCP. Let AI build pixel-perfect layouts using 15+ specially engineered, AI-friendly Gutenberg blocks.
+Connect WordPress to AI clients like Cursor and Claude via MCP. Let AI build pixel-perfect layouts using 15+ specially engineered Gutenberg blocks.
 
 == Description ==
 

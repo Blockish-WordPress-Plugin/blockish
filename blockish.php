@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name:       Blockish
- * Description:       An AI-powered site building toolkit for WordPress. Includes creative Gutenberg blocks, an advanced Class Manager, and native Model Context Protocol (MCP) integration for autonomous AI design.
+ * Description:       An AI-powered site building toolkit with creative Gutenberg blocks, an advanced Class Manager, and native MCP integration for autonomous web design.
  * Requires at least: 6.1
  * Requires PHP:      7.4
  * Version:           1.1.2
