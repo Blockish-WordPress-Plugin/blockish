@@ -83,3 +83,13 @@
         }
     }
 }
+// Fix for Site Editor: WordPress core constrained layout CSS uses a direct child selector that fails 
+// in the editor due to extra wrapper divs unless the block declares `supports: { layout: true }`.
+// Wrapping in :where() keeps specificity at 0, allowing .align-custom-width to override the max-width,
+// while !important ensures the centering margins are applied.
+:where(.is-layout-constrained > .wp-block-blockish-container:not(.alignleft):not(.alignright):not(.alignfull)),
+:where(.is-layout-constrained > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block-blockish-container:not(.alignleft):not(.alignright):not(.alignfull)) {
+    max-width: var(--wp--style--global--content-size);
+    margin-left: auto !important;
+    margin-right: auto !important;
+}

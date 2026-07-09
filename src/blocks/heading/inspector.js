@@ -52,6 +52,11 @@ const Inspector = ({ advancedControls }) => {
                                             ]}
                                             __nextHasNoMarginBottom={true}
                                         />
+                                        <BlockishControl
+                                            type="BlockishLink"
+                                            label={__('Link', 'blockish')}
+                                            slug="url"
+                                        />
                                         <BlockishResponsiveControl
                                             type="BlockishToggleGroup"
                                             label={__('Alignment', 'blockish')}

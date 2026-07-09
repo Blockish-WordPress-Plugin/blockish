@@ -6,7 +6,6 @@
   "title": "Social Icon Item",
   "category": "blockish-framework",
   "description": "Item for the Social Icons block.",
-  "icon": "share-alt2",
   "parent": [
     "blockish/social-icons"
   ],

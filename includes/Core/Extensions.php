@@ -474,7 +474,7 @@ class Extensions
     private function extension_targets_block($extension, $block_name)
     {
         // Extensions are scoped to Blockish blocks only.
-        if (!str_starts_with($block_name, 'blockish/')) {
+        if (!str_starts_with($block_name, 'blockish')) {
             return false;
         }
 
@@ -494,7 +494,7 @@ class Extensions
         }
 
         if (empty($include)) {
-            return str_starts_with($block_name, 'blockish/');
+            return str_starts_with($block_name, 'blockish');
         }
 
         return true;

@@ -6,7 +6,6 @@
   "title": "Heading",
   "category": "blockish-framework",
   "description": "Flexible heading block for titles and section labels.",
-  "icon": "heading",
   "keywords": [
     "blockish",
     "heading",
@@ -20,12 +19,10 @@
   },
   "attributes": {
     "content": {
-      "type": "string",
-      "default": "Heading Text"
+      "type": "string"
     },
-    "link": {
-      "type": "string",
-      "default": "#"
+    "url": {
+      "type": "object"
     },
     "tag": {
       "type": "object",
@@ -83,6 +80,12 @@
           {
             "slug": "content",
             "title": "Content"
+          }
+        ],
+        "url": [
+          {
+            "slug": "url",
+            "title": "Link URL"
           }
         ]
       }

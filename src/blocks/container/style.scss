@@ -1,3 +1,7 @@
+:where(.wp-block-blockish-container) {
+    position: relative;
+}
+
 .wp-block-blockish-container {
     transition: all 0.3s ease;
 
@@ -32,5 +36,10 @@
 
     .wp-block-blockish-container{
         width: 100%;
+    }
+
+    &.align-custom-width {
+        margin-left: auto;
+        margin-right: auto;
     }
 }

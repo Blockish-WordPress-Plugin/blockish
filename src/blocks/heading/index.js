@@ -5,6 +5,7 @@ import Save from './save';
 import metadata from './block.json';
 
 registerBlockType( metadata.name, {
+	icon: () => window?.blockish?.components?.blockIcons?.heading,
 	edit: Edit,
 	save: Save,
 });

@@ -6,7 +6,6 @@
   "title": "Progress Bar",
   "category": "blockish-framework",
   "description": "Progress bar showing completion status.",
-  "icon": "chart-bar",
   "keywords": [
     "blockish",
     "progress",

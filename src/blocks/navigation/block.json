@@ -6,7 +6,6 @@
   "title": "Navigation",
   "category": "blockish-framework",
   "description": "Navigation wrapper that pairs a desktop Nav Menu with a mobile Offcanvas, switching between them at a breakpoint.",
-  "icon": "menu",
   "keywords": [
     "nav",
     "navigation",

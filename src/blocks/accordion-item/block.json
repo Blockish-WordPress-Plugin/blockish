@@ -6,7 +6,6 @@
   "title": "Accordion Item",
   "category": "blockish-framework",
   "description": "Item for the Accordion block.",
-  "icon": "excerpt-view",
   "parent": [
     "blockish/accordion"
   ],

@@ -13,17 +13,21 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
 
     const device = useDeviceType();
 
-    const { imageSizes } = useSelect((select) => {
-        const settings = select('core/block-editor').getSettings();
-        return {
-            imageSizes: Object.entries(settings?.imageSizes || {}).map(([key, value]) => {
-                return {
-                    value: value?.slug,
-                    label: value?.name
-                }
-            })
-        }
+    const rawImageSizes = useSelect((select) => {
+        return select('core/block-editor').getSettings()?.imageSizes;
     }, []);
+
+    const imageSizes = rawImageSizes 
+        ? Object.entries(rawImageSizes).map(([key, value]) => ({
+            value: value?.slug,
+            label: value?.name
+        }))
+        : [
+            { value: 'thumbnail', label: 'Thumbnail' },
+            { value: 'medium', label: 'Medium' },
+            { value: 'large', label: 'Large' },
+            { value: 'full', label: 'Full Size' },
+        ];
 
     return (
         <InspectorControls>

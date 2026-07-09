@@ -8,7 +8,7 @@ export default function Branding( { headerType, headerText, headerImage } ) {
 	const { siteTitle, siteLogoUrl } = useSelect( ( select ) => {
 		const site = select( 'core' ).getEntityRecord( 'root', 'site' );
 		const logoId = site?.site_logo;
-		const media = logoId ? select( 'core' ).getMedia( logoId ) : null;
+		const media = logoId ? select( 'core' ).getEntityRecord( 'postType', 'attachment', logoId ) : null;
 
 		return {
 			siteTitle: site?.title,

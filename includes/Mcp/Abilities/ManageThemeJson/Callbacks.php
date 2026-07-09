@@ -46,9 +46,7 @@ class Callbacks
             ];
         }
 
-        if (empty($theme_json) || !is_array($theme_json)) {
-            return ['error' => 'theme_json must be an object.'];
-        }
+
 
         $current_data = [];
         if ($post) {
@@ -61,12 +59,21 @@ class Callbacks
             }
         }
 
-        if (class_exists('\WP_Theme_JSON')) {
-            $current_theme_json = new \WP_Theme_JSON($current_data, 'custom');
-            $new_theme_json_obj = new \WP_Theme_JSON($theme_json, 'custom');
-            $current_theme_json->merge($new_theme_json_obj);
-            $final_data = $current_theme_json->get_raw_data();
+        if (!empty($input['reset'])) {
+            $custom_fonts = $current_data['settings']['typography']['fontFamilies']['custom'] ?? [];
+            $final_data = [
+                'settings' => [
+                    'typography' => [
+                        'fontFamilies' => [
+                            'custom' => $custom_fonts
+                        ]
+                    ]
+                ]
+            ];
         } else {
+            if (empty($theme_json) || !is_array($theme_json)) {
+                return ['error' => 'theme_json must be an object.'];
+            }
             $final_data = array_replace_recursive($current_data, $theme_json);
         }
 

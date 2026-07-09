@@ -104,6 +104,7 @@ class Dashboard {
                     'dashboardToolsApiPath' => '/blockish/v1/dashboard-tools',
                     'nonce'             => wp_create_nonce( 'wp_rest' ),
                     'siteUrl'           => admin_url(),
+                    'currentUser'       => wp_get_current_user()->user_login,
                     'plugin'            => array(
                         'name'     => 'Blockish',
                         'tagline'  => __( 'Creative Gutenberg blocks for modern websites.', 'blockish' ),

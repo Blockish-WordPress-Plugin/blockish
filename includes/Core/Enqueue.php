@@ -65,6 +65,30 @@ class Enqueue {
             BLOCKISH_URL . 'build/global/index.js',
             BLOCKISH_DIR . 'build/global/index.asset.php'
         );
+
+        $this->register_and_enqueue_script(
+            'blockish-template-library',
+            BLOCKISH_URL . 'build/template-library/index.js',
+            BLOCKISH_DIR . 'build/template-library/index.asset.php'
+        );
+        
+        $this->register_and_enqueue_style(
+            'blockish-template-library',
+            BLOCKISH_URL . 'build/template-library/style-index.css',
+            BLOCKISH_VERSION
+        );
+
+        $library_url = BLOCKISH_TEMPLATE_LIBRARY_URL;
+        $library_token = BLOCKISH_TEMPLATE_LIBRARY_TOKEN;
+        
+        wp_localize_script(
+            'blockish-template-library',
+            'blockishTemplateLibraryData',
+            array(
+                'token' => $library_token,
+                'url'   => rtrim($library_url, '/')
+            )
+        );
     }
 
     /**

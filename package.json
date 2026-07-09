@@ -1,8 +1,8 @@
 {
 	"name": "blockish",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Example block scaffolded with Create Block tool.",
-	"author": "The WordPress Contributors",
+	"author": "wowdevs <hello@wowdevs.com>",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {
@@ -14,7 +14,7 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
 		"start-hot": "wp-scripts start --hot",
-		"make-pot": "npx @wp-blocks/make-pot --exclude=node_modules,build,vendor,src",
+		"make-pot": "npx @wp-blocks/make-pot --exclude=node_modules,vendor,src",
 		"publish": "npm run build && npm run make-pot && npm run plugin-zip"
 	},
 	"files": [

@@ -14,6 +14,38 @@ class Callbacks
         }
 
         $editing = ! empty( $input['term_id'] );
+        $deleting = ! empty( $input['delete'] );
+
+        if ( $deleting ) {
+            $term_id = 0;
+            if ( ! empty( $input['term_id'] ) ) {
+                $term_id = absint( $input['term_id'] );
+            } elseif ( ! empty( $input['name'] ) ) {
+                $term_obj = get_term_by( 'name', $input['name'], $taxonomy );
+                if ( $term_obj ) {
+                    $term_id = $term_obj->term_id;
+                }
+            }
+
+            if ( ! $term_id ) {
+                return [ 'error' => 'Term not found.' ];
+            }
+
+            $term = get_term( $term_id, $taxonomy );
+            if ( is_wp_error( $term ) || ! $term ) {
+                return [ 'error' => 'Term not found.' ];
+            }
+            wp_delete_term( $term_id, $taxonomy );
+            return [
+                'term_id'          => $term_id,
+                'term_taxonomy_id' => $term->term_taxonomy_id,
+                'taxonomy'         => $taxonomy,
+                'name'             => $term->name,
+                'slug'             => $term->slug,
+            ];
+        }
+
+
         $args    = [];
 
         if ( isset( $input['description'] ) ) {

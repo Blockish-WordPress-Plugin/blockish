@@ -6,7 +6,6 @@
   "title": "Icon List Item",
   "category": "blockish-framework",
   "description": "Item for the Icon List block.",
-  "icon": "marker",
   "parent": [
     "blockish/icon-list"
   ],

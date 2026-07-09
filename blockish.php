@@ -5,7 +5,7 @@
  * Description:       An AI-powered site building toolkit for WordPress. Includes creative Gutenberg blocks, an advanced Class Manager, and native Model Context Protocol (MCP) integration for autonomous AI design.
  * Requires at least: 6.1
  * Requires PHP:      7.4
- * Version:           1.1.0
+ * Version:           1.1.1
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/
@@ -47,7 +47,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.1.0';
+    const VERSION = '1.1.1';
 
     /**
      * Holds the instance of this class.
@@ -90,6 +90,8 @@ final class Blockish
         define('BLOCKISH_STYLES_DIR', BLOCKISH_DIR . 'build/styles/');
         define('BLOCKISH_BLOCKS_DIR', BLOCKISH_DIR . 'build/blocks/');
         define('BLOCKISH_EXTENSIONS_DIR', BLOCKISH_DIR . 'build/extensions/');
+        define('BLOCKISH_TEMPLATE_LIBRARY_URL', 'https://blockish.wowdevs.com/wp-json/blockish-template-library/v1');
+        define('BLOCKISH_TEMPLATE_LIBRARY_TOKEN', 'blockish-design-library');
         define('BLOCKISH_RESERVED_PLACEHOLDERS', [
             '{{VALUE}}',
             '{{TOP}}',

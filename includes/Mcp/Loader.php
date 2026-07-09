@@ -69,6 +69,7 @@ class Loader
         Abilities\GetMedia\Config::class,
         Abilities\GetPosts\Config::class,
         Abilities\GetTemplates\Config::class,
+        Abilities\FetchCloudTemplates\Config::class,
         Abilities\ManageTemplate\Config::class,
         Abilities\ManageThemeJson\Config::class,
         Abilities\GetThemeJsonDocs\Config::class,
@@ -77,6 +78,11 @@ class Loader
         Abilities\ManageTerm\Config::class,
         Abilities\GetDesignerWorkflow\Config::class,
         Abilities\GetIcons\Config::class,
+        Abilities\GetFonts\Config::class,
+        Abilities\ManageFonts\Config::class,
+        Abilities\ManageOptions\Config::class,
+        Abilities\ManageComments\Config::class,
+        Abilities\ManageGlobalInteractions\Config::class,
     ];
 
     public function register_abilities()

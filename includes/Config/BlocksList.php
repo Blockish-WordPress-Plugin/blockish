@@ -46,6 +46,12 @@ class BlocksList extends ConfigList {
                 'package' => 'free',
                 'status'  => 'active',
             ),
+            'paragraph' => array(
+                'name'    => __('Paragraph', 'blockish'),
+                'description' => __('A standard paragraph block with advanced typography, colors, text shadow, and dynamic data binding. Use for general text content.', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
             'image' => array(
                 'name'    => __('Image', 'blockish'),
                 'description' => __('Displays an image with full visual control including custom dimensions, object-fit, opacity, CSS filters, border, shadow, and hover transition effects. Also supports captions. Use when more styling control than the core image block is needed.', 'blockish'),

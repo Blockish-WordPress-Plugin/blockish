@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create or Edit Template', 'blockish'),
-            'description'         => __('Creates, updates or deletes a Full Site Editing (FSE) template or template part (set delete to remove); returns id, slug, edit_url and action. Pass Blockish layouts as block_schema, never raw HTML. When a schema is staged, share edit_url (not the preview link) so the user can review it in the canvas and accept it.', 'blockish'),
+            'description'         => __('Creates, updates or deletes a Full Site Editing (FSE) template or template part (set delete to remove); returns id, slug, edit_url and action. Pass Blockish layouts as block_schema, never raw HTML. When a schema is staged, share edit_url (not the preview link) so the user can review it in the canvas and accept it. CRITICAL WARNING: Before calling this tool, you MUST call blockish/get-designer-workflow and blockish/get-block-docs, otherwise your design will fail.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',

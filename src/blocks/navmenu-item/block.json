@@ -6,7 +6,6 @@
   "title": "Nav Menu Item",
   "category": "blockish-framework",
   "description": "Item for the Nav Menu block.",
-  "icon": "minus",
   "parent": [
     "blockish/navmenu",
     "blockish/offcanvas"

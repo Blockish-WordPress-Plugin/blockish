@@ -6,7 +6,6 @@
   "title": "Google Map",
   "category": "blockish-framework",
   "description": "Embed a Google Map location on your page.",
-  "icon": "location-alt",
   "keywords": [
     "blockish",
     "map",

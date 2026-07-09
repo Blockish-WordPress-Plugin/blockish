@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Manage Global Styles', 'blockish'),
-            'description'         => __('The theme.json structure to apply (e.g., settings, styles). Pass a complete JSON object. This will permanently update the site\'s wp_global_styles in the database.', 'blockish'),
+            'description'         => __('The theme.json structure to apply (e.g., settings, styles). Pass a complete JSON object. This will permanently update the site\'s wp_global_styles in the database. NOTE: If you are applying custom typography, you MUST first use the `blockish/manage-fonts` ability to install the font before setting it here.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
