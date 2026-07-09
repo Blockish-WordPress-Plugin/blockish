@@ -5,8 +5,8 @@ The desktop menu row. Must be a child of `blockish/navigation`. **Accepts childr
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
 | `isVertical` | Scalar (boolean) | `false` | Stack items vertically instead of in a row |
-| `justifyContent` | Responsive-Option | unset | `"flex-start"` `"center"` `"flex-end"` `"space-between"` `"space-around"` `"space-evenly"` |
-| `alignItems` | Responsive-Option | unset | `"flex-start"` `"center"` `"flex-end"` `"stretch"` |
+| `justifyContent` | Responsive-Option | e.g. `{"Desktop":{"label":"Start","value":"flex-start"}}` | Options: `[{"label":"Start","value":"flex-start"},{"label":"Center","value":"center"},{"label":"End","value":"flex-end"},{"label":"Space Between","value":"space-between"},{"label":"Space Around","value":"space-around"},{"label":"Space Evenly","value":"space-evenly"}]` |
+| `alignItems` | Responsive-Option | e.g. `{"Desktop":{"label":"Start","value":"flex-start"}}` | Options: `[{"label":"Start","value":"flex-start"},{"label":"Center","value":"center"},{"label":"End","value":"flex-end"},{"label":"Stretch","value":"stretch"}]` |
 | `navGap` | Responsive (length) | unset | Gap between items |
 | `itemColorNormal` | Color | unset | Link text, normal |
 | `itemColorHover` | Color | unset | Link text, hover |

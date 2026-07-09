@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai, ai site builder, ai page builder, ai web design
 Tested up to: 7.0
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 Requires at least: 6.1
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -144,6 +144,10 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.1.2 =
+
+* Improved: Refined AI developer documentation with precise JSON option arrays for robust MCP styling
 
 = 1.1.1 =
 

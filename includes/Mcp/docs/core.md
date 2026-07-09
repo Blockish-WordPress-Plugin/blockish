@@ -10,13 +10,10 @@ You (the AI) build a **schema**: a JSON tree of `{ name, attributes, innerBlocks
 
 **You never write HTML, CSS classes, or comment markup of any kind.** Turning your schema into real Gutenberg blocks happens in the editor, not by you. Do not include a `content` field. Do not try to reproduce a block's rendered HTML. If you find yourself writing an HTML tag, stop — that's a sign you've stepped outside your job.
 
-**CRITICAL RULE: Naming Top-Level Blocks**
-Every top-level layout block you emit MUST carry a unique and meaningful `metadata.name` attribute (e.g., `"attributes": { "metadata": { "name": "Hero Section" } }`). This allows the editor UI to instantly detect whether a layout is new or an update to an existing section, preventing wrong-block edits. If you do not name your blocks, the human user is forced to guess what you meant.
+**Naming Top-Level Blocks**
+Every top-level layout block you emit MUST carry a unique and meaningful `metadata.name` attribute (e.g., `"attributes": { "metadata": { "name": "Hero Section" } }`). this metadata.name is used for identifying blocks in the editor. this metadata.name must be unique and meaningful, and should be different for each block.
 
 **Your schema is staged for human review, not written live.** Passing `block_schema` to `blockish/manage-post` does not put anything into `post_content`. It saves the schema as pending data on the post. When a human opens that post in the block editor, a styled AI Preview Wrapper block (with a neon border) will automatically appear in the canvas containing your layout. The user must review it visually and click the "Accept" or "Discard" button on the block itself to commit it to the real content. Never pass a schema as `post_content` directly, and never expect it to appear on the live post without that manual step.
-
-**CRITICAL RULE: Nesting Depth and Payload Size**
-While the block engine technically supports deep nesting (e.g., depth 5 or more), deep nesting exponentially increases the JSON payload size because you must inline all styles for every block in a headless build. If your JSON payload becomes too large, it may hit server limits (`post_max_size`) and get dropped, resulting in a "Payload too large" or "slug is required" error. **Keep your layouts as flat as practically possible.** If you must build a deeply nested structure (like a mega-footer), consider chunking it or using reusable Class Manager classes to aggressively reduce style repetition.
 
 ### Core Workflow (Fetch, Modify, Update)
 
@@ -178,15 +175,15 @@ Video (`blockish/container`'s `containerBackground` only — see that block's se
 | `gradient` | Scalar (string, CSS gradient) | unset | Used when `backgroundType` = `"gradient"` |
 | `backgroundVideo` | Image (video file) | unset | Used when `backgroundType` = `"video"` |
 | `backgroundImage` | Responsive of Image | unset | |
-| `backgroundImageResolution` | Responsive-Option | unset | Picks one of the *uploaded image's own* registered sizes (e.g. `"thumbnail"`/`"medium"`/`"large"`/`"full"`) — the exact list varies per image, not a fixed enum. Leave unset to use the size `backgroundImage` itself was set with. |
-| `backgroundImageSize` | Responsive-Option | `{"value":"auto"}` | `"auto"` `"cover"` `"contain"` `"custom"` (use `backgroundImageSizeWidth` when `"custom"`) |
+| `backgroundImageResolution` | Responsive-Option | unset | Picks one of the *uploaded image's own* registered sizes (e.g. `{"Desktop":{"label":"Thumbnail","value":"thumbnail"}}`). Leave unset to use the size `backgroundImage` itself was set with. |
+| `backgroundImageSize` | Responsive-Option | e.g. `{"Desktop":{"label":"Auto","value":"auto"}}` | Options: `[{"label":"Auto","value":"auto"},{"label":"Cover","value":"cover"},{"label":"Contain","value":"contain"},{"label":"Custom","value":"custom"}]`. Use `backgroundImageSizeWidth` when `"custom"` |
 | `backgroundImageSizeWidth` | Responsive | unset | Used when `backgroundImageSize` = `"custom"` |
-| `backgroundImagePosition` | Responsive-Option | `{"value":"top left"}` | `"top left"` `"top center"` `"top right"` `"center left"` `"center center"` `"center right"` `"bottom left"` `"bottom center"` `"bottom right"` `"custom"` (use `backgroundImagePositionHorizontal`/`Vertical` when `"custom"`) |
+| `backgroundImagePosition` | Responsive-Option | e.g. `{"Desktop":{"label":"Top Left","value":"top left"}}` | Options: `[{"label":"Top Left","value":"top left"},{"label":"Top Center","value":"top center"},{"label":"Top Right","value":"top right"},{"label":"Center Left","value":"center left"},{"label":"Center Center","value":"center center"},{"label":"Center Right","value":"center right"},{"label":"Bottom Left","value":"bottom left"},{"label":"Bottom Center","value":"bottom center"},{"label":"Bottom Right","value":"bottom right"},{"label":"Custom","value":"custom"}]` |
 | `backgroundImagePositionHorizontal` | Responsive | unset | Used when `backgroundImagePosition` = `"custom"` |
 | `backgroundImagePositionVertical` | Responsive | unset | Used when `backgroundImagePosition` = `"custom"` |
-| `backgroundImageAttachment` | Option | `{"value":"scroll"}` | `"scroll"` `"fixed"` |
-| `backgroundImageRepeat` | Responsive-Option | `{"value":"repeat"}` | `"repeat"` `"repeat-x"` `"repeat-y"` `"no-repeat"` |
-| `backgroundImageBlendMode` | Option (not responsive) | `{"value":"normal"}` | Same 16-value enum as Background Overlay's `blendMode` below |
+| `backgroundImageAttachment` | Option | e.g. `{"label":"Scroll","value":"scroll"}` | Options: `[{"label":"Scroll","value":"scroll"},{"label":"Fixed","value":"fixed"}]` |
+| `backgroundImageRepeat` | Responsive-Option | e.g. `{"Desktop":{"label":"Repeat","value":"repeat"}}` | Options: `[{"label":"Repeat","value":"repeat"},{"label":"Repeat X","value":"repeat-x"},{"label":"Repeat Y","value":"repeat-y"},{"label":"No Repeat","value":"no-repeat"}]` |
+| `backgroundImageBlendMode` | Option (not responsive) | e.g. `{"label":"Normal","value":"normal"}` | Options: `[{"label":"Normal","value":"normal"},{"label":"Multiply","value":"multiply"},{"label":"Screen","value":"screen"},{"label":"Overlay","value":"overlay"},{"label":"Darken","value":"darken"},{"label":"Lighten","value":"lighten"},{"label":"Color Dodge","value":"color-dodge"},{"label":"Color Burn","value":"color-burn"},{"label":"Hard Light","value":"hard-light"},{"label":"Soft Light","value":"soft-light"},{"label":"Difference","value":"difference"},{"label":"Exclusion","value":"exclusion"},{"label":"Hue","value":"hue"},{"label":"Saturation","value":"saturation"},{"label":"Color","value":"color"},{"label":"Luminosity","value":"luminosity"}]` |
 
 #### Shape: Background Overlay
 
@@ -208,7 +205,7 @@ Renders on top of the background, for darkening/tinting images.
 | `gradient` | Scalar (string, CSS gradient) | unset | Used when `type` = `"gradient"` |
 | `opacity` | Scalar (integer) | `100` | `0`–`100` |
 | `filters` | **Stringified-JSON (CSS Filters), nested** | unset | A JSON-string-within-a-JSON-string — same shape as the CSS Filters block below, but `grayscale`/`invert`/`sepia` are not offered here (omit them; only `blur`/`brightness`/`contrast`/`saturate`/`hue-rotate` apply to the overlay) |
-| `blendMode` | Option | `{"value":"normal"}` | `"normal"` `"multiply"` `"screen"` `"overlay"` `"darken"` `"lighten"` `"color-dodge"` `"color-burn"` `"hard-light"` `"soft-light"` `"difference"` `"exclusion"` `"hue"` `"saturation"` `"color"` `"luminosity"` |
+| `blendMode` | Option | e.g. `{"label":"Normal","value":"normal"}` | Options: `[{"label":"Normal","value":"normal"},{"label":"Multiply","value":"multiply"},{"label":"Screen","value":"screen"},{"label":"Overlay","value":"overlay"},{"label":"Darken","value":"darken"},{"label":"Lighten","value":"lighten"},{"label":"Color Dodge","value":"color-dodge"},{"label":"Color Burn","value":"color-burn"},{"label":"Hard Light","value":"hard-light"},{"label":"Soft Light","value":"soft-light"},{"label":"Difference","value":"difference"},{"label":"Exclusion","value":"exclusion"},{"label":"Hue","value":"hue"},{"label":"Saturation","value":"saturation"},{"label":"Color","value":"color"},{"label":"Luminosity","value":"luminosity"}]` |
 
 #### Shape: Border
 
@@ -340,7 +337,7 @@ Never set `blockClass`, `styles`, or `preview` — all three are internal/auto-m
 |---|---|---|---|
 | `padding` | Spacing (Responsive) | unset | |
 | `margin` | Spacing (Responsive) | unset | |
-| `widthType` | Responsive-Option | unset | `"auto"` `"100%"` `"custom"` — set `{"value":"custom"}` to enable `customWidth` |
+| `widthType` | Responsive-Option | unset | Options: `[{"label":"Auto","value":"auto"},{"label":"Full","value":"100%"},{"label":"Custom","value":"custom"}]`. If `custom`, `customWidth` is active. **Note: Do NOT use on `blockish/container`. Use `customCss` if a container needs a specific width.** |
 | `customWidth` | Responsive | unset | Active when `widthType` = `"custom"` |
 | `minWidth` | Responsive | unset | |
 | `maxWidth` | Responsive | unset | |
@@ -350,7 +347,7 @@ Never set `blockClass`, `styles`, or `preview` — all three are internal/auto-m
 
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
-| `position` | Responsive-Option | unset | `"relative"` `"absolute"` `"fixed"` `"sticky"` |
+| `position` | Responsive-Option | unset | Options: `[{"label":"Relative","value":"relative"},{"label":"Absolute","value":"absolute"},{"label":"Fixed","value":"fixed"},{"label":"Sticky","value":"sticky"}]` |
 | `positionTop` | Responsive | unset | Only applies when `position` is set |
 | `positionRight` | Responsive | unset | |
 | `positionBottom` | Responsive | unset | |
@@ -360,9 +357,9 @@ Never set `blockClass`, `styles`, or `preview` — all three are internal/auto-m
 
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
-| `alignSelf` | Responsive-Option | unset | `"auto"` `"flex-start"` `"center"` `"flex-end"` `"stretch"` `"baseline"` |
-| `justifySelf` | Responsive-Option | unset | `"auto"` `"start"` `"center"` `"end"` `"stretch"` |
-| `flexOrder` | Responsive-Option | unset | `{"value":"1"}` · `{"value":"custom"}` + `flexCustomOrder` for an arbitrary number |
+| `alignSelf` | Responsive | unset | `"auto"` `"flex-start"` `"center"` `"flex-end"` `"stretch"` `"baseline"` |
+| `justifySelf` | Responsive | unset | `"auto"` `"start"` `"center"` `"end"` `"stretch"` |
+| `flexOrder` | Responsive | unset | `"1"` (etc) · `"custom"` (activates `flexCustomOrder`) |
 | `flexCustomOrder` | Responsive | unset | Active when `flexOrder` = `"custom"` |
 | `flexGrow` | Responsive | unset | `"0"` = no grow, `"1"` = grow to fill |
 | `flexShrink` | Responsive | unset | `"0"` = don't shrink, `"1"` = can shrink |

@@ -103,7 +103,7 @@ class StyleGenerator
     {
         $attribute_value = $value;
 
-        if (is_array($value) && !empty($value['value'])) {
+        if (!empty($value['value'])) {
             $attribute_value = $value['value'];
         }
 
@@ -154,13 +154,6 @@ class StyleGenerator
             }
 
             $attribute_value = $attributes[$meta_key];
-
-            if (is_string($attribute_value) && str_starts_with(trim($attribute_value), '{')) {
-                $decoded = json_decode($attribute_value, true);
-                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                    $attribute_value = $decoded;
-                }
-            }
 
             // Function to apply CSS to the rules
             $apply_css = function ($device_slug, $value) use ($meta_attr, &$css_rules, $block_css_class) {

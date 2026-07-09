@@ -12,10 +12,10 @@ The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 | `customWidthContainer` | Responsive | `{"Desktop":"100%"}` | Active when `containerWidth` = `"align-custom-width"` |
 | `containerMinHeight` | Responsive | `{"Desktop":"0"}` | |
 | `overflow` | Responsive-Option | unset | `"visible"` `"hidden"` `"scroll"` `"auto"` |
-| `flexDirection` | Responsive-Option | `{"Desktop":{"label":"Row","value":"row"}}` | `Row`/`row` · `Column`/`column` · `Row Reverse`/`row-reverse` · `Column Reverse`/`column-reverse` |
-| `flexWrap` | Responsive-Option | unset | `Wrap`/`wrap` · `No Wrap`/`nowrap` · `Reverse`/`wrap-reverse` |
-| `justifyContent` | Responsive-Option | `{"Desktop":{"label":"Center","value":"center"}}` | `Start`/`flex-start` · `End`/`flex-end` · `Center`/`center` · `Space Between`/`space-between` · `Space Around`/`space-around` · `Space Evenly`/`space-evenly` |
-| `alignItems` | Responsive-Option | `{"Desktop":{"label":"Center","value":"center"}}` | `Start`/`flex-start` · `End`/`flex-end` · `Center`/`center` · `Stretch`/`stretch` — **no `baseline` option** (despite the global `alignSelf` attribute supporting it) |
+| `flexDirection` | Responsive-Option | unset | Used when `display` = `"flex"`. Options: `[{"label":"Row","value":"row"},{"label":"Column","value":"column"},{"label":"Row Reverse","value":"row-reverse"},{"label":"Column Reverse","value":"column-reverse"}]` |
+| `flexWrap` | Responsive | `{"Desktop":"wrap"}` | Used when `display` = `"flex"`. `"wrap"` `"nowrap"` `"wrap-reverse"` |
+| `justifyContent` | Responsive-Option | unset | Used when `display` = `"flex"`. Options: `[{"label":"Start","value":"flex-start"},{"label":"End","value":"flex-end"},{"label":"Center","value":"center"},{"label":"Space Between","value":"space-between"},{"label":"Space Around","value":"space-around"},{"label":"Space Evenly","value":"space-evenly"}]` |
+| `alignItems` | Responsive-Option | unset | Used when `display` = `"flex"`. Options: `[{"label":"Start","value":"flex-start"},{"label":"End","value":"flex-end"},{"label":"Center","value":"center"},{"label":"Stretch","value":"stretch"}]` — **no `baseline` option** (despite the global `alignSelf` attribute supporting it) |
 | `columnGap` | Responsive | unset | |
 | `rowGap` | Responsive | unset | |
 | `gridLayoutType` | Scalar (string) | `"auto"` | `"auto"` (auto-fit columns) `"fixed"` (explicit count) |
