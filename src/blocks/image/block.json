@@ -6,7 +6,6 @@
   "title": "Image",
   "category": "blockish-framework",
   "description": "Display an image with optional caption and styling.",
-  "icon": "format-image",
   "keywords": [
     "blockish",
     "image",

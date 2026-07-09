@@ -6,7 +6,6 @@
   "title": "Off Canvas",
   "category": "blockish-framework",
   "description": "Slide-in offcanvas panel with a hamburger trigger. Mirrors a sibling Nav Menu's items as real blocks.",
-  "icon": "menu-alt",
   "keywords": [
     "offcanvas",
     "drawer",

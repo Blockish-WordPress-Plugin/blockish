@@ -1,0 +1,103 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/paragraph",
+  "version": "1.0.0",
+  "title": "Paragraph",
+  "category": "blockish-framework",
+  "description": "Flexible paragraph block for text content.",
+  "keywords": [
+    "blockish",
+    "paragraph",
+    "text"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "content": {
+      "type": "string"
+    },
+    "url": {
+      "type": "object"
+    },
+    "alignment": {
+      "type": "object",
+      "default": {
+        "Desktop": "left"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "typography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "color": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}": "color: {{VALUE}};"
+      }
+    },
+    "hoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}:hover": "color: {{VALUE}};"
+      }
+    },
+    "textShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "textShadowHover": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}:hover"
+      }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "text": [
+          {
+            "slug": "content",
+            "title": "Content"
+          }
+        ],
+        "url": [
+          {
+            "slug": "url",
+            "title": "Link URL"
+          }
+        ]
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ],
+    "__experimentalSlashInserter": true
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
+}

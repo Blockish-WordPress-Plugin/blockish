@@ -147,6 +147,12 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 
 = 1.1.1 =
 
+* Added: Paragraph block optimized for AI site building
+* Improved: Unified block icon styling across all blocks for consistent editor branding
+* Added: Template Library feature with 1-click page and pattern import in Block Editor
+* Improved: Template Library UI and infinite scroll performance
+* Fixed: Cross-Origin Resource Sharing (CORS) preflight errors with token-based query authentication
+* Improved: Enqueue logic using wp_localize_script for safer JS configuration
 * Added: Automated MCP Connection Wizard with 1-click command generation
 * Added: `ManageOptions` MCP AI ability to read and update WordPress core settings.
 * Added: `ManageComments` MCP AI ability for autonomous comment moderation.

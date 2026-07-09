@@ -130,3 +130,29 @@ Example of designing the inside of a header template part (logo + navigation):
 
 ---
 
+## 8. Interactions Extension (interactionData)
+
+All Blockish blocks accept the `interactionData` attribute. This allows you to add custom vanilla JavaScript interactions (animations, event listeners) to a specific block.
+
+**Attribute Structure:**
+```json
+"interactionData": [
+  {
+    "id": "unique-id-123",
+    "scope": "block",
+    "event": "click",
+    "selector": ".trigger-element", // Optional. Event delegation selector relative to this block
+    "callbacks": [
+      "console.log('Clicked!', event); blockElement.classList.toggle('active');" // Raw JS string. 'event' and 'blockElement' variables are exposed.
+    ]
+  }
+]
+```
+Note: Do not use this for global interactions. For global interactions, use the `blockish/manage-global-interactions` ability instead.
+
+**CRITICAL RULE FOR ANIMATIONS & INTERACTIONS (BOTH BLOCK-LEVEL & GLOBAL):**
+Many Blockish blocks (like `blockish/button`) use an outer wrapper `<div>` and inner elements (like an `<a>` tag for the actual button with styles). By default, interactions are applied to the outermost wrapper `<div>`.
+If a user complains about an animation looking weird (e.g., "the shadow is appearing behind the button when it scales", or they provide an image showing a styling issue during animation), **DO NOT guess the fix**. 
+1. **INSPECT THE RAW MARKUP:** Use the `blockish/get-posts` MCP tool to fetch the post and look at the raw HTML structure inside the `content` property, OR ask the user for a screenshot of the raw markup.
+2. **USE THE `selector` PROPERTY:** Once you see the HTML structure (e.g., `<div class="wp-block-blockish-button ..."><a class="blockish-button-link">`), add the correct `selector` (e.g., `"selector": ".blockish-button-link"`) to your `interactionData` schema (or global interaction schema) so that the animation applies exactly to the inner target element instead of the outer wrapper. (When `selector` is used, the `blockElement` variable in the callback automatically refers to the matched inner element).
+3. **COMBINE WITH CLASS MANAGER:** To ensure animations or interactions reliably target a specific block (especially when using Global Interactions or when you need to target a block from another block's event), always assign a unique CSS class to the target block using the **Class Manager** extension (or the block's `className` attribute). This guarantees you have a unique selector to query the element without affecting other blocks on the page.

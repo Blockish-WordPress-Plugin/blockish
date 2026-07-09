@@ -3,6 +3,7 @@ import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { __experimentalHeading as Heading, __experimentalText as Text, __experimentalVStack as VStack } from '@wordpress/components';
 import SavedExtensionSchemasSettings from './settings/saved-extension-schemas-settings';
+import GlobalInteractionsSettings from './settings/global-interactions-settings';
 import SeoSettings from './settings/seo-settings';
 
 export default function SettingsPage() {
@@ -11,6 +12,7 @@ export default function SettingsPage() {
 	const [isSaving, setIsSaving] = useState(false);
 	const [error, setError] = useState('');
 	const [schemas, setSchemas] = useState({ count: 0, items: [] });
+	const [globalInteractions, setGlobalInteractions] = useState({ count: 0, items: [] });
 	const [seoSettings, setSeoSettings] = useState({});
 
 	const loadToolsData = async () => {
@@ -19,6 +21,7 @@ export default function SettingsPage() {
 		try {
 			const response = await apiFetch({ path: toolsPath, method: 'GET' });
 			setSchemas(response?.schemas || { count: 0, items: [] });
+			setGlobalInteractions(response?.globalInteractions || { count: 0, items: [] });
 			setSeoSettings(response?.seoSettings || {});
 		} catch (err) {
 			setError(err?.message || __('Failed to load settings data', 'blockish'));
@@ -65,6 +68,22 @@ export default function SettingsPage() {
 		}
 	};
 
+	const deleteGlobalInteraction = async (id) => {
+		setIsSaving(true);
+		setError('');
+		try {
+			const response = await apiFetch({
+				path: `${toolsPath}/global-interactions/${id}`,
+				method: 'DELETE',
+			});
+			setGlobalInteractions(response?.globalInteractions || { count: 0, items: [] });
+		} catch (err) {
+			setError(err?.message || __('Failed to delete global interaction', 'blockish'));
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
 	return (
 		<VStack className="blockish-settings-page" spacing={6}>
 			<header className="blockish-page-header">
@@ -90,6 +109,13 @@ export default function SettingsPage() {
 				isLoading={isLoading}
 				isSaving={isSaving}
 				onCleanupSchema={cleanupSchema}
+			/>
+
+			<GlobalInteractionsSettings
+				interactions={globalInteractions}
+				isLoading={isLoading}
+				isSaving={isSaving}
+				onDeleteInteraction={deleteGlobalInteraction}
 			/>
 		</VStack>
 	);

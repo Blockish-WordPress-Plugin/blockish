@@ -6,7 +6,6 @@
   "title": "Nav Menu Submenu",
   "category": "blockish-framework",
   "description": "Dropdown submenu panel for a Nav Menu Item.",
-  "icon": "menu",
   "parent": [
     "blockish/navmenu-item"
   ],

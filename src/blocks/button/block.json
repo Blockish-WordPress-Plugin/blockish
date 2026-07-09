@@ -11,7 +11,6 @@
     "call to action"
   ],
   "version": "1.0.0",
-  "icon": "button",
   "description": "Call-to-action button with style options.",
   "textdomain": "blockish",
   "attributes": {

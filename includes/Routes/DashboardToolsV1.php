@@ -66,6 +66,18 @@ class DashboardToolsV1 extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/global-interactions/(?P<id>[\w-]+)',
+			array(
+				array(
+					'methods'             => 'DELETE',
+					'callback'            => array( $this, 'delete_global_interaction' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/' . $this->rest_base . '/class-manager',
 			array(
 				array(
@@ -108,16 +120,18 @@ class DashboardToolsV1 extends WP_REST_Controller {
 	public function get_tools_data() {
 		$schemas = $this->get_saved_schemas();
 		$class_manager = $this->get_class_manager_items();
+		$global_interactions = $this->get_global_interactions();
 		$seo_settings = array(
 			'global_meta_description' => get_option( 'blockish_global_meta_description', '' ),
 		);
 
 		return rest_ensure_response(
 			array(
-				'status'       => 'success',
-				'schemas'      => $schemas,
-				'classManager' => $class_manager,
-				'seoSettings'  => $seo_settings,
+				'status'             => 'success',
+				'schemas'            => $schemas,
+				'classManager'       => $class_manager,
+				'globalInteractions' => $global_interactions,
+				'seoSettings'        => $seo_settings,
 			)
 		);
 	}
@@ -157,6 +171,37 @@ class DashboardToolsV1 extends WP_REST_Controller {
 			array(
 				'status' => 'success',
 				'schemas' => $this->get_saved_schemas(),
+			)
+		);
+	}
+
+	public function delete_global_interaction( WP_REST_Request $request ) {
+		$id = sanitize_text_field( (string) $request->get_param( 'id' ) );
+		
+		if ( empty( $id ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Invalid interaction ID.',
+				)
+			);
+		}
+
+		$interactions = get_option( 'blockish_global_interactions', array() );
+		if ( ! is_array( $interactions ) ) {
+			$interactions = array();
+		}
+
+		$updated_interactions = array_filter( $interactions, function( $interaction ) use ( $id ) {
+			return isset( $interaction['id'] ) && $interaction['id'] !== $id;
+		});
+
+		update_option( 'blockish_global_interactions', array_values( $updated_interactions ), false );
+
+		return rest_ensure_response(
+			array(
+				'status' => 'success',
+				'globalInteractions' => $this->get_global_interactions(),
 			)
 		);
 	}
@@ -336,6 +381,18 @@ class DashboardToolsV1 extends WP_REST_Controller {
 		return array(
 			'count' => count( $items ),
 			'items' => $items,
+		);
+	}
+
+	private function get_global_interactions() {
+		$interactions = get_option( 'blockish_global_interactions', array() );
+		if ( ! is_array( $interactions ) ) {
+			$interactions = array();
+		}
+
+		return array(
+			'count' => count( $interactions ),
+			'items' => $interactions,
 		);
 	}
 

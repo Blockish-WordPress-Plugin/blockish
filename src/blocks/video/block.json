@@ -6,7 +6,6 @@
   "title": "Video",
   "category": "blockish-framework",
   "description": "Embed a video with custom controls and settings.",
-  "icon": "format-video",
   "keywords": [
     "blockish",
     "video",

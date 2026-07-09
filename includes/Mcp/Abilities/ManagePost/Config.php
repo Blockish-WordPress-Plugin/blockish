@@ -40,6 +40,14 @@ class Config
                             'required'   => [ 'name' ],
                         ],
                     ],
+                    'meta_input' => [
+                        'type'        => 'object',
+                        'description' => 'Key-value pairs of post meta to set.',
+                    ],
+                    'tax_input' => [
+                        'type'        => 'object',
+                        'description' => 'Key-value pairs of taxonomy names to arrays of term names (or IDs) to set.',
+                    ],
                     'delete' => [
                         'type'        => 'boolean',
                         'description' => 'If true, deletes the post specified by post_id. Defaults to false.',

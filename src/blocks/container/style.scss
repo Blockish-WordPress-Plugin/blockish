@@ -1,3 +1,7 @@
+:where(.wp-block-blockish-container) {
+    position: relative;
+}
+
 .wp-block-blockish-container {
     transition: all 0.3s ease;
 

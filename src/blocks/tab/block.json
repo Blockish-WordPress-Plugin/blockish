@@ -6,7 +6,6 @@
   "title": "Tab",
   "category": "blockish-framework",
   "description": "Tabbed content container for tab items.",
-  "icon": "index-card",
   "keywords": [
     "tabs",
     "tab",

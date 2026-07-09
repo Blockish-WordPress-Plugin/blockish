@@ -11,8 +11,8 @@ class Config
     public static function get(): array
     {
         return [
-            'label'               => __('Create or Edit Term', 'blockish'),
-            'description'         => __('Creates a term (omit term_id) or edits one (provide term_id) within any registered taxonomy.', 'blockish'),
+            'label'               => __('Create, Edit or Delete Term', 'blockish'),
+            'description'         => __('Creates a term (omit term_id), edits one (provide term_id), or deletes one (provide term_id and set delete to true) within any registered taxonomy.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -23,6 +23,7 @@ class Config
                     'description'  => ['type' => 'string',  'description' => 'Term description.'],
                     'slug'         => ['type' => 'string',  'description' => 'Term slug (optional, generated from name if omitted).'],
                     'parent'       => ['type' => 'integer', 'description' => 'Parent term ID for hierarchical taxonomies.'],
+                    'delete'       => ['type' => 'boolean', 'description' => 'If true, deletes the term specified by term_id. Defaults to false.'],
                 ],
                 'required'   => ['taxonomy'],
             ],

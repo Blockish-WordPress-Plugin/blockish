@@ -6,7 +6,6 @@
   "title": "Rating",
   "category": "blockish-framework",
   "description": "Star rating display for reviews and scores.",
-  "icon": "star-filled",
   "keywords": [
     "blockish",
     "rating",

@@ -1,0 +1,14 @@
+{
+	"attributes": {
+		"interactionData": {
+			"type": "array",
+			"default": []
+		}
+	},
+	"include": [
+		"*"
+	],
+	"exclude": [],
+	"editorScript": "file:./editor.js",
+	"viewScript": "file:./view.js"
+}

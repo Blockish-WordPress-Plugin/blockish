@@ -59,7 +59,7 @@ class Callbacks
 
         $commentdata = [
             'comment_post_ID' => intval($args['comment_post_ID']),
-            'comment_content' => sanitize_text_field($args['comment_content']),
+            'comment_content' => wp_kses_post($args['comment_content']),
             'comment_author' => sanitize_text_field($args['comment_author'] ?? 'Admin'),
             'comment_author_email' => sanitize_email($args['comment_author_email'] ?? get_option('admin_email')),
             'comment_approved' => 1, // Auto approve for AI
@@ -84,7 +84,7 @@ class Callbacks
         $commentdata = ['comment_ID' => intval($args['comment_ID'])];
         
         if (isset($args['comment_content'])) {
-            $commentdata['comment_content'] = sanitize_text_field($args['comment_content']);
+            $commentdata['comment_content'] = wp_kses_post($args['comment_content']);
         }
 
         wp_update_comment($commentdata);

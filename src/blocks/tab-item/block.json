@@ -6,7 +6,6 @@
   "title": "Tab Item",
   "category": "blockish-framework",
   "description": "Item for the Tab block.",
-  "icon": "excerpt-view",
   "parent": [
     "blockish/tab"
   ],
