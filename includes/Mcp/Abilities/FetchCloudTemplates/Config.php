@@ -51,7 +51,7 @@ class Config
                                 'id'             => ['type' => 'integer'],
                                 'title'          => ['type' => 'string'],
                                 'slug'           => ['type' => 'string'],
-                                'featured_image' => ['type' => 'string', 'description' => 'URL to visual representation of the template.'],
+                                'featured_image' => ['type' => ['string', 'boolean', 'null'], 'description' => 'URL to visual representation of the template.'],
                                 'schema'         => ['type' => 'array', 'description' => 'Native JS block schema array for this design. Modify this directly to edit layout.']
                             ]
                         ]
