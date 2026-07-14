@@ -16,8 +16,11 @@
   },
   "attributes": {
     "network": {
-      "type": "string",
-      "default": "facebook"
+      "type": "object",
+      "default": {
+        "value": "facebook",
+        "label": "Facebook"
+      }
     },
     "label": {
       "type": "string",

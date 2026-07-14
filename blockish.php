@@ -27,6 +27,7 @@ use Blockish\Extensions\ExtensionsLoader;
 use Blockish\Mcp\Loader;
 use Blockish\Routes\BlocksV1;
 use Blockish\Routes\DashboardToolsV1;
+use Blockish\Routes\EditorSyncV1;
 use Blockish\Routes\ExtensionsV1;
 use Blockish\Routes\SVGUploaderV1;
 
@@ -151,11 +152,13 @@ final class Blockish
         StyleGenerator::get_instance();
         BlocksV1::get_instance();
         ExtensionsV1::get_instance();
+        EditorSyncV1::get_instance();
         DashboardToolsV1::get_instance();
         SVGUploaderV1::get_instance();
         Blocks::get_instance();
         ExtensionsLoader::get_instance();
         SEO::get_instance();
+        \Blockish\Core\MagicLogin::get_instance();
 
         if (! class_exists('WP\MCP\Core\McpAdapter')) {
             // MCP Adapter is not active — show an admin notice or return early.

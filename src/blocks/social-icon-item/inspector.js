@@ -46,15 +46,12 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishSelect"
 									label={ __( 'Network', 'blockish' ) }
 									slug="network"
-									value={ attributes?.network || 'facebook' }
+									value={ attributes?.network || { value: 'facebook', label: 'Facebook' } }
 									onChange={ applyNetworkPreset }
-									options={ [
-										{ value: 'facebook', label: 'Facebook' },
-										{ value: 'x', label: 'X' },
-										{ value: 'instagram', label: 'Instagram' },
-										{ value: 'linkedin', label: 'LinkedIn' },
-										{ value: 'youtube', label: 'YouTube' },
-									] }
+									options={ Object.entries( NETWORKS ).map( ( [ key, network ] ) => ( {
+										value: key,
+										label: network.label,
+									} ) ) }
 								/>
 								<BlockishControl
 									type="TextControl"

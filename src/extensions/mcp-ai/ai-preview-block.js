@@ -38,7 +38,7 @@ registerBlockType('blockish/ai-preview', {
     edit: (props) => {
         const { clientId, attributes: { previousBlocks } } = props;
 
-        const { removeBlocks, insertBlocks } = useDispatch('core/block-editor');
+        const { removeBlocks, replaceBlocks } = useDispatch('core/block-editor');
         const innerBlockProps = useInnerBlocksProps({
             className: 'blockish-ai-preview-inner-blocks is-root-container is-layout-constrained',
         });
@@ -50,11 +50,11 @@ registerBlockType('blockish/ai-preview', {
         const handleApprove = useCallback(() => {
             const block = window.wp.data.select('core/block-editor').getBlock(clientId);
             if (block && block.innerBlocks.length > 0) {
-                const approvedBlocks = block.innerBlocks;
+                replaceBlocks([clientId], block.innerBlocks);
+            } else {
                 removeBlocks([clientId]);
-                insertBlocks(approvedBlocks, 0, undefined);
             }
-        }, [clientId, removeBlocks, insertBlocks]);
+        }, [clientId, replaceBlocks, removeBlocks]);
 
         /**
          * Discard: restore the editor to its state before the AI preview was
@@ -62,22 +62,21 @@ registerBlockType('blockish/ai-preview', {
          * removing this wrapper.
          */
         const handleReject = useCallback(() => {
-            // Always remove the AI preview wrapper first
-            removeBlocks([clientId]);
-
-            // Then restore the previous blocks if we have a snapshot
             if (previousBlocks) {
                 try {
                     const snapshot = JSON.parse(previousBlocks);
                     const restoredBlocks = snapshot.map(schemaNodeToBlock).filter(Boolean);
                     if (restoredBlocks.length > 0) {
-                        insertBlocks(restoredBlocks, 0, undefined);
+                        replaceBlocks([clientId], restoredBlocks);
+                        return;
                     }
                 } catch (e) {
                     console.error('Blockish: failed to parse previousBlocks snapshot', e);
                 }
             }
-        }, [clientId, previousBlocks, removeBlocks, insertBlocks]);
+            // If no previous blocks to restore, just remove the preview wrapper
+            removeBlocks([clientId]);
+        }, [clientId, previousBlocks, replaceBlocks, removeBlocks]);
 
         return (
             <div className='blockish-ai-preview-wrapper alignfull'>

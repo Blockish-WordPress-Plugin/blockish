@@ -83,6 +83,9 @@ class Loader
         Abilities\ManageOptions\Config::class,
         Abilities\ManageComments\Config::class,
         Abilities\ManageGlobalInteractions\Config::class,
+        Abilities\TriggerRefresh\Config::class,
+        Abilities\JsonHelper\Config::class,
+        Abilities\GetMagicLogin\Config::class,
     ];
 
     public function register_abilities()

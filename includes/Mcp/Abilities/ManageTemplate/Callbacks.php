@@ -3,7 +3,6 @@
 namespace Blockish\Mcp\Abilities\ManageTemplate;
 
 use WP_Query;
-use Blockish\Mcp\BlockSchemaMeta;
 
 defined('ABSPATH') || exit;
 

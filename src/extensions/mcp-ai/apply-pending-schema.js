@@ -35,16 +35,11 @@ const ApplyPendingSchema = () => {
         const editor = select('core/editor');
         const currentPost = editor ? editor.getCurrentPost() : null;
         let type = editor ? editor.getCurrentPostType() : null;
-        let currentSlug = currentPost?.slug || currentPost?.post_name;
+        let postId = editor ? editor.getCurrentPostId() : null;
+        let currentSlug = currentPost?.slug || currentPost?.post_name || postId;
 
-        // Site Editor (FSE)
-        const siteEditor = select('core/edit-site');
-        if (!type && siteEditor) {
-            type = siteEditor.getEditedPostType();
-            currentSlug = siteEditor.getEditedPostId();
-            if (currentSlug && currentSlug.includes('//')) {
-                currentSlug = currentSlug.split('//')[1];
-            }
+        if (currentSlug && typeof currentSlug === 'string' && currentSlug.includes('//')) {
+            currentSlug = currentSlug.split('//')[1];
         }
 
         return {
@@ -58,7 +53,7 @@ const ApplyPendingSchema = () => {
     const [stagedTemplate, setStagedTemplate] = useEntityProp('root', 'site', 'blockish_mcp_staged_template');
     const [stagedTemplatePart, setStagedTemplatePart] = useEntityProp('root', 'site', 'blockish_mcp_staged_template_part');
 
-    const { insertBlocks, removeBlocks } = useDispatch('core/block-editor');
+    const { insertBlocks, removeBlocks, replaceBlocks } = useDispatch('core/block-editor');
 
     const { getBlocks, getBlockOrder } = useSelect((select) => {
         const editor = select('core/block-editor');
@@ -153,14 +148,14 @@ const ApplyPendingSchema = () => {
                 aiBlocks
             );
 
-            // 3. Remove all existing top-level blocks
+            // 3. Replace all existing top-level blocks with the wrapper
+            // Using replaceBlocks bypasses the core/post-content removal warning
             const allClientIds = allEditorBlocks.map(b => b.clientId);
             if (allClientIds.length > 0) {
-                removeBlocks(allClientIds);
+                replaceBlocks(allClientIds, [wrapperBlock]);
+            } else {
+                insertBlocks([wrapperBlock], 0, undefined);
             }
-
-            // 4. Insert the AI preview block
-            insertBlocks([wrapperBlock], 0, undefined);
 
             clearPendingSchema();
         };
