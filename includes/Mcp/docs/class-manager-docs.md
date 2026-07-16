@@ -107,7 +107,8 @@ A flat JSON object. **Include only the properties you're setting** — omit ever
 
 - **Plain value** — a string/number used as-is: `"display": "flex"`, `"zIndex": 10`.
 - **Length** — a CSS length *string*: `"borderRadius": "12px"`, `"maxWidth": "640px"`. (`px`/`%`/`rem`/`em`/`vh`/`fr`/etc.)
-- **Responsive** — wrap any plain/length value in `{ "Desktop": …, "Tablet": …, "Mobile": … }`. **`Desktop` is the base (applies everywhere); `Tablet` overrides at ≤1024px, `Mobile` at ≤768px.** Only `Desktop` is required. A bare value (not wrapped) also works and applies to all breakpoints. So both of these are valid:
+- **Option** — an object with `label` and `value` keys: `{ "label": "Flex", "value": "flex" }`.
+- **Responsive** — wrap any plain/length/Option value in `{ "Desktop": …, "Tablet": …, "Mobile": … }`. **`Desktop` is the base (applies everywhere); `Tablet` overrides at ≤1024px, `Mobile` at ≤768px.** Only `Desktop` is required. A bare value (not wrapped) also works and applies to all breakpoints. So both of these are valid:
   ```json
   "fontSize": "32px"
   "fontSize": { "Desktop": "32px", "Mobile": "24px" }
@@ -131,86 +132,87 @@ A flat JSON object. **Include only the properties you're setting** — omit ever
 
 Layout / flex / grid (all Responsive unless noted):
 
-| Key | Shape | CSS / enum |
-|---|---|---|
-| `display` | Responsive (string) | `block` `inline-block` `flex` `inline-flex` `grid` `inline-grid` `none` |
-| `flexDirection` | Responsive (string) | `row` `column` `row-reverse` `column-reverse` |
-| `flexWrap` | Responsive (string) | `nowrap` `wrap` `wrap-reverse` |
-| `justifyContent` | Responsive (string) | `flex-start` `flex-end` `center` `space-between` `space-around` `space-evenly` |
-| `alignItems` | Responsive (string) | `flex-start` `flex-end` `center` `stretch` `baseline` |
-| `columnGap` / `rowGap` | Responsive (Length) | |
-| `gridLayoutType` | Plain (string) | `fixed` (use `gridColumns`/`gridRows`) or `auto` (use `autoGridWidth`/`autoGridHeight`) |
-| `gridColumns` / `gridRows` | Responsive (number) | repeat count — only when `gridLayoutType:"fixed"` |
-| `autoGridWidth` / `autoGridHeight` | Responsive (Length) | only when `gridLayoutType:"auto"` |
+| Key | Shape | Options | CSS |
+|---|---|---|---|
+| `display` | Responsive (Option) | `[{"label":"Block","value":"block"},{"label":"Inline Block","value":"inline-block"},{"label":"Flex","value":"flex"},{"label":"Inline Flex","value":"inline-flex"},{"label":"Grid","value":"grid"},{"label":"Inline Grid","value":"inline-grid"},{"label":"None","value":"none"}]` | `display: {{VALUE}};` |
+| `flexDirection` | Responsive (Option) | `[{"label":"Row","value":"row"},{"label":"Column","value":"column"},{"label":"Row Reverse","value":"row-reverse"},{"label":"Column Reverse","value":"column-reverse"}]` | `flex-direction: {{VALUE}};` |
+| `flexWrap` | Responsive (Option) | `[{"label":"No Wrap","value":"nowrap"},{"label":"Wrap","value":"wrap"},{"label":"Wrap Reverse","value":"wrap-reverse"}]` | `flex-wrap: {{VALUE}};` |
+| `justifyContent` | Responsive (Option) | `[{"label":"Start","value":"flex-start"},{"label":"End","value":"flex-end"},{"label":"Center","value":"center"},{"label":"Space Between","value":"space-between"},{"label":"Space Around","value":"space-around"},{"label":"Space Evenly","value":"space-evenly"}]` | `justify-content: {{VALUE}};` |
+| `alignItems` | Responsive (Option) | `[{"label":"Start","value":"flex-start"},{"label":"End","value":"flex-end"},{"label":"Center","value":"center"},{"label":"Stretch","value":"stretch"},{"label":"Baseline","value":"baseline"}]` | `align-items: {{VALUE}};` |
+| `columnGap` / `rowGap` | Responsive (Length) | | `column-gap: {{VALUE}};` / `row-gap: {{VALUE}};` |
+| `gridLayoutType` | Responsive (Option) | `[{"label":"Auto","value":"auto"},{"label":"Fixed","value":"fixed"}]` | `fixed` (use `gridColumns`/`gridRows`) or `auto` (use `autoGridWidth`/`autoGridHeight`) |
+| `gridColumns` / `gridRows` | Responsive (number) | | `grid-template-columns`/`rows: repeat({{VALUE}}, minmax(0, 1fr));` |
+| `autoGridWidth` / `autoGridHeight` | Responsive (Length) | | `grid-template-columns: repeat(auto-fill, minmax(min({{VALUE}}, 100%), 1fr));` / `grid-auto-rows: {{VALUE}};` |
 
 Sizing & position:
 
-| Key | Shape | CSS / enum |
-|---|---|---|
-| `padding` / `margin` | Spacing (Responsive) | |
-| `width` `height` `minWidth` `minHeight` `maxWidth` `maxHeight` | Responsive (Length) | |
-| `overflow` | Responsive (string) | `visible` `hidden` `auto` `scroll` |
-| `aspectRatio` | Responsive (string) | e.g. `"16 / 9"` |
-| `objectFit` | Responsive (string) | `fill` `contain` `cover` `none` `scale-down` |
-| `position` | Responsive (string) | `static` `relative` `absolute` `fixed` `sticky` |
-| `top` `right` `bottom` `left` | Responsive (Length) | |
-| `zIndex` | Responsive (number) | |
-| `anchorOffset` | Responsive (Length) | → `scroll-margin-top` (offset for sticky-header anchor jumps) |
+| Key | Shape | Options | CSS |
+|---|---|---|---|
+| `padding` / `margin` | Spacing (Responsive) | | `padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};` / `margin: ...` |
+| `width` `height` `minWidth` `minHeight` `maxWidth` `maxHeight` | Responsive (Length) | | `width: {{VALUE}};` etc. |
+| `overflow` | Responsive (Option) | `[{"label":"Visible","value":"visible"},{"label":"Hidden","value":"hidden"},{"label":"Auto","value":"auto"},{"label":"Scroll","value":"scroll"}]` | `overflow: {{VALUE}};` |
+| `aspectRatio` | Responsive (Option) | `[{"label":"Auto","value":"auto"},{"label":"1 / 1","value":"1 / 1"},{"label":"4 / 3","value":"4 / 3"},{"label":"3 / 2","value":"3 / 2"},{"label":"16 / 9","value":"16 / 9"},{"label":"21 / 9","value":"21 / 9"}]` | `aspect-ratio: {{VALUE}};` |
+| `objectFit` | Responsive (Option) | `[{"label":"Fill","value":"fill"},{"label":"Contain","value":"contain"},{"label":"Cover","value":"cover"},{"label":"None","value":"none"},{"label":"Scale Down","value":"scale-down"}]` | `object-fit: {{VALUE}};` |
+| `position` | Responsive (Option) | `[{"label":"Static","value":"static"},{"label":"Relative","value":"relative"},{"label":"Absolute","value":"absolute"},{"label":"Fixed","value":"fixed"},{"label":"Sticky","value":"sticky"}]` | `position: {{VALUE}};` |
+| `top` `right` `bottom` `left` | Responsive (Length) | | `top: {{VALUE}};` etc. |
+| `zIndex` | Responsive (number) | | `z-index: {{VALUE}};` |
+| `anchorOffset` | Responsive (Length) | | `scroll-margin-top: {{VALUE}};` (offset for sticky-header anchor jumps) |
 
 Typography:
 
-| Key | Shape | CSS / enum |
-|---|---|---|
-| `fontFamily` | Object `{ "value": "Inter, sans-serif" }` | |
-| `fontWeight` | Responsive (string) | `100`–`900` |
-| `fontSize` `lineHeight` `letterSpacing` `wordSpacing` | Responsive (Length) | |
-| `textAlign` | Responsive (string) | `left` `center` `right` `justify` `start` `end` |
-| `textDecoration` | Responsive (string) | `none` `underline` `overline` `line-through` |
-| `textTransform` | Responsive (string) | `none` `uppercase` `lowercase` `capitalize` |
-| `fontStyle` | Responsive (string) | `normal` `italic` `oblique` |
-| `direction` | Responsive (string) | `ltr` `rtl` |
-| `textOverflow` | Responsive (string) | `clip` `ellipsis` |
-| `columnCount` | Responsive (number) | |
-| `color` | Color | text color |
+| Key | Shape | Options | CSS |
+|---|---|---|---|
+| `fontFamily` | Object | | `font-family: {{VALUE}};` (`{ "value": "Inter, sans-serif" }`) |
+| `fontWeight` | Responsive (Option) | `[{"label":"Default","value":""},{"label":"100","value":"100"},{"label":"200","value":"200"},{"label":"300","value":"300"},{"label":"400","value":"400"},{"label":"500","value":"500"},{"label":"600","value":"600"},{"label":"700","value":"700"},{"label":"800","value":"800"},{"label":"900","value":"900"}]` | `font-weight: {{VALUE}};` |
+| `fontSize` `lineHeight` `letterSpacing` `wordSpacing` | Responsive (Length) | | `font-size: {{VALUE}};` etc. |
+| `textAlign` | Responsive (Option) | `[{"label":"Left","value":"left"},{"label":"Center","value":"center"},{"label":"Right","value":"right"},{"label":"Justify","value":"justify"},{"label":"Start","value":"start"},{"label":"End","value":"end"}]` | `text-align: {{VALUE}};` |
+| `textDecoration` | Responsive (Option) | `[{"label":"None","value":"none"},{"label":"Underline","value":"underline"},{"label":"Overline","value":"overline"},{"label":"Line Through","value":"line-through"}]` | `text-decoration: {{VALUE}};` |
+| `textTransform` | Responsive (Option) | `[{"label":"None","value":"none"},{"label":"Uppercase","value":"uppercase"},{"label":"Lowercase","value":"lowercase"},{"label":"Capitalize","value":"capitalize"}]` | `text-transform: {{VALUE}};` |
+| `fontStyle` | Responsive (Option) | `[{"label":"Normal","value":"normal"},{"label":"Italic","value":"italic"},{"label":"Oblique","value":"oblique"}]` | `font-style: {{VALUE}};` |
+| `direction` | Responsive (Option) | `[{"label":"LTR","value":"ltr"},{"label":"RTL","value":"rtl"}]` | `direction: {{VALUE}};` |
+| `textOverflow` | Responsive (Option) | `[{"label":"Clip","value":"clip"},{"label":"Ellipsis","value":"ellipsis"}]` | `text-overflow: {{VALUE}};` |
+| `columnCount` | Responsive (number) | | `column-count: {{VALUE}};` |
+| `color` | Color | | `color: {{VALUE}};` |
 
 Appearance & effects:
 
-| Key | Shape | CSS / notes |
-|---|---|---|
-| `background` | Background object | normal-state background (classic/gradient) |
-| `blendMode` | Responsive (string) | `mix-blend-mode` — same 16-value enum as block-docs |
-| `backgroundClip` | Responsive (string) | `border-box` `padding-box` `content-box` `text` |
-| `border` | Border object | |
-| `borderRadius` | Responsive (Length) | |
-| `textStroke` | Text Stroke object | |
-| `boxShadow` | Box Shadow array | |
-| `textShadow` | Text Shadow array | |
-| `opacity` | Responsive (number 0–1) | |
-| `filters` | CSS Filters object | `filter:` |
-| `backgroundFilters` | CSS Filters object | `backdrop-filter:` |
+| Key | Shape | Options | CSS |
+|---|---|---|---|
+| `background` | Background object | | `background: ...;` (classic/gradient) |
+| `blendMode` | Responsive (Option) | `[{"label":"Normal","value":"normal"},{"label":"Multiply","value":"multiply"},{"label":"Screen","value":"screen"},{"label":"Overlay","value":"overlay"},{"label":"Darken","value":"darken"},{"label":"Lighten","value":"lighten"},{"label":"Color Dodge","value":"color-dodge"},{"label":"Color Burn","value":"color-burn"},{"label":"Hard Light","value":"hard-light"},{"label":"Soft Light","value":"soft-light"},{"label":"Difference","value":"difference"},{"label":"Exclusion","value":"exclusion"},{"label":"Hue","value":"hue"},{"label":"Saturation","value":"saturation"},{"label":"Color","value":"color"},{"label":"Luminosity","value":"luminosity"}]` | `mix-blend-mode: {{VALUE}};` |
+| `backgroundClip` | Responsive (Option) | `[{"label":"Border Box","value":"border-box"},{"label":"Padding Box","value":"padding-box"},{"label":"Content Box","value":"content-box"},{"label":"Text","value":"text"}]` | `background-clip: {{VALUE}};` |
+| `border` | Border object | | Generates CSS `border` properties |
+| `borderRadius` | Responsive (Length) | | `border-radius: {{VALUE}};` |
+| `textStroke` | Text Stroke object | | Generates `-webkit-text-stroke` properties |
+| `boxShadow` | Box Shadow array | | `box-shadow: ...;` |
+| `textShadow` | Text Shadow array | | `text-shadow: ...;` |
+| `opacity` | Responsive (number 0–1) | | `opacity: {{VALUE}};` |
+| `filters` | CSS Filters object | | `filter: ...;` |
+| `backgroundFilters` | CSS Filters object | | `backdrop-filter: ...;` |
 
 Transform (individual keys, all Responsive; raw numbers — units/`deg` added automatically; everything combines into one `transform`):
 
-| Key | Unit | Notes |
-|---|---|---|
-| `translateX` `translateY` `translateZ` | as-is (Length) | |
-| `rotate` `rotateX` `rotateY` `rotateZ` | `deg` | use one; `rotate` = Z axis |
-| `scale` | multiplier | both axes |
-| `scale3DX` `scale3DY` `scale3DZ` | multiplier | |
-| `skewX` `skewY` | `deg` | |
-| `perspective` | Length | parent depth for 3D |
-| `transformOrigin` | string | `top left` … `bottom right`, or `custom` + `transformOriginX`/`transformOriginY` (Length) |
+| Key | Unit | Options | CSS |
+|---|---|---|---|
+| `translateX` `translateY` `translateZ` | as-is (Length) | | `transform: translateX({{VALUE}});` etc. |
+| `rotate` `rotateX` `rotateY` `rotateZ` | `deg` | | `transform: rotate({{VALUE}}deg);` etc. (`rotate` = Z axis) |
+| `scale` | multiplier | | `transform: scale({{VALUE}});` |
+| `scale3DX` `scale3DY` `scale3DZ` | multiplier | | `transform: scale3d(X, Y, Z);` |
+| `skewX` `skewY` | `deg` | | `transform: skewX({{VALUE}}deg);` etc. |
+| `perspective` | Length | | `perspective: {{VALUE}};` (parent depth for 3D) |
+| `transformOrigin` | Responsive (Option) | `[{"label":"Top Left","value":"top left"},{"label":"Top Center","value":"top center"},{"label":"Top Right","value":"top right"},{"label":"Center Left","value":"center left"},{"label":"Center","value":"center center"},{"label":"Center Right","value":"center right"},{"label":"Bottom Left","value":"bottom left"},{"label":"Bottom Center","value":"bottom center"},{"label":"Bottom Right","value":"bottom right"},{"label":"Custom","value":"custom"}]` | `transform-origin: {{VALUE}};` (or `transformOriginX`/`Y` if `custom`) |
+| `transformOriginX` `transformOriginY` | Responsive (Length) | | `transform-origin: {{X}} {{Y}};` (only when `transformOrigin` is `custom`) |
 
 > Unlike the block transform system, a class transform needs **no** "enable" flag — setting any transform key here applies it directly.
 
 Transition (Responsive):
 
-| Key | Shape | Notes |
-|---|---|---|
-| `transitionProperty` | string | default `all` |
-| `transitionDuration` | number (seconds) | |
-| `transitionDelay` | number (seconds) | |
-| `transitionTimingFunction` | string | `ease` `linear` `ease-in` `ease-out` `ease-in-out` (default `ease`) |
+| Key | Shape | Options | CSS |
+|---|---|---|---|
+| `transitionProperty` | string | | `transition: {property} {duration}s {timing} {delay}s;` (default `all`) |
+| `transitionDuration` | number (seconds) | | default `0.2` |
+| `transitionDelay` | number (seconds) | | default `0` |
+| `transitionTimingFunction` | Responsive (Option) | `[{"label":"Ease","value":"ease"},{"label":"Linear","value":"linear"},{"label":"Ease In","value":"ease-in"},{"label":"Ease Out","value":"ease-out"},{"label":"Ease In Out","value":"ease-in-out"}]` | `ease` `linear` `ease-in` `ease-out` `ease-in-out` (default `ease`) |
 
 Custom escape hatch:
 

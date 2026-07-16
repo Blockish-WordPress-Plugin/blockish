@@ -8,7 +8,23 @@ You (the AI) build a **schema**: a JSON tree of `{ name, attributes, innerBlocks
 - `attributes` — only the attributes you want different from their default. Anything you omit automatically falls back to the block's registered default — you never need to repeat a default value, and you never need to compute what an omitted value "renders as." That is handled for you.
 - `innerBlocks` — array of child schema nodes, same shape, recursive. Only for blocks marked "Accepts children: yes" below.
 
-**You never write HTML, CSS classes, or comment markup of any kind.** Turning your schema into real Gutenberg blocks happens in the editor, not by you. Do not include a `content` field. Do not try to reproduce a block's rendered HTML. If you find yourself writing an HTML tag, stop — that's a sign you've stepped outside your job.
+**You never write HTML, CSS classes, or comment markup of any kind.** Turning your schema into real Gutenberg blocks happens in the editor, not by you. The HTML markup and CSS mappings shown in the individual block documentation files are strictly **examples for understanding** how the system generates the frontend; you should never try to reproduce a block's rendered HTML or write CSS directly (except in `customCss`). If you find yourself writing an HTML tag, stop — that's a sign you've stepped outside your job.
+
+*Note on CSS Mappings:* In the block docs, you will see CSS mappings like `.{{WRAPPER}} -> padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};`. These use reserved placeholders to show how your JSON data maps to CSS properties:
+- `{{WRAPPER}}`: Represents the unique, auto-generated class for that specific block instance (e.g., `.bb-[hash].blockish-block-wrapper`).
+- `{{VALUE}}`: Represents the standard/single value you provide for that attribute.
+- `{{TOP}}`, `{{RIGHT}}`, `{{BOTTOM}}`, `{{LEFT}}`: Represent the respective side values from a `Spacing` or `Border` attribute.
+- `{{TOP_LEFT}}`, `{{TOP_RIGHT}}`, `{{BOTTOM_RIGHT}}`, `{{BOTTOM_LEFT}}`: Represent the respective corner values from a `Border-Radius` attribute.
+
+**Responsive CSS Generation:** If an attribute type is `Responsive`, the PHP backend will automatically loop through your provided breakpoints (`Desktop`, `Tablet`, `Mobile`). It will generate the exact same CSS mapping for each breakpoint, but will wrap the `Tablet` and `Mobile` CSS rules inside their respective `@media` queries automatically. You do NOT need to write media queries yourself.
+
+**Global HTML Classes:**
+Every Blockish block automatically receives the `blockish-block-wrapper` class and a unique `bb-[hash]` class on its outermost wrapper element. The individual block documentation files will show you the exact HTML structure, but keep in mind these global classes are injected server-side for every block.
+
+**Base CSS (`style.scss`):**
+At the bottom of each block's documentation, you will see a `Base CSS` section. This contains the static SCSS from the block's `style.scss` file. It shows the default styling applied to the block *before* any of your dynamic JSON attributes are applied. You should read this to understand the block's baseline behavior (e.g., if a block already has `display: flex` or `margin: 0` by default).
+
+These are just placeholders to help you understand which HTML elements and CSS properties are dynamically targeted.
 
 **Naming Top-Level Blocks**
 As a best practice, every top-level layout block you emit should carry a meaningful `metadata.name` attribute (e.g., `"attributes": { "metadata": { "name": "Hero Section" } }`). This metadata.name is used for identifying blocks in the editor. It is recommended to make this meaningful for readability.
@@ -148,14 +164,14 @@ A plain CSS color string. Always use hex or `rgba()` — never guess a theme pre
 
 | Key | Type | Default | Notes/enum |
 |---|---|---|---|
-| `fontFamily` | Option | unset | `{"value": "Inter, sans-serif", "label": "Inter"}` |
-| `fontWeight` | Scalar (string) | unset | `"100"` `"200"` `"300"` `"400"` `"500"` `"600"` `"700"` `"800"` `"900"` |
-| `fontSize` | Responsive | unset | e.g. `{"Desktop":"24px"}` — `px`/`em`/`rem` |
-| `lineHeight` | Responsive | unset | e.g. `{"Desktop":"1.5"}` |
-| `letterSpacing` | Responsive | unset | e.g. `{"Desktop":"0.05em"}` |
-| `textTransform` | Scalar (string) | `"none"` | `"none"` `"uppercase"` `"lowercase"` `"capitalize"` |
-| `fontStyle` | Scalar (string) | `"normal"` | `"normal"` `"italic"` |
-| `textDecoration` | Scalar (string) | `"none"` | `"none"` `"underline"` `"line-through"` |
+| `fontFamily` | Option | unset | `{"value": "Inter, sans-serif", "label": "Inter"}` <br>**CSS:** `font-family: {{VALUE}};` |
+| `fontWeight` | Scalar (string) | unset | `"100"` `"200"` `"300"` `"400"` `"500"` `"600"` `"700"` `"800"` `"900"` <br>**CSS:** `font-weight: {{VALUE}};` |
+| `fontSize` | Responsive | unset | e.g. `{"Desktop":"24px"}` — `px`/`em`/`rem` <br>**CSS:** `font-size: {{VALUE}};` |
+| `lineHeight` | Responsive | unset | e.g. `{"Desktop":"1.5"}` <br>**CSS:** `line-height: {{VALUE}};` |
+| `letterSpacing` | Responsive | unset | e.g. `{"Desktop":"0.05em"}` <br>**CSS:** `letter-spacing: {{VALUE}};` |
+| `textTransform` | Scalar (string) | `"none"` | `"none"` `"uppercase"` `"lowercase"` `"capitalize"` <br>**CSS:** `text-transform: {{VALUE}};` |
+| `fontStyle` | Scalar (string) | `"normal"` | `"normal"` `"italic"` <br>**CSS:** `font-style: {{VALUE}};` |
+| `textDecoration` | Scalar (string) | `"none"` | `"none"` `"underline"` `"line-through"` <br>**CSS:** `text-decoration: {{VALUE}};` |
 
 Omit any key you don't need — you do not need to pass the whole object, only the keys you're changing.
 
@@ -181,19 +197,19 @@ Video (`blockish/container`'s `containerBackground` only — see that block's se
 | Key | Type | Default | Notes/enum |
 |---|---|---|---|
 | `backgroundType` | Scalar (string) | `"classic"` | `"classic"` `"gradient"` `"video"` — `"video"` only works on `blockish/container`'s `containerBackground`, silently ignored elsewhere |
-| `backgroundColor` | Color | unset | |
-| `gradient` | Scalar (string, CSS gradient) | unset | Used when `backgroundType` = `"gradient"` |
+| `backgroundColor` | Color | unset | Used when `backgroundType` = `"classic"` <br>**CSS:** `background-color: {{VALUE}};` |
+| `backgroundImage` | Responsive of Image | unset | <br>**CSS:** `background-image: url({{URL}});` |
+| `gradient` | Color (gradient format) | unset | Used when `backgroundType` = `"gradient"`. (Not responsive). <br>**CSS:** `background: {{VALUE}};` |
 | `backgroundVideo` | Image (video file) | unset | Used when `backgroundType` = `"video"` |
-| `backgroundImage` | Responsive of Image | unset | |
+| `backgroundImageSize` | Responsive-Option | e.g. `{"Desktop":{"label":"Auto","value":"auto"}}` | Options: `[{"label":"Auto","value":"auto"},{"label":"Cover","value":"cover"},{"label":"Contain","value":"contain"},{"label":"Custom","value":"custom"}]` <br>**CSS:** `background-size: {{VALUE}};` |
+| `backgroundImageSizeWidth` | Responsive | unset | Used when `backgroundImageSize` = `"custom"` <br>**CSS:** `background-size: {{VALUE}} auto;` |
+| `backgroundImagePosition` | Responsive-Option | e.g. `{"Desktop":{"label":"Top Left","value":"top left"}}` | Options: `[{"label":"Top Left","value":"top left"},{"label":"Top Center","value":"top center"},{"label":"Top Right","value":"top right"},{"label":"Center Left","value":"center left"},{"label":"Center Center","value":"center center"},{"label":"Center Right","value":"center right"},{"label":"Bottom Left","value":"bottom left"},{"label":"Bottom Center","value":"bottom center"},{"label":"Bottom Right","value":"bottom right"},{"label":"Custom","value":"custom"}]` <br>**CSS:** `background-position: {{VALUE}};` |
+| `backgroundImagePositionHorizontal` | Responsive | unset | Used when `backgroundImagePosition` = `"custom"` <br>**CSS:** `background-position: {{X}} {{Y}};` |
+| `backgroundImagePositionVertical` | Responsive | unset | Used when `backgroundImagePosition` = `"custom"` <br>**CSS:** `background-position: {{X}} {{Y}};` |
+| `backgroundImageAttachment` | Option | e.g. `{"label":"Scroll","value":"scroll"}` | Options: `[{"label":"Scroll","value":"scroll"},{"label":"Fixed","value":"fixed"}]` <br>**CSS:** `background-attachment: {{VALUE}};` |
+| `backgroundImageRepeat` | Responsive-Option | e.g. `{"Desktop":{"label":"Repeat","value":"repeat"}}` | Options: `[{"label":"Repeat","value":"repeat"},{"label":"Repeat X","value":"repeat-x"},{"label":"Repeat Y","value":"repeat-y"},{"label":"No Repeat","value":"no-repeat"}]` <br>**CSS:** `background-repeat: {{VALUE}};` |
+| `backgroundImageBlendMode` | Option (not responsive) | e.g. `{"label":"Normal","value":"normal"}` | Options: `[{"label":"Normal","value":"normal"},{"label":"Multiply","value":"multiply"},{"label":"Screen","value":"screen"},{"label":"Overlay","value":"overlay"},{"label":"Darken","value":"darken"},{"label":"Lighten","value":"lighten"},{"label":"Color Dodge","value":"color-dodge"},{"label":"Color Burn","value":"color-burn"},{"label":"Hard Light","value":"hard-light"},{"label":"Soft Light","value":"soft-light"},{"label":"Difference","value":"difference"},{"label":"Exclusion","value":"exclusion"},{"label":"Hue","value":"hue"},{"label":"Saturation","value":"saturation"},{"label":"Color","value":"color"},{"label":"Luminosity","value":"luminosity"}]` <br>**CSS:** `background-blend-mode: {{VALUE}};` |
 | `backgroundImageResolution` | Responsive-Option | unset | Picks one of the *uploaded image's own* registered sizes (e.g. `{"Desktop":{"label":"Thumbnail","value":"thumbnail"}}`). Leave unset to use the size `backgroundImage` itself was set with. |
-| `backgroundImageSize` | Responsive-Option | e.g. `{"Desktop":{"label":"Auto","value":"auto"}}` | Options: `[{"label":"Auto","value":"auto"},{"label":"Cover","value":"cover"},{"label":"Contain","value":"contain"},{"label":"Custom","value":"custom"}]`. Use `backgroundImageSizeWidth` when `"custom"` |
-| `backgroundImageSizeWidth` | Responsive | unset | Used when `backgroundImageSize` = `"custom"` |
-| `backgroundImagePosition` | Responsive-Option | e.g. `{"Desktop":{"label":"Top Left","value":"top left"}}` | Options: `[{"label":"Top Left","value":"top left"},{"label":"Top Center","value":"top center"},{"label":"Top Right","value":"top right"},{"label":"Center Left","value":"center left"},{"label":"Center Center","value":"center center"},{"label":"Center Right","value":"center right"},{"label":"Bottom Left","value":"bottom left"},{"label":"Bottom Center","value":"bottom center"},{"label":"Bottom Right","value":"bottom right"},{"label":"Custom","value":"custom"}]` |
-| `backgroundImagePositionHorizontal` | Responsive | unset | Used when `backgroundImagePosition` = `"custom"` |
-| `backgroundImagePositionVertical` | Responsive | unset | Used when `backgroundImagePosition` = `"custom"` |
-| `backgroundImageAttachment` | Option | e.g. `{"label":"Scroll","value":"scroll"}` | Options: `[{"label":"Scroll","value":"scroll"},{"label":"Fixed","value":"fixed"}]` |
-| `backgroundImageRepeat` | Responsive-Option | e.g. `{"Desktop":{"label":"Repeat","value":"repeat"}}` | Options: `[{"label":"Repeat","value":"repeat"},{"label":"Repeat X","value":"repeat-x"},{"label":"Repeat Y","value":"repeat-y"},{"label":"No Repeat","value":"no-repeat"}]` |
-| `backgroundImageBlendMode` | Option (not responsive) | e.g. `{"label":"Normal","value":"normal"}` | Options: `[{"label":"Normal","value":"normal"},{"label":"Multiply","value":"multiply"},{"label":"Screen","value":"screen"},{"label":"Overlay","value":"overlay"},{"label":"Darken","value":"darken"},{"label":"Lighten","value":"lighten"},{"label":"Color Dodge","value":"color-dodge"},{"label":"Color Burn","value":"color-burn"},{"label":"Hard Light","value":"hard-light"},{"label":"Soft Light","value":"soft-light"},{"label":"Difference","value":"difference"},{"label":"Exclusion","value":"exclusion"},{"label":"Hue","value":"hue"},{"label":"Saturation","value":"saturation"},{"label":"Color","value":"color"},{"label":"Luminosity","value":"luminosity"}]` |
 
 #### Shape: Background Overlay
 
@@ -211,11 +227,11 @@ Renders on top of the background, for darkening/tinting images.
 |---|---|---|---|
 | `enabled` | Scalar (boolean) | `false` | |
 | `type` | Scalar (string) | `"color"` | `"color"` `"gradient"` |
-| `color` | Color | unset | Used when `type` = `"color"` |
-| `gradient` | Scalar (string, CSS gradient) | unset | Used when `type` = `"gradient"` |
-| `opacity` | Scalar (integer) | `100` | `0`–`100` |
-| `filters` | **Stringified-JSON (CSS Filters), nested** | unset | A JSON-string-within-a-JSON-string — same shape as the CSS Filters block below, but `grayscale`/`invert`/`sepia` are not offered here (omit them; only `blur`/`brightness`/`contrast`/`saturate`/`hue-rotate` apply to the overlay) |
-| `blendMode` | Option | e.g. `{"label":"Normal","value":"normal"}` | Options: `[{"label":"Normal","value":"normal"},{"label":"Multiply","value":"multiply"},{"label":"Screen","value":"screen"},{"label":"Overlay","value":"overlay"},{"label":"Darken","value":"darken"},{"label":"Lighten","value":"lighten"},{"label":"Color Dodge","value":"color-dodge"},{"label":"Color Burn","value":"color-burn"},{"label":"Hard Light","value":"hard-light"},{"label":"Soft Light","value":"soft-light"},{"label":"Difference","value":"difference"},{"label":"Exclusion","value":"exclusion"},{"label":"Hue","value":"hue"},{"label":"Saturation","value":"saturation"},{"label":"Color","value":"color"},{"label":"Luminosity","value":"luminosity"}]` |
+| `color` | Color | unset | Used when `type` = `"color"` <br>**CSS:** `background-color: {{VALUE}};` |
+| `gradient` | Scalar (string, CSS gradient) | unset | Used when `type` = `"gradient"` <br>**CSS:** `background-image: {{VALUE}};` |
+| `opacity` | Scalar (integer) | `100` | `0`–`100` <br>**CSS:** `opacity: calc({{VALUE}} / 100);` |
+| `filters` | **Stringified-JSON (CSS Filters), nested** | unset | A JSON-string-within-a-JSON-string — same shape as the CSS Filters block below, but `grayscale`/`invert`/`sepia` are not offered here (omit them; only `blur`/`brightness`/`contrast`/`saturate`/`hue-rotate` apply to the overlay) <br>**CSS:** `filter: blur(...) brightness(...) ...;` |
+| `blendMode` | Option | e.g. `{"label":"Normal","value":"normal"}` | Options: `[{"label":"Normal","value":"normal"},{"label":"Multiply","value":"multiply"},{"label":"Screen","value":"screen"},{"label":"Overlay","value":"overlay"},{"label":"Darken","value":"darken"},{"label":"Lighten","value":"lighten"},{"label":"Color Dodge","value":"color-dodge"},{"label":"Color Burn","value":"color-burn"},{"label":"Hard Light","value":"hard-light"},{"label":"Soft Light","value":"soft-light"},{"label":"Difference","value":"difference"},{"label":"Exclusion","value":"exclusion"},{"label":"Hue","value":"hue"},{"label":"Saturation","value":"saturation"},{"label":"Color","value":"color"},{"label":"Luminosity","value":"luminosity"}]` <br>**CSS:** `mix-blend-mode: {{VALUE}};` |
 
 #### Shape: Border
 
@@ -230,10 +246,10 @@ Per-side (only specify the sides you need):
 
 | Key | Type | Default | Notes/enum |
 |---|---|---|---|
-| `width` | Responsive | unset | |
-| `style` | Scalar (string) | `"solid"` | `"solid"` `"dashed"` `"dotted"` `"double"` `"none"` |
-| `color` | Color | unset | |
-| `top`/`right`/`bottom`/`left` | Object (same shape: `width`/`style`/`color`) | unset | Use instead of the linked `width`/`style`/`color` keys for per-side control |
+| `width` | Responsive | unset | <br>**CSS:** (Used in `border`) |
+| `style` | Scalar (string) | `"solid"` | `"solid"` `"dashed"` `"dotted"` `"double"` `"none"` <br>**CSS:** (Used in `border`) |
+| `color` | Color | unset | <br>**CSS:** (Used in `border`) |
+| `top`/`right`/`bottom`/`left` | Object (same shape: `width`/`style`/`color`) | unset | Use instead of the linked `width`/`style`/`color` keys for per-side control <br>**CSS:** `border-{{SIDE}}: {{WIDTH}} {{STYLE}} {{COLOR}};` (if omitted, generates `border: {{WIDTH}} {{STYLE}} {{COLOR}};`) |
 
 #### Shape: Box Shadow / Text Shadow
 
@@ -250,12 +266,12 @@ Text shadow (no `spread`/`inset`):
 
 | Key | Type | Notes |
 |---|---|---|
-| `x` | Scalar (length) | Horizontal offset |
-| `y` | Scalar (length) | Vertical offset |
-| `blur` | Scalar (length) | Blur radius |
-| `spread` | Scalar (length) | Box shadow only |
-| `color` | Color | |
-| `inset` | Scalar (string) | Box shadow only. **Not a boolean** — the literal string `"inset"` to enable it, or `""`/omit for a normal outset shadow. |
+| `x` | Scalar (length) | Horizontal offset <br>**CSS:** (Used in `box-shadow`/`text-shadow`) |
+| `y` | Scalar (length) | Vertical offset <br>**CSS:** (Used in `box-shadow`/`text-shadow`) |
+| `blur` | Scalar (length) | Blur radius <br>**CSS:** (Used in `box-shadow`/`text-shadow`) |
+| `spread` | Scalar (length) | Box shadow only <br>**CSS:** (Used in `box-shadow`) |
+| `color` | Color | <br>**CSS:** (Used in `box-shadow`/`text-shadow`) |
+| `inset` | Scalar (string) | Box shadow only. **Not a boolean** — the literal string `"inset"` to enable it, or `""`/omit for a normal outset shadow. <br>**CSS:** Generates `box-shadow: {{X}} {{Y}} {{BLUR}} {{SPREAD}} {{COLOR}} {{INSET}};` or `text-shadow: {{X}} {{Y}} {{BLUR}} {{COLOR}};` for all objects combined. |
 
 Add more objects to the array for multiple shadows.
 
@@ -278,6 +294,8 @@ Units are added automatically — pass raw numbers only. Default: `{}` (no filte
 | `grayscale` | `%` | `0` | `0`–`200` |
 | `sepia` | `%` | `0` | `0`–`100` |
 
+<br>**CSS:** Generates a single `filter: blur({{VALUE}}px) brightness({{VALUE}}%) ...;` rule combining all defined filters.
+
 #### Shape: Text Stroke
 
 Default: `{}` (no stroke).
@@ -286,10 +304,10 @@ Default: `{}` (no stroke).
 "{\"width\":{\"Desktop\":\"1px\"},\"color\":\"#1a1a2e\"}"
 ```
 
-| Key | Type |
-|---|---|
-| `width` | Responsive |
-| `color` | Color |
+| Key | Type | Notes/CSS |
+|---|---|---|
+| `width` | Responsive | <br>**CSS:** `-webkit-text-stroke-width: {{VALUE}};` |
+| `color` | Color | <br>**CSS:** `-webkit-text-stroke-color: {{VALUE}};` |
 
 ---
 
@@ -297,31 +315,31 @@ Default: `{}` (no stroke).
 
 Individual top-level Responsive attributes (not a Stringified-JSON shape). Set only what you need; everything else defaults to unset/no-op. Pass raw numbers — units are added automatically. All of these are combined automatically into one CSS `transform` — you never compose the `transform` string yourself.
 
-| Attribute | Auto unit | No-op |
-|---|---|---|
-| `rotateZ` | `deg` | `0` |
-| `rotateX` | `deg` | `0` |
-| `rotateY` | `deg` | `0` |
-| `translateX` | as-is | `0` |
-| `translateY` | as-is | `0` |
-| `translateZ` | as-is | `0` |
-| `scale` | multiplier (sets both X and Y) | `1` |
-| `scaleX` | multiplier | `1` |
-| `scaleY` | multiplier | `1` |
-| `scale3DX` | multiplier | `1` |
-| `scale3DY` | multiplier | `1` |
-| `skewX` | `deg` | `0` |
-| `skewY` | `deg` | `0` |
-| `perspective` | as-is | `1000px` |
+| Attribute | Auto unit | No-op | CSS Variable on `.{{WRAPPER}}` |
+|---|---|---|---|
+| `rotateZ` | `deg` | `0` | `--rotate-z: {{VALUE}}deg;` |
+| `rotateX` | `deg` | `0` | `--rotate-x: {{VALUE}}deg;` |
+| `rotateY` | `deg` | `0` | `--rotate-y: {{VALUE}}deg;` |
+| `translateX` | as-is | `0` | `--translate-x: {{VALUE}};` |
+| `translateY` | as-is | `0` | `--translate-y: {{VALUE}};` |
+| `translateZ` | as-is | `0` | `--translate-z: {{VALUE}};` |
+| `scale` | multiplier (sets both X and Y) | `1` | `--scale-x: {{VALUE}}; --scale-y: {{VALUE}};` |
+| `scaleX` | multiplier | `1` | `--scale-x: {{VALUE}};` |
+| `scaleY` | multiplier | `1` | `--scale-y: {{VALUE}};` |
+| `scale3DX` | multiplier | `1` | `--scale-3d-x: {{VALUE}};` |
+| `scale3DY` | multiplier | `1` | `--scale-3d-y: {{VALUE}};` |
+| `skewX` | `deg` | `0` | `--skew-x: {{VALUE}}deg;` |
+| `skewY` | `deg` | `0` | `--skew-y: {{VALUE}}deg;` |
+| `perspective` | as-is | `1000px` | `--perspective: {{VALUE}};` |
 
-`transformOrigin` (Scalar string, default unset → browser default `50% 50%`): `"top left"` `"top center"` `"top right"` `"center left"` `"center center"` `"center right"` `"bottom left"` `"bottom center"` `"bottom right"` `"custom"`. Only when set to `"custom"`, also set `transformOriginX`/`transformOriginY` (Responsive, length/percentage) for a precise origin point.
+`transformOrigin` (Scalar string, default unset → browser default `50% 50%`): `"top left"` `"top center"` `"top right"` `"center left"` `"center center"` `"center right"` `"bottom left"` `"bottom center"` `"bottom right"` `"custom"`. Only when set to `"custom"`, also set `transformOriginX`/`transformOriginY` (Responsive, length/percentage) for a precise origin point. <br>**CSS:** `.{{WRAPPER}}` -> `transform-origin: {{VALUE}};` (or `--transform-origin-x`/`--transform-origin-y` if custom).
 
-Hover variants use the same names with a `Hover` suffix (`rotateZHover`, `scaleHover`, `translateZHover`, `scale3DXHover`, etc.) — same defaults, same units. `transformTransitionDuration` is a Scalar (number of seconds), default unset.
+Hover variants use the same names with a `Hover` suffix (`rotateZHover`, `scaleHover`, `translateZHover`, `scale3DXHover`, etc.) — same defaults, same units, setting `--*-hover` CSS variables on `.{{WRAPPER}}`. `transformTransitionDuration` is a Scalar (number of seconds, default unset, mapped to `--transform-transition: {{VALUE}}s;`).
 
 **You must turn transforms on explicitly — this is the single easiest transform mistake to make.** `applyTransform` (normal state) and `applyTransformHover` (hover state) are booleans that both default to **`false`**. If you set any transform attribute above but leave the matching enable flag off, the transform is **emitted as nothing — it has zero effect**. So:
 
-- Set `"applyTransform": true` whenever you use **any** normal-state transform or `transformOrigin` attribute (`rotateZ`, `rotateX`, `scale`, `translateX`, `perspective`, `skewY`, `transformOrigin`, etc.).
-- Set `"applyTransformHover": true` whenever you use **any** `*Hover` transform attribute (`scaleHover`, `rotateZHover`, …).
+- Set `"applyTransform": true` whenever you use **any** normal-state transform or `transformOrigin` attribute (`rotateZ`, `rotateX`, `scale`, `translateX`, `perspective`, `skewY`, `transformOrigin`, etc.). <br>**CSS:** Maps to `.{{WRAPPER}}` -> `transform: perspective(var(--perspective, 1000px)) rotateX(...) ... scale3d(...) ... skewY(...);`
+- Set `"applyTransformHover": true` whenever you use **any** `*Hover` transform attribute (`scaleHover`, `rotateZHover`, …). <br>**CSS:** Maps to `.{{WRAPPER}}:hover` -> `transform: perspective(var(--perspective-hover, var(--perspective, 1000px))) ...;`
 
 `applyTransformOriginCustom` is the one exception you still never set — it defaults `true` and auto-applies when `transformOrigin` is `"custom"`.
 
@@ -345,58 +363,58 @@ Never set `blockClass`, `styles`, or `preview` — all three are internal/auto-m
 
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
-| `padding` | Spacing (Responsive) | unset | |
-| `margin` | Spacing (Responsive) | unset | |
-| `widthType` | Responsive-Option | unset | Options: `[{"label":"Auto","value":"auto"},{"label":"Full","value":"100%"},{"label":"Custom","value":"custom"}]`. If `custom`, `customWidth` is active. **Note: Do NOT use on `blockish/container`. Use `customCss` if a container needs a specific width.** |
-| `customWidth` | Responsive | unset | Active when `widthType` = `"custom"` |
-| `minWidth` | Responsive | unset | |
-| `maxWidth` | Responsive | unset | |
-| `zIndex` | Responsive | unset | |
+| `padding` | Spacing (Responsive) | unset | <br>**CSS:** `.{{WRAPPER}}` -> `padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};` |
+| `margin` | Spacing (Responsive) | unset | <br>**CSS:** `.{{WRAPPER}}` -> `margin: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};` |
+| `widthType` | Responsive-Option | unset | Options: `[{"label":"Auto","value":"auto"},{"label":"Full","value":"100%"},{"label":"Custom","value":"custom"}]`. If `custom`, `customWidth` is active. **Note: Do NOT use on `blockish/container`. Use `customCss` if a container needs a specific width.** <br>**CSS:** `.{{WRAPPER}}` -> `width: {{VALUE}};` |
+| `customWidth` | Responsive | unset | Active when `widthType` = `"custom"` <br>**CSS:** `.{{WRAPPER}}` -> `width: {{VALUE}};` |
+| `minWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `min-width: {{VALUE}};` |
+| `maxWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `max-width: {{VALUE}};` |
+| `zIndex` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `z-index: {{VALUE}};` |
 
 ### Position
 
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
-| `position` | Responsive-Option | unset | Options: `[{"label":"Relative","value":"relative"},{"label":"Absolute","value":"absolute"},{"label":"Fixed","value":"fixed"},{"label":"Sticky","value":"sticky"}]` |
-| `positionTop` | Responsive | unset | Only applies when `position` is set |
-| `positionRight` | Responsive | unset | |
-| `positionBottom` | Responsive | unset | |
-| `positionLeft` | Responsive | unset | |
+| `position` | Option | unset | Options: `[{"label":"Relative","value":"relative"},{"label":"Absolute","value":"absolute"},{"label":"Fixed","value":"fixed"},{"label":"Sticky","value":"sticky"}]` <br>**CSS:** `.{{WRAPPER}}` -> `position: {{VALUE}}; width: 100%;` |
+| `positionTop` | Responsive | unset | Only applies when `position` is set <br>**CSS:** `.{{WRAPPER}}` -> `top: {{VALUE}};` |
+| `positionRight` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `right: {{VALUE}};` |
+| `positionBottom` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `bottom: {{VALUE}};` |
+| `positionLeft` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `left: {{VALUE}};` |
 
 ### Flex child (block is inside a flex container)
 
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
-| `alignSelf` | Responsive | unset | `"auto"` `"flex-start"` `"center"` `"flex-end"` `"stretch"` `"baseline"` |
-| `justifySelf` | Responsive | unset | `"auto"` `"start"` `"center"` `"end"` `"stretch"` |
-| `flexOrder` | Responsive | unset | `"1"` (etc) · `"custom"` (activates `flexCustomOrder`) |
-| `flexCustomOrder` | Responsive | unset | Active when `flexOrder` = `"custom"` |
-| `flexGrow` | Responsive | unset | `"0"` = no grow, `"1"` = grow to fill |
-| `flexShrink` | Responsive | unset | `"0"` = don't shrink, `"1"` = can shrink |
+| `alignSelf` | Responsive | unset | `"auto"` `"flex-start"` `"center"` `"flex-end"` `"stretch"` `"baseline"` <br>**CSS:** `.{{WRAPPER}}` -> `align-self: {{VALUE}};` |
+| `justifySelf` | Responsive | unset | `"auto"` `"start"` `"center"` `"end"` `"stretch"` <br>**CSS:** `.{{WRAPPER}}` -> `justify-self: {{VALUE}};` |
+| `flexOrder` | Responsive | unset | `"1"` (etc) · `"custom"` (activates `flexCustomOrder`) <br>**CSS:** `.{{WRAPPER}}` -> `order: {{VALUE}};` |
+| `flexCustomOrder` | Responsive | unset | Active when `flexOrder` = `"custom"` <br>**CSS:** `.{{WRAPPER}}` -> `order: {{VALUE}};` |
+| `flexGrow` | Responsive | unset | `"0"` = no grow, `"1"` = grow to fill <br>**CSS:** `.{{WRAPPER}}` -> `flex-grow: {{VALUE}};` |
+| `flexShrink` | Responsive | unset | `"0"` = don't shrink, `"1"` = can shrink <br>**CSS:** `.{{WRAPPER}}` -> `flex-shrink: {{VALUE}};` |
 
 ### Grid child (block is inside a grid container)
 
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
-| `gridColumnStart` | Responsive | unset | |
-| `gridColumnEnd` | Responsive | unset | e.g. `"span 2"` |
-| `gridRowStart` | Responsive | unset | |
-| `gridRowEnd` | Responsive | unset | e.g. `"span 2"` |
+| `gridColumnStart` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `grid-column-start: {{VALUE}};` |
+| `gridColumnEnd` | Responsive | unset | e.g. `"span 2"` <br>**CSS:** `.{{WRAPPER}}` -> `grid-column-end: {{VALUE}};` |
+| `gridRowStart` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `grid-row-start: {{VALUE}};` |
+| `gridRowEnd` | Responsive | unset | e.g. `"span 2"` <br>**CSS:** `.{{WRAPPER}}` -> `grid-row-end: {{VALUE}};` |
 
 ### Appearance
 
 | Attribute | Type | Default | Notes |
 |---|---|---|---|
-| `background` | Stringified-JSON (Background) | unset | Normal state |
-| `backgroundHover` | Stringified-JSON (Background) | unset | Hover state |
-| `backgroundHoverTransition` | Scalar (number, seconds) | unset | |
-| `border` | Stringified-JSON (Border) | unset | Normal state |
-| `borderHover` | Stringified-JSON (Border) | unset | Hover state |
-| `borderRadius` | Border-Radius | unset | |
-| `borderRadiusHover` | Border-Radius | unset | |
-| `borderHoverTransition` | Scalar (number, seconds) | unset | |
-| `boxShadow` | Stringified-JSON (Box Shadow) | unset | Normal state |
-| `boxShadowHover` | Stringified-JSON (Box Shadow) | unset | Hover state |
+| `background` | Stringified-JSON (Background) | unset | Normal state <br>**CSS:** Uses `BlockishBackground` on `.{{WRAPPER}}` |
+| `backgroundHover` | Stringified-JSON (Background) | unset | Hover state <br>**CSS:** Uses `BlockishBackground` on `.{{WRAPPER}}:hover` |
+| `backgroundHoverTransition` | Scalar (number, seconds) | unset | <br>**CSS:** `.{{WRAPPER}}` -> `--blockish-background-hover-transition: {{VALUE}}s;` |
+| `border` | Stringified-JSON (Border) | unset | Normal state <br>**CSS:** Uses `BlockishBorder` on `.{{WRAPPER}}` |
+| `borderHover` | Stringified-JSON (Border) | unset | Hover state <br>**CSS:** Uses `BlockishBorder` on `.{{WRAPPER}}:hover` |
+| `borderRadius` | Border-Radius | unset | <br>**CSS:** `.{{WRAPPER}}` -> `border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};` |
+| `borderRadiusHover` | Border-Radius | unset | <br>**CSS:** `.{{WRAPPER}}:hover` -> `border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};` |
+| `borderHoverTransition` | Scalar (number, seconds) | unset | <br>**CSS:** `.{{WRAPPER}}` -> `--blockish-border-hover-transition: {{VALUE}}s;` |
+| `boxShadow` | Stringified-JSON (Box Shadow) | unset | Normal state <br>**CSS:** Uses `BlockishBoxShadow` on `.{{WRAPPER}}` |
+| `boxShadowHover` | Stringified-JSON (Box Shadow) | unset | Hover state <br>**CSS:** Uses `BlockishBoxShadow` on `.{{WRAPPER}}:hover` |
 | `customCss` | Scalar (string, raw CSS) | no-op template | See §5 |
 | `classManager` | Array of `{id, title}` | `[]` | See §6 |
 | `classManagerSubselector` | Array of `{id, title, parent}` | `[]` | See §6 |

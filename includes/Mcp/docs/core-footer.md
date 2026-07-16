@@ -21,7 +21,7 @@
       "attributes": {
         "text": "Get Started Free",
         "url": { "url": "/signup", "newTab": false },
-        "buttonPlacement": { "Desktop": { "value": "center" } },
+        "buttonPlacement": { "Desktop": { "label": "Center", "value": "center" } },
         "buttonBackground": "{\"backgroundType\":\"classic\",\"backgroundColor\":\"#1a73e8\"}",
         "buttonTextColor": "#ffffff",
         "buttonPadding": { "top": "14px", "right": "28px", "bottom": "14px", "left": "28px" },
@@ -32,7 +32,7 @@
 }
 ```
 
-`buttonPlacement` is set here even though the container's `alignItems` is already Center — that container setting only affects how the button's wrapper *box* is sized in the column, not where the visible button sits inside it (the wrapper is hard-width: 100% regardless). Without `buttonPlacement: {"Desktop":{"value":"center"}}`, this button would render flush-left despite the "centered" hero layout.
+`buttonPlacement` is set here even though the container's `alignItems` is already Center — that container setting only affects how the button's wrapper *box* is sized in the column, not where the visible button sits inside it (the wrapper is hard-width: 100% regardless). Without `buttonPlacement: {"Desktop":{"label":"Center","value":"center"}}`, this button would render flush-left despite the "centered" hero layout.
 
 Note what's omitted because it already matches the container's defaults: `display` (defaults `"flex"`), `alignItems`/`justifyContent` (both default Center), `containerWidth` (defaults `"alignfull"`). Only `flexDirection`, `containerMinHeight`, `containerBackground`, and `padding` actually differ from default.
 

@@ -11,26 +11,26 @@ A call-to-action link. **Accepts children: no.**
 | `text` | Scalar (string) | `"Click Here"` | |
 | `url` | Link | unset | |
 | `icon` | Icon | unset | |
-| `iconPosition` | Scalar (string) | `"row"` | Options: `[{"value":"row-reverse","label":"Left"},{"value":"row","label":"Right"}]` — order of icon vs. text inside the button |
-| `buttonPlacement` | Responsive-Option | unset | **Required whenever the button isn't meant to sit flush-left.** Options: `[{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}]` — horizontal position of the **whole button** within its parent container. The parent's `alignItems`/`justifyContent` does NOT center a button; use this instead. Mobile-only centering: `{"Desktop":{"value":"flex-end"},"Mobile":{"value":"center"}}` |
-| `buttonAlignment` | Responsive-Option | unset | Options: `[{"value":"start","label":"Left"},{"value":"center","label":"Center"},{"value":"end","label":"Right"}]` — aligns the icon+text **inside** the button (text-align + justify-content on the inner link), independent of `buttonPlacement` |
-| `buttonContentSpacing` | Responsive | unset | Gap between icon and text inside the button |
-| `buttonTextColor` | Color | unset | Normal |
-| `buttonHoverTextColor` | Color | unset | Hover |
-| `buttonBackground` | Stringified-JSON (Background) | unset | Normal |
-| `buttonHoverBackground` | Stringified-JSON (Background) | unset | Hover |
-| `buttonBorder` | Stringified-JSON (Border) | unset | Normal |
-| `buttonHoverBorderColor` | Color | unset | Hover border color override |
-| `buttonBorderRadius` | Border-Radius | unset | |
-| `buttonPadding` | Spacing | unset | |
-| `buttonTypography` | Stringified-JSON (Typography) | unset | |
-| `buttonTextShadow` | Stringified-JSON (Text Shadow) | unset | |
-| `buttonBoxShadow` | Stringified-JSON (Box Shadow) | unset | Normal |
-| `buttonHoverBoxShadow` | Stringified-JSON (Box Shadow) | unset | Hover |
-| `buttonHoverTransition` | Scalar (number, seconds) | unset | |
-| `buttonWidth` | Responsive | unset | |
-| `buttonMinHeight` | Responsive | unset | |
-| `buttonIconSize` | Responsive | unset | |
+| `iconPosition` | Scalar (string) | `"row"` | Options: `[{"value":"row-reverse","label":"Left"},{"value":"row","label":"Right"}]` — order of icon vs. text inside the button <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `flex-direction: {{VALUE}};` |
+| `buttonPlacement` | Responsive-Option | unset | **Required whenever the button isn't meant to sit flush-left.** Options: `[{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}]` — horizontal position of the **whole button** within its parent container. The parent's `alignItems`/`justifyContent` does NOT center a button; use this instead. Mobile-only centering: `{"Desktop":{"value":"flex-end"},"Mobile":{"value":"center"}}` <br>**CSS:** `.{{WRAPPER}}` -> `justify-content: {{VALUE}};` |
+| `buttonAlignment` | Responsive-Option | unset | Options: `[{"value":"start","label":"Left"},{"value":"center","label":"Center"},{"value":"end","label":"Right"}]` — aligns the icon+text **inside** the button (text-align + justify-content on the inner link), independent of `buttonPlacement` <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `text-align: {{VALUE}}; justify-content: {{VALUE}};` |
+| `buttonContentSpacing` | Responsive | unset | Gap between icon and text inside the button <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `gap: {{VALUE}};` |
+| `buttonTextColor` | Color | unset | Normal <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `color: {{VALUE}};` |
+| `buttonHoverTextColor` | Color | unset | Hover <br>**CSS:** `.{{WRAPPER}} .blockish-button-link:hover` -> `color: {{VALUE}};` |
+| `buttonBackground` | Stringified-JSON (Background) | unset | Normal <br>**CSS:** Uses `BlockishBackground` on `.{{WRAPPER}} .blockish-button-link` |
+| `buttonHoverBackground` | Stringified-JSON (Background) | unset | Hover <br>**CSS:** Uses `BlockishBackground` on `.{{WRAPPER}} .blockish-button-link:hover` |
+| `buttonBorder` | Stringified-JSON (Border) | unset | Normal <br>**CSS:** Uses `BlockishBorder` on `.{{WRAPPER}} .blockish-button-link` |
+| `buttonHoverBorderColor` | Color | unset | Hover border color override <br>**CSS:** `.{{WRAPPER}} .blockish-button-link:hover` -> `border-color: {{VALUE}};` |
+| `buttonBorderRadius` | Border-Radius | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};` |
+| `buttonPadding` | Spacing | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};` |
+| `buttonTypography` | Stringified-JSON (Typography) | unset | <br>**CSS:** Uses `BlockishTypography` on `.{{WRAPPER}} .blockish-button-link` |
+| `buttonTextShadow` | Stringified-JSON (Text Shadow) | unset | <br>**CSS:** Uses `BlockishTextShadow` on `.{{WRAPPER}} .blockish-button-link` |
+| `buttonBoxShadow` | Stringified-JSON (Box Shadow) | unset | Normal <br>**CSS:** Uses `BlockishBoxShadow` on `.{{WRAPPER}} .blockish-button-link` |
+| `buttonHoverBoxShadow` | Stringified-JSON (Box Shadow) | unset | Hover <br>**CSS:** Uses `BlockishBoxShadow` on `.{{WRAPPER}} .blockish-button-link:hover` |
+| `buttonHoverTransition` | Scalar (number, seconds) | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `--blockish-button-hover-transition: {{VALUE}}s;` |
+| `buttonWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `width: {{VALUE}};` |
+| `buttonMinHeight` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `min-height: {{VALUE}};` |
+| `buttonIconSize` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link .blockish-button-icon` -> `width: {{VALUE}}; height: {{VALUE}};` |
 
 `blockish/button` does **not** support `anchor` or `align` (no `id`, no wide/full alignment) — unlike almost every other Blockish block. See §7.1.
 
@@ -48,55 +48,54 @@ Minimal schema:
 
 ### Markup & CSS Generation
 
-**Frontend Markup Structure (from `save.js`):**
-```jsx
-<div {...blockProps}>
-			<a {...linkProps}>
-				<RichText.Content
-					tagName="span"
-					value={attributes?.text}
-				/>
-				<BlockishIcon className="blockish-button-icon" icon={attributes?.icon} fill="currentColor" />
-			</a>
-		</div>
+**Generated HTML Structure:**
+```html
+<div class="blockish-button">
+  
+  <!-- The <a> tag is always rendered, even if URL is empty -->
+  <a class="blockish-button-link" href="..." target="_blank" rel="noopener noreferrer">
+    
+    <!-- Button text is rendered as a span -->
+    <span>Button Text Content</span>
+    
+    <!-- The icon <svg> is ONLY rendered if `icon` attribute exists AND has both `viewBox` and `path` -->
+    <svg class="blockish-icon blockish-button-icon" fill="currentColor">...</svg>
+
+  </a>
+
+</div>
 ```
-*Note: The actual HTML tag might be dynamic (e.g., `div`, `section`). A unique class `bb-[hash]` and `blockish-block-wrapper` are automatically injected server-side.*
 
-**CSS Generation & Injection:**
-Dynamic CSS is generated by `includes/Core/StyleGenerator.php` and injected in the `<head>` or footer as inline styles.
+**Base CSS (`style.scss`):**
+```scss
+.blockish-button {
+	display: flex;
+	align-items: center;
 
-**CSS Mapping per Attribute:**
-- `iconPosition`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link` -> `flex-direction: {{VALUE}};`
-- `buttonPlacement`: Maps to:
-  - `.{{WRAPPER}}` -> `justify-content: {{VALUE}};`
-- `buttonAlignment`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link` -> `text-align: {{VALUE}}; justify-content: {{VALUE}};`
-- `buttonContentSpacing`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link` -> `gap: {{VALUE}};`
-- `buttonWidth`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link` -> `width: {{VALUE}};`
-- `buttonMinHeight`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link` -> `min-height: {{VALUE}};`
-- `buttonTypography`: Uses `BlockishTypography` on `.{{WRAPPER}} .blockish-button-link`
-- `buttonTextShadow`: Uses `BlockishTextShadow` on `.{{WRAPPER}} .blockish-button-link`
-- `buttonTextColor`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link` -> `color: {{VALUE}};`
-- `buttonBackground`: Uses `BlockishBackground` on `.{{WRAPPER}} .blockish-button-link`
-- `buttonBoxShadow`: Uses `BlockishBoxShadow` on `.{{WRAPPER}} .blockish-button-link`
-- `buttonHoverTextColor`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link:hover` -> `color: {{VALUE}};`
-- `buttonHoverBackground`: Uses `BlockishBackground` on `.{{WRAPPER}} .blockish-button-link:hover`
-- `buttonHoverBoxShadow`: Uses `BlockishBoxShadow` on `.{{WRAPPER}} .blockish-button-link:hover`
-- `buttonHoverTransition`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link` -> `--blockish-button-hover-transition: {{VALUE}}s;`
-- `buttonHoverBorderColor`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link:hover` -> `border-color: {{VALUE}};`
-- `buttonBorder`: Uses `BlockishBorder` on `.{{WRAPPER}} .blockish-button-link`
-- `buttonBorderRadius`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link` -> `border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};`
-- `buttonPadding`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link` -> `padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};`
-- `buttonIconSize`: Maps to:
-  - `.{{WRAPPER}} .blockish-button-link .blockish-button-icon` -> `width: {{VALUE}}; height: {{VALUE}};`
+	.blockish-button-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		text-decoration: none;
+		cursor: pointer;
+		box-sizing: border-box;
+		background-color: #000;
+		color: #fff;
+		padding: 10px 20px;
+		transition: all 0.3s ease;
+
+		& > span {
+			white-space: nowrap;
+		}
+	}
+
+	.blockish-button-icon {
+		width: 1em;
+		height: 1em;
+	}
+}
+```
+
+
 

@@ -33,13 +33,16 @@
         object-fit: cover;
         pointer-events: none;
     }
-
-    .wp-block-blockish-container{
-        width: 100%;
-    }
-
+    
     &.align-custom-width {
         margin-left: auto;
         margin-right: auto;
+    }
+    
+    .wp-block-blockish-container {
+        &.align-custom-width {
+            margin-left: unset;
+            margin-right: unset;
+        }
     }
 }
