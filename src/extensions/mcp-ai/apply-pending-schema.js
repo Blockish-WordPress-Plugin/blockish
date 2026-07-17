@@ -1,7 +1,7 @@
 import { useEntityProp } from '@wordpress/core-data';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, resolveSelect, dispatch, subscribe } from '@wordpress/data';
 import { useEffect, useCallback } from '@wordpress/element';
-import { createBlock, getBlockType, serialize } from '@wordpress/blocks';
+import { createBlock, serialize } from '@wordpress/blocks';
 
 const META_KEY = '_blockish_block_schema';
 
@@ -35,16 +35,11 @@ const ApplyPendingSchema = () => {
         const editor = select('core/editor');
         const currentPost = editor ? editor.getCurrentPost() : null;
         let type = editor ? editor.getCurrentPostType() : null;
-        let currentSlug = currentPost?.slug || currentPost?.post_name;
+        let postId = editor ? editor.getCurrentPostId() : null;
+        let currentSlug = currentPost?.slug || currentPost?.post_name || postId;
 
-        // Site Editor (FSE)
-        const siteEditor = select('core/edit-site');
-        if (!type && siteEditor) {
-            type = siteEditor.getEditedPostType();
-            currentSlug = siteEditor.getEditedPostId();
-            if (currentSlug && currentSlug.includes('//')) {
-                currentSlug = currentSlug.split('//')[1];
-            }
+        if (currentSlug && typeof currentSlug === 'string' && currentSlug.includes('//')) {
+            currentSlug = currentSlug.split('//')[1];
         }
 
         return {
@@ -58,7 +53,7 @@ const ApplyPendingSchema = () => {
     const [stagedTemplate, setStagedTemplate] = useEntityProp('root', 'site', 'blockish_mcp_staged_template');
     const [stagedTemplatePart, setStagedTemplatePart] = useEntityProp('root', 'site', 'blockish_mcp_staged_template_part');
 
-    const { insertBlocks, removeBlocks } = useDispatch('core/block-editor');
+    const { insertBlocks, removeBlocks, replaceBlocks } = useDispatch('core/block-editor');
 
     const { getBlocks, getBlockOrder } = useSelect((select) => {
         const editor = select('core/block-editor');
@@ -93,30 +88,69 @@ const ApplyPendingSchema = () => {
         }
     }, [postType, slug, stagedTemplate, stagedTemplatePart, meta, setStagedTemplate, setStagedTemplatePart, setMeta]);
 
-    const getParsedBlocks = useCallback(() => {
-        if (!pendingSchema) return [];
-        try {
-            const schema = typeof pendingSchema === 'string' ? JSON.parse(pendingSchema) : pendingSchema;
-            const schemaArray = Array.isArray(schema) ? schema : [schema];
-            return schemaArray.map(schemaNodeToBlock).filter(Boolean);
-        } catch (e) {
-            console.error('Schema parse error:', e);
-            return [];
+    const resolvePatterns = async (schemaNode) => {
+        if (!schemaNode) return;
+        
+        if (Array.isArray(schemaNode)) {
+            await Promise.all(schemaNode.map(resolvePatterns));
+            return;
         }
-    }, [pendingSchema]);
+
+        if (typeof schemaNode === 'object') {
+            if (schemaNode.name === 'core/block' && schemaNode.attributes && schemaNode.attributes.ref) {
+                const ref = schemaNode.attributes.ref;
+                try {
+                    // Fetch the wp_block post
+                    const record = await resolveSelect('core').getEntityRecord('postType', 'wp_block', ref);
+                    
+                    if (record && record.meta && record.meta['_blockish_block_schema']) {
+                        const pendingJson = record.meta['_blockish_block_schema'];
+                        const parsed = typeof pendingJson === 'string' ? JSON.parse(pendingJson) : pendingJson;
+                        const parsedArray = Array.isArray(parsed) ? parsed : [parsed];
+                        
+                        // RECURSIVELY resolve any nested patterns inside this pattern!
+                        await Promise.all(parsedArray.map(resolvePatterns));
+                        
+                        // Convert pending schema to raw blocks
+                        const blocks = parsedArray.map(schemaNodeToBlock).filter(Boolean);
+                        
+                        // Serialize blocks to raw HTML
+                        const html = serialize(blocks);
+                        
+                        // Save it directly via dispatch
+                        await dispatch('core').saveEntityRecord('postType', 'wp_block', {
+                            id: ref,
+                            content: html,
+                            meta: {
+                                '_blockish_block_schema': '' // clear the pending schema
+                            }
+                        });
+                        console.log(`Blockish AI: Auto-resolved and saved pattern ${ref}`);
+                    }
+                } catch (e) {
+                    console.error('Blockish AI: Failed to resolve pattern', ref, e);
+                }
+            }
+
+            // Recursively check innerBlocks
+            if (schemaNode.innerBlocks && Array.isArray(schemaNode.innerBlocks)) {
+                await Promise.all(schemaNode.innerBlocks.map(resolvePatterns));
+            }
+        }
+    };
 
     useEffect(() => {
         if (!pendingSchema) {
             return;
         }
 
-        const aiBlocks = getParsedBlocks();
-        if (!aiBlocks.length) return;
-
+        let isCancelled = false;
+        let aiBlocks = [];
         let hasInjected = false;
+        let isProcessing = false;
 
-        const tryInject = (force = false) => {
-            if (hasInjected) return;
+        const processAndInject = async (force = false) => {
+            if (hasInjected || isProcessing) return;
 
             // Ensure the DOM canvas is ready to receive inserts
             const canvas = document.querySelector('.block-editor-block-list__layout');
@@ -139,6 +173,31 @@ const ApplyPendingSchema = () => {
                 return;
             }
 
+            isProcessing = true;
+
+            if (!aiBlocks.length) {
+                try {
+                    const schema = typeof pendingSchema === 'string' ? JSON.parse(pendingSchema) : pendingSchema;
+                    const schemaArray = Array.isArray(schema) ? schema : [schema];
+                    
+                    // Resolve all patterns asynchronously before building the blocks
+                    await resolvePatterns(schemaArray);
+                    
+                    if (isCancelled) return;
+                    
+                    aiBlocks = schemaArray.map(schemaNodeToBlock).filter(Boolean);
+                } catch (e) {
+                    console.error('Blockish AI Schema parse error:', e);
+                    isProcessing = false;
+                    return;
+                }
+            }
+
+            if (!aiBlocks.length) {
+                isProcessing = false;
+                return;
+            }
+
             hasInjected = true;
 
             // 1. Snapshot the current editor content into a serializable array
@@ -153,33 +212,34 @@ const ApplyPendingSchema = () => {
                 aiBlocks
             );
 
-            // 3. Remove all existing top-level blocks
+            // 3. Replace all existing top-level blocks with the wrapper
+            // Using replaceBlocks bypasses the core/post-content removal warning
             const allClientIds = allEditorBlocks.map(b => b.clientId);
             if (allClientIds.length > 0) {
-                removeBlocks(allClientIds);
+                replaceBlocks(allClientIds, [wrapperBlock]);
+            } else {
+                insertBlocks([wrapperBlock], 0, undefined);
             }
-
-            // 4. Insert the AI preview block
-            insertBlocks([wrapperBlock], 0, undefined);
 
             clearPendingSchema();
         };
 
-        const { subscribe } = window.wp.data;
+
         const unsubscribe = subscribe(() => {
-            tryInject(false);
+            processAndInject(false);
         });
 
         // Fallback timer: force inject after 2 seconds if the editor still appears empty.
         const fallbackTimer = setTimeout(() => {
-            tryInject(true);
+            processAndInject(true);
         }, 2000);
 
         return () => {
+            isCancelled = true;
             unsubscribe();
             clearTimeout(fallbackTimer);
         };
-    }, [pendingSchema, getParsedBlocks, getBlocks, getBlockOrder, insertBlocks, removeBlocks, clearPendingSchema]);
+    }, [pendingSchema, getBlocks, getBlockOrder, insertBlocks, removeBlocks, clearPendingSchema]);
 
     // This component renders nothing — UI is handled by blockish/ai-preview block.
     return null;

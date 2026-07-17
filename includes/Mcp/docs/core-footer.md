@@ -21,7 +21,7 @@
       "attributes": {
         "text": "Get Started Free",
         "url": { "url": "/signup", "newTab": false },
-        "buttonPlacement": { "Desktop": { "value": "center" } },
+        "buttonPlacement": { "Desktop": { "label": "Center", "value": "center" } },
         "buttonBackground": "{\"backgroundType\":\"classic\",\"backgroundColor\":\"#1a73e8\"}",
         "buttonTextColor": "#ffffff",
         "buttonPadding": { "top": "14px", "right": "28px", "bottom": "14px", "left": "28px" },
@@ -32,7 +32,7 @@
 }
 ```
 
-`buttonPlacement` is set here even though the container's `alignItems` is already Center — that container setting only affects how the button's wrapper *box* is sized in the column, not where the visible button sits inside it (the wrapper is hard-width: 100% regardless). Without `buttonPlacement: {"Desktop":{"value":"center"}}`, this button would render flush-left despite the "centered" hero layout.
+`buttonPlacement` is set here even though the container's `alignItems` is already Center — that container setting only affects how the button's wrapper *box* is sized in the column, not where the visible button sits inside it (the wrapper is hard-width: 100% regardless). Without `buttonPlacement: {"Desktop":{"label":"Center","value":"center"}}`, this button would render flush-left despite the "centered" hero layout.
 
 Note what's omitted because it already matches the container's defaults: `display` (defaults `"flex"`), `alignItems`/`justifyContent` (both default Center), `containerWidth` (defaults `"alignfull"`). Only `flexDirection`, `containerMinHeight`, `containerBackground`, and `padding` actually differ from default.
 
@@ -149,6 +149,24 @@ All Blockish blocks accept the `interactionData` attribute. This allows you to a
 ]
 ```
 Note: Do not use this for global interactions. For global interactions, use the `blockish/manage-global-interactions` ability instead.
+
+**Lifecycle events (`ready` / `init`) — use these for one-time setup:**
+- `event: "ready"` or `event: "init"` runs **once** after the interactions script boots (safe even if the script loads after `DOMContentLoaded`).
+- Use them to set initial UI state (e.g. mark the default pricing tab active), define helpers on `window`, or query Class Manager hooks.
+- Do **not** rely on `DOMContentLoaded` inside a callback — it may have already fired. Prefer `ready`/`init`.
+- For ongoing listeners, keep using normal DOM events (`click`, `scroll`, etc.).
+
+Example (global):
+```json
+{
+  "id": "pricing-init",
+  "scope": "global",
+  "event": "ready",
+  "callbacks": [
+    "var tab = document.querySelector('.pricing-plan-monthly'); if (tab) tab.classList.add('is-active');"
+  ]
+}
+```
 
 **CRITICAL RULE FOR ANIMATIONS & INTERACTIONS (BOTH BLOCK-LEVEL & GLOBAL):**
 Many Blockish blocks (like `blockish/button`) use an outer wrapper `<div>` and inner elements (like an `<a>` tag for the actual button with styles). By default, interactions are applied to the outermost wrapper `<div>`.

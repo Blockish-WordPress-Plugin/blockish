@@ -26,6 +26,7 @@ import useExtensionsAttributes from "./use-extensions-attributes";
 import generateCSS from "./generate-css";
 import deviceList from "./device-list";
 import generateBackgroundOverlayStyles from "./generate-background-overlay-styles";
+import "./editor-sync";
 
 if( window?.blockish?.screen ){
     window.blockish.helpers = {

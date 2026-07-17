@@ -44,6 +44,10 @@
 			transform: translateY(0);
 		}
 	}
+
+	.wp-block-template-part, .block-library-block__reusable-block-container{
+		max-width: none !important;
+	}
 }
 
 .blockish-ai-preview-actions {

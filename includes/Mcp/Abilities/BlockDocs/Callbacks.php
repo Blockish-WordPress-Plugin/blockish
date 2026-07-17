@@ -18,13 +18,27 @@ class Callbacks
             $content .= file_get_contents( $core_file ) . "\n\n";
         }
         
-        // Read all block files
+        // Read requested block files or all if not specified
         $content .= "## 7. Per-block reference\n\n";
-        $block_files = glob( $docs_dir . 'blocks/*.md' );
-        if ( $block_files ) {
-            foreach ( $block_files as $file ) {
+        
+        $requested_blocks = isset( $_input['block_names'] ) && is_array( $_input['block_names'] ) ? $_input['block_names'] : [];
+        
+        if ( ! empty( $requested_blocks ) ) {
+            foreach ( $requested_blocks as $block_name ) {
+                // Strip "blockish/" prefix if present to get filename
+                $filename = str_replace( 'blockish/', '', $block_name ) . '.md';
+                $file = $docs_dir . 'blocks/' . basename($filename);
                 if ( is_readable( $file ) ) {
                     $content .= file_get_contents( $file ) . "\n\n";
+                }
+            }
+        } else {
+            $block_files = glob( $docs_dir . 'blocks/*.md' );
+            if ( $block_files ) {
+                foreach ( $block_files as $file ) {
+                    if ( is_readable( $file ) ) {
+                        $content .= file_get_contents( $file ) . "\n\n";
+                    }
                 }
             }
         }
@@ -36,7 +50,7 @@ class Callbacks
         }
         
         // Apply filter for extensions/addons to append their docs
-        $content = apply_filters( 'blockish_mcp_block_docs', $content );
+        $content = apply_filters( 'blockish_mcp_block_docs', $content, $requested_blocks );
 
         return [ 'docs' => $content ];
     }

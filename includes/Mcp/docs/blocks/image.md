@@ -6,22 +6,22 @@
 |---|---|---|---|
 | `image` | Image | unset | |
 | `alt` | Scalar (string) | unset | |
-| `imageSize` | Option | `{"value":"full","label":"Full Size"}` | `Thumbnail`/`thumbnail` · `Medium`/`medium` · `Large`/`large` · `Full Size`/`full` |
+| `imageSize` | Option | `{"value":"full","label":"Full Size"}` | Options: `[{"label":"Thumbnail","value":"thumbnail"},{"label":"Medium","value":"medium"},{"label":"Large","value":"large"},{"label":"Full Size","value":"full"}]` |
 | `captionType` | Scalar (string) | `"none"` | `"none"` `"attachment"` (WP media caption) `"custom"` (use `customCaption`) |
 | `customCaption` | Scalar (string) | unset | Used when `captionType` = `"custom"` |
-| `alignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` |
-| `imageWidth` | Responsive | unset | |
-| `imageMaxWidth` | Responsive | unset | |
-| `imageHeight` | Responsive | unset | |
-| `objectFit` | Responsive-Option | unset | `None`/`none` · `Fill`/`fill` · `Cover`/`cover` · `Contain`/`contain` — only these 4, no `scale-down`. Only meaningful when `imageHeight` is also set for that device (object-fit needs a constrained box to fit into) |
-| `imageBorderRadiusNormal` | Border-Radius | unset | |
-| `imageBorderNormal` | Stringified-JSON (Border) | unset | |
-| `imageBoxShadowNormal` | Stringified-JSON (Box Shadow) | unset | |
-| `imageCSSFiltersNormal` | Stringified-JSON (CSS Filters) | unset | Normal |
-| `imageCSSFiltersHover` | Stringified-JSON (CSS Filters) | unset | Hover |
-| `imageOpacityNormal` | Scalar (number, 0–1) | unset | |
-| `imageOpacityHover` | Scalar (number, 0–1) | unset | |
-| `imageHoverTransition` | Scalar (number, seconds) | unset | |
+| `alignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` <br>**CSS:** `.{{WRAPPER}}` -> `text-align: {{VALUE}};` |
+| `imageWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-image` -> `width: {{VALUE}};` |
+| `imageMaxWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-image` -> `max-width: {{VALUE}};` |
+| `imageHeight` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-image` -> `height: {{VALUE}};` |
+| `objectFit` | Responsive-Option | unset | Options: `[{"label":"None","value":"none"},{"label":"Fill","value":"fill"},{"label":"Cover","value":"cover"},{"label":"Contain","value":"contain"}]` — only these 4, no `scale-down`. Only meaningful when `imageHeight` is also set for that device (object-fit needs a constrained box to fit into) <br>**CSS:** `.{{WRAPPER}} .blockish-image` -> `object-fit: {{VALUE}};` |
+| `imageBorderRadiusNormal` | Border-Radius | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-image` -> `border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};` |
+| `imageBorderNormal` | Stringified-JSON (Border) | unset | <br>**CSS:** Uses `BlockishBorder` on `.{{WRAPPER}} .blockish-image` |
+| `imageBoxShadowNormal` | Stringified-JSON (Box Shadow) | unset | <br>**CSS:** Uses `BlockishBoxShadow` on `.{{WRAPPER}} .blockish-image` |
+| `imageCSSFiltersNormal` | Stringified-JSON (CSS Filters) | unset | Normal <br>**CSS:** Uses `BlockishCSSFilters` on `.{{WRAPPER}} .blockish-image` |
+| `imageCSSFiltersHover` | Stringified-JSON (CSS Filters) | unset | Hover <br>**CSS:** Uses `BlockishCSSFilters` on `.{{WRAPPER}} .blockish-image:hover` |
+| `imageOpacityNormal` | Scalar (number, 0–1) | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-image` -> `opacity: {{VALUE}}%;` |
+| `imageOpacityHover` | Scalar (number, 0–1) | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-image:hover` -> `opacity: {{VALUE}}%;` |
+| `imageHoverTransition` | Scalar (number, seconds) | unset | <br>**CSS:** `.{{WRAPPER}}` -> `--blockish-image-hover-transition: {{VALUE}}s;` |
 
 Minimal schema:
 ```json
@@ -32,4 +32,48 @@ Minimal schema:
 ```
 
 ---
+
+
+
+### Markup & CSS Generation
+
+**Generated HTML Structure:**
+```html
+<figure class="blockish-image-wrapper">
+  
+  <!-- The <img> tag is ONLY rendered if `image.url` exists -->
+  <!-- `wp-image-{id}` class is added if `image.id` exists -->
+  <!-- `src` uses the specific size URL (e.g. `sizes.medium.url`) if available, otherwise fallback to original `url` -->
+  <img 
+    width="..." 
+    height="..." 
+    alt="..." 
+    title="..." 
+    class="blockish-image wp-image-123" 
+    src="..." 
+  />
+
+  <!-- The <figcaption> is ONLY rendered if a caption text resolves AND `captionType` is NOT 'none' -->
+  <figcaption class="blockish-image-caption">
+    Caption text
+  </figcaption>
+
+</figure>
+```
+
+**Base CSS (`style.scss`):**
+```scss
+.blockish-image-wrapper {
+	margin: 0;
+
+    .blockish-image {
+        box-sizing: border-box;
+        width: 100%;
+        height: auto;
+        transition: all var(--blockish-image-hover-transition, 0.3s) ease;
+    }
+}
+```
+
+
 

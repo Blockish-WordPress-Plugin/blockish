@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Plugin Name:       Blockish
+ * Plugin Name:       Blockish - AI site builder for WordPress
  * Description:       An AI-powered site building toolkit with creative Gutenberg blocks, an advanced Class Manager, and native MCP integration for autonomous web design.
  * Requires at least: 6.1
  * Requires PHP:      7.4
- * Version:           1.1.2
+ * Version:           1.1.3
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/
@@ -27,6 +27,7 @@ use Blockish\Extensions\ExtensionsLoader;
 use Blockish\Mcp\Loader;
 use Blockish\Routes\BlocksV1;
 use Blockish\Routes\DashboardToolsV1;
+use Blockish\Routes\EditorSyncV1;
 use Blockish\Routes\ExtensionsV1;
 use Blockish\Routes\SVGUploaderV1;
 
@@ -47,7 +48,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.1.1';
+    const VERSION = '1.1.3';
 
     /**
      * Holds the instance of this class.
@@ -151,11 +152,13 @@ final class Blockish
         StyleGenerator::get_instance();
         BlocksV1::get_instance();
         ExtensionsV1::get_instance();
+        EditorSyncV1::get_instance();
         DashboardToolsV1::get_instance();
         SVGUploaderV1::get_instance();
         Blocks::get_instance();
         ExtensionsLoader::get_instance();
         SEO::get_instance();
+        \Blockish\Core\MagicLogin::get_instance();
 
         if (! class_exists('WP\MCP\Core\McpAdapter')) {
             // MCP Adapter is not active — show an admin notice or return early.

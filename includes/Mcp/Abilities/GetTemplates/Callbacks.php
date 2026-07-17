@@ -28,14 +28,9 @@ class Callbacks
             $block_templates = get_block_templates($query_args, $pt);
 
             foreach ($block_templates as $template) {
-                $has_schema = false;
-                if ($template->wp_id) {
-                    $has_schema = (bool) get_post_meta($template->wp_id, BlockSchemaMeta::META_KEY, true);
-                } else {
-                    $option_name = $pt === 'wp_template' ? 'blockish_mcp_staged_template' : 'blockish_mcp_staged_template_part';
-                    $staged_data = get_option($option_name, []);
-                    $has_schema = isset($staged_data[$template->slug]);
-                }
+                $option_name = $pt === 'wp_template' ? 'blockish_mcp_staged_template' : 'blockish_mcp_staged_template_part';
+                $staged_data = get_option($option_name, []);
+                $has_schema = isset($staged_data[$template->slug]);
 
                 $template_data = [
                     'id'            => $template->wp_id ?? 0,
@@ -53,6 +48,10 @@ class Callbacks
                     $template_data['content'] = $template->content;
                     $parsed_blocks = parse_blocks($template->content);
                     $template_data['schema']  = \Blockish\Mcp\SchemaUtils::convert_to_js_schema($parsed_blocks);
+                    
+                    if ($has_schema) {
+                        $template_data['pending_schema'] = $staged_data[$template->slug];
+                    }
                 }
 
                 $templates[] = $template_data;

@@ -26,6 +26,7 @@ export default function Edit({ attributes, setAttributes, advancedControls }) {
                         allowedFormats={[]}
                         onChange={(value) => setAttributes({ text: value })}
                         placeholder={__('Button Text', 'blockish')}
+                        withoutInteractiveFormatting
                     />
                     <BlockishIcon className="blockish-button-icon" icon={attributes?.icon} fill="currentColor" />
                 </a>

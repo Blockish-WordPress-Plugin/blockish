@@ -1,9 +1,9 @@
-
-.blockish-button{
+.blockish-button {
 	display: flex;
 	align-items: center;
+	width: 100%;
 
-	.blockish-button-link{
+	.blockish-button-link {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -15,12 +15,14 @@
 		color: #fff;
 		padding: 10px 20px;
 		transition: all 0.3s ease;
+
+		& > span {
+			white-space: nowrap;
+		}
 	}
 
 	.blockish-button-icon {
-		svg {
-			width: 24px;
-			height: 24px;
-		}
+		width: 1em;
+		height: 1em;
 	}
 }

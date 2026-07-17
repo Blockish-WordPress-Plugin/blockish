@@ -71,3 +71,7 @@
 		fill: currentColor;
 	}
 }
+
+:where(.blockish-social-icons){
+	width: 100%;
+}

@@ -1,13 +1,16 @@
 <?php
 
-namespace Blockish\Mcp\Abilities\UploadMedia;
+namespace Blockish\Mcp\Abilities\ManageMedia;
 
 defined('ABSPATH') || exit;
 
 class Callbacks
 {
-    public static function upload_media( $input ): array
+    public static function manage_media( $input ): array
     {
+        $attachment_ids = isset( $input['attachment_id'] ) ? (array) $input['attachment_id'] : [];
+        $is_delete    = ! empty( $input['delete'] );
+
         $urls         = isset( $input['url'] ) ? (array) $input['url'] : [];
         $file_paths   = isset( $input['file_path'] ) ? (array) $input['file_path'] : [];
         $base64_datas = isset( $input['base64_data'] ) ? (array) $input['base64_data'] : [];
@@ -17,8 +20,56 @@ class Callbacks
         
         $post_id      = ! empty( $input['post_id'] ) ? absint( $input['post_id'] ) : 0;
 
+        $results = [];
+
+        // DELETE Operation
+        if ( $is_delete ) {
+            if ( empty( $attachment_ids ) ) {
+                return [ 'items' => [[ 'error' => '"attachment_id" is required for deletion.' ]] ];
+            }
+            foreach ( $attachment_ids as $id ) {
+                $id = absint( $id );
+                if ( wp_delete_attachment( $id, true ) ) {
+                    $results[] = [ 'id' => $id, 'deleted' => true ];
+                } else {
+                    $results[] = [ 'id' => $id, 'error' => 'Failed to delete attachment.' ];
+                }
+            }
+            return [ 'items' => $results ];
+        }
+
+        // UPDATE Operation
+        if ( ! empty( $attachment_ids ) ) {
+            foreach ( $attachment_ids as $i => $id ) {
+                $id = absint( $id );
+                $title    = $titles[$i] ?? ( count($titles) === 1 ? $titles[0] : null );
+                $alt_text = $alt_texts[$i] ?? ( count($alt_texts) === 1 ? $alt_texts[0] : null );
+
+                if ( $title !== null ) {
+                    wp_update_post( [
+                        'ID'         => $id,
+                        'post_title' => sanitize_text_field( $title ),
+                    ] );
+                }
+                if ( $alt_text !== null ) {
+                    update_post_meta( $id, '_wp_attachment_image_alt', sanitize_text_field( $alt_text ) );
+                }
+
+                $metadata = wp_get_attachment_metadata( $id );
+                $results[] = [
+                    'id'     => $id,
+                    'url'    => wp_get_attachment_url( $id ),
+                    'width'  => $metadata['width']  ?? 0,
+                    'height' => $metadata['height'] ?? 0,
+                    'updated' => true,
+                ];
+            }
+            return [ 'items' => $results ];
+        }
+
+        // CREATE Operation
         if ( empty( $urls ) && empty( $file_paths ) && empty( $base64_datas ) ) {
-            return [ 'items' => [[ 'error' => 'One of "url", "file_path", or "base64_data" is required.' ]] ];
+            return [ 'items' => [[ 'error' => 'One of "url", "file_path", or "base64_data" is required to create an attachment.' ]] ];
         }
 
         require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -26,7 +77,6 @@ class Callbacks
         require_once ABSPATH . 'wp-admin/includes/image.php';
 
         $max_count = max( count( $urls ), count( $file_paths ), count( $base64_datas ) );
-        $results = [];
 
         for ( $i = 0; $i < $max_count; $i++ ) {
             $url         = $urls[$i] ?? ( count($urls) === 1 ? $urls[0] : '' );
