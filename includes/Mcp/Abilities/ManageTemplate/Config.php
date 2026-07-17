@@ -35,6 +35,10 @@ class Config
                             'required'   => [ 'name' ],
                         ],
                     ],
+                    'schema_file' => [
+                        'type'        => 'string',
+                        'description' => 'Absolute file path to a JSON file containing the block_schema. Use this if the block_schema payload is extremely large (e.g., >10KB) to avoid chat truncation issues. Write the JSON to a scratch file first, then pass the file path here instead of passing block_schema directly.',
+                    ],
                 ],
                 'required' => ['slug'],
             ],
@@ -46,6 +50,7 @@ class Config
                     'edit_url'      => ['type' => 'string', 'description' => 'URL to edit the template in the Site Editor. Share this when schema is staged.'],
                     'action'        => ['type' => 'string', 'description' => '"created", "updated", or "deleted"'],
                     'schema_staged' => ['type' => 'boolean'],
+                    'warnings'      => ['type' => 'array', 'description' => 'Non-blocking agent warnings.', 'items' => ['type' => 'string']],
                     'error'         => ['type' => 'string'],
                 ],
             ],
@@ -53,7 +58,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_theme_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'block_schema is never written into the template — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself before it goes live. Call blockish/get-block-docs first to learn each block\'s attributes before building block_schema. ALWAYS call blockish/trigger-refresh immediately after staging a block_schema to force the user\'s editor to reload. After staging and refreshing, share edit_url so the user can approve; do not share the preview link by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
+                'usage_notes' => 'block_schema is never written into the template — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself before it goes live. Monolithic / deeply nested full-template schemas are REJECTED — build sections with blockish/manage-pattern and assemble with core/block refs (get-designer-workflow steps 7–8). Call blockish/get-block-docs first. ALWAYS call blockish/trigger-refresh immediately after staging. After staging and refreshing, share edit_url so the user can approve; do not share the preview link by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
             ],
         ];
     }

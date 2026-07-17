@@ -29,7 +29,7 @@ class Config
                     ],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'Array of Blockish block schema nodes ({name, attributes, innerBlocks}) to stage on this post. Build it from blockish/get-block-docs (call it first to learn each block\'s attributes). Stored as pending data for a human to review and apply in the editor — never written directly into post_content. Pass an empty array to clear a previously staged schema without setting a new one.',
+                        'description' => 'Array of Blockish block schema nodes ({name, attributes, innerBlocks}) to stage on this post. For full pages, pass a LIGHTWEIGHT assembly of core/block pattern refs — monolithic nested pages are rejected. Build sections with blockish/manage-pattern first. Build from blockish/get-block-docs. Stored as pending data for a human to Accept — never written directly into post_content. Pass an empty array to clear a previously staged schema.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [
@@ -39,6 +39,10 @@ class Config
                             ],
                             'required'   => [ 'name' ],
                         ],
+                    ],
+                    'schema_file' => [
+                        'type'        => 'string',
+                        'description' => 'Absolute file path to a JSON file containing the block_schema. Prefer this for large section schemas to avoid chat/MCP truncation. Still subject to monolithic-schema rejection on pages/templates — use patterns + refs for full pages.',
                     ],
                     'meta_input' => [
                         'type'        => 'object',
@@ -67,6 +71,7 @@ class Config
                     'edit_url'     => ['type' => 'string'],
                     'schema_staged' => ['type' => 'boolean', 'description' => 'True if block_schema was provided and saved as pending data on this post.'],
                     'featured_media_set' => ['type' => 'boolean', 'description' => 'True if featured_media was provided and successfully set as the post thumbnail.'],
+                    'warnings'     => ['type' => 'array', 'description' => 'Non-blocking agent warnings (e.g. button double-border). Fix these when present.', 'items' => ['type' => 'string']],
                     'error'        => ['type' => 'string'],
                 ],
             ],
@@ -74,7 +79,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'CRITICAL RULES: 1) block_schema is never written into post_content — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself before it goes live. 2) Submitting a block_schema REPLACES any previously staged schema; it does not merge. 3) There is no single-attribute patch for an already-applied block. To patch something, read the post content, rebuild the full block schema, stage it, and tell the human to select the old block and use "Replace". 4) Deeply nested schemas (~4+ levels) can fail with misleading errors; flatten schemas where possible or split large pages into multiple calls. 5) Call blockish/get-block-docs first to learn block attributes. 6) ALWAYS call blockish/trigger-refresh immediately after staging a block_schema to force the user\'s editor to reload. 7) After staging and refreshing, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
+                'usage_notes' => 'CRITICAL RULES: 1) block_schema is staged as pending data — never written live. After staging, call blockish/trigger-refresh and share edit_url so the human can Accept in the canvas. Do NOT auto-accept unless the user explicitly asks (then use blockish/get-automation-guideline). Accept exists so a bad AI schema cannot destroy a live site. 2) Submitting a block_schema REPLACES any previously staged schema; it does not merge. 3) There is no single-attribute patch for an already-applied block. To patch something, read the post content, rebuild the full block schema, stage it, and tell the human to Accept. 4) Monolithic / deeply nested full-page schemas are REJECTED — build sections with blockish/manage-pattern, assemble with core/block refs (see get-designer-workflow steps 7–8). Use schema_file for large section JSON. 5) Call blockish/get-block-docs first. 6) ALWAYS call blockish/trigger-refresh immediately after staging.',
             ],
         ];
     }

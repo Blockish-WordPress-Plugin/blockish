@@ -5,7 +5,7 @@
  * Description:       An AI-powered site building toolkit with creative Gutenberg blocks, an advanced Class Manager, and native MCP integration for autonomous web design.
  * Requires at least: 6.1
  * Requires PHP:      7.4
- * Version:           1.1.2
+ * Version:           1.1.3
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/
@@ -48,7 +48,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.1.1';
+    const VERSION = '1.1.3';
 
     /**
      * Holds the instance of this class.

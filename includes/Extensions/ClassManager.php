@@ -46,6 +46,7 @@ class ClassManager {
 		}
 
 		$styles = $this->get_styles_for_classes();
+		
 		if ( '' === $styles ) {
 			return;
 		}
@@ -97,6 +98,7 @@ class ClassManager {
 
 		$class_items       = $block['attrs']['classManager'] ?? array();
 		$subselector_items = $block['attrs']['classManagerSubselector'] ?? array();
+		
 
 		if ( ! is_array( $class_items ) ) {
 			$class_items = array();
@@ -352,40 +354,6 @@ class ClassManager {
 		foreach ( $children as $child_id ) {
 			wp_delete_post( (int) $child_id, true );
 		}
-	}
-
-	/**
-	 * @param mixed $class_item
-	 * @return array{slug: string, id: int}
-	 */
-	private function normalize_class_item( $class_item ) {
-		if ( is_string( $class_item ) ) {
-			return array(
-				'slug' => $this->normalize_class_slug( $class_item ),
-				'id'   => 0,
-			);
-		}
-
-		if ( ! is_array( $class_item ) ) {
-			return array(
-				'slug' => '',
-				'id'   => 0,
-			);
-		}
-
-		$title = '';
-		if ( isset( $class_item['title'] ) && is_string( $class_item['title'] ) ) {
-			$title = $class_item['title'];
-		}
-
-		if ( '' === $title && isset( $class_item['slug'] ) && is_string( $class_item['slug'] ) ) {
-			$title = $class_item['slug'];
-		}
-
-		return array(
-			'slug' => $this->normalize_class_slug( $title ),
-			'id'   => absint( $class_item['id'] ?? 0 ),
-		);
 	}
 
 	/**

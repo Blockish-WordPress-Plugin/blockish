@@ -150,6 +150,24 @@ All Blockish blocks accept the `interactionData` attribute. This allows you to a
 ```
 Note: Do not use this for global interactions. For global interactions, use the `blockish/manage-global-interactions` ability instead.
 
+**Lifecycle events (`ready` / `init`) — use these for one-time setup:**
+- `event: "ready"` or `event: "init"` runs **once** after the interactions script boots (safe even if the script loads after `DOMContentLoaded`).
+- Use them to set initial UI state (e.g. mark the default pricing tab active), define helpers on `window`, or query Class Manager hooks.
+- Do **not** rely on `DOMContentLoaded` inside a callback — it may have already fired. Prefer `ready`/`init`.
+- For ongoing listeners, keep using normal DOM events (`click`, `scroll`, etc.).
+
+Example (global):
+```json
+{
+  "id": "pricing-init",
+  "scope": "global",
+  "event": "ready",
+  "callbacks": [
+    "var tab = document.querySelector('.pricing-plan-monthly'); if (tab) tab.classList.add('is-active');"
+  ]
+}
+```
+
 **CRITICAL RULE FOR ANIMATIONS & INTERACTIONS (BOTH BLOCK-LEVEL & GLOBAL):**
 Many Blockish blocks (like `blockish/button`) use an outer wrapper `<div>` and inner elements (like an `<a>` tag for the actual button with styles). By default, interactions are applied to the outermost wrapper `<div>`.
 If a user complains about an animation looking weird (e.g., "the shadow is appearing behind the button when it scales", or they provide an image showing a styling issue during animation), **DO NOT guess the fix**. 

@@ -32,6 +32,7 @@ const RenderClassManagerStyles = () => {
                     title: item?.title,
                     style: item?.content,
                     parent: parent?.title,
+                    metaCss: item?.meta?.[META_KEY] || '',
                 };
             }).filter((item) => item?.id);
         }
@@ -145,8 +146,19 @@ const RenderClassManagerStyles = () => {
         const nextMap = JSON.stringify(cssByClassId);
         const prevMap = JSON.stringify(classStylesRef.current);
 
-        // Skip initial update to avoid marking entities as dirty on page load.
+        // Automatically mark entities as dirty on page load ONLY if their CSS meta is missing or outdated.
         if (!hasClassStylesInitialized.current) {
+            const idsMissingCss = classStyles
+                .filter(item => {
+                    const newCss = cssByClassId[item.id] || '';
+                    return item.style && item.metaCss !== newCss;
+                })
+                .map(item => item.id);
+
+            if (idsMissingCss.length > 0) {
+                updateStyles(cssByClassId, idsMissingCss);
+            }
+
             classStylesRef.current = cssByClassId;
             hasClassStylesInitialized.current = true;
             return;

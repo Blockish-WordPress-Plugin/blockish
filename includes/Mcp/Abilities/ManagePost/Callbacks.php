@@ -13,7 +13,32 @@ class Callbacks
 
         // Check if this might be a payload size issue (JSON truncated/dropped)
         if (empty($input) && isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 0) {
-            return ['error' => 'Payload too large or invalid JSON. The request body was dropped or truncated before reaching the handler. Try chunking your layout or simplifying styles to reduce payload size.'];
+            return ['error' => BlockSchemaMeta::payload_truncated_error()];
+        }
+
+        // Support loading large schemas from a file to avoid payload truncation
+        if ( !empty($input['schema_file']) && file_exists($input['schema_file']) ) {
+            $json = file_get_contents($input['schema_file']);
+            $decoded = json_decode($json, true);
+            if ($decoded) {
+                $input['block_schema'] = $decoded;
+            }
+        }
+
+        $schema_context = 'page';
+        if ( ! empty( $input['post_type'] ) && 'wp_block' === $input['post_type'] ) {
+            $schema_context = 'pattern';
+        } elseif ( ! empty( $input['post_id'] ) ) {
+            $existing_type = get_post_type( (int) $input['post_id'] );
+            if ( 'wp_block' === $existing_type ) {
+                $schema_context = 'pattern';
+            }
+        }
+        if ( array_key_exists( 'block_schema', $input ) && is_array( $input['block_schema'] ) && ! empty( $input['block_schema'] ) ) {
+            $mono_error = BlockSchemaMeta::get_monolithic_schema_error( $input['block_schema'], $schema_context );
+            if ( $mono_error ) {
+                return [ 'error' => $mono_error ];
+            }
         }
 
         $editing = ! empty( $input['post_id'] );
@@ -75,7 +100,11 @@ class Callbacks
         }
 
         $schema_staged = false;
+        $warnings      = [];
         if ( array_key_exists( 'block_schema', $input ) && is_array( $input['block_schema'] ) ) {
+            if ( ! empty( $input['block_schema'] ) ) {
+                $warnings = BlockSchemaMeta::get_schema_warnings( $input['block_schema'] );
+            }
             $encoded     = empty( $input['block_schema'] ) ? '' : wp_json_encode( $input['block_schema'] );
             $schema_json = BlockSchemaMeta::sanitize( false === $encoded ? '' : $encoded );
             $slushed     = wp_slash( $schema_json );
@@ -92,7 +121,7 @@ class Callbacks
             $featured_media_set = (bool) set_post_thumbnail( $post_id, $attachment_id );
         }
 
-        return [
+        $result = [
             'post_id'            => $post_id,
             'post_status'        => get_post_status( $post_id ),
             'post_url'           => get_permalink( $post_id ),
@@ -100,5 +129,9 @@ class Callbacks
             'schema_staged'      => $schema_staged,
             'featured_media_set' => $featured_media_set,
         ];
+        if ( ! empty( $warnings ) ) {
+            $result['warnings'] = $warnings;
+        }
+        return $result;
     }
 }
