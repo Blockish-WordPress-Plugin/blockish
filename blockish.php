@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name:       Blockish
+ * Plugin Name:       Blockish - AI site builder for WordPress
  * Description:       An AI-powered site building toolkit with creative Gutenberg blocks, an advanced Class Manager, and native MCP integration for autonomous web design.
  * Requires at least: 6.1
  * Requires PHP:      7.4

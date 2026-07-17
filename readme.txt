@@ -1,4 +1,4 @@
-=== Blockish – MCP AI Site Builder (Cursor, Claude & More) ===
+=== Blockish - AI site builder for WordPress ===
 Author: wowdevs
 Author URI: https://wowdevs.com/
 Plugin URI: https://blockish.wowdevs.com/
@@ -12,7 +12,7 @@ Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Connect WordPress to AI clients like Cursor and Claude via MCP. Let AI build pixel-perfect layouts using 15+ specially engineered Gutenberg blocks.
+Connect WordPress to AI clients like Cursor and Claude via MCP. Let AI build pixel-perfect layouts using 18+ specially engineered Gutenberg blocks.
 
 == Description ==
 
@@ -20,7 +20,7 @@ Connect WordPress to AI clients like Cursor and Claude via MCP. Let AI build pix
 
 While other generic MCP plugins let AI read posts or perform basic admin tasks, Blockish turns any MCP-compatible AI assistant (such as Claude Desktop, Cursor, Windsurf, and others) into an autonomous web designer directly inside your Gutenberg Block Editor.
 
-Currently, AI struggles to build beautiful WordPress pages because standard core blocks generate messy HTML and lack structured styling systems. We solved this by building **15+ AI-Optimized Gutenberg Blocks** and a unified **Class Manager**. 
+Currently, AI struggles to build beautiful WordPress pages because standard core blocks generate messy HTML and lack structured styling systems. We solved this by building **18+ AI-Optimized Gutenberg Blocks** and a unified **Class Manager**. 
 
 You don't just drag and drop blocks manually anymore (though you can!). You connect Blockish to your AI and simply say: *"Build a dark-mode pricing page with 3 tiers."* The AI will use Blockish's clean structural blocks and Class Manager to instantly generate a pixel-perfect, fully responsive layout right in your Gutenberg canvas.
 
@@ -42,7 +42,13 @@ Unlike traditional block libraries built exclusively for human clicks, Blockish 
 
 * **Human-Friendly:** Once the AI builds it, you have full visual control to edit everything via standard Gutenberg sidebars.
 
-== 15+ AI-Optimized Blocks ==
+== Powerful Features ==
+
+* **Template Library:** Access our built-in Template Library with 1-click page and pattern import directly in the Block Editor.
+* **Magic Login:** Seamless and secure 1-click login directly from your AI agent.
+* **EditorSync:** Real-time updates between the AI agent and the WordPress editor for a smooth workflow.
+
+== 18+ AI-Optimized Blocks ==
 
 Even though they are built for AI to understand, they are incredibly powerful for manual site building:
 
@@ -53,6 +59,8 @@ Even though they are built for AI to understand, they are incredibly powerful fo
 = Typography =
 
 * **Heading** — Highly customizable headings with powerful typography, colors, and shadow options.
+
+* **Paragraph** — AI-optimized paragraph block with advanced typography and spacing controls.
 
 = Media =
 
@@ -69,6 +77,8 @@ Even though they are built for AI to understand, they are incredibly powerful fo
 * **Tab** — Tabbed content panels for organizing large amounts of information.
 
 * **Navigation** — Robust, flexible navigation block for building complex headers.
+
+* **Offcanvas** — Slide-out side panel for menus, filters, and secondary content.
 
 = Data & Stats =
 
@@ -147,7 +157,12 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 
 = 1.1.3 =
 
-* Minor improvements and fixes
+* Added: 4 new MCP AI abilities (`GetAutomationGuideline`, `JsonHelper`, `ManagePattern`, `TriggerRefresh`)
+* Added: Magic Login feature and corresponding AI ability for quick access
+* Added: EditorSync functionality for improved block editor synchronization
+* Improved: Renamed `UploadMedia` ability to `ManageMedia` for broader functionality
+* Improved: AI developer documentation and schema definitions for all blocks
+* Improved: Backward compatibility and styling fixes for Social Icons, Button, Container, and Google Map blocks
 
 = 1.1.2 =
 
