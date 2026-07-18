@@ -38,11 +38,10 @@
         margin-left: auto;
         margin-right: auto;
     }
-    
-    .wp-block-blockish-container {
-        &.align-custom-width {
-            margin-left: unset;
-            margin-right: unset;
-        }
+
+    // Low specificity so block margin attributes can override when set.
+    :where(.wp-block-blockish-container .wp-block-blockish-container.align-custom-width) {
+        margin-left: unset;
+        margin-right: unset;
     }
 }

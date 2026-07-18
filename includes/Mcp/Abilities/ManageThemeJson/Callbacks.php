@@ -74,7 +74,10 @@ class Callbacks
             if (empty($theme_json) || !is_array($theme_json)) {
                 return ['error' => 'theme_json must be an object.'];
             }
+            $theme_json = self::normalize_preset_origins($theme_json);
             $final_data = array_replace_recursive($current_data, $theme_json);
+            $final_data = self::replace_preset_leaves($final_data, $theme_json);
+            $final_data = self::strip_invalid_preset_origins($final_data);
         }
 
         // Ensure flags required by WP Core
@@ -112,5 +115,111 @@ class Callbacks
             'action'   => 'updated',
             'edit_url' => admin_url('site-editor.php?canvas=edit'),
         ];
+    }
+
+    /**
+     * User global styles store presets under origin keys (theme/custom/default/blocks).
+     * Flat arrays from agents must be wrapped under "theme" or array_replace_recursive
+     * leaves numeric keys that trigger WP_Theme_JSON "Undefined array key slug" warnings.
+     */
+    private static function normalize_preset_origins(array $theme_json): array
+    {
+        foreach (self::preset_paths() as $path) {
+            $value = self::array_get($theme_json, $path);
+            if (!is_array($value) || self::is_list($value)) {
+                if (is_array($value) && self::is_list($value)) {
+                    self::array_set($theme_json, $path, ['theme' => $value]);
+                }
+                continue;
+            }
+        }
+
+        return $theme_json;
+    }
+
+    private static function replace_preset_leaves(array $final_data, array $incoming): array
+    {
+        foreach (self::preset_paths() as $path) {
+            $value = self::array_get($incoming, $path);
+            if (!is_array($value)) {
+                continue;
+            }
+            self::array_set($final_data, $path, $value);
+        }
+
+        return $final_data;
+    }
+
+    private static function strip_invalid_preset_origins(array $theme_json): array
+    {
+        $valid = ['default', 'blocks', 'theme', 'custom'];
+
+        foreach (self::preset_paths() as $path) {
+            $value = self::array_get($theme_json, $path);
+            if (!is_array($value) || self::is_list($value)) {
+                continue;
+            }
+
+            $clean = [];
+            foreach ($value as $origin => $presets) {
+                if (!in_array((string) $origin, $valid, true) || !is_array($presets)) {
+                    continue;
+                }
+                $clean[$origin] = array_values(array_filter($presets, static function ($preset) {
+                    return is_array($preset) && !empty($preset['slug']);
+                }));
+            }
+            self::array_set($theme_json, $path, $clean);
+        }
+
+        return $theme_json;
+    }
+
+    private static function preset_paths(): array
+    {
+        return [
+            ['settings', 'color', 'palette'],
+            ['settings', 'color', 'gradients'],
+            ['settings', 'color', 'duotone'],
+            ['settings', 'typography', 'fontSizes'],
+            ['settings', 'typography', 'fontFamilies'],
+            ['settings', 'spacing', 'spacingSizes'],
+            ['settings', 'shadow', 'presets'],
+        ];
+    }
+
+    private static function is_list(array $value): bool
+    {
+        if (function_exists('array_is_list')) {
+            return array_is_list($value);
+        }
+
+        return array_keys($value) === range(0, count($value) - 1);
+    }
+
+    private static function array_get(array $data, array $path)
+    {
+        $current = $data;
+        foreach ($path as $key) {
+            if (!is_array($current) || !array_key_exists($key, $current)) {
+                return null;
+            }
+            $current = $current[$key];
+        }
+
+        return $current;
+    }
+
+    private static function array_set(array &$data, array $path, $value): void
+    {
+        $current = &$data;
+        $last    = array_pop($path);
+        foreach ($path as $key) {
+            if (!isset($current[$key]) || !is_array($current[$key])) {
+                $current[$key] = [];
+            }
+            $current = &$current[$key];
+        }
+        $current[$last] = $value;
     }
 }

@@ -10,8 +10,8 @@ The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 
 | `tagName` | Option | `{"label":"Div","value":"div"}` | Options: `[{"label":"Div","value":"div"},{"label":"Section","value":"section"},{"label":"Article","value":"article"},{"label":"Main","value":"main"},{"label":"Aside","value":"aside"},{"label":"Header","value":"header"},{"label":"Footer","value":"footer"}]` <br>**Note:** Do not use `header` or `footer` when building inside a Template Part, to avoid double `<header>`/`<footer>` tags. |
 | `display` | Scalar (string) | `"flex"` | `"flex"` `"grid"` <br>**CSS:** `.{{WRAPPER}}.blockish-container` -> `display: {{VALUE}};` |
-| `containerWidth` | Scalar (string) | `"alignfull"` | `"alignfull"` `"alignwide"` `"align-custom-width"` (with `customWidthContainer`) — **the custom option's value is the literal string `"align-custom-width"`, not `"custom"`** |
-| `customWidthContainer` | Responsive | `{"Desktop":"100%"}` | Active when `containerWidth` = `"align-custom-width"` <br>**CSS:** `.{{WRAPPER}}.align-custom-width` -> `max-width: {{VALUE}};` |
+| `containerWidth` | Scalar (string) | `"alignfull"` | `"alignfull"` `"alignwide"` `"align-custom-width"` (with `customWidthContainer`) — **the custom option's value is the literal string `"align-custom-width"`, not `"custom"`**. **Nested containers:** the editor forces nested containers to `align-custom-width`. Keep `customWidthContainer` at the default `100%` unless you intentionally need a narrower inner shell (e.g. `1200px`). Do not rely on top-level centering margins on nested containers — see Base CSS below. |
+| `customWidthContainer` | Responsive | `{"Desktop":"100%"}` | Active when `containerWidth` = `"align-custom-width"` <br>**CSS:** `.{{WRAPPER}}.align-custom-width` -> `max-width: {{VALUE}};`. For a container nested inside another container, prefer leaving this at `100%` so it fills the parent; set a px/`rem` max-width only when you need a constrained content shell. |
 | `containerMinHeight` | Responsive | `{"Desktop":"0"}` | <br>**CSS:** `.{{WRAPPER}}` -> `min-height: {{VALUE}};` | `.{{WRAPPER}} > .block-list-appender` -> `min-height: {{VALUE}};` |
 | `overflow` | Responsive-Option | unset | Options: `[{"label":"Visible","value":"visible"},{"label":"Hidden","value":"hidden"},{"label":"Scroll","value":"scroll"},{"label":"Auto","value":"auto"}]` <br>**CSS:** `.{{WRAPPER}}.blockish-container` -> `overflow: {{VALUE}};` |
 | `flexDirection` | Responsive-Option | unset | Used when `display` = `"flex"`. Options: `[{"label":"Row","value":"row"},{"label":"Column","value":"column"},{"label":"Row Reverse","value":"row-reverse"},{"label":"Column Reverse","value":"column-reverse"}]` <br>**CSS:** `.{{WRAPPER}}.blockish-container.layout-type-flex` -> `flex-direction: {{VALUE}};` |
@@ -115,13 +115,17 @@ Conditional Classes Breakdown:
         pointer-events: none;
     }
 
-    .wp-block-blockish-container{
-        width: 100%;
-    }
-
+    // Top-level custom-width: center in the canvas / content area.
     &.align-custom-width {
         margin-left: auto;
         margin-right: auto;
+    }
+
+    // Nested custom-width: unset auto margins (low specificity) so block margin attributes can win.
+    // Keep customWidthContainer at 100% unless a narrower inner max-width is intentional.
+    :where(.wp-block-blockish-container .wp-block-blockish-container.align-custom-width) {
+        margin-left: unset;
+        margin-right: unset;
     }
 }
 ```
