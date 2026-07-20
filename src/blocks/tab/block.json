@@ -30,6 +30,15 @@
         ".{{WRAPPER}} .blockish-block-tab-nav": "justify-content: {{VALUE}};"
       }
     },
+    "navAlign": {
+      "type": "object",
+      "default": {
+        "Desktop": "stretch"
+      },
+      "selectors": {
+        ".{{WRAPPER}} .blockish-block-tab-nav": "align-self: {{VALUE}};"
+      }
+    },
     "alignTitle": {
       "type": "object",
       "default": {
@@ -59,6 +68,32 @@
       },
       "selectors": {
         ".{{WRAPPER}} .blockish-block-tab-layout": "gap: {{VALUE}};"
+      }
+    },
+    "navBackground": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-block-tab-nav"
+      }
+    },
+    "navBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-block-tab-nav"
+      }
+    },
+    "navBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-block-tab-nav": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "navPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-block-tab-nav": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
       }
     },
     "tabsBackgroundNormal": {

@@ -62,6 +62,46 @@ const Inspector = ({ advancedControls }) => {
 							<>
 								<BlockishControl
 									type="BlockishPanelBody"
+									title={__('Nav Container', 'blockish')}
+									initialOpen={false}
+								>
+									<BlockishResponsiveControl
+										type="BlockishToggleGroup"
+										label={__('Alignment', 'blockish')}
+										slug="navAlign"
+										options={[
+											{ value: 'stretch', label: __('Full', 'blockish') },
+											{ value: 'flex-start', label: __('Left', 'blockish') },
+											{ value: 'center', label: __('Center', 'blockish') },
+											{ value: 'flex-end', label: __('Right', 'blockish') },
+										]}
+										left="86px"
+									/>
+									<BlockishGroupControl
+										type="BlockishBackground"
+										label={__('Background', 'blockish')}
+										slug="navBackground"
+									/>
+									<BlockishGroupControl
+										type="BlockishBorder"
+										label={__('Border', 'blockish')}
+										slug="navBorder"
+									/>
+									<BlockishResponsiveControl
+										type="BlockishBorderRadius"
+										label={__('Border Radius', 'blockish')}
+										slug="navBorderRadius"
+										left="44px"
+									/>
+									<BlockishResponsiveControl
+										type="BlockishSpacingSizes"
+										label={__('Padding', 'blockish')}
+										slug="navPadding"
+										left="52px"
+									/>
+								</BlockishControl>
+								<BlockishControl
+									type="BlockishPanelBody"
 									title={__('Tabs', 'blockish')}
 									initialOpen={true}
 								>
