@@ -197,7 +197,7 @@ export default function App() {
 					</div>
 				</div>
 			)}
-			<DashboardSidebar activeMenu={activeMenu} onMenuClick={handleMenuClick} />
+			<DashboardSidebar activeMenu={activeMenu} onMenuClick={handleMenuClick} data={data} />
 
 			<FlexBlock as="main" className="blockish-main-content">
 				{isLoading && (

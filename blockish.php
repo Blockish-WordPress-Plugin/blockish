@@ -159,6 +159,7 @@ final class Blockish
         ExtensionsLoader::get_instance();
         SEO::get_instance();
         \Blockish\Core\MagicLogin::get_instance();
+        \Blockish\Core\TemplateManager::get_instance();
 
         if (! class_exists('WP\MCP\Core\McpAdapter')) {
             // MCP Adapter is not active — show an admin notice or return early.

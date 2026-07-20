@@ -56,8 +56,9 @@ class Dashboard {
 
     public function enqueue_assets( $hook_suffix ) {
         $page_hook = 'toplevel_page_' . self::PAGE_SLUG;
+        $is_wizard = class_exists( '\Blockish\Core\TemplateManager' ) && \Blockish\Core\TemplateManager::get_instance()->is_wizard_screen();
 
-        if ( $hook_suffix !== $page_hook ) {
+        if ( $hook_suffix !== $page_hook && ! $is_wizard ) {
             return;
         }
 
@@ -105,6 +106,7 @@ class Dashboard {
                     'nonce'             => wp_create_nonce( 'wp_rest' ),
                     'siteUrl'           => admin_url(),
                     'currentUser'       => wp_get_current_user()->user_login,
+                    'isBlockTheme'      => wp_is_block_theme(),
                     'plugin'            => array(
                         'name'     => 'Blockish',
                         'tagline'  => __( 'Creative Gutenberg blocks for modern websites.', 'blockish' ),
@@ -116,6 +118,8 @@ class Dashboard {
                             'changelog'     => 'https://wordpress.org/plugins/blockish/#developers',
                         ),
                     ),
+                    'wizardEditUrl'     => admin_url( 'post.php?post=' . get_option( 'blockish_template_wizard_id' ) . '&action=edit' ),
+                    'wizardPostId'      => get_option( 'blockish_template_wizard_id' ),
                 )
             ) . ';',
             'before'

@@ -8,6 +8,8 @@ import IntegrationsPage from './integrations-page';
 import AddonsPage from './addons-page';
 import McpConfigPage from './mcp-config-page';
 
+import TemplateBuilderPage from './template-builder/template-builder-page';
+
 export default function ContentArea({
 	activeMenu,
 	data,
@@ -21,6 +23,10 @@ export default function ContentArea({
 }) {
 	if (activeMenu === 'dashboard') {
 		return <DashboardHome data={data} onNavigate={onNavigate} />;
+	}
+
+	if (activeMenu === 'template-builder') {
+		return <TemplateBuilderPage data={data} />;
 	}
 
 	if (activeMenu === 'blocks') {

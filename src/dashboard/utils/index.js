@@ -9,6 +9,7 @@ import {
 
 export const SIDEBAR_MENUS = [
 	{ key: 'dashboard', label: 'Dashboard', icon: layoutDashboard },
+	{ key: 'template-builder', label: 'Template Builder', icon: layoutDashboard, conditionalExtension: 'template-builder' },
 	{ key: 'blocks', label: 'Blocks', icon: blocksIcon },
 	{ key: 'extensions', label: 'Extensions', icon: plugIcon },
 	{ key: 'addons', label: 'Addons', icon: plugIcon },
