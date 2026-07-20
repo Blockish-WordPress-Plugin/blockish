@@ -365,10 +365,10 @@ Never set `blockClass`, `styles`, or `preview` — all three are internal/auto-m
 |---|---|---|---|
 | `padding` | Spacing (Responsive) | unset | <br>**CSS:** `.{{WRAPPER}}` -> `padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};` |
 | `margin` | Spacing (Responsive) | unset | <br>**CSS:** `.{{WRAPPER}}` -> `margin: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};` |
-| `widthType` | Responsive-Option | unset | Options: `[{"label":"Auto","value":"auto"},{"label":"Full","value":"100%"},{"label":"Custom","value":"custom"}]`. If `custom`, `customWidth` is active. **Note: Do NOT use on `blockish/container`. Use `customCss` if a container needs a specific width.** <br>**CSS:** `.{{WRAPPER}}` -> `width: {{VALUE}};` |
+| `widthType` | Responsive-Option | unset | Options: `[{"label":"Auto","value":"auto"},{"label":"Full","value":"100%"},{"label":"Custom","value":"custom"}]`. If `custom`, `customWidth` is active. <br>**CSS:** `.{{WRAPPER}}` -> `width: {{VALUE}};` |
 | `customWidth` | Responsive | unset | Active when `widthType` = `"custom"` <br>**CSS:** `.{{WRAPPER}}` -> `width: {{VALUE}};` |
 | `minWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `min-width: {{VALUE}};` |
-| `maxWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `max-width: {{VALUE}};` |
+| `maxWidth` | Responsive | unset | **Note: Do NOT use on `blockish/container`.** <br>**CSS:** `.{{WRAPPER}}` -> `max-width: {{VALUE}};` |
 | `zIndex` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}` -> `z-index: {{VALUE}};` |
 
 ### Position

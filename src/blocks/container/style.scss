@@ -34,7 +34,7 @@
         pointer-events: none;
     }
     
-    &.align-custom-width {
+    :where(.wp-block-blockish-container.align-custom-width) {
         margin-left: auto;
         margin-right: auto;
     }

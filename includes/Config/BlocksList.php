@@ -173,6 +173,12 @@ class BlocksList extends ConfigList {
                 'status'      => 'active',
                 'parent'      => 'navigation',
             ),
+            'before-after-slider' => array(
+                'name'    => __('Before/After Slider', 'blockish'),
+                'description' => __('An interactive slider that lets users compare two images (a "before" and "after" image) by dragging a handle horizontally.', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
         );
 
         $this->list = apply_filters( 'blockish/blocks/list', $this->list );

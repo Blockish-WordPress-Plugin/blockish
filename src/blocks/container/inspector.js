@@ -1,7 +1,6 @@
 import { InspectorControls } from '@wordpress/block-editor';
 import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { addFilter } from '@wordpress/hooks';
 
 const Inspector = ({ attributes, advancedControls, hasParent }) => {
     const {
@@ -9,16 +8,6 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
         BlockishResponsiveControl,
         BlockishGroupControl
     } = window?.blockish?.controls;
-
-    addFilter('blockish.advancedControl.width.exclude', 'blockish/container/exclude-width', (list) => {
-        return list.add('blockish/container');
-    });
-    addFilter('blockish.advancedControl.background.exclude', 'blockish/container/exclude-background', (list) => {
-        return list.add('blockish/container');
-    });
-    addFilter('blockish.advancedControl.border.exclude', 'blockish/container/exclude-border', (list) => {
-        return list.add('blockish/container');
-    });
 
     return (
         <InspectorControls>

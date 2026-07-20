@@ -1,0 +1,36 @@
+.blockish-before-after-setup {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: #f0f0f0;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+
+    .setup-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        
+        h4 {
+            margin: 0;
+            font-size: 14px;
+            color: #333;
+        }
+    }
+
+    .image-preview-wrapper {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    }
+}

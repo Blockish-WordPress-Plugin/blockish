@@ -4,6 +4,7 @@ import Edit from './edit';
 import Save from './save';
 import metadata from './block.json';
 import transforms from './transforms';
+import './filters';
 
 registerBlockType( metadata.name, {
 	edit: Edit,

@@ -1,0 +1,120 @@
+.blockish-before-after-slider {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    --slider-pos: 50%; /* Default, overridden by inline style */
+}
+
+.blockish-slider-wrapper {
+    position: relative;
+    width: 100%;
+    display: block;
+    user-select: none;
+}
+
+.blockish-image-base {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+.blockish-image-after {
+    /* Background image */
+}
+
+.blockish-image-before-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--slider-pos);
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.blockish-image-before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw; /* This ensures the image doesn't squish */
+    height: 100%;
+    /* To make sure it matches the after image dimensions exactly, we can use a trick */
+}
+
+/* Better approach for before image: using clip-path instead of wrapper width */
+.blockish-slider-wrapper {
+    .blockish-image-before-wrapper {
+        width: 100%;
+        clip-path: polygon(0 0, var(--slider-pos) 0, var(--slider-pos) 100%, 0 100%);
+    }
+    
+    .blockish-image-before {
+        position: static;
+        width: 100%;
+    }
+
+    .blockish-slider-label {
+        position: absolute;
+        top: 20px;
+        padding: 5px 12px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        pointer-events: none;
+        line-height: 1.2;
+    }
+
+    .before-label {
+        left: 20px;
+        z-index: 5;
+    }
+
+    .after-label {
+        right: 20px;
+        z-index: 0;
+    }
+}
+
+.blockish-slider-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--slider-pos);
+    width: 2px;
+    background-color: #fff;
+    cursor: ew-resize;
+    z-index: 2;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 40px; /* larger grab area */
+        left: -20px;
+        background: transparent;
+    }
+}
+
+.blockish-slider-handle-arrows {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    aspect-ratio: 1/1;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    color: #333;
+    pointer-events: none;
+}

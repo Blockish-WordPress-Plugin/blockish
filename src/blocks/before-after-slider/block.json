@@ -1,0 +1,135 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/before-after-slider",
+  "version": "1.0.0",
+  "title": "Before/After Slider",
+  "category": "blockish-framework",
+  "description": "An interactive slider to compare two images.",
+  "keywords": [
+    "blockish",
+    "slider",
+    "before",
+    "after",
+    "compare"
+  ],
+  "attributes": {
+    "beforeImage": {
+      "type": "object"
+    },
+    "afterImage": {
+      "type": "object"
+    },
+    "sliderPosition": {
+      "type": "number",
+      "default": 50,
+      "selectors": {
+        ".{{WRAPPER}}": "--slider-pos: {{VALUE}}%;"
+      }
+    },
+    "beforeLabel": {
+      "type": "string",
+      "default": "Before"
+    },
+    "afterLabel": {
+      "type": "string",
+      "default": "After"
+    },
+    "labelTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-slider-label"
+      }
+    },
+    "labelColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-slider-label": "color: {{VALUE}};"
+      }
+    },
+    "labelBackgroundColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-slider-label": "background-color: {{VALUE}};"
+      }
+    },
+    "labelPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-slider-label": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "labelBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-slider-label": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "handleColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-slider-handle": "background-color: {{VALUE}};"
+      }
+    },
+    "handleArrowColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-slider-handle-arrows": "color: {{VALUE}};"
+      }
+    },
+    "handleArrowBackground": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-slider-handle-arrows": "background-color: {{VALUE}};"
+      }
+    },
+    "handleArrowBoxShadow": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-slider-handle-arrows": "box-shadow: {{HOFFSET}} {{VOFFSET}} {{BLUR}} {{SPREAD}} {{COLOR}} {{POSITION}};"
+      }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "image": [
+          {
+            "slug": "beforeImage",
+            "title": "Before Image"
+          },
+          {
+            "slug": "afterImage",
+            "title": "After Image"
+          }
+        ],
+        "text": [
+          {
+            "slug": "beforeLabel",
+            "title": "Before Label"
+          },
+          {
+            "slug": "afterLabel",
+            "title": "After Label"
+          }
+        ]
+      }
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./view.js",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
+}
