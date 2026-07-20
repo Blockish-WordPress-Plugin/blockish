@@ -8,6 +8,8 @@ import IntegrationsPage from './integrations-page';
 import AddonsPage from './addons-page';
 import McpConfigPage from './mcp-config-page';
 
+import { applyFilters } from '@wordpress/hooks';
+
 export default function ContentArea({
 	activeMenu,
 	data,
@@ -19,6 +21,11 @@ export default function ContentArea({
 	onSetAllExtensionStatus,
 	onSaveExtensionSettings,
 }) {
+	const customRoute = applyFilters('blockish.dashboard.customRoutes', null, activeMenu, data, isSaving);
+	if (customRoute) {
+		return customRoute;
+	}
+
 	if (activeMenu === 'dashboard') {
 		return <DashboardHome data={data} onNavigate={onNavigate} />;
 	}

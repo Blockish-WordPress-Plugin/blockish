@@ -2,7 +2,11 @@ import { __ } from '@wordpress/i18n';
 import { Icon, __experimentalHeading as Heading, __experimentalText as Text, __experimentalVStack as VStack } from '@wordpress/components';
 import { SIDEBAR_MENUS } from '../utils';
 
+import { applyFilters } from '@wordpress/hooks';
+
 export default function DashboardSidebar({ activeMenu, onMenuClick }) {
+	const menus = applyFilters('blockish.dashboard.sidebarMenus', SIDEBAR_MENUS);
+
 	return (
 		<aside className="blockish-sidebar">
 			<VStack className="blockish-sidebar-brand" spacing={0}>
@@ -13,7 +17,7 @@ export default function DashboardSidebar({ activeMenu, onMenuClick }) {
 			</VStack>
 
 			<nav className="blockish-sidebar-nav">
-				{SIDEBAR_MENUS.map((menu) => (
+				{menus.map((menu) => (
 					<button
 						key={menu.key}
 						type="button"
