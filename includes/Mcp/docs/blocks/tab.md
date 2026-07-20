@@ -10,6 +10,11 @@
 | `alignTitle` | Responsive | `{"Desktop":"left"}` | `"left"` `"center"` `"right"` <br>**CSS:** `.{{WRAPPER}} .blockish-block-tab-trigger-title` -> `text-align: {{VALUE}};` |
 | `navGap` | Responsive | `{"Desktop":"10px"}` | <br>**CSS:** `.{{WRAPPER}} .blockish-block-tab-nav` -> `gap: {{VALUE}};` |
 | `distanceFromContent` | Responsive | `{"Desktop":"10px"}` | <br>**CSS:** `.{{WRAPPER}} .blockish-block-tab-layout` -> `gap: {{VALUE}};` |
+| `navAlign` | Responsive | `{"Desktop":"stretch"}` | `"stretch"` `"flex-start"` `"center"` `"flex-end"` <br>**CSS:** `.{{WRAPPER}} .blockish-block-tab-nav` -> `align-self: {{VALUE}};` |
+| `navBackground` | Stringified-JSON (Background) | unset | <br>**CSS:** Uses `BlockishBackground` on `.{{WRAPPER}} .blockish-block-tab-nav` |
+| `navBorder` | Stringified-JSON (Border) | unset | <br>**CSS:** Uses `BlockishBorder` on `.{{WRAPPER}} .blockish-block-tab-nav` |
+| `navBorderRadius` | Border-Radius | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-block-tab-nav` -> `border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};` |
+| `navPadding` | Spacing | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-block-tab-nav` -> `padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};` |
 | `iconPosition` | Responsive | `{"Desktop":"row"}` | `"row"` (icon left) `"row-reverse"` (icon right) <br>**CSS:** `.{{WRAPPER}} .blockish-block-tab-trigger` -> `flex-direction: {{VALUE}};` |
 | `tabsBackgroundNormal` | Stringified-JSON (Background) | unset | <br>**CSS:** Uses `BlockishBackground` on `.{{WRAPPER}} .blockish-block-tab-trigger` |
 | `tabsBackgroundHover` | Stringified-JSON (Background) | unset | <br>**CSS:** Uses `BlockishBackground` on `.{{WRAPPER}} .blockish-block-tab-trigger:hover` |
