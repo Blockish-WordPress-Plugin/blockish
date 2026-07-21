@@ -95,6 +95,14 @@ class Dashboard {
             $script_asset['version'] ?? BLOCKISH_VERSION
         );
 
+        wp_enqueue_script(
+            'freemius-checkout',
+            'https://checkout.freemius.com/checkout.min.js',
+            array(),
+            null,
+            true
+        );
+
         wp_add_inline_script(
             'blockish-dashboard',
             'window.blockishDashboardData = ' . wp_json_encode(
@@ -116,6 +124,7 @@ class Dashboard {
                             'changelog'     => 'https://wordpress.org/plugins/blockish/#developers',
                         ),
                     ),
+                    'addonsList'        => \Blockish\Config\AddonsList::get_instance()->get_list(),
                 )
             ) . ';',
             'before'

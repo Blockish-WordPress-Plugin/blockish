@@ -12,6 +12,7 @@ import Transform from './components/transform';
 import Background from './components/background';
 import Border from './components/border';
 import CustomCss from './components/custom-css';
+import DynamicityMarketing from './components/dynamicity-marketing';
 
 const BlockishBlocksAdvancedControls = createHigherOrderComponent(
     (BlockEdit) =>
@@ -57,6 +58,7 @@ const BlockishBlocksAdvancedControls = createHigherOrderComponent(
                     <>
                         <BlockishStyleTag {...props} hash={hash} />
                         <BlockEdit {...wrappedProps} />
+                        {props.isSelected && <DynamicityMarketing {...props} />}
                     </>
                 )
             }

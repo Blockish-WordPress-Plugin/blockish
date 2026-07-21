@@ -66,6 +66,15 @@ class Enqueue {
             BLOCKISH_DIR . 'build/global/index.asset.php'
         );
 
+        wp_localize_script(
+            'blockish-global',
+            'blockishGlobalData',
+            array(
+                'dashboardUrl' => admin_url( 'admin.php?page=blockish-dashboard' ),
+                'addonsUrl'    => admin_url( 'admin.php?page=blockish-dashboard&route=addons' ),
+            )
+        );
+
         $this->register_and_enqueue_script(
             'blockish-template-library',
             BLOCKISH_URL . 'build/template-library/index.js',

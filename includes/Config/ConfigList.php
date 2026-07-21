@@ -44,11 +44,13 @@ abstract class ConfigList {
      * @return array|false  The requested list or module data, or false if not found.
      */
     public function get_list( $data = 'list', $module = null ) {
+        $prop = $data === 'list' ? 'list' : $data . '_list';
+
         if ( $module !== null ) {
-            return $this->{$data . '_list'}[$module] ?? false;
+            return $this->{$prop}[$module] ?? false;
         }
 
-        return $this->{$data . '_list'} ?? array();  // Ensure returning an array even if empty
+        return $this->{$prop} ?? array();
     }
 
     /**

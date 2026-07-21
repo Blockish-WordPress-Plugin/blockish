@@ -43,6 +43,24 @@ class ExtensionList extends ConfigList {
                 'category'    => 'general',
                 'status'      => 'active',
             ),
+            'dynamic-data' => array(
+                'name'        => __( 'Dynamic Data', 'blockish' ),
+                'description' => __( 'Adds dynamic data binding capabilities to blocks.', 'blockish' ),
+                'package'     => 'pro',
+                'addon'       => 'blockish-dynamicity',
+                'addon_name'  => 'Dynamicity',
+                'category'    => 'general',
+                'status'      => 'active',
+            ),
+            'display-conditions' => array(
+                'name'        => __( 'Display Conditions', 'blockish' ),
+                'description' => __( 'Conditionally show or hide blocks based on specific rules.', 'blockish' ),
+                'package'     => 'pro',
+                'addon'       => 'blockish-dynamicity',
+                'addon_name'  => 'Dynamicity',
+                'category'    => 'general',
+                'status'      => 'active',
+            ),
         );
 
         $this->list = apply_filters( 'blockish/extensions/list', $this->list );

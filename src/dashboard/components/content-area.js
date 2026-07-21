@@ -37,6 +37,7 @@ export default function ContentArea({
 				isSaving={isSaving}
 				onToggleBlock={onToggleBlock}
 				onSetAllBlockStatus={onSetAllBlockStatus}
+				onNavigate={onNavigate}
 			/>
 		);
 	}
@@ -53,6 +54,7 @@ export default function ContentArea({
 				onToggleExtension={onToggleExtension}
 				onSetAllExtensionStatus={onSetAllExtensionStatus}
 				onSaveExtensionSettings={onSaveExtensionSettings}
+				onNavigate={onNavigate}
 			/>
 		);
 	}

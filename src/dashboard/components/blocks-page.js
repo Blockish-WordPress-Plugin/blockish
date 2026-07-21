@@ -28,7 +28,7 @@ function buildDescription(item, categoryLabel) {
 	return `${categoryLabel} block`;
 }
 
-export default function BlocksPage({ blocks = {}, isSaving, onSave, onToggleBlock, onSetAllBlockStatus }) {
+export default function BlocksPage({ blocks = {}, isSaving, onSave, onToggleBlock, onSetAllBlockStatus, onNavigate }) {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [activeFilter, setActiveFilter] = useState('all');
 
@@ -43,7 +43,7 @@ export default function BlocksPage({ blocks = {}, isSaving, onSave, onToggleBloc
 				return {
 					slug,
 					name: item?.name || humanizeSlug(slug),
-					status: item?.status === 'inactive' ? 'inactive' : 'active',
+					status: item?.status === 'locked' ? 'locked' : (item?.status === 'inactive' ? 'inactive' : 'active'),
 					category,
 					categoryLabel,
 					description: buildDescription(item, categoryLabel),
@@ -140,6 +140,7 @@ export default function BlocksPage({ blocks = {}, isSaving, onSave, onToggleBloc
 						block={block}
 						isSaving={isSaving}
 						onToggle={onToggleBlock}
+						onNavigate={onNavigate}
 					/>
 				))}
 			</div>
