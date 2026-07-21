@@ -59,9 +59,9 @@ class BlocksV1 extends WP_REST_Controller {
 				}
 			}
 
-			// Override with locked if required addon is not installed
+			// Override with locked if required addon is not available (installed & licensed)
 			if ( ! empty( $block['addon'] ) && isset( $addons[ $block['addon'] ] ) ) {
-				if ( empty( $addons[ $block['addon'] ]['is_installed'] ) ) {
+				if ( empty( $addons[ $block['addon'] ]['is_available'] ) ) {
 					$block['status'] = 'locked';
 				}
 			}

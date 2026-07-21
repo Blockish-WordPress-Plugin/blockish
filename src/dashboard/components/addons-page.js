@@ -112,7 +112,7 @@ export default function AddonsPage() {
 							</VStack>
 							
 							<div style={{ marginTop: '32px' }}>
-								{addon.is_installed ? (
+								{addon.is_available ? (
 									<div style={{ background: 'var(--color-green-50)', color: 'var(--color-green-700)', padding: '16px', borderRadius: '8px', textAlign: 'center', fontWeight: 'bold', border: '1px solid var(--color-green-100)' }}>
 										{__('Installed & Active', 'blockish')}
 									</div>

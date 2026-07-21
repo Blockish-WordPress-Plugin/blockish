@@ -18,6 +18,7 @@
  */
 
 use Blockish\Config\ExtensionList;
+use Blockish\Config\Freemius as FreemiusConfig;
 use Blockish\Core\Blocks;
 use Blockish\Core\Dashboard;
 use Blockish\Core\Enqueue;
@@ -71,6 +72,9 @@ final class Blockish
 
         // Load autoloader (vendor/autoload.php).
         require_once BLOCKISH_DIR . 'vendor/autoload_packages.php';
+
+        // Initialize Freemius after the Blockish autoloader is available.
+        FreemiusConfig::get_instance();
 
         // Initialize plugin hooks.
         add_action('plugins_loaded', array($this, 'plugins_loaded'));
@@ -274,4 +278,15 @@ function blockish()
 {
     return Blockish::instance();
 }
+
+/**
+ * Retrieve the Blockish Freemius SDK instance.
+ *
+ * @return \Freemius|false
+ */
+function blockish_fs()
+{
+    return FreemiusConfig::get_instance()->get_sdk();
+}
+
 blockish();

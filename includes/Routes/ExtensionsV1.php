@@ -64,9 +64,9 @@ class ExtensionsV1 extends WP_REST_Controller {
 				$extension['settings'] = $saved_extensions[ $slug ]['settings'];
 			}
 
-			// Override with locked if required addon is not installed
+			// Override with locked if required addon is not available (installed & licensed)
 			if ( ! empty( $extension['addon'] ) && isset( $addons[ $extension['addon'] ] ) ) {
-				if ( empty( $addons[ $extension['addon'] ]['is_installed'] ) ) {
+				if ( empty( $addons[ $extension['addon'] ]['is_available'] ) ) {
 					$extension['status'] = 'locked';
 				}
 			}
