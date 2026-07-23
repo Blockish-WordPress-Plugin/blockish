@@ -66,6 +66,23 @@ class DashboardToolsV1 extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/global-interactions',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'get_global_interactions_route' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'update_global_interactions' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/' . $this->rest_base . '/global-interactions/(?P<id>[\w-]+)',
 			array(
 				array(
@@ -175,9 +192,56 @@ class DashboardToolsV1 extends WP_REST_Controller {
 		);
 	}
 
+	public function get_global_interactions_route() {
+		$data = $this->get_global_interactions();
+
+		return rest_ensure_response(
+			array(
+				'status'             => 'success',
+				'count'              => $data['count'],
+				'items'              => $data['items'],
+				'globalInteractions' => $data,
+			)
+		);
+	}
+
+	public function update_global_interactions( WP_REST_Request $request ) {
+		$interactions = $request->get_param( 'interactions' );
+
+		if ( ! is_array( $interactions ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Invalid interactions payload.',
+				)
+			);
+		}
+
+		$sanitized = array();
+		foreach ( $interactions as $interaction ) {
+			if ( ! is_array( $interaction ) ) {
+				continue;
+			}
+			$sanitized[] = $this->sanitize_interaction_item( $interaction );
+		}
+
+		update_option( 'blockish_global_interactions', array_values( $sanitized ), false );
+
+		$data = $this->get_global_interactions();
+
+		return rest_ensure_response(
+			array(
+				'status'             => 'success',
+				'count'              => $data['count'],
+				'items'              => $data['items'],
+				'globalInteractions' => $data,
+			)
+		);
+	}
+
 	public function delete_global_interaction( WP_REST_Request $request ) {
 		$id = sanitize_text_field( (string) $request->get_param( 'id' ) );
-		
+
 		if ( empty( $id ) ) {
 			return rest_ensure_response(
 				array(
@@ -192,18 +256,131 @@ class DashboardToolsV1 extends WP_REST_Controller {
 			$interactions = array();
 		}
 
-		$updated_interactions = array_filter( $interactions, function( $interaction ) use ( $id ) {
-			return isset( $interaction['id'] ) && $interaction['id'] !== $id;
-		});
+		$updated_interactions = array_filter(
+			$interactions,
+			function ( $interaction ) use ( $id ) {
+				return isset( $interaction['id'] ) && $interaction['id'] !== $id;
+			}
+		);
 
 		update_option( 'blockish_global_interactions', array_values( $updated_interactions ), false );
 
+		$data = $this->get_global_interactions();
+
 		return rest_ensure_response(
 			array(
-				'status' => 'success',
-				'globalInteractions' => $this->get_global_interactions(),
+				'status'             => 'success',
+				'count'              => $data['count'],
+				'items'              => $data['items'],
+				'globalInteractions' => $data,
 			)
 		);
+	}
+
+	/**
+	 * Light sanitize for interaction objects (preserve structure for runtime).
+	 *
+	 * @param array $item Interaction item.
+	 * @return array
+	 */
+	private function sanitize_interaction_item( array $item ) {
+		$out = array();
+
+		if ( isset( $item['id'] ) ) {
+			$out['id'] = sanitize_text_field( (string) $item['id'] );
+		}
+		if ( isset( $item['title'] ) ) {
+			$out['title'] = sanitize_text_field( (string) $item['title'] );
+		}
+		if ( isset( $item['scope'] ) ) {
+			$out['scope'] = sanitize_key( (string) $item['scope'] );
+		}
+		if ( isset( $item['event'] ) ) {
+			$out['event'] = sanitize_text_field( (string) $item['event'] );
+		}
+		if ( isset( $item['selector'] ) ) {
+			$out['selector'] = sanitize_text_field( (string) $item['selector'] );
+		}
+		if ( isset( $item['actionType'] ) ) {
+			$out['actionType'] = sanitize_key( (string) $item['actionType'] );
+		}
+		if ( isset( $item['preset'] ) ) {
+			$out['preset'] = sanitize_key( (string) $item['preset'] );
+		}
+		if ( isset( $item['listenEventName'] ) ) {
+			$out['listenEventName'] = sanitize_text_field( (string) $item['listenEventName'] );
+		}
+		if ( isset( $item['listenPhase'] ) ) {
+			$out['listenPhase'] = sanitize_key( (string) $item['listenPhase'] );
+		}
+		if ( isset( $item['emitEventName'] ) ) {
+			$out['emitEventName'] = sanitize_text_field( (string) $item['emitEventName'] );
+		}
+		if ( isset( $item['emitPhase'] ) ) {
+			$out['emitPhase'] = sanitize_key( (string) $item['emitPhase'] );
+		}
+		if ( isset( $item['presetOptions'] ) && is_array( $item['presetOptions'] ) ) {
+			$out['presetOptions'] = array(
+				'duration' => isset( $item['presetOptions']['duration'] ) ? absint( $item['presetOptions']['duration'] ) : 600,
+				'delay'    => isset( $item['presetOptions']['delay'] ) ? absint( $item['presetOptions']['delay'] ) : 0,
+				'once'     => ! empty( $item['presetOptions']['once'] ),
+			);
+		}
+		if ( isset( $item['callbacks'] ) && is_array( $item['callbacks'] ) ) {
+			$out['callbacks'] = array_values(
+				array_filter(
+					array_map(
+						static function ( $cb ) {
+							return is_string( $cb ) ? $cb : '';
+						},
+						$item['callbacks']
+					)
+				)
+			);
+		}
+		if ( isset( $item['when'] ) && is_array( $item['when'] ) ) {
+			$out['when'] = array(
+				'source'    => isset( $item['when']['source'] ) ? sanitize_key( (string) $item['when']['source'] ) : 'dom',
+				'event'     => isset( $item['when']['event'] ) ? sanitize_text_field( (string) $item['when']['event'] ) : 'ready',
+				'selector'  => isset( $item['when']['selector'] ) ? sanitize_text_field( (string) $item['when']['selector'] ) : '',
+				'eventName' => isset( $item['when']['eventName'] ) ? sanitize_text_field( (string) $item['when']['eventName'] ) : '',
+				'phase'     => isset( $item['when']['phase'] ) ? sanitize_key( (string) $item['when']['phase'] ) : 'start',
+			);
+		}
+		if ( isset( $item['action'] ) && is_array( $item['action'] ) ) {
+			$action = $item['action'];
+			$out['action'] = array(
+				'type'          => isset( $action['type'] ) ? sanitize_key( (string) $action['type'] ) : 'custom',
+				'preset'        => isset( $action['preset'] ) ? sanitize_key( (string) $action['preset'] ) : 'fadeUp',
+				'eventName'     => isset( $action['eventName'] ) ? sanitize_text_field( (string) $action['eventName'] ) : '',
+				'phase'         => isset( $action['phase'] ) ? sanitize_key( (string) $action['phase'] ) : 'start',
+				'presetOptions' => isset( $action['presetOptions'] ) && is_array( $action['presetOptions'] )
+					? array(
+						'duration' => isset( $action['presetOptions']['duration'] ) ? absint( $action['presetOptions']['duration'] ) : 600,
+						'delay'    => isset( $action['presetOptions']['delay'] ) ? absint( $action['presetOptions']['delay'] ) : 0,
+						'once'     => ! empty( $action['presetOptions']['once'] ),
+					)
+					: array(
+						'duration' => 600,
+						'delay'    => 0,
+						'once'     => true,
+					),
+				'callbacks'     => isset( $action['callbacks'] ) && is_array( $action['callbacks'] )
+					? array_values(
+						array_filter(
+							array_map(
+								static function ( $cb ) {
+									return is_string( $cb ) ? $cb : '';
+								},
+								$action['callbacks']
+							)
+						)
+					)
+					: array(),
+			);
+		}
+
+		return $out;
 	}
 
 	public function update_class_manager_item( WP_REST_Request $request ) {

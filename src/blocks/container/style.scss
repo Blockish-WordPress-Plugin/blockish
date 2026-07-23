@@ -5,6 +5,16 @@
 .wp-block-blockish-container {
     transition: all 0.3s ease;
 
+    // Linked container (tag = a): don't underline child text/markup.
+    &:is(a) {
+        text-decoration: none;
+        color: inherit;
+
+        * {
+            text-decoration: none;
+        }
+    }
+
     &.has-background-video {
         position: relative;
         overflow: hidden;
@@ -34,10 +44,16 @@
         pointer-events: none;
     }
     
-    :where(.wp-block-blockish-container.align-custom-width) {
+    &.align-custom-width {
         margin-left: auto;
         margin-right: auto;
     }
+    
+    // .wp-block-blockish-container {
+    //     &.align-custom-width {
+    //         width: 100%;
+    //     }
+    // }
 
     // Low specificity so block margin attributes can override when set.
     :where(.wp-block-blockish-container .wp-block-blockish-container.align-custom-width) {

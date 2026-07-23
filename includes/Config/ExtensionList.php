@@ -43,6 +43,13 @@ class ExtensionList extends ConfigList {
                 'category'    => 'general',
                 'status'      => 'active',
             ),
+            'visibility' => array(
+                'name'        => __( 'Visibility', 'blockish' ),
+                'description' => __( 'Hide blocks on Desktop, Tablet, or Mobile.', 'blockish' ),
+                'package'     => 'free',
+                'category'    => 'general',
+                'status'      => 'active',
+            ),
             'dynamic-data' => array(
                 'name'        => __( 'Dynamic Data', 'blockish' ),
                 'description' => __( 'Adds dynamic data binding capabilities to blocks.', 'blockish' ),

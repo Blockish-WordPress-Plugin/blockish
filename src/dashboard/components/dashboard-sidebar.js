@@ -22,7 +22,13 @@ export default function DashboardSidebar({ activeMenu, onMenuClick }) {
 						key={menu.key}
 						type="button"
 						className={menu.key === activeMenu ? 'is-active' : ''}
-						onClick={() => onMenuClick(menu.key)}
+						onClick={() => {
+							if (typeof menu.callback === 'function') {
+								menu.callback(menu, onMenuClick);
+								return;
+							}
+							onMenuClick(menu.key);
+						}}
 					>
 						<Icon icon={menu.icon} />
 						<Text>{__(menu.label, 'blockish')}</Text>

@@ -1,10 +1,99 @@
 .blockish-image-wrapper {
 	margin: 0;
 
-    .blockish-image {
-        box-sizing: border-box;
-        width: 100%;
-        height: auto;
-        transition: all var(--blockish-image-hover-transition, 0.3s) ease;
-    }
+	.blockish-image {
+		box-sizing: border-box;
+		width: 100%;
+		height: auto;
+		transition: all var(--blockish-image-hover-transition, 0.3s) ease;
+	}
+
+	&.has-lightbox {
+		.blockish-image-lightbox-trigger {
+			display: inline-block;
+			max-width: 100%;
+			line-height: 0;
+			cursor: zoom-in;
+			text-decoration: none;
+			color: inherit;
+		}
+	}
+}
+
+.blockish-lightbox {
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background: rgba(10, 12, 16, 0.88);
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity 0.2s ease, visibility 0.2s ease;
+
+	&.is-open {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	&__dialog {
+		max-width: min(1100px, 100%);
+		max-height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+	}
+
+	&__image {
+		display: block;
+		max-width: 100%;
+		max-height: calc(100vh - 120px);
+		width: auto;
+		height: auto;
+		object-fit: contain;
+		border-radius: 4px;
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+	}
+
+	&__caption {
+		margin: 0;
+		max-width: 40rem;
+		text-align: center;
+		color: #f8fafc;
+		font-size: 14px;
+		line-height: 1.45;
+	}
+
+	&__close {
+		position: absolute;
+		top: 16px;
+		right: 16px;
+		width: 40px;
+		height: 40px;
+		border: 0;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.12);
+		color: #fff;
+		font-size: 28px;
+		line-height: 1;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+
+		&:hover,
+		&:focus-visible {
+			background: rgba(255, 255, 255, 0.22);
+			outline: none;
+		}
+	}
+}
+
+html.blockish-lightbox-open {
+	overflow: hidden;
 }

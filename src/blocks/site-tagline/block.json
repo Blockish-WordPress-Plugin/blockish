@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/site-tagline",
+  "version": "1.0.0",
+  "title": "Site Tagline",
+  "category": "blockish-framework",
+  "description": "Displays the site tagline (description) with semantic HTML tag, alignment, typography, and color controls.",
+  "keywords": ["blockish", "site", "tagline", "description", "subtitle"],
+  "textdomain": "blockish",
+  "attributes": {
+    "tag": {
+      "type": "object",
+      "default": {
+        "label": "P",
+        "value": "p"
+      }
+    },
+    "alignment": {
+      "type": "object",
+      "default": {
+        "Desktop": "left"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "typography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "color": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}": "color: {{VALUE}};"
+      }
+    },
+    "hoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}:hover": "color: {{VALUE}};"
+      }
+    },
+    "textShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "textShadowHover": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}:hover"
+      }
+    }
+  },
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": ["wide", "full"]
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

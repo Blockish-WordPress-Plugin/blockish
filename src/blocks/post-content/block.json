@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/post-content",
+  "version": "1.0.0",
+  "title": "Post Content",
+  "category": "blockish-framework",
+  "description": "Displays the current post content.",
+  "keywords": ["blockish", "post", "content", "body"],
+  "textdomain": "blockish",
+  "attributes": {
+    "tag": {
+      "type": "object",
+      "default": {
+        "value": "div",
+        "label": "Div"
+      }
+    },
+    "alignment": {
+      "type": "object",
+      "default": {
+        "Desktop": "left"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "typography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "color": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}": "color: {{VALUE}};"
+      }
+    },
+    "linkColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} a": "color: {{VALUE}};"
+      }
+    },
+    "linkHoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} a:hover": "color: {{VALUE}};"
+      }
+    }
+  },
+  "usesContext": ["postId", "postType"],
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": ["wide", "full"]
+  },
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
+}

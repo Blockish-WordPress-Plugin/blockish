@@ -1,0 +1,137 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/post-info",
+  "version": "1.0.0",
+  "title": "Post Info",
+  "category": "blockish-framework",
+  "description": "Displays post metadata such as author, dates, comments, and terms.",
+  "keywords": ["blockish", "post", "meta", "author", "date", "comments", "terms"],
+  "textdomain": "blockish",
+  "attributes": {
+    "layout": {
+      "type": "object",
+      "default": {
+        "value": "row",
+        "label": "Row"
+      }
+    },
+    "separator": {
+      "type": "object",
+      "default": {
+        "value": "dot",
+        "label": "Dot"
+      }
+    },
+    "items": {
+      "type": "array",
+      "default": [
+        {
+          "type": { "value": "author", "label": "Author" },
+          "beforeText": "",
+          "link": true,
+          "icon": { "value": "default", "label": "Default" },
+          "showAvatar": false,
+          "avatarSize": 16
+        },
+        {
+          "type": { "value": "date", "label": "Date" },
+          "beforeText": "",
+          "link": true,
+          "icon": { "value": "default", "label": "Default" },
+          "dateFormat": { "value": "default", "label": "Default" }
+        },
+        {
+          "type": { "value": "comments", "label": "Comments" },
+          "beforeText": "",
+          "link": true,
+          "icon": { "value": "default", "label": "Default" }
+        }
+      ]
+    },
+    "alignment": {
+      "type": "object",
+      "default": {
+        "Desktop": "flex-start"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "justify-content: {{VALUE}};"
+      }
+    },
+    "alignItems": {
+      "type": "object",
+      "default": {
+        "Desktop": "center"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "align-items: {{VALUE}};"
+      }
+    },
+    "gap": {
+      "type": "object",
+      "default": {
+        "Desktop": "12px"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "gap: {{VALUE}};"
+      }
+    },
+    "typography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "color": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}, .{{WRAPPER}} a": "color: {{VALUE}};"
+      }
+    },
+    "hoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} a:hover": "color: {{VALUE}};"
+      }
+    },
+    "iconColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-info__icon": "color: {{VALUE}};"
+      }
+    },
+    "iconSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-info__icon": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "iconGap": {
+      "type": "object",
+      "default": {
+        "Desktop": "6px"
+      },
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-info__item": "gap: {{VALUE}};"
+      }
+    },
+    "separatorColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}.is-separator-line .blockish-post-info__entry:not(:last-child)::after": "background-color: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-post-info__separator": "color: {{VALUE}};"
+      }
+    }
+  },
+  "usesContext": ["postId", "postType"],
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": ["wide", "full"]
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

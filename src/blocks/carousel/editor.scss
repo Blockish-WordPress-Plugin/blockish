@@ -1,0 +1,25 @@
+.blockish-carousel {
+	&.is-editor-preview {
+		.blockish-carousel__arrow,
+		.blockish-carousel__dot {
+			pointer-events: auto;
+		}
+
+		.blockish-carousel__track > .is-clone {
+			pointer-events: none !important;
+		}
+	}
+}
+
+.blockish-carousel-editor__appender {
+	display: flex;
+	justify-content: center;
+	margin-top: 12px;
+}
+
+.blockish-carousel-help {
+	margin: 0 0 12px;
+	font-size: 12px;
+	line-height: 1.45;
+	color: #646970;
+}

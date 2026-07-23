@@ -1,86 +1,99 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
-import { Button, Icon } from '@wordpress/components';
-import { trash } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
+import InteractionsBuilder from './components/InteractionsBuilder';
+import withInteractionsToolbar from './toolbar';
+import './editor.scss';
 
 const InteractionsPanel = ({ clientId }) => {
-    const { useExtensionsAttributes } = window?.blockish?.helpers || {};
-    const BlockishControl = window?.blockish?.controls?.BlockishControl;
+	const { useExtensionsAttributes } = window?.blockish?.helpers || {};
+	const BlockishControl = window?.blockish?.controls?.BlockishControl;
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
-    if (!BlockishControl || !useExtensionsAttributes) return null;
+	if (!BlockishControl || !useExtensionsAttributes) return null;
 
-    const { attributes, setAttributes } = useExtensionsAttributes(clientId);
-    const interactions = attributes?.interactionData || [];
+	const { attributes, setAttributes } = useExtensionsAttributes(clientId);
+	const interactions = attributes?.interactionData || [];
+	const hasInteractions = interactions.length > 0;
 
-    const handleDelete = (idToDelete) => {
-        setAttributes({
-            interactionData: interactions.filter(interaction => interaction.id !== idToDelete)
-        });
-    };
+	return (
+		<>
+			<BlockishControl
+				type="BlockishPanelBody"
+				title={__('Interactions', 'blockish')}
+				initialOpen={false}
+			>
+				<div className="blockish-interactions-panel">
+					<p className="blockish-interactions-panel__desc">
+						{__(
+							'Animate this block, react to clicks, or connect blocks with simple signals.',
+							'blockish'
+						)}
+					</p>
+					<button
+						type="button"
+						className="components-button is-primary is-blockish-primary"
+						onClick={() => setIsModalOpen(true)}
+						style={{ width: '100%', justifyContent: 'center' }}
+					>
+						{hasInteractions
+							? __('Manage interactions', 'blockish')
+							: __('Add interaction', 'blockish')}
+					</button>
+					{hasInteractions && (
+						<p className="blockish-interactions-panel__status">
+							✓{' '}
+							{interactions.length === 1
+								? __('1 active on this block', 'blockish')
+								: `${interactions.length} ${__(
+										'active on this block',
+										'blockish'
+								  )}`}
+						</p>
+					)}
+				</div>
+			</BlockishControl>
 
-    return (
-        <BlockishControl 
-            type="BlockishPanelBody" 
-            title={__('Interactions', 'blockish')} 
-            initialOpen={false}
-        >
-            <div className="blockish-interactions-panel">
-                <p style={{ fontSize: '12px', marginBottom: '15px' }}>
-                    {__('Interactions (animations and event listeners) are generated and managed by the AI. You can view and delete them here, but not edit them directly. To add an interaction, ask the AI!', 'blockish')}
-                </p>
-
-                {interactions.length === 0 ? (
-                    <p style={{ fontStyle: 'italic', color: '#757575', fontSize: '12px' }}>
-                        {__('No interactions set for this block.', 'blockish')}
-                    </p>
-                ) : (
-                    <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
-                        {interactions.map((interaction, index) => (
-                            <li key={interaction.id || index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f0f0f0', padding: '8px', marginBottom: '8px', borderRadius: '4px' }}>
-                                <div>
-                                    <strong style={{ fontSize: '12px', display: 'block' }}>{interaction.event || 'Event'}</strong>
-                                    {interaction.selector && (
-                                        <span style={{ fontSize: '10px', color: '#555' }}>Target: {interaction.selector}</span>
-                                    )}
-                                </div>
-                                <Button 
-                                    icon={<Icon icon={trash} />} 
-                                    isDestructive 
-                                    size="small" 
-                                    onClick={() => handleDelete(interaction.id)}
-                                    title={__('Delete Interaction', 'blockish')}
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
-        </BlockishControl>
-    );
+			{isModalOpen && (
+				<InteractionsBuilder
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+					attributes={attributes}
+					setAttributes={setAttributes}
+				/>
+			)}
+		</>
+	);
 };
 
 const Inspector = createHigherOrderComponent((WrappedComponent) => {
-    return (props) => {
-        const { tabName, blockName, clientId } = props;
-        
-        // Only run on the Advanced tab and only for blockish blocks
-        if (tabName !== 'advanced' || !blockName || !blockName.startsWith('blockish')) {
-            return <WrappedComponent {...props} />;
-        }
+	return (props) => {
+		const { tabName, blockName, clientId } = props;
 
-        return (
-            <>
-                <WrappedComponent {...props} />
-                <InteractionsPanel clientId={clientId} />
-            </>
-        );
-    };
+		if (tabName !== 'advanced' || !blockName || !blockName.startsWith('blockish')) {
+			return <WrappedComponent {...props} />;
+		}
+
+		return (
+			<>
+				<WrappedComponent {...props} />
+				<InteractionsPanel clientId={clientId} />
+			</>
+		);
+	};
 }, 'withInteractionsInspector');
 
 addFilter(
-    'blockish.tabs.after-tab-content',
-    'blockish/interactions-inspector',
-    Inspector,
-    20 // Run after other plugins
+	'blockish.tabs.after-tab-content',
+	'blockish/interactions-inspector',
+	Inspector,
+	20
+);
+
+addFilter(
+	'editor.BlockEdit',
+	'blockish/interactions-toolbar',
+	withInteractionsToolbar,
+	20
 );

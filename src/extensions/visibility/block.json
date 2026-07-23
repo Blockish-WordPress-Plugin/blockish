@@ -1,0 +1,22 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/visibility",
+	"title": "Visibility",
+	"category": "blockish-extensions",
+	"attributes": {
+		"hideOn": {
+			"type": "object",
+			"default": {
+				"Desktop": false,
+				"Tablet": false,
+				"Mobile": false
+			}
+		}
+	},
+	"include": ["*"],
+	"exclude": [],
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}

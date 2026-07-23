@@ -156,9 +156,239 @@ export const accordionItem = <BlockishIcon icon="excerpt-view" />;
 export const button = <BlockishIcon icon="button" />;
 export const googleMap = <BlockishIcon icon="location-alt" />;
 export const heading = <BlockishIcon icon="heading" />;
+export const postTitle = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				style={ { fill: 'none', stroke: 'currentColor' } }
+				aria-hidden="true"
+				focusable="false"
+			>
+				<path
+					style={ { fill: 'none' } }
+					d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
+				/>
+				<path style={ { fill: 'none' } } d="M14 2v5a1 1 0 0 0 1 1h5" />
+				<path style={ { fill: 'none' } } d="M11 18h2" />
+				<path style={ { fill: 'none' } } d="M12 12v6" />
+				<path
+					style={ { fill: 'none' } }
+					d="M9 13v-.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v.5"
+				/>
+			</svg>
+		}
+	/>
+);
+export const postExcerpt = <BlockishIcon icon="editor-paragraph" />;
+export const postFeaturedImage = <BlockishIcon icon="format-image" />;
+export const postContent = <BlockishIcon icon="welcome-write-blog" />;
+export const postInfo = <BlockishIcon icon="info" />;
+export const siteTitle = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				style={ { fill: 'none', stroke: 'currentColor' } }
+				aria-hidden="true"
+				focusable="false"
+			>
+				{ /* Site chrome + title text — site name in the header */ }
+				<path
+					style={ { fill: 'none' } }
+					d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
+				/>
+				<path style={ { fill: 'none' } } d="M2 9h20" />
+				<path style={ { fill: 'none' } } d="M7 14h10" />
+				<path style={ { fill: 'none' } } d="M7 17h6" />
+			</svg>
+		}
+	/>
+);
+export const siteTagline = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				style={ { fill: 'none', stroke: 'currentColor' } }
+				aria-hidden="true"
+				focusable="false"
+			>
+				{ /* Subtitle / description lines under a title bar */ }
+				<path style={ { fill: 'none' } } d="M4 6h16" />
+				<path style={ { fill: 'none' } } d="M4 12h12" />
+				<path style={ { fill: 'none' } } d="M4 18h8" />
+			</svg>
+		}
+	/>
+);
+export const siteLogo = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				style={ { fill: 'none', stroke: 'currentColor' } }
+				aria-hidden="true"
+				focusable="false"
+			>
+				{ /* Rounded brand mark with image — site logo */ }
+				<rect
+					style={ { fill: 'none' } }
+					width="18"
+					height="18"
+					x="3"
+					y="3"
+					rx="4"
+				/>
+				<circle style={ { fill: 'none' } } cx="9" cy="9" r="2" />
+				<path
+					style={ { fill: 'none' } }
+					d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+				/>
+			</svg>
+		}
+	/>
+);
+export const queryTitle = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				style={ { fill: 'none', stroke: 'currentColor' } }
+				aria-hidden="true"
+				focusable="false"
+			>
+				{ /* Heading with search/query accent */ }
+				<path style={ { fill: 'none' } } d="M4 6h16" />
+				<path style={ { fill: 'none' } } d="M4 12h10" />
+				<path style={ { fill: 'none' } } d="M4 18h7" />
+				<circle style={ { fill: 'none' } } cx="17.5" cy="17.5" r="2.5" />
+				<path style={ { fill: 'none' } } d="m19.3 19.3 1.7 1.7" />
+			</svg>
+		}
+	/>
+);
+export const archiveDescription = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				style={ { fill: 'none', stroke: 'currentColor' } }
+				aria-hidden="true"
+				focusable="false"
+			>
+				{ /* Text body / description lines */ }
+				<path style={ { fill: 'none' } } d="M4 5h16" />
+				<path style={ { fill: 'none' } } d="M4 10h16" />
+				<path style={ { fill: 'none' } } d="M4 15h12" />
+				<path style={ { fill: 'none' } } d="M4 20h8" />
+			</svg>
+		}
+	/>
+);
+export const queryTotal = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				style={ { fill: 'none', stroke: 'currentColor' } }
+				aria-hidden="true"
+				focusable="false"
+			>
+				{ /* Hash / count mark */ }
+				<path style={ { fill: 'none' } } d="M4 9h16" />
+				<path style={ { fill: 'none' } } d="M4 15h16" />
+				<path style={ { fill: 'none' } } d="M10 3 8 21" />
+				<path style={ { fill: 'none' } } d="m16 3-2 18" />
+			</svg>
+		}
+	/>
+);
 export const iconList = <BlockishIcon icon="editor-ul" />;
 export const iconListItem = <BlockishIcon icon="marker" />;
 export const image = <BlockishIcon icon="format-image" />;
+export const carousel = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="1.75"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				aria-hidden="true"
+				focusable="false"
+			>
+				<rect x="1.5" y="6.5" width="4" height="11" rx="1" opacity="0.45" />
+				<rect x="18.5" y="6.5" width="4" height="11" rx="1" opacity="0.45" />
+				<rect x="6" y="5" width="12" height="14" rx="1.5" />
+				<path d="M9.25 12H7.75" />
+				<path d="M8.5 10.75 7.25 12l1.25 1.25" />
+				<path d="M14.75 12h1.5" />
+				<path d="M15.5 10.75 16.75 12l-1.25 1.25" />
+			</svg>
+		}
+	/>
+);
+export const carouselSlide = <BlockishIcon icon="image-flip-horizontal" />;
 export const navigation = <BlockishIcon icon="menu" />;
 export const navmenu = <BlockishIcon icon="menu" />;
 export const navmenuItem = <BlockishIcon icon="minus" />;

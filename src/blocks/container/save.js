@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import getBackgroundVideo from './background-video';
 
 export default function Save({ attributes }) {
+	const { getLinkProps } = window.blockish.helpers;
 	const backgroundVideo = getBackgroundVideo(attributes?.containerBackground);
 	const backgroundOverlay = typeof attributes?.containerBackgroundOverlay === 'string' ? JSON.parse(attributes?.containerBackgroundOverlay) : attributes?.containerBackgroundOverlay;
 	const blockProps = useBlockProps.save({
@@ -17,10 +18,14 @@ export default function Save({ attributes }) {
 
 	const innerBlockProps = useInnerBlocksProps.save(blockProps);
 	let Tag = attributes?.tagName?.value || 'div';
+	const linkProps = Tag === 'a' ? getLinkProps(attributes?.url) : null;
 
 	return (
 		<>
-			<Tag {...innerBlockProps}>
+			<Tag
+				{...innerBlockProps}
+				{...(linkProps || {})}
+			>
 				{backgroundVideo?.url && (
 					<video
 						className="blockish-container-background-video"

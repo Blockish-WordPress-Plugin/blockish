@@ -1,0 +1,52 @@
+/**
+ * Frontend entrance preset styles for Blockish Interactions.
+ */
+
+.blockish-ix-prep {
+	opacity: 0;
+	will-change: opacity, transform;
+}
+
+.blockish-ix-prep-fadeIn {
+	opacity: 0;
+}
+
+.blockish-ix-prep-fadeUp {
+	opacity: 0;
+	transform: translateY(24px);
+}
+
+.blockish-ix-prep-fadeDown {
+	opacity: 0;
+	transform: translateY(-24px);
+}
+
+.blockish-ix-prep-fadeLeft {
+	opacity: 0;
+	transform: translateX(24px);
+}
+
+.blockish-ix-prep-fadeRight {
+	opacity: 0;
+	transform: translateX(-24px);
+}
+
+.blockish-ix-prep-zoomIn {
+	opacity: 0;
+	transform: scale(0.92);
+}
+
+.blockish-ix-run {
+	opacity: 1;
+	transform: none;
+}
+
+.blockish-ix-run-fadeIn,
+.blockish-ix-run-fadeUp,
+.blockish-ix-run-fadeDown,
+.blockish-ix-run-fadeLeft,
+.blockish-ix-run-fadeRight,
+.blockish-ix-run-zoomIn {
+	opacity: 1;
+	transform: none;
+}

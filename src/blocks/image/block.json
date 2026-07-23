@@ -40,6 +40,10 @@
     "customCaption": {
       "type": "string"
     },
+    "lightbox": {
+      "type": "boolean",
+      "default": false
+    },
     "alignment": {
       "type": "object",
       "default": {
@@ -228,6 +232,7 @@
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
+  "viewScript": "file:./view.js",
   "usesContext": [
     "postId",
     "postType"

@@ -106,7 +106,7 @@ Example of designing the inside of a header template part (logo + navigation):
     "padding": { "top": "16px", "right": "40px", "bottom": "16px", "left": "40px" }
   },
   "innerBlocks": [
-    { "name": "blockish/image", "attributes": { "image": { "id": 0, "url": "https://example.com/logo.png" }, "alt": "Logo", "imageWidth": { "Desktop": "140px" } } },
+    { "name": "blockish/site-logo", "attributes": { "logoWidth": { "Desktop": "140px" }, "linkToHome": true } },
     {
       "name": "blockish/navigation",
       "attributes": { "menuBreakpoint": "tablet" },
@@ -130,47 +130,83 @@ Example of designing the inside of a header template part (logo + navigation):
 
 ---
 
-## 8. Interactions Extension (interactionData)
+## 9. Extensions: Visibility & Interactions
 
-All Blockish blocks accept the `interactionData` attribute. This allows you to add custom vanilla JavaScript interactions (animations, event listeners) to a specific block.
+### Visibility (`hideOn`)
 
-**Attribute Structure:**
-```json
-"interactionData": [
-  {
-    "id": "unique-id-123",
-    "scope": "block",
-    "event": "click",
-    "selector": ".trigger-element", // Optional. Event delegation selector relative to this block
-    "callbacks": [
-      "console.log('Clicked!', event); blockElement.classList.toggle('active');" // Raw JS string. 'event' and 'blockElement' variables are exposed.
-    ]
-  }
-]
-```
-Note: Do not use this for global interactions. For global interactions, use the `blockish/manage-global-interactions` ability instead.
+Documented in **§4 Global attributes → Visibility**. Set `"hideOn": { "Desktop": false, "Tablet": true, "Mobile": true }` on any block to hide it on selected devices. Prefer this over `customCss` display hacks.
 
-**Lifecycle events (`ready` / `init`) — use these for one-time setup:**
-- `event: "ready"` or `event: "init"` runs **once** after the interactions script boots (safe even if the script loads after `DOMContentLoaded`).
-- Use them to set initial UI state (e.g. mark the default pricing tab active), define helpers on `window`, or query Class Manager hooks.
-- Do **not** rely on `DOMContentLoaded` inside a callback — it may have already fired. Prefer `ready`/`init`.
-- For ongoing listeners, keep using normal DOM events (`click`, `scroll`, etc.).
+### Interactions (`interactionData`)
 
-Example (global):
+All Blockish blocks accept `interactionData` (array). Prefer the **structured** shape below. Legacy `{ event, selector, callbacks }` still works and is treated as `action.type: "custom"`.
+
+**Structured interaction object:**
+
 ```json
 {
-  "id": "pricing-init",
-  "scope": "global",
-  "event": "ready",
-  "callbacks": [
-    "var tab = document.querySelector('.pricing-plan-monthly'); if (tab) tab.classList.add('is-active');"
-  ]
+  "id": "ix_unique",
+  "title": "Entrance fade",
+  "scope": "block",
+  "when": {
+    "source": "dom",
+    "event": "inView",
+    "selector": "",
+    "eventName": "",
+    "phase": "start"
+  },
+  "action": {
+    "type": "preset",
+    "preset": "fadeUp",
+    "presetOptions": { "duration": 600, "delay": 0, "once": true },
+    "eventName": "",
+    "phase": "start",
+    "callbacks": [""]
+  }
 }
 ```
 
-**CRITICAL RULE FOR ANIMATIONS & INTERACTIONS (BOTH BLOCK-LEVEL & GLOBAL):**
-Many Blockish blocks (like `blockish/button`) use an outer wrapper `<div>` and inner elements (like an `<a>` tag for the actual button with styles). By default, interactions are applied to the outermost wrapper `<div>`.
-If a user complains about an animation looking weird (e.g., "the shadow is appearing behind the button when it scales", or they provide an image showing a styling issue during animation), **DO NOT guess the fix**. 
-1. **INSPECT THE RAW MARKUP:** Use the `blockish/get-posts` MCP tool to fetch the post and look at the raw HTML structure inside the `content` property, OR ask the user for a screenshot of the raw markup.
-2. **USE THE `selector` PROPERTY:** Once you see the HTML structure (e.g., `<div class="wp-block-blockish-button ..."><a class="blockish-button-link">`), add the correct `selector` (e.g., `"selector": ".blockish-button-link"`) to your `interactionData` schema (or global interaction schema) so that the animation applies exactly to the inner target element instead of the outer wrapper. (When `selector` is used, the `blockElement` variable in the callback automatically refers to the matched inner element).
-3. **COMBINE WITH CLASS MANAGER:** To ensure animations or interactions reliably target a specific block (especially when using Global Interactions or when you need to target a block from another block's event), always assign a unique CSS class to the target block using the **Class Manager** extension (or the block's `className` attribute). This guarantees you have a unique selector to query the element without affecting other blocks on the page.
+| Field | Values / notes |
+|---|---|
+| `when.source` | `"dom"` (page action) \| `"listen"` (signal from another block) |
+| `when.event` (dom) | `"ready"` (page load / boot) \| `"click"` \| `"mouseenter"` \| `"focus"` \| `"inView"` (scroll into view) |
+| `when.selector` | Optional CSS selector **relative to this block** (event delegation / animation target) |
+| `when.eventName` / `when.phase` | Used when `source` is `"listen"` — named signal + `"start"` \| `"end"` \| `"any"` |
+| `action.type` | `"preset"` \| `"emit"` \| `"custom"` |
+| `action.preset` | `"fadeIn"` `"fadeUp"` `"fadeDown"` `"fadeLeft"` `"fadeRight"` `"zoomIn"` |
+| `action.presetOptions` | `{ duration, delay, once }` — ms / boolean |
+| `action.eventName` / `action.phase` | Used when `type` is `"emit"` — broadcast a named signal (`"start"` \| `"end"`) |
+| `action.callbacks` | Array of JS strings when `type` is `"custom"`. Exposed vars: `event`, `blockElement` |
+
+**Entrance animation (recommended for AI layouts):**
+```json
+"interactionData": [
+  {
+    "id": "ix_hero_in",
+    "title": "Hero entrance",
+    "scope": "block",
+    "when": { "source": "dom", "event": "inView", "selector": "", "eventName": "", "phase": "start" },
+    "action": {
+      "type": "preset",
+      "preset": "fadeUp",
+      "presetOptions": { "duration": 700, "delay": 0, "once": true },
+      "eventName": "",
+      "phase": "start",
+      "callbacks": [""]
+    }
+  }
+]
+```
+
+**Emit / listen (cross-block signals):** one block `action.type: "emit"` with `action.eventName: "open-menu"`; another block `when.source: "listen"`, `when.eventName: "open-menu"`.
+
+**Custom JS:** `action.type: "custom"` + `callbacks`. Do **not** rely on `DOMContentLoaded` inside callbacks — use `when.event: "ready"` for one-time setup.
+
+**Page / global libraries:** block-scoped data lives on `interactionData`. Page-level and site-wide libraries are managed via Blockish Interactions UI / REST (not by stuffing everything onto one block). For global reusable interactions, use the `blockish/manage-global-interactions` ability when available.
+
+**CRITICAL — animation target:**
+Many blocks wrap an outer `<div>` around an inner styled element (e.g. button `<a>`). Interactions default to the **outer wrapper**. If an animation looks wrong (shadow behind a scaling button, etc.):
+1. Inspect markup (`blockish/get-posts` → `content`, or ask for a screenshot).
+2. Set `when.selector` to the inner target (e.g. `".blockish-button-link"`).
+3. Prefer Class Manager classes as stable cross-block selectors.
+
+---

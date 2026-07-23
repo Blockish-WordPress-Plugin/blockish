@@ -1,3 +1,4 @@
+import { applyFilters } from '@wordpress/hooks';
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 import {
 	blocks as blocksIcon,
@@ -36,7 +37,8 @@ export const EXTENSION_CONTROL_MAP = {
 };
 
 export function isValidMenu(menuKey) {
-	return SIDEBAR_MENUS.some((menu) => menu.key === menuKey);
+	const menus = applyFilters('blockish.dashboard.sidebarMenus', SIDEBAR_MENUS);
+	return menus.some((menu) => menu.key === menuKey);
 }
 
 export function getBlockCategoryKey(item = {}, slug = '') {

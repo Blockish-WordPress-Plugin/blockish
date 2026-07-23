@@ -9,6 +9,7 @@
 | `imageSize` | Option | `{"value":"full","label":"Full Size"}` | Options: `[{"label":"Thumbnail","value":"thumbnail"},{"label":"Medium","value":"medium"},{"label":"Large","value":"large"},{"label":"Full Size","value":"full"}]` |
 | `captionType` | Scalar (string) | `"none"` | `"none"` `"attachment"` (WP media caption) `"custom"` (use `customCaption`) |
 | `customCaption` | Scalar (string) | unset | Used when `captionType` = `"custom"` |
+| `lightbox` | Scalar (boolean) | `false` | When `true`, clicking the image opens a fullscreen lightbox on the **frontend** (editor preview does not open it). Uses the full-size image URL. |
 | `alignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` <br>**CSS:** `.{{WRAPPER}}` -> `text-align: {{VALUE}};` |
 | `imageWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-image` -> `width: {{VALUE}};` |
 | `imageMaxWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-image` -> `max-width: {{VALUE}};` |

@@ -25,5 +25,6 @@ class ExtensionsLoader
     {
         \Blockish\Extensions\ClassManager::get_instance();
         \Blockish\Extensions\Interaction::get_instance();
+        \Blockish\Extensions\Visibility::get_instance();
     }
 }

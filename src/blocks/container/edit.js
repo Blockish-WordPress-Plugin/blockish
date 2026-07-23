@@ -72,6 +72,8 @@ export default function Edit({ attributes, setAttributes, advancedControls, clie
 
 	let content = null;
 	let Tag = attributes?.tagName?.value || 'div';
+	const { getLinkProps } = window.blockish.helpers;
+	const linkProps = Tag === 'a' ? getLinkProps(attributes?.url) : null;
 
 	if (attributes?.isVariationPicked) {
 		content = (
@@ -82,7 +84,10 @@ export default function Edit({ attributes, setAttributes, advancedControls, clie
 					advancedControls={advancedControls}
 					hasParent={hasParent}
 				/>
-				<Tag {...innerBlockProps}>
+				<Tag
+					{...innerBlockProps}
+					{...(linkProps || {})}
+				>
 					{backgroundVideo?.url && (
 						<video
 							className="blockish-container-background-video"

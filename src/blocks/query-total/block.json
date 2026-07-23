@@ -1,0 +1,98 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/query-total",
+  "version": "1.0.0",
+  "title": "Query Total",
+  "category": "blockish-framework",
+  "description": "Displays the total number of results for the current query (search, archive, or blog).",
+  "keywords": ["blockish", "search", "results", "count", "total", "query"],
+  "textdomain": "blockish",
+  "attributes": {
+    "displayType": {
+      "type": "object",
+      "default": {
+        "label": "Total results",
+        "value": "total-results"
+      }
+    },
+    "totalFormat": {
+      "type": "string",
+      "default": "{count} results found"
+    },
+    "totalFormatSingular": {
+      "type": "string",
+      "default": "{count} result found"
+    },
+    "rangeFormat": {
+      "type": "string",
+      "default": "Displaying {start} – {end} of {total}"
+    },
+    "rangeFormatSingle": {
+      "type": "string",
+      "default": "Displaying {start} of {total}"
+    },
+    "tag": {
+      "type": "object",
+      "default": {
+        "label": "P",
+        "value": "p"
+      }
+    },
+    "alignment": {
+      "type": "object",
+      "default": {
+        "Desktop": "left"
+      },
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "typography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "color": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}": "color: {{VALUE}};"
+      }
+    },
+    "hoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}:hover": "color: {{VALUE}};"
+      }
+    },
+    "textShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "textShadowHover": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}:hover"
+      }
+    }
+  },
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": ["wide", "full"]
+  },
+  "usesContext": [
+    "blockish-dynamicity/loopContext",
+    "blockish-dynamicity/queryId"
+  ],
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

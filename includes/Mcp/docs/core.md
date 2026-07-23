@@ -419,6 +419,20 @@ Never set `blockClass`, `styles`, or `preview` — all three are internal/auto-m
 | `classManager` | Array of `{id, title}` | `[]` | See §6 |
 | `classManagerSubselector` | Array of `{id, title, parent}` | `[]` | See §6 |
 
+### Visibility (Hide on device)
+
+Available on **every** Blockish block via the Visibility extension. Adds CSS classes that hide the block at matching breakpoints (Desktop ≥1025px, Tablet 769–1024px, Mobile ≤768px).
+
+| Attribute | Type | Default | Notes |
+|---|---|---|---|
+| `hideOn` | Object | `{"Desktop":false,"Tablet":false,"Mobile":false}` | Set a device key to `true` to hide on that breakpoint. Frontend classes: `blockish-hide-on-desktop`, `blockish-hide-on-tablet`, `blockish-hide-on-mobile`. |
+
+```json
+"hideOn": { "Desktop": false, "Tablet": true, "Mobile": true }
+```
+
+Do **not** use `customCss` + `display:none` for responsive hide — use `hideOn` instead.
+
 ---
 
 ## 5. `customCss` — last resort only

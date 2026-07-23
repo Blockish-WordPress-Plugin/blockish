@@ -1,0 +1,19 @@
+/* Frontend: hide on selected breakpoints (match StyleGenerator: Tablet 1024, Mobile 768). */
+
+@media screen and (min-width: 1025px) {
+	.blockish-hide-on-desktop {
+		display: none !important;
+	}
+}
+
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+	.blockish-hide-on-tablet {
+		display: none !important;
+	}
+}
+
+@media screen and (max-width: 768px) {
+	.blockish-hide-on-mobile {
+		display: none !important;
+	}
+}

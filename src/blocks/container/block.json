@@ -23,6 +23,9 @@
         "value": "div"
       }
     },
+    "url": {
+      "type": "object"
+    },
     "overflow": {
       "type": "object",
       "selectors": {
@@ -218,6 +221,17 @@
       "groupSelector": {
         "type": "BlockishBoxShadow",
         "selector": ".{{WRAPPER}}:hover"
+      }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "url": [
+          {
+            "slug": "url",
+            "title": "Link URL"
+          }
+        ]
       }
     }
   },

@@ -1,0 +1,214 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/carousel",
+  "version": "1.2.0",
+  "title": "Carousel",
+  "category": "blockish-framework",
+  "description": "InnerBlocks carousel for hero, testimonials, or logo strips. Each slide is a Carousel Slide with limited allowed blocks.",
+  "keywords": [
+    "blockish",
+    "carousel",
+    "slider",
+    "hero",
+    "testimonial",
+    "logo"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "slidesPerView": {
+      "type": "number",
+      "default": 1
+    },
+    "slidesPerViewTablet": {
+      "type": "number",
+      "default": 1
+    },
+    "slidesPerViewMobile": {
+      "type": "number",
+      "default": 1
+    },
+    "gap": {
+      "type": "number",
+      "default": 16
+    },
+    "showArrows": {
+      "type": "boolean",
+      "default": true
+    },
+    "showDots": {
+      "type": "boolean",
+      "default": true
+    },
+    "autoplay": {
+      "type": "boolean",
+      "default": false
+    },
+    "autoplaySpeed": {
+      "type": "number",
+      "default": 4000
+    },
+    "loop": {
+      "type": "boolean",
+      "default": true
+    },
+    "pauseOnHover": {
+      "type": "boolean",
+      "default": true
+    },
+    "transitionSpeed": {
+      "type": "number",
+      "default": 450
+    },
+    "arrowsPosition": {
+      "type": "string",
+      "default": "inside"
+    },
+    "dotsPosition": {
+      "type": "string",
+      "default": "below"
+    },
+    "dotsAlign": {
+      "type": "string",
+      "default": "center"
+    },
+    "slideMinHeight": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__slide": "min-height: {{VALUE}};"
+      }
+    },
+    "slideBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__slide": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "trackPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__viewport": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "arrowSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__arrow": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "arrowIconSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__arrow": "font-size: {{VALUE}};"
+      }
+    },
+    "arrowOffset": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__arrow.is-prev": "left: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-carousel__arrow.is-next": "right: {{VALUE}};"
+      }
+    },
+    "arrowColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__arrow": "color: {{VALUE}};"
+      }
+    },
+    "arrowBackground": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__arrow": "background-color: {{VALUE}};"
+      }
+    },
+    "arrowBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-carousel__arrow"
+      }
+    },
+    "arrowBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__arrow": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "arrowBoxShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBoxShadow",
+        "selector": ".{{WRAPPER}} .blockish-carousel__arrow"
+      }
+    },
+    "arrowColorHover": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__arrow:hover": "color: {{VALUE}};"
+      }
+    },
+    "arrowBackgroundHover": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__arrow:hover": "background-color: {{VALUE}};"
+      }
+    },
+    "dotSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__dot": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "dotActiveSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__dot.is-active": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "dotGap": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__dots": "gap: {{VALUE}};"
+      }
+    },
+    "dotsOffset": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}:not(.is-dots-overlay) .blockish-carousel__dots": "margin-top: {{VALUE}};",
+        ".{{WRAPPER}}.is-dots-overlay .blockish-carousel__dots": "bottom: {{VALUE}};"
+      }
+    },
+    "dotColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__dot": "background-color: {{VALUE}};"
+      }
+    },
+    "dotActiveColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__dot.is-active": "background-color: {{VALUE}};"
+      }
+    },
+    "dotBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-carousel__dot": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    }
+  },
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": ["wide", "full"]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./view.js"
+}

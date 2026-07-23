@@ -1,0 +1,5 @@
+@use '../shared/media-placeholder-editor' as media;
+
+.blockish-site-logo {
+	@include media.blockish-media-placeholder-editor;
+}
