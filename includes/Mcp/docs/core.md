@@ -8,7 +8,9 @@ You (the AI) build a **schema**: a JSON tree of `{ name, attributes, innerBlocks
 - `attributes` — only the attributes you want different from their default. Anything you omit automatically falls back to the block's registered default — you never need to repeat a default value, and you never need to compute what an omitted value "renders as." That is handled for you.
 - `innerBlocks` — array of child schema nodes, same shape, recursive. Only for blocks marked "Accepts children: yes" below.
 
-**You never write HTML, CSS classes, or comment markup of any kind.** Turning your schema into real Gutenberg blocks happens in the editor, not by you. The HTML markup and CSS mappings shown in the individual block documentation files are strictly **examples for understanding** how the system generates the frontend; you should never try to reproduce a block's rendered HTML or write CSS directly (except in `customCss`). If you find yourself writing an HTML tag, stop — that's a sign you've stepped outside your job.
+**You never write block HTML, CSS classes, or hand-built block trees as markup.** Section design is always `{ name, attributes, innerBlocks }` schema (usually via `blockish/manage-pattern`). The HTML markup and CSS mappings in block docs are **examples for understanding** only — never reproduce a block's rendered HTML or write CSS directly (except in `customCss`). If you find yourself writing an HTML tag for a Blockish block, stop.
+
+**One exception — `blockish/manage-post` only:** when assembling a **fully empty** page/post, you may pass `post_content` that contains **only** synced pattern ref comments (see below). Never use that exception for templates, template parts, or section design.
 
 *Note on CSS Mappings:* In the block docs, you will see CSS mappings like `.{{WRAPPER}} -> padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};`. These use reserved placeholders to show how your JSON data maps to CSS properties:
 - `{{WRAPPER}}`: Represents the unique, auto-generated class for that specific block instance (e.g., `.bb-[hash].blockish-block-wrapper`).
@@ -29,7 +31,26 @@ These are just placeholders to help you understand which HTML elements and CSS p
 **Naming Top-Level Blocks**
 As a best practice, every top-level layout block you emit should carry a meaningful `metadata.name` attribute (e.g., `"attributes": { "metadata": { "name": "Hero Section" } }`). This metadata.name is used for identifying blocks in the editor. It is recommended to make this meaningful for readability.
 
-**Your schema is staged for human review, not written live.** Passing `block_schema` to `blockish/manage-post` does not put anything into `post_content`. It saves the schema as pending data on the post. When a human opens that post in the block editor, a styled AI Preview Wrapper block (with a neon border) will automatically appear in the canvas containing your layout. The user must review it visually and click the "Accept" or "Discard" button on the block itself to commit it to the real content. Never pass a schema as `post_content` directly, and never expect it to appear on the live post without that manual step.
+### `manage-post` page/post assembly (this tool only)
+
+**Create patterns before you include them.** Call `blockish/manage-pattern` for each section first and use only the **returned real pattern IDs**. Never invent or hallucinate `ref` values.
+
+**Empty vs not empty** (check with `blockish/get-posts`):
+
+| State | Meaning | What to send on `manage-post` |
+|---|---|---|
+| **Empty** | `post_content` is empty **and** there is no `pending_schema` | `post_content` = pattern refs only, e.g. `<!-- wp:block {"ref":163} /-->` (one per section). Goes live immediately — share `post_url`. |
+| **Not empty** | Has `post_content` **or** has `pending_schema` | `block_schema` = lightweight pattern-ref nodes only: `{"name":"core/block","attributes":{"ref":163}}`. Staged for Accept/Discard — share `edit_url`, call `trigger-refresh`. |
+
+- **Markup allowed on empty pages means only those pattern-ref comments** — never full section HTML, never hand-built Blockish trees in `post_content`.
+- **Never** put `core/template-part` header/footer on a page (theme template already provides chrome).
+- This empty→`post_content` path is **`manage-post` only**. Templates / template parts always use `block_schema` via `manage-template` (Accept required). Do not invent a direct-markup path for them.
+
+When `block_schema` is staged on a non-empty post, the editor shows a neon AI Preview wrapper; the user must Accept or Discard. Do not expect the live URL to change until Accept.
+
+**meta_input:** Never invent meta keys. The user must give exact key names, or (if Blockish Dynamicity is active) call `blockish-dynamicity/get-meta-list` and pick a real key. If Dynamicity is not active and the user needs meta discovery/bindings, ask them for the keys or mention that Dynamicity provides meta listing + dynamic bindings.
+
+**Undo live content:** Use `blockish/get-revisions` then `blockish/restore-revision` (`confirm: true`) only when the user asks. Pending AI preview is undone with Discard in the editor, not revisions.
 
 ### Core Workflow (Fetch, Modify, Update)
 
@@ -38,8 +59,8 @@ As a best practice, every top-level layout block you emit should carry a meaning
 1. **Fetch**: Call `blockish/get-posts` (for posts/pages) or `blockish/get-templates` (for templates/template parts) with the specific `post_id` or `slug`.
 2. **Inspect**: Look at the returned `schema` array. This is the exact live block structure. You will also receive `pending_schema` which shows any unaccepted changes currently in the editor, allowing you to understand what the user is seeing even if they haven't accepted it yet.
 3. **Modify**: Locate the specific block node you need to change and update its `attributes` or `innerBlocks` in memory.
-4. **Update**: Send the fully modified schema array back to `blockish/manage-post` or `blockish/manage-template` as the `block_schema` argument.
-5. **Review**: Always provide the returned `edit_url` to the user. When updating an existing post, you must ALSO call `blockish/trigger-refresh` and tell the user: "I have refreshed your active tab. If you don't have it open, you can visit this link: [edit_url]". **CRITICAL:** NEVER provide the live frontend URL to the user unless they explicitly ask for it. The live URL will not show your changes until the user approves them in the editor.
+4. **Update**: For templates / template parts, always send `block_schema` via `manage-template`. For pages/posts via `manage-post`: if the target is **empty**, assemble with pattern-ref `post_content`; if **not empty**, send `block_schema` (pattern refs only).
+5. **Review**: If you staged `block_schema`, provide `edit_url`, call `blockish/trigger-refresh`, and tell the user to Accept. If you applied pattern-ref `post_content` on an empty page, share `post_url` (live). Never share a live URL for staged-only changes — it will look empty or unchanged until Accept.
 
 ---
 
@@ -432,6 +453,10 @@ Available on **every** Blockish block via the Visibility extension. Adds CSS cla
 ```
 
 Do **not** use `customCss` + `display:none` for responsive hide — use `hideOn` instead.
+
+### Interactions (`interactionData`)
+
+Available on Blockish blocks via the Interactions extension. Full shapes, presets, emit/listen, and custom JS rules are in **§9 Extensions** (footer). Prefer entrance presets (`action.type: "preset"`, `when.event: "inView"` or `"ready"`) over hand-written animation CSS.
 
 ---
 

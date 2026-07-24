@@ -1,4 +1,6 @@
-.blockish-post-title {
+:where(.blockish-post-title) {
+	margin: 0;
+
 	a {
 		color: inherit;
 		text-decoration: inherit;

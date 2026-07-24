@@ -1,12 +1,22 @@
-.blockish-post-featured-image {
+:where(.blockish-post-featured-image) {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	// Parent containers default to align-items: center — without this the
+	// block shrinks to the placeholder's intrinsic width (thin strip).
+	align-self: stretch;
 	margin: 0;
 
-	a {
+	:where(a),
+	:where(.components-placeholder),
+	:where(.block-editor-media-placeholder),
+	:where(.blockish-post-featured-image__image) {
 		display: block;
+		width: 100%;
+		max-width: 100%;
 	}
 
-	.blockish-post-featured-image__image {
-		display: block;
+	:where(.blockish-post-featured-image__image) {
 		height: auto;
 	}
 }

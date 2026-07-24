@@ -82,24 +82,12 @@
     },
     "justifyContent": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "label": "Center",
-          "value": "center"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-flex": "justify-content: {{VALUE}};"
       }
     },
     "alignItems": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "label": "Center",
-          "value": "center"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-flex": "align-items: {{VALUE}};"
       }
@@ -250,6 +238,5 @@
   "textdomain": "blockish",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css",
-  "viewScript": "file:./view.js"
+  "style": "file:./style-index.css"
 }

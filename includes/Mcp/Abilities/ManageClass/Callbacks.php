@@ -25,13 +25,22 @@ class Callbacks
             if ( 'blockish-classes' !== get_post_type( $post_id ) ) {
                 return [ 'error' => 'Invalid post_id: not a blockish-classes post.' ];
             }
+            if ( ! current_user_can( 'delete_post', $post_id ) ) {
+                return [ 'error' => 'You do not have access to delete this class.' ];
+            }
             wp_delete_post( $post_id, true );
             return [ 'deleted' => true, 'post_id' => $post_id ];
         }
 
         if ( $action === 'create' ) {
-            if ( empty( $input['name'] ) ) {
-                return [ 'error' => 'name is required when creating a class.' ];
+            if ( empty( $input['name'] ) || ! is_string( $input['name'] ) ) {
+                return [ 'error' => 'name is required when creating a class (non-empty string).' ];
+            }
+        }
+
+        if ( $action === 'update' && $post_id > 0 ) {
+            if ( ! current_user_can( 'edit_post', $post_id ) ) {
+                return [ 'error' => 'You do not have access to edit this class.' ];
             }
         }
 
@@ -41,6 +50,9 @@ class Callbacks
         ];
 
         if ( isset( $input['name'] ) ) {
+            if ( ! is_string( $input['name'] ) || '' === trim( $input['name'] ) ) {
+                return [ 'error' => 'name must be a non-empty string.' ];
+            }
             $args['post_title'] = sanitize_text_field( $input['name'] );
         }
 
@@ -48,6 +60,18 @@ class Callbacks
         // compiles it to the blockishClassManagerStyles meta automatically.
         if ( array_key_exists( 'content', $input ) ) {
             $content = $input['content'];
+
+            if ( is_string( $content ) ) {
+                $decoded = json_decode( $content, true );
+                if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
+                    return [ 'error' => 'content must be a style object (JSON object), not a string of invalid JSON.' ];
+                }
+                $content = $decoded;
+            }
+
+            if ( ! is_array( $content ) ) {
+                return [ 'error' => 'content must be a style object (key/value map).' ];
+            }
             
             if ( $action === 'update' && $post_id > 0 ) {
                 $existing_post = get_post( $post_id );
@@ -75,10 +99,7 @@ class Callbacks
                 }
             }
 
-            if ( is_array( $content ) ) {
-                $content = wp_json_encode( $content );
-            }
-            $args['post_content'] = wp_slash( is_string( $content ) ? $content : '' );
+            $args['post_content'] = wp_slash( wp_json_encode( $content ) );
         }
 
         if ( ! empty( $input['parent_id'] ) ) {

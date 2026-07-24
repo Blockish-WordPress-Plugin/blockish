@@ -1,3 +1,16 @@
+## 7.1 Shared WP supports: `anchor` and `align`
+
+Most Blockish blocks opt into WordPress core supports:
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `anchor` | Scalar (string) | Sets the wrapper element's HTML `id` (HTML anchor / jump target). |
+| `align` | Scalar (string) | `"wide"` or `"full"` when the block declares `supports.align`. |
+
+**Exceptions (do not set these):** `blockish/button` (no `anchor` / `align`), `blockish/navmenu-item` (no `anchor`), and some child-only blocks. If a per-block table says "See §7.1", that block supports the attributes above unless it explicitly says otherwise.
+
+---
+
 ## 8. Composite examples
 
 ### Hero section (nested container + heading + button)
@@ -34,7 +47,7 @@
 
 `buttonPlacement` is set here even though the container's `alignItems` is already Center — that container setting only affects how the button's wrapper *box* is sized in the column, not where the visible button sits inside it (the wrapper is hard-width: 100% regardless). Without `buttonPlacement: {"Desktop":{"label":"Center","value":"center"}}`, this button would render flush-left despite the "centered" hero layout.
 
-Note what's omitted because it already matches the container's defaults: `display` (defaults `"flex"`), `alignItems`/`justifyContent` (both default Center), `containerWidth` (defaults `"alignfull"`). Only `flexDirection`, `containerMinHeight`, `containerBackground`, and `padding` actually differ from default.
+Note what's omitted because it already matches the container's defaults: `display` (defaults `"flex"`), `alignItems`/`justifyContent` on a **top-level** container (base CSS Center — omit), `containerWidth` (defaults `"alignfull"`). Only `flexDirection`, `containerMinHeight`, `containerBackground`, and `padding` actually differ from default. Nested containers do **not** inherit Center — set `alignItems`/`justifyContent` explicitly when a nested stack must align.
 
 ### Stats row (grid container with three counters)
 
@@ -80,20 +93,23 @@ Note what's omitted because it already matches the container's defaults: `displa
 
 ### Site header / Template parts
 
-**CRITICAL RULE FOR HEADERS & FOOTERS:**
-1. **When adding a header/footer to a page layout:** Do NOT build a custom `blockish/container` with `"tagName": {"value": "header"}`. Headers and footers are global. You MUST use the WordPress native `core/template-part` block so it remains reusable.
+**CRITICAL — pages vs templates:**
+
+1. **`manage-post` for a page/post:** Do **NOT** put `core/template-part` (header/footer) in the page `block_schema` or `post_content`. On block themes the active page template already wraps content with header + footer. Adding them again causes **duplicate** headers/footers. Create patterns first with real IDs, then assemble: empty page → `post_content` pattern-ref comments only; not-empty page → `block_schema` pattern refs only (Accept). Example ref node: `{"name":"core/block","attributes":{"ref":123}}`.
+
+2. **`manage-template` for a `wp_template` layout** (e.g. designing `page` / `single` / `home`): THEN you may include reusable header/footer parts:
 ```json
 {
   "name": "core/template-part",
   "attributes": {
     "slug": "header",
-    "theme": "twentytwentyfive" 
+    "theme": "twentytwentyfive"
   }
 }
 ```
-*(Use `"slug": "footer"` for footers).*
+*(Use `"slug": "footer"` for footers.)* Do **not** invent a page-level `blockish/container` with `"tagName": {"value": "header"}` as a fake site header.
 
-2. **When DESIGNING a header/footer template part itself:** If you are asked to design the actual header layout (e.g. logo + navigation), you will use `blockish/container`, but **DO NOT set `"tagName": {"label": "Header", "value": "header"}`**. WordPress already wraps the entire template part in a `<header>` tag natively on the frontend. If you set `tagName` to `header` on your container, it will render double `<header>` tags. Leave it as the default `div`.
+3. **When DESIGNING a header/footer template part itself:** If you are asked to design the actual header layout (e.g. logo + navigation), you will use `blockish/container`, but **DO NOT set `"tagName": {"label": "Header", "value": "header"}`**. WordPress already wraps the entire template part in a `<header>` tag natively on the frontend. If you set `tagName` to `header` on your container, it will render double `<header>` tags. Leave it as the default `div`.
 
 Example of designing the inside of a header template part (logo + navigation):
 

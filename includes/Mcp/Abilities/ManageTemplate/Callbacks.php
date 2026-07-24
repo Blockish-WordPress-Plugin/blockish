@@ -3,6 +3,7 @@
 namespace Blockish\Mcp\Abilities\ManageTemplate;
 
 use Blockish\Mcp\BlockSchemaMeta;
+use Blockish\Mcp\SchemaUtils;
 use WP_Query;
 
 defined('ABSPATH') || exit;
@@ -23,15 +24,19 @@ class Callbacks
         }
         
         // Support loading large schemas from a file to avoid payload truncation
-        if ( !empty($input['schema_file']) && file_exists($input['schema_file']) ) {
-            $json = file_get_contents($input['schema_file']);
-            $decoded = json_decode($json, true);
-            if ($decoded) {
-                $input['block_schema'] = $decoded;
+        if ( ! empty( $input['schema_file'] ) ) {
+            $loaded = SchemaUtils::load_schema_file( (string) $input['schema_file'] );
+            if ( is_string( $loaded ) ) {
+                return [ 'error' => $loaded ];
             }
+            $input['block_schema'] = $loaded;
         }
 
         if (array_key_exists('block_schema', $input) && is_array($input['block_schema']) && !empty($input['block_schema'])) {
+            $shape_error = SchemaUtils::validate_schema_shape( $input['block_schema'] );
+            if ( $shape_error ) {
+                return [ 'error' => $shape_error ];
+            }
             $mono_error = BlockSchemaMeta::get_monolithic_schema_error($input['block_schema'], 'template');
             if ($mono_error) {
                 return ['error' => $mono_error];

@@ -44,20 +44,26 @@
         pointer-events: none;
     }
     
-    &.align-custom-width {
+    :where(.wp-block-blockish-container.align-custom-width) {
         margin-left: auto;
         margin-right: auto;
     }
-    
-    // .wp-block-blockish-container {
-    //     &.align-custom-width {
-    //         width: 100%;
-    //     }
-    // }
 
     // Low specificity so block margin attributes can override when set.
     :where(.wp-block-blockish-container .wp-block-blockish-container.align-custom-width) {
         margin-left: unset;
         margin-right: unset;
     }
+}
+
+// Top-level flex containers default to center. Nested containers have no
+// align/justify default (:where keeps specificity 0 so attribute CSS wins).
+:where(.wp-block-blockish-container.blockish-container.layout-type-flex) {
+    justify-content: center;
+    align-items: center;
+}
+
+:where(.wp-block-blockish-container .wp-block-blockish-container.blockish-container.layout-type-flex) {
+    justify-content: initial;
+    align-items: initial;
 }

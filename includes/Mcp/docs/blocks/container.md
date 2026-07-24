@@ -3,7 +3,7 @@
 The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 
 > [!WARNING]
-> **Common Mistake:** After designing your container, ALWAYS double-check your `flexDirection`, `alignItems`, and `justifyContent` settings. These are frequently misconfigured.
+> **Hard rule — `alignItems` / `justifyContent`:** **Top-level** containers default to **Center** (via base CSS — omit the attrs). **Nested** (child) containers have **no default** — omit `alignItems`/`justifyContent` unless you intentionally need alignment (e.g. `flex-start` for copy columns, `stretch` for equal-height cards, `center` for a centered stack inside a column). Do **not** copy Center onto every nested container. Centering a button requires `buttonPlacement` on the button — parent align does not move buttons. After designing, re-check `flexDirection`, `alignItems`, and `justifyContent`.
 
 | Attribute | Type | Default | Notes/enum |
 |---|---|---|---|
@@ -17,8 +17,8 @@ The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 | `overflow` | Responsive-Option | unset | Options: `[{"label":"Visible","value":"visible"},{"label":"Hidden","value":"hidden"},{"label":"Scroll","value":"scroll"},{"label":"Auto","value":"auto"}]` <br>**CSS:** `.{{WRAPPER}}.blockish-container` -> `overflow: {{VALUE}};` |
 | `flexDirection` | Responsive-Option | unset | Used when `display` = `"flex"`. Options: `[{"label":"Row","value":"row"},{"label":"Column","value":"column"},{"label":"Row Reverse","value":"row-reverse"},{"label":"Column Reverse","value":"column-reverse"}]` <br>**CSS:** `.{{WRAPPER}}.blockish-container.layout-type-flex` -> `flex-direction: {{VALUE}};` |
 | `flexWrap` | Responsive | unset | Used when `display` = `"flex"`. `"wrap"` `"nowrap"` `"wrap-reverse"` <br>**CSS:** `.{{WRAPPER}}.blockish-container.layout-type-flex` -> `flex-wrap: {{VALUE}};` |
-| `justifyContent` | Responsive-Option | unset | Used when `display` = `"flex"`. Options: `[{"label":"Start","value":"flex-start"},{"label":"End","value":"flex-end"},{"label":"Center","value":"center"},{"label":"Space Between","value":"space-between"},{"label":"Space Around","value":"space-around"},{"label":"Space Evenly","value":"space-evenly"}]` <br>**CSS:** `.{{WRAPPER}}.blockish-container.layout-type-flex` -> `justify-content: {{VALUE}};` |
-| `alignItems` | Responsive-Option | unset | Used when `display` = `"flex"`. Options: `[{"label":"Start","value":"flex-start"},{"label":"End","value":"flex-end"},{"label":"Center","value":"center"},{"label":"Stretch","value":"stretch"}]` — **no `baseline` option** (despite the global `alignSelf` attribute supporting it) <br>**CSS:** `.{{WRAPPER}}.blockish-container.layout-type-flex` -> `align-items: {{VALUE}};` |
+| `justifyContent` | Responsive-Option | **Top-level:** Center (base CSS when omitted). **Nested:** unset (omit) | Used when `display` = `"flex"`. Options: `[{"label":"Start","value":"flex-start"},{"label":"End","value":"flex-end"},{"label":"Center","value":"center"},{"label":"Space Between","value":"space-between"},{"label":"Space Around","value":"space-around"},{"label":"Space Evenly","value":"space-evenly"}]` — omit on top-level (inherits Center); omit on nested unless intentional. Set `flex-start` on nested content columns. <br>**CSS:** `.{{WRAPPER}}.blockish-container.layout-type-flex` -> `justify-content: {{VALUE}};` |
+| `alignItems` | Responsive-Option | **Top-level:** Center (base CSS when omitted). **Nested:** unset (omit) | Used when `display` = `"flex"`. Options: `[{"label":"Start","value":"flex-start"},{"label":"End","value":"flex-end"},{"label":"Center","value":"center"},{"label":"Stretch","value":"stretch"}]` — **no `baseline` option**. Omit on top-level; omit on nested unless intentional. Nested copy/form/card columns usually need `{"Desktop":{"label":"Start","value":"flex-start"}}` or `stretch`. <br>**CSS:** `.{{WRAPPER}}.blockish-container.layout-type-flex` -> `align-items: {{VALUE}};` |
 | `columnGap` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}.blockish-container` -> `column-gap: {{VALUE}};` |
 | `rowGap` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}}.blockish-container` -> `row-gap: {{VALUE}};` |
 | `gridLayoutType` | Scalar (string) | `"auto"` | `"auto"` (auto-fit columns — **default for card/icon grids; responsive without breakpoint math**) `"fixed"` (explicit count — use only when you need an exact column count, e.g. a strict 50/50 split) |
@@ -128,6 +128,17 @@ Conditional Classes Breakdown:
         margin-left: unset;
         margin-right: unset;
     }
+}
+
+// Top-level flex: Center. Nested flex: no align/justify default (attribute CSS wins via higher specificity).
+:where(.wp-block-blockish-container.blockish-container.layout-type-flex) {
+    justify-content: center;
+    align-items: center;
+}
+
+:where(.wp-block-blockish-container .wp-block-blockish-container.blockish-container.layout-type-flex) {
+    justify-content: initial;
+    align-items: initial;
 }
 ```
 

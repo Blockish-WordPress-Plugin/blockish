@@ -65,8 +65,13 @@ class BlockSchemaMeta
     /**
      * Recursively forces non-obvious required attributes that default to false.
      * e.g., isVariationPicked on blockish/container, hasStarted on blockish/navigation.
+     * Nested containers: strip alignItems/justifyContent so they do not pick up the
+     * top-level Center CSS default (omit = unset; set only when intentional).
+     *
+     * @param array $blocks
+     * @param bool  $inside_container Whether walking children of a blockish/container.
      */
-    public static function force_required_attributes(array $blocks): array
+    public static function force_required_attributes(array $blocks, bool $inside_container = false): array
     {
         foreach ($blocks as &$block) {
             if (isset($block['name'])) {
@@ -75,6 +80,17 @@ class BlockSchemaMeta
                         $block['attributes'] = [];
                     }
                     $block['attributes']['isVariationPicked'] = true;
+
+                    if ($inside_container) {
+                        // Empty objects survive serialization and prevent accidental
+                        // center/start from older schema defaults / AI habit.
+                        if (!isset($block['attributes']['alignItems'])) {
+                            $block['attributes']['alignItems'] = new \stdClass();
+                        }
+                        if (!isset($block['attributes']['justifyContent'])) {
+                            $block['attributes']['justifyContent'] = new \stdClass();
+                        }
+                    }
                 } elseif ($block['name'] === 'blockish/navigation') {
                     if (!isset($block['attributes']) || !is_array($block['attributes'])) {
                         $block['attributes'] = [];
@@ -93,7 +109,8 @@ class BlockSchemaMeta
             }
 
             if (!empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
-                $block['innerBlocks'] = self::force_required_attributes($block['innerBlocks']);
+                $child_inside = $inside_container || (isset($block['name']) && $block['name'] === 'blockish/container');
+                $block['innerBlocks'] = self::force_required_attributes($block['innerBlocks'], $child_inside);
             }
         }
         return $blocks;
@@ -197,7 +214,7 @@ class BlockSchemaMeta
 
         if ($m['max_depth'] >= 6 || $m['node_count'] >= 80 || $m['json_bytes'] >= 100000) {
             return sprintf(
-                'Schema too large or too deeply nested for a full page/template (nodes=%d, depth=%d, bytes=%d). Do NOT send a monolithic layout. Build each section with blockish/manage-pattern, then assemble a lightweight schema of {"name":"core/block","attributes":{"ref":<pattern_id>}} (plus core/template-part for header/footer). See blockish/get-designer-workflow step 7–8.',
+                'Schema too large or too deeply nested for a full page/template (nodes=%d, depth=%d, bytes=%d). Do NOT send a monolithic layout. Build each section with blockish/manage-pattern, then assemble a lightweight schema of {"name":"core/block","attributes":{"ref":<pattern_id>}}. On block themes, omit header/footer template-parts from page content (the template already provides them); use core/template-part only when editing wp_template layouts. See blockish/get-designer-workflow step 7–8.',
                 $m['node_count'],
                 $m['max_depth'],
                 $m['json_bytes']
@@ -244,6 +261,49 @@ class BlockSchemaMeta
         $walk($blocks);
 
         return array_values(array_unique($warnings));
+    }
+
+    /**
+     * Pages/posts must not embed header/footer template parts (theme template already does).
+     *
+     * @param array  $blocks
+     * @param string $post_type
+     * @return string|null
+     */
+    public static function get_page_template_part_error(array $blocks, string $post_type): ?string
+    {
+        // Only enforce on normal content; templates may include header/footer parts.
+        if (in_array($post_type, ['wp_template', 'wp_template_part', 'wp_block'], true)) {
+            return null;
+        }
+
+        $found = [];
+        $walk  = function ($nodes) use (&$walk, &$found) {
+            if (!is_array($nodes)) {
+                return;
+            }
+            foreach ($nodes as $node) {
+                if (!is_array($node) || empty($node['name'])) {
+                    continue;
+                }
+                if ('core/template-part' === $node['name']) {
+                    $slug = isset($node['attributes']['slug']) ? (string) $node['attributes']['slug'] : '';
+                    if (in_array($slug, ['header', 'footer'], true) || '' === $slug) {
+                        $found[] = $slug !== '' ? $slug : 'template-part';
+                    }
+                }
+                if (!empty($node['innerBlocks']) && is_array($node['innerBlocks'])) {
+                    $walk($node['innerBlocks']);
+                }
+            }
+        };
+        $walk($blocks);
+
+        if (empty($found)) {
+            return null;
+        }
+
+        return 'Do not put core/template-part header/footer in page/post block_schema — the block theme template already renders them (duplicates otherwise). Assemble pages with core/block pattern refs only. Use core/template-part only when editing a wp_template via blockish/manage-template. See blockish/get-designer-workflow step 8.';
     }
 
     /**

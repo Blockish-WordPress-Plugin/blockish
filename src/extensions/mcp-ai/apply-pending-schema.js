@@ -1,21 +1,29 @@
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect, useDispatch, resolveSelect, dispatch, subscribe } from '@wordpress/data';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { createBlock, serialize } from '@wordpress/blocks';
+import apiFetch from '@wordpress/api-fetch';
 
 const META_KEY = '_blockish_block_schema';
+const MAX_PREVIOUS_BLOCKS_JSON = 150000;
 
 const schemaNodeToBlock = (node) => {
     if (!node || typeof node !== 'object' || !node.name) {
         return null;
     }
 
-    const innerBlocks = Array.isArray(node.innerBlocks)
-        ? node.innerBlocks.map(schemaNodeToBlock).filter(Boolean)
-        : [];
+    try {
+        const innerBlocks = Array.isArray(node.innerBlocks)
+            ? node.innerBlocks.map(schemaNodeToBlock).filter(Boolean)
+            : [];
 
-    return createBlock(node.name, node.attributes || {}, innerBlocks);
+        return createBlock(node.name, node.attributes || {}, innerBlocks);
+    } catch (e) {
+        console.error('Blockish AI: failed to create block from schema node', node?.name, e);
+        return null;
+    }
 };
+
 
 /**
  * Serialize a block tree to a lightweight JSON-serializable snapshot.
@@ -30,38 +38,83 @@ const blockToSnapshot = (block) => {
 };
 
 const ApplyPendingSchema = () => {
-    const { postType, slug, isTemplateOrPart } = useSelect((select) => {
-        // Post/Page Editor
-        const editor = select('core/editor');
-        const currentPost = editor ? editor.getCurrentPost() : null;
-        let type = editor ? editor.getCurrentPostType() : null;
-        let postId = editor ? editor.getCurrentPostId() : null;
-        let currentSlug = currentPost?.slug || currentPost?.post_name || postId;
+    const { postType, postId, slug, isTemplateOrPart, pendingFromRecord } =
+        useSelect((select) => {
+            const editor = select('core/editor');
+            const currentPost = editor ? editor.getCurrentPost() : null;
+            const type = editor ? editor.getCurrentPostType() : null;
+            const id = editor ? editor.getCurrentPostId() : null;
+            let currentSlug =
+                currentPost?.slug || currentPost?.post_name || id;
 
-        if (currentSlug && typeof currentSlug === 'string' && currentSlug.includes('//')) {
-            currentSlug = currentSlug.split('//')[1];
-        }
+            if (
+                currentSlug &&
+                typeof currentSlug === 'string' &&
+                currentSlug.includes('//')
+            ) {
+                currentSlug = currentSlug.split('//')[1];
+            }
 
-        return {
-            postType: type,
-            slug: currentSlug,
-            isTemplateOrPart: type === 'wp_template' || type === 'wp_template_part'
-        };
-    }, []);
+            let pendingMeta = null;
+            if (
+                type &&
+                id &&
+                type !== 'wp_template' &&
+                type !== 'wp_template_part'
+            ) {
+                const edited = select('core').getEditedEntityRecord(
+                    'postType',
+                    type,
+                    id
+                );
+                const raw = select('core').getEntityRecord(
+                    'postType',
+                    type,
+                    id
+                );
+                pendingMeta =
+                    edited?.meta?.[META_KEY] ||
+                    raw?.meta?.[META_KEY] ||
+                    null;
+            }
+
+            return {
+                postType: type,
+                postId: id,
+                slug: currentSlug,
+                isTemplateOrPart:
+                    type === 'wp_template' || type === 'wp_template_part',
+                pendingFromRecord: pendingMeta,
+            };
+        }, []);
 
     const [meta, setMeta] = useEntityProp('postType', postType, 'meta');
-    const [stagedTemplate, setStagedTemplate] = useEntityProp('root', 'site', 'blockish_mcp_staged_template');
-    const [stagedTemplatePart, setStagedTemplatePart] = useEntityProp('root', 'site', 'blockish_mcp_staged_template_part');
+    const [stagedTemplate, setStagedTemplate] = useEntityProp(
+        'root',
+        'site',
+        'blockish_mcp_staged_template'
+    );
+    const [stagedTemplatePart, setStagedTemplatePart] = useEntityProp(
+        'root',
+        'site',
+        'blockish_mcp_staged_template_part'
+    );
 
-    const { insertBlocks, removeBlocks, replaceBlocks } = useDispatch('core/block-editor');
+    // resetEditorBlocks (core/editor) — NOT block-editor resetBlocks.
+    // block-editor resetBlocks updates the canvas only and leaves the post
+    // entity clean, so Accept later never dirties the Save button.
+    const { resetEditorBlocks } = useDispatch('core/editor');
 
-    const { getBlocks, getBlockOrder } = useSelect((select) => {
-        const editor = select('core/block-editor');
-        return {
-            getBlocks: editor.getBlocks,
-            getBlockOrder: editor.getBlockOrder,
-        };
-    }, []);
+    // Stable selector fn — call inside inject/subscribe for a fresh block list.
+    // Keep it in a ref so the inject effect does not re-subscribe on every render.
+    const getBlocks = useSelect(
+        (select) => select('core/block-editor').getBlocks,
+        []
+    );
+    const getBlocksRef = useRef(getBlocks);
+    getBlocksRef.current = getBlocks;
+    const resetEditorBlocksRef = useRef(resetEditorBlocks);
+    resetEditorBlocksRef.current = resetEditorBlocks;
 
     let pendingSchema = null;
     if (isTemplateOrPart) {
@@ -71,177 +124,296 @@ const ApplyPendingSchema = () => {
             pendingSchema = stagedTemplatePart?.[slug];
         }
     } else {
-        pendingSchema = meta && meta[META_KEY] ? meta[META_KEY] : null;
+        pendingSchema =
+            (meta && meta[META_KEY] ? meta[META_KEY] : null) ||
+            pendingFromRecord ||
+            null;
     }
 
-    const clearPendingSchema = useCallback(() => {
-        if (postType === 'wp_template') {
-            const newData = { ...stagedTemplate };
-            delete newData[slug];
-            setStagedTemplate(newData);
-        } else if (postType === 'wp_template_part') {
-            const newData = { ...stagedTemplatePart };
-            delete newData[slug];
-            setStagedTemplatePart(newData);
-        } else {
-            setMeta({ ...meta, [META_KEY]: '' });
-        }
-    }, [postType, slug, stagedTemplate, stagedTemplatePart, meta, setStagedTemplate, setStagedTemplatePart, setMeta]);
+    // Stabilize pending key so effect does not re-fire when object identity churns.
+    const pendingKey =
+        typeof pendingSchema === 'string'
+            ? pendingSchema
+            : pendingSchema
+                ? JSON.stringify(pendingSchema)
+                : '';
 
-    const resolvePatterns = async (schemaNode) => {
-        if (!schemaNode) return;
-        
-        if (Array.isArray(schemaNode)) {
-            await Promise.all(schemaNode.map(resolvePatterns));
+    /**
+     * Apply pending `_blockish_block_schema` on a nested entity (pattern or form),
+     * then clear the meta. REST write keeps stringified JSON attrs intact
+     * (unlike ad-hoc PHP serialize_blocks without wp_slash).
+     */
+    const resolvePendingEntity = async ({
+        id,
+        restBase,
+        postType,
+        label,
+    }) => {
+        // Direct REST fetch — core-data cache often omits large meta.
+        const record = await apiFetch({
+            path: `/wp/v2/${restBase}/${id}?context=edit`,
+        });
+
+        const pendingJson =
+            record?.meta?.[META_KEY] ||
+            record?.meta?._blockish_block_schema ||
+            '';
+
+        if (!pendingJson) {
             return;
         }
 
-        if (typeof schemaNode === 'object') {
-            if (schemaNode.name === 'core/block' && schemaNode.attributes && schemaNode.attributes.ref) {
-                const ref = schemaNode.attributes.ref;
-                try {
-                    // Fetch the wp_block post
-                    const record = await resolveSelect('core').getEntityRecord('postType', 'wp_block', ref);
-                    
-                    if (record && record.meta && record.meta['_blockish_block_schema']) {
-                        const pendingJson = record.meta['_blockish_block_schema'];
-                        const parsed = typeof pendingJson === 'string' ? JSON.parse(pendingJson) : pendingJson;
-                        const parsedArray = Array.isArray(parsed) ? parsed : [parsed];
-                        
-                        // RECURSIVELY resolve any nested patterns inside this pattern!
-                        await Promise.all(parsedArray.map(resolvePatterns));
-                        
-                        // Convert pending schema to raw blocks
-                        const blocks = parsedArray.map(schemaNodeToBlock).filter(Boolean);
-                        
-                        // Serialize blocks to raw HTML
-                        const html = serialize(blocks);
-                        
-                        // Save it directly via dispatch
-                        await dispatch('core').saveEntityRecord('postType', 'wp_block', {
-                            id: ref,
-                            content: html,
-                            meta: {
-                                '_blockish_block_schema': '' // clear the pending schema
-                            }
-                        });
-                        console.log(`Blockish AI: Auto-resolved and saved pattern ${ref}`);
-                    }
-                } catch (e) {
-                    console.error('Blockish AI: Failed to resolve pattern', ref, e);
-                }
-            }
+        const parsed =
+            typeof pendingJson === 'string'
+                ? JSON.parse(pendingJson)
+                : pendingJson;
+        const parsedArray = Array.isArray(parsed) ? parsed : [parsed];
 
-            // Recursively check innerBlocks
-            if (schemaNode.innerBlocks && Array.isArray(schemaNode.innerBlocks)) {
-                await Promise.all(schemaNode.innerBlocks.map(resolvePatterns));
+        // Nested pattern/form refs inside this entity first.
+        await resolveNestedPending(parsedArray);
+
+        const blocks = parsedArray.map(schemaNodeToBlock).filter(Boolean);
+
+        if (!blocks.length) {
+            throw new Error(
+                `${label} ${id}: pending schema produced 0 blocks`
+            );
+        }
+
+        const html = serialize(blocks);
+
+        // Two-step save is more reliable for large content:
+        // 1) write content, 2) clear pending meta.
+        await apiFetch({
+            path: `/wp/v2/${restBase}/${id}`,
+            method: 'POST',
+            data: {
+                content: html,
+            },
+        });
+
+        await apiFetch({
+            path: `/wp/v2/${restBase}/${id}`,
+            method: 'POST',
+            data: {
+                meta: {
+                    [META_KEY]: '',
+                },
+            },
+        });
+
+        // Refresh editor entity store so embeds/previews re-read content.
+        dispatch('core').invalidateResolution('getEntityRecord', [
+            'postType',
+            postType,
+            id,
+        ]);
+        await resolveSelect('core').getEntityRecord(
+            'postType',
+            postType,
+            id,
+            { context: 'edit' }
+        );
+    };
+
+    const resolveNestedPending = async (schemaNode) => {
+        if (!schemaNode) {
+            return;
+        }
+
+        if (Array.isArray(schemaNode)) {
+            // Sequential — parallel saves of large entities race / overwhelm REST.
+            for (const node of schemaNode) {
+                await resolveNestedPending(node);
+            }
+            return;
+        }
+
+        if (typeof schemaNode !== 'object') {
+            return;
+        }
+
+        if (
+            schemaNode.name === 'core/block' &&
+            schemaNode.attributes?.ref
+        ) {
+            const ref = schemaNode.attributes.ref;
+            try {
+                await resolvePendingEntity({
+                    id: ref,
+                    restBase: 'blocks',
+                    postType: 'wp_block',
+                    label: 'Pattern',
+                });
+            } catch (e) {
+                console.error(
+                    'Blockish AI: Failed to resolve pattern',
+                    ref,
+                    e
+                );
+                throw e;
+            }
+        }
+
+        if (
+            schemaNode.name === 'blockish-forms/form' &&
+            schemaNode.attributes?.formId
+        ) {
+            const formId = schemaNode.attributes.formId;
+            try {
+                await resolvePendingEntity({
+                    id: formId,
+                    restBase: 'blockish_form',
+                    postType: 'blockish_form',
+                    label: 'Form',
+                });
+            } catch (e) {
+                console.error(
+                    'Blockish AI: Failed to resolve form',
+                    formId,
+                    e
+                );
+                throw e;
+            }
+        }
+
+        if (
+            schemaNode.innerBlocks &&
+            Array.isArray(schemaNode.innerBlocks)
+        ) {
+            for (const child of schemaNode.innerBlocks) {
+                await resolveNestedPending(child);
             }
         }
     };
 
+    const injectedForKey = useRef('');
+    const isProcessingRef = useRef(false);
+
     useEffect(() => {
-        if (!pendingSchema) {
+        if (!pendingKey) {
+            return;
+        }
+
+        // Already injected this pending payload in this editor session.
+        if (injectedForKey.current === pendingKey) {
             return;
         }
 
         let isCancelled = false;
-        let aiBlocks = [];
-        let hasInjected = false;
-        let isProcessing = false;
 
         const processAndInject = async (force = false) => {
-            if (hasInjected || isProcessing) return;
-
-            // Ensure the DOM canvas is ready to receive inserts
-            const canvas = document.querySelector('.block-editor-block-list__layout');
-            const iframe = document.querySelector('iframe[name="editor-canvas"]');
-            let isDomReady = false;
-            if (iframe) {
-                isDomReady = !!iframe.contentDocument?.querySelector('.block-editor-block-list__layout');
-            } else if (canvas) {
-                isDomReady = true;
+            if (isCancelled || isProcessingRef.current) {
+                return;
             }
-
-            if (!isDomReady && !force) {
+            if (injectedForKey.current === pendingKey) {
                 return;
             }
 
-            const allEditorBlocks = getBlocks();
+            const allEditorBlocks = getBlocksRef.current();
+            const hasAiPreview = allEditorBlocks.some(
+                (block) => block.name === 'blockish/ai-preview'
+            );
 
-            // If editor blocks haven't loaded yet and we're not forcing, wait.
             if (!force && allEditorBlocks.length === 0) {
                 return;
             }
 
-            isProcessing = true;
+            isProcessingRef.current = true;
 
-            if (!aiBlocks.length) {
-                try {
-                    const schema = typeof pendingSchema === 'string' ? JSON.parse(pendingSchema) : pendingSchema;
-                    const schemaArray = Array.isArray(schema) ? schema : [schema];
-                    
-                    // Resolve all patterns asynchronously before building the blocks
-                    await resolvePatterns(schemaArray);
-                    
-                    if (isCancelled) return;
-                    
-                    aiBlocks = schemaArray.map(schemaNodeToBlock).filter(Boolean);
-                } catch (e) {
-                    console.error('Blockish AI Schema parse error:', e);
-                    isProcessing = false;
+            let schemaArray = [];
+            try {
+                const schema = JSON.parse(pendingKey);
+                schemaArray = Array.isArray(schema) ? schema : [schema];
+
+                // Always resolve nested pattern/form pending first — even when
+                // ai-preview is already in the canvas (e.g. preview was saved
+                // into post_content). The old early-return skipped resolve.
+                await resolveNestedPending(schemaArray);
+
+                if (isCancelled) {
+                    isProcessingRef.current = false;
                     return;
                 }
-            }
-
-            if (!aiBlocks.length) {
-                isProcessing = false;
+            } catch (e) {
+                console.error('Blockish AI Schema resolve/parse error:', e);
+                isProcessingRef.current = false;
                 return;
             }
 
-            hasInjected = true;
+            const aiBlocks = schemaArray
+                .map(schemaNodeToBlock)
+                .filter(Boolean);
 
-            // 1. Snapshot the current editor content into a serializable array
-            const previousBlocksSnapshot = allEditorBlocks.map(blockToSnapshot);
+            if (!aiBlocks.length) {
+                isProcessingRef.current = false;
+                return;
+            }
 
-            // 2. Create the AI preview wrapper, carrying the snapshot as an attribute
+            // Re-inject (or refresh existing preview) so synced pattern refs
+            // re-read the content we just wrote during resolve.
+            const previousBlocksSnapshot = hasAiPreview
+                ? []
+                : allEditorBlocks.map(blockToSnapshot);
+            let previousBlocksJson = '[]';
+            try {
+                const encoded = JSON.stringify(previousBlocksSnapshot);
+                previousBlocksJson =
+                    encoded.length > MAX_PREVIOUS_BLOCKS_JSON ? '[]' : encoded;
+            } catch (e) {
+                previousBlocksJson = '[]';
+            }
+
             const wrapperBlock = createBlock(
                 'blockish/ai-preview',
                 {
-                    previousBlocks: JSON.stringify(previousBlocksSnapshot),
+                    previousBlocks: previousBlocksJson,
                 },
                 aiBlocks
             );
 
-            // 3. Replace all existing top-level blocks with the wrapper
-            // Using replaceBlocks bypasses the core/post-content removal warning
-            const allClientIds = allEditorBlocks.map(b => b.clientId);
-            if (allClientIds.length > 0) {
-                replaceBlocks(allClientIds, [wrapperBlock]);
-            } else {
-                insertBlocks([wrapperBlock], 0, undefined);
+            resetEditorBlocksRef.current([wrapperBlock]);
+
+            const after = getBlocksRef.current();
+            const didInject = after.some(
+                (block) => block.name === 'blockish/ai-preview'
+            );
+
+            if (!didInject) {
+                isProcessingRef.current = false;
+                console.error(
+                    'Blockish AI: resetEditorBlocks failed to inject ai-preview'
+                );
+                return;
             }
 
-            clearPendingSchema();
+            injectedForKey.current = pendingKey;
+            isProcessingRef.current = false;
         };
 
-
-        const unsubscribe = subscribe(() => {
-            processAndInject(false);
-        });
-
-        // Fallback timer: force inject after 2 seconds if the editor still appears empty.
+        // One-shot tries: immediate (if blocks ready), then a longer force
+        // fallback so large pattern resolves can finish before we give up.
+        processAndInject(false);
         const fallbackTimer = setTimeout(() => {
             processAndInject(true);
-        }, 2000);
+        }, 8000);
+
+        // Subscribe only until inject succeeds — then unsubscribe.
+        const unsubscribe = subscribe(() => {
+            if (injectedForKey.current === pendingKey) {
+                unsubscribe();
+                return;
+            }
+            processAndInject(false);
+        });
 
         return () => {
             isCancelled = true;
             unsubscribe();
             clearTimeout(fallbackTimer);
         };
-    }, [pendingSchema, getBlocks, getBlockOrder, insertBlocks, removeBlocks, clearPendingSchema]);
+    }, [pendingKey]);
 
-    // This component renders nothing — UI is handled by blockish/ai-preview block.
     return null;
 };
 

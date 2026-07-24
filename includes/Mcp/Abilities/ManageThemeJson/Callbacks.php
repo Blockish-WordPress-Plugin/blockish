@@ -32,6 +32,9 @@ class Callbacks
         $post  = !empty($query->posts) ? $query->posts[0] : null;
 
         if ($delete) {
+            if ($post && ! current_user_can( 'edit_theme_options' ) ) {
+                return [ 'error' => 'You do not have access to edit theme options.' ];
+            }
             if ($post) {
                 wp_delete_post($post->ID, true);
                 if (function_exists('wp_clean_theme_json_cache')) {
@@ -74,6 +77,10 @@ class Callbacks
             if (empty($theme_json) || !is_array($theme_json)) {
                 return ['error' => 'theme_json must be an object.'];
             }
+            $validate_error = self::validate_theme_json_payload($theme_json);
+            if ($validate_error) {
+                return ['error' => $validate_error];
+            }
             $theme_json = self::normalize_preset_origins($theme_json);
             $final_data = array_replace_recursive($current_data, $theme_json);
             $final_data = self::replace_preset_leaves($final_data, $theme_json);
@@ -115,6 +122,44 @@ class Callbacks
             'action'   => 'updated',
             'edit_url' => admin_url('site-editor.php?canvas=edit'),
         ];
+    }
+
+    /**
+     * Light validation: object with known top-level keys; settings/styles must be objects when present.
+     */
+    private static function validate_theme_json_payload(array $theme_json): ?string
+    {
+        $allowed = [
+            'version',
+            'settings',
+            'styles',
+            'title',
+            'slug',
+            'isGlobalStylesUserThemeJSON',
+        ];
+
+        foreach (array_keys($theme_json) as $key) {
+            if (!in_array($key, $allowed, true)) {
+                return 'theme_json has unsupported top-level key "' . $key . '". Allowed: version, settings, styles, title, slug.';
+            }
+        }
+
+        if (isset($theme_json['settings']) && !is_array($theme_json['settings'])) {
+            return 'theme_json.settings must be an object.';
+        }
+        if (isset($theme_json['styles']) && !is_array($theme_json['styles'])) {
+            return 'theme_json.styles must be an object.';
+        }
+        if (isset($theme_json['version']) && !is_numeric($theme_json['version'])) {
+            return 'theme_json.version must be a number.';
+        }
+
+        if (!isset($theme_json['settings']) && !isset($theme_json['styles']) && empty($theme_json['reset'])) {
+            // Allow empty merge objects only if at least one known section — empty object already rejected upstream.
+            // Partial updates may send only settings or only styles.
+        }
+
+        return null;
     }
 
     /**

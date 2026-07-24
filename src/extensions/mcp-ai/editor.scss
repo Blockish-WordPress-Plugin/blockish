@@ -28,21 +28,11 @@
 	// Add a subtle futuristic background tint
 	background: linear-gradient(180deg, rgba(138, 43, 226, 0.03) 0%, rgba(138, 43, 226, 0.01) 100%);
 
-	// Hide actions by default until hover
+	// Always show Accept/Discard — hiding behind hover made staging look "broken".
 	.blockish-ai-preview-actions {
-		opacity: 0;
-		visibility: hidden;
-		transform: translateY(4px);
-		transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	&:hover,
-	&:focus-within {
-		.blockish-ai-preview-actions {
-			opacity: 1;
-			visibility: visible;
-			transform: translateY(0);
-		}
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
 	}
 
 	.wp-block-template-part, .block-library-block__reusable-block-container{
@@ -52,7 +42,7 @@
 
 .blockish-ai-preview-actions {
 	position: absolute;
-	top: -20px; // Float slightly above the border
+	top: 12px;
 	right: 16px;
 	z-index: 100000;
 	

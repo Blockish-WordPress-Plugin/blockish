@@ -17,8 +17,57 @@ class Loader
         add_action('wp_abilities_api_init', [$this, 'register_abilities']);
         add_action('init', [$this, 'register_settings']);
 
+        // Expose each public ability as its own MCP tool (skip generic adapter bridge tools).
+        add_filter('mcp_adapter_default_server_config', [$this, 'expose_abilities_as_mcp_tools']);
 
         BlockSchemaMeta::get_instance();
+    }
+
+    /**
+     * Replace the default 3 adapter tools with every public ability as a first-class MCP tool.
+     *
+     * @param mixed $config
+     * @return array
+     */
+    public function expose_abilities_as_mcp_tools( $config )
+    {
+        if ( ! is_array( $config ) ) {
+            return $config;
+        }
+
+        if ( ! function_exists( 'wp_get_abilities' ) ) {
+            return $config;
+        }
+
+        $tools = [];
+        foreach ( wp_get_abilities() as $ability ) {
+            $name = $ability->get_name();
+
+            // Drop discover / get-info / execute bridge — agents call abilities directly.
+            if ( 0 === strpos( $name, 'mcp-adapter/' ) ) {
+                continue;
+            }
+
+            $meta = $ability->get_meta();
+            if ( empty( $meta['mcp']['public'] ) ) {
+                continue;
+            }
+
+            $type = $meta['mcp']['type'] ?? 'tool';
+            if ( 'tool' !== $type ) {
+                continue;
+            }
+
+            $tools[] = $name;
+        }
+
+        if ( ! empty( $tools ) ) {
+            $config['tools']              = $tools;
+            $config['server_name']        = $config['server_name'] ?? 'Blockish MCP Server';
+            $config['server_description'] = 'Blockish MCP — each ability is exposed as a direct tool.';
+        }
+
+        return $config;
     }
 
     public function register_categories()
@@ -62,6 +111,8 @@ class Loader
         Abilities\PostTypes\Config::class,
         Abilities\ManagePost\Config::class,
         Abilities\ManagePattern\Config::class,
+        Abilities\GetRevisions\Config::class,
+        Abilities\RestoreRevision\Config::class,
         Abilities\GetClasses\Config::class,
         Abilities\ManageClass\Config::class,
         Abilities\BlockDocs\Config::class,
