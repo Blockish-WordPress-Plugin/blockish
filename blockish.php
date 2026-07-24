@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Plugin Name:       Blockish - AI site builder for WordPress
- * Description:       An AI-powered site building toolkit with creative Gutenberg blocks, an advanced Class Manager, and native MCP integration for autonomous web design.
+ * Plugin Name:       Blockish – MCP AI Site Builder for Gutenberg
+ * Description:       Build sites with AI via MCP (Cursor, Claude). 30+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
  * Requires at least: 6.1
  * Requires PHP:      7.4
- * Version:           1.1.3
+ * Version:           1.2.0
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/
@@ -49,7 +49,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.1.3';
+    const VERSION = '1.2.0';
 
     /**
      * Holds the instance of this class.
