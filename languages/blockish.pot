@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"POT-Creation-Date: 2026-07-24T20:30:03.951Z\n"
+"POT-Creation-Date: 2026-07-26T17:01:31.597Z\n"
 "PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
 "Last-Translator: wowdevs <hello@wowdevs.com>\n"
 "Language-Team: wowdevs <hello@wowdevs.com>\n"
@@ -176,8 +176,51 @@ msgstr ""
 msgid "Submit & Deactivate"
 msgstr ""
 
-#: includes/Extensions/ClassManager.php:61
-msgid "Class Manager"
+#: includes/Routes/AddonsV1.php:133
+msgid "Please enter a license key."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:146
+msgid "License activation is unavailable. Freemius SDK is missing activate support."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:156
+msgid "License activation failed. Check the key and try again."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:168
+msgid "License activated successfully. Reload the page to load premium features."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:186
+msgid "This site does not have an active license for this add-on."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:198
+msgid "License deactivation failed."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:206
+msgid "License deactivated."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:226
+#: includes/Routes/AddonsV1.php:268
+msgid "Unknown add-on."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:276
+msgid ""
+"Blockish Freemius is not configured. Set the parent product ID and public "
+"key first."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:286
+msgid "Install and activate this add-on plugin before managing its license."
+msgstr ""
+
+#: includes/Routes/AddonsV1.php:296
+msgid "This add-on?s Freemius credentials are not configured yet."
 msgstr ""
 
 #: includes/Mcp/Loader.php:76
@@ -189,6 +232,10 @@ msgstr ""
 msgid "Blockish AI abilities"
 msgstr ""
 
+#: includes/Extensions/ClassManager.php:61
+msgid "Class Manager"
+msgstr ""
+
 #: includes/Core/MagicLogin.php:43
 msgid "Invalid or expired magic login token."
 msgstr ""
@@ -197,11 +244,19 @@ msgstr ""
 msgid "Login Failed"
 msgstr ""
 
+#: includes/Core/Enqueue.php:115
+msgid "Forms"
+msgstr ""
+
+#: includes/Core/Enqueue.php:122
+msgid "Dynamicity"
+msgstr ""
+
 #: includes/Core/Dashboard.php:43
 msgid "Blockish Dashboard"
 msgstr ""
 
-#: includes/Core/Dashboard.php:118
+#: includes/Core/Dashboard.php:119
 msgid "Creative Gutenberg blocks for modern websites."
 msgstr ""
 
@@ -238,7 +293,7 @@ msgid "Adds dynamic data binding capabilities to blocks."
 msgstr ""
 
 #: includes/Config/ExtensionList.php:63
-#: includes/Config/AddonsList.php:67
+#: includes/Config/AddonsList.php:101
 msgid "Display Conditions"
 msgstr ""
 
@@ -734,79 +789,72 @@ msgstr ""
 msgid "Renders pagination links for the parent Query Builder query."
 msgstr ""
 
-#: includes/Config/AddonsList.php:24
-msgid "Blockish Pro Bundle"
-msgstr ""
-
-#: includes/Config/AddonsList.php:25
-msgid ""
-"Get Lifetime Access to ALL current and future Blockish Addons! This is the "
-"ultimate bundle for professionals who want everything we have to offer "
-"without any recurring fees."
-msgstr ""
-
-#: includes/Config/AddonsList.php:33
-msgid "All Current & Future Addons"
-msgstr ""
-
-#: includes/Config/AddonsList.php:34
-msgid "Lifetime Updates & Support"
-msgstr ""
-
-#: includes/Config/AddonsList.php:35
-msgid "Unlimited Sites License"
-msgstr ""
-
-#: includes/Config/AddonsList.php:36
-msgid "Premium Templates & Blocks"
-msgstr ""
-
-#: includes/Config/AddonsList.php:40
+#: includes/Config/AddonsList.php:41
 msgid "Blockish Forms"
 msgstr ""
 
-#: includes/Config/AddonsList.php:41
+#: includes/Config/AddonsList.php:42
 msgid ""
 "A modern, secure Form Builder addon for Blockish with reCAPTCHA protection "
 "and reusable centralized form management."
 msgstr ""
 
-#: includes/Config/AddonsList.php:49
-msgid "Drag & Drop Form Builder"
-msgstr ""
-
-#: includes/Config/AddonsList.php:50
-msgid "reCAPTCHA v3 Integration"
-msgstr ""
-
-#: includes/Config/AddonsList.php:51
-msgid "Centralized Form Management"
-msgstr ""
-
-#: includes/Config/AddonsList.php:52
-msgid "Database Submissions"
-msgstr ""
-
 #: includes/Config/AddonsList.php:56
-msgid "Blockish Dynamicity"
+#: includes/Config/AddonsList.php:88
+msgid "Personal"
 msgstr ""
 
 #: includes/Config/AddonsList.php:57
+#: includes/Config/AddonsList.php:89
+msgid "1 site"
+msgstr ""
+
+#: includes/Config/AddonsList.php:62
+#: includes/Config/AddonsList.php:94
+msgid "Agency"
+msgstr ""
+
+#: includes/Config/AddonsList.php:63
+#: includes/Config/AddonsList.php:95
+msgid "Unlimited sites"
+msgstr ""
+
+#: includes/Config/AddonsList.php:67
+msgid "Drag & Drop Form Builder"
+msgstr ""
+
+#: includes/Config/AddonsList.php:68
+msgid "reCAPTCHA v3 Integration"
+msgstr ""
+
+#: includes/Config/AddonsList.php:69
+msgid "Centralized Form Management"
+msgstr ""
+
+#: includes/Config/AddonsList.php:70
+msgid "Database Submissions"
+msgstr ""
+
+#: includes/Config/AddonsList.php:74
+msgid "Blockish Dynamicity"
+msgstr ""
+
+#: includes/Config/AddonsList.php:75
 msgid ""
 "A powerful addon for Blockish that introduces dynamic data capabilities. "
 "Includes a visual Query Builder, Loop, Pagination blocks, and advanced "
 "display conditions."
 msgstr ""
 
-#: includes/Config/AddonsList.php:65
+#: includes/Config/AddonsList.php:99
 msgid "Advanced Query Builder"
 msgstr ""
 
-#: includes/Config/AddonsList.php:66
+#: includes/Config/AddonsList.php:100
 msgid "Dynamic Data Binding"
 msgstr ""
 
-#: includes/Config/AddonsList.php:68
+#: includes/Config/AddonsList.php:102
 msgid "Custom Loop Templates"
 msgstr ""
 
@@ -827,14 +875,6 @@ msgstr ""
 msgid "Trigger Editor Refresh"
 msgstr ""
 
-#: includes/Mcp/Abilities/SiteInfo/Config.php:14
-msgid "Get Site Info"
-msgstr ""
-
-#: includes/Mcp/Abilities/SiteInfo/Config.php:15
-msgid "Returns WordPress site name, description, URL and version."
-msgstr ""
-
 #: includes/Mcp/Abilities/RestoreRevision/Config.php:14
 msgid "Restore Post Revision"
 msgstr ""
@@ -845,14 +885,12 @@ msgid ""
 "Only call when the user explicitly asks to undo/restore."
 msgstr ""
 
-#: includes/Mcp/Abilities/PostTypes/Config.php:14
-msgid "Get Post Types"
+#: includes/Mcp/Abilities/SiteInfo/Config.php:14
+msgid "Get Site Info"
 msgstr ""
 
-#: includes/Mcp/Abilities/PostTypes/Config.php:15
-msgid ""
-"Returns all registered WordPress post types with their label, public "
-"visibility, and hierarchy."
+#: includes/Mcp/Abilities/SiteInfo/Config.php:15
+msgid "Returns WordPress site name, description, URL and version."
 msgstr ""
 
 #: includes/Mcp/Abilities/ManageThemeJson/Config.php:14
@@ -866,6 +904,16 @@ msgid ""
 "the database. NOTE: If you are applying custom typography, you MUST first "
 "use the `blockish/manage-fonts` ability to install the font before setting "
 "it here."
+msgstr ""
+
+#: includes/Mcp/Abilities/PostTypes/Config.php:14
+msgid "Get Post Types"
+msgstr ""
+
+#: includes/Mcp/Abilities/PostTypes/Config.php:15
+msgid ""
+"Returns all registered WordPress post types with their label, public "
+"visibility, and hierarchy."
 msgstr ""
 
 #: includes/Mcp/Abilities/ManageTerm/Config.php:14
@@ -904,14 +952,14 @@ msgid ""
 "post_title and post_type. To EDIT: provide post_id. To DELETE: provide "
 "post_id and set delete to true. ALWAYS create sections with "
 "blockish/manage-pattern first and use returned real pattern IDs (never "
-"hallucinate refs). For a fully empty page/post (no post_content and no "
-"pending_schema), assemble with post_content pattern-ref comments only. If "
-"the page already has content or pending schema, pass block_schema pattern "
-"refs for Accept. Never put core/template-part header/footer on pages. This "
-"empty?post_content rule is manage-post only ? do not use it for templates. "
-"CRITICAL: call blockish/get-designer-workflow and blockish/get-block-docs "
-"before designing. Call blockish/trigger-refresh after staging block_schema. "
-"For blog prose use blockish/write-blog, not this tool."
+"hallucinate refs). Assemble pages/posts with block_schema pattern refs only "
+"? NEVER write pattern-ref markup or block HTML into post_content. Pending "
+"schemas (including nested patterns/forms) only resolve when the editor is "
+"open, so always stage block_schema, call trigger-refresh, and share "
+"edit_url (not post_url / preview). Never put core/template-part "
+"header/footer on pages. CRITICAL: call blockish/get-designer-workflow and "
+"blockish/get-block-docs before designing. For blog prose use "
+"blockish/write-blog, not this tool."
 msgstr ""
 
 #: includes/Mcp/Abilities/ManagePattern/Config.php:16
@@ -939,26 +987,6 @@ msgid ""
 "options. Cannot change siteurl or home (those break the site)."
 msgstr ""
 
-#: includes/Mcp/Abilities/ManageGlobalInteractions/Config.php:14
-msgid "Manage Global Interactions"
-msgstr ""
-
-#: includes/Mcp/Abilities/ManageGlobalInteractions/Config.php:15
-msgid ""
-"Get or update global vanilla JS interactions (animations and event "
-"listeners applied to the entire document)."
-msgstr ""
-
-#: includes/Mcp/Abilities/ManageComments/Config.php:14
-msgid "Manage Comments"
-msgstr ""
-
-#: includes/Mcp/Abilities/ManageComments/Config.php:15
-msgid ""
-"Retrieve, create, update, or delete WordPress comments (approve, spam, "
-"trash)."
-msgstr ""
-
 #: includes/Mcp/Abilities/ManageMedia/Config.php:14
 msgid "Create, Edit or Delete Media"
 msgstr ""
@@ -971,12 +999,32 @@ msgid ""
 "Images only."
 msgstr ""
 
+#: includes/Mcp/Abilities/ManageGlobalInteractions/Config.php:14
+msgid "Manage Global Interactions"
+msgstr ""
+
+#: includes/Mcp/Abilities/ManageGlobalInteractions/Config.php:15
+msgid ""
+"Get or update global vanilla JS interactions (animations and event "
+"listeners applied to the entire document)."
+msgstr ""
+
 #: includes/Mcp/Abilities/ManageFonts/Config.php:14
 msgid "Manage Fonts"
 msgstr ""
 
 #: includes/Mcp/Abilities/ManageFonts/Config.php:15
 msgid "Installs or deletes custom fonts in the WordPress Font Library."
+msgstr ""
+
+#: includes/Mcp/Abilities/ManageComments/Config.php:14
+msgid "Manage Comments"
+msgstr ""
+
+#: includes/Mcp/Abilities/ManageComments/Config.php:15
+msgid ""
+"Retrieve, create, update, or delete WordPress comments (approve, spam, "
+"trash)."
 msgstr ""
 
 #: includes/Mcp/Abilities/ManageClass/Config.php:14
@@ -1083,14 +1131,8 @@ msgid ""
 "mime_type and pagination."
 msgstr ""
 
-#: includes/Mcp/Abilities/GetIcons/Config.php:14
-msgid "Get Icons"
-msgstr ""
-
-#: includes/Mcp/Abilities/GetIcons/Config.php:15
-msgid ""
-"Searches the built-in Font Awesome icon library and returns the SVG paths "
-"so you can use them with the Icon type."
+#: includes/Mcp/Abilities/GetMagicLogin/Config.php:14
+msgid "Get Magic Login URL"
 msgstr ""
 
 #: includes/Mcp/Abilities/GetFonts/Config.php:14
@@ -1103,10 +1145,6 @@ msgid ""
 "theme-provided fonts from global styles."
 msgstr ""
 
-#: includes/Mcp/Abilities/GetMagicLogin/Config.php:14
-msgid "Get Magic Login URL"
-msgstr ""
-
 #: includes/Mcp/Abilities/GetDesignerWorkflow/Config.php:14
 msgid "Get Designer Workflow"
 msgstr ""
@@ -1117,16 +1155,14 @@ msgid ""
 "workflow and best practices (SOP)."
 msgstr ""
 
-#: includes/Mcp/Abilities/GetClasses/Config.php:14
-msgid "Get CSS Classes"
+#: includes/Mcp/Abilities/GetIcons/Config.php:14
+msgid "Get Icons"
 msgstr ""
 
-#: includes/Mcp/Abilities/GetClasses/Config.php:15
+#: includes/Mcp/Abilities/GetIcons/Config.php:15
 msgid ""
-"Returns all classes registered in the Blockish Class Manager, keyed by "
-"name, each with its post_id, css_selector, parent_id, editable content and "
-"compiled css. Call this before creating or updating classes to avoid "
-"duplicates."
+"Searches the built-in Font Awesome icon library and returns the SVG paths "
+"so you can use them with the Icon type."
 msgstr ""
 
 #: includes/Mcp/Abilities/GetClassManagerDocs/Config.php:14
@@ -1152,6 +1188,18 @@ msgid ""
 "and take screenshots. MUST BE READ before attempting browser automation."
 msgstr ""
 
+#: includes/Mcp/Abilities/GetClasses/Config.php:14
+msgid "Get CSS Classes"
+msgstr ""
+
+#: includes/Mcp/Abilities/GetClasses/Config.php:15
+msgid ""
+"Returns all classes registered in the Blockish Class Manager, keyed by "
+"name, each with its post_id, css_selector, parent_id, editable content and "
+"compiled css. Call this before creating or updating classes to avoid "
+"duplicates."
+msgstr ""
+
 #: includes/Mcp/Abilities/FetchCloudTemplates/Config.php:14
 msgid "Fetch Cloud Templates"
 msgstr ""
@@ -1159,9 +1207,19 @@ msgstr ""
 #: includes/Mcp/Abilities/FetchCloudTemplates/Config.php:15
 msgid ""
 "Fetches boilerplate design templates (patterns and pages) from the Blockish "
-"Cloud Template Library. CRITICAL: The returned block schemas are starting "
-"points. You MUST modify colors, placeholder text, and structure based on "
-"the user's prompt before inserting them."
+"Cloud Template Library. Designs may include dependencies.patterns and "
+"dependencies.forms (cloud id + content/schema). Recreate those as local "
+"wp_block / blockish_form posts, remap ref/formId cloud?local, then adapt "
+"the schema to the user request. CRITICAL: Never use cloud IDs as-is on the "
+"destination site."
+msgstr ""
+
+#: includes/Mcp/Abilities/ExtensionsInfo/Config.php:14
+msgid "Get Extensions Info"
+msgstr ""
+
+#: includes/Mcp/Abilities/ExtensionsInfo/Config.php:15
+msgid "Returns total, active and inactive Blockish extension counts."
 msgstr ""
 
 #: includes/Mcp/Abilities/BlocksInfo/Config.php:14
@@ -1183,12 +1241,4 @@ msgid ""
 "Returns the full Blockish block reference ? all blocks, their attributes, "
 "formats (responsive object, typography, background, border, spacing, icon, "
 "image) and markup examples."
-msgstr ""
-
-#: includes/Mcp/Abilities/ExtensionsInfo/Config.php:14
-msgid "Get Extensions Info"
-msgstr ""
-
-#: includes/Mcp/Abilities/ExtensionsInfo/Config.php:15
-msgid "Returns total, active and inactive Blockish extension counts."
 msgstr ""
