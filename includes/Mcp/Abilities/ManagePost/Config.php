@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create, Edit or Delete Post', 'blockish'),
-            'description'         => __('Creates, edits, or deletes a post. To CREATE: omit post_id but provide post_title and post_type. To EDIT: provide post_id. To DELETE: provide post_id and set delete to true. ALWAYS create sections with blockish/manage-pattern first and use returned real pattern IDs (never hallucinate refs). For a fully empty page/post (no post_content and no pending_schema), assemble with post_content pattern-ref comments only. If the page already has content or pending schema, pass block_schema pattern refs for Accept. Never put core/template-part header/footer on pages. This empty→post_content rule is manage-post only — do not use it for templates. CRITICAL: call blockish/get-designer-workflow and blockish/get-block-docs before designing. Call blockish/trigger-refresh after staging block_schema. For blog prose use blockish/write-blog, not this tool.', 'blockish'),
+            'description'         => __('Creates, edits, or deletes a post. To CREATE: omit post_id but provide post_title and post_type. To EDIT: provide post_id. To DELETE: provide post_id and set delete to true. ALWAYS create sections with blockish/manage-pattern first and use returned real pattern IDs (never hallucinate refs). Assemble pages/posts with block_schema pattern refs only — NEVER write pattern-ref markup or block HTML into post_content. Pending schemas (including nested patterns/forms) only resolve when the editor is open, so always stage block_schema, call trigger-refresh, and share edit_url (not post_url / preview). Never put core/template-part header/footer on pages. CRITICAL: call blockish/get-designer-workflow and blockish/get-block-docs before designing. For blog prose use blockish/write-blog, not this tool.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -22,7 +22,7 @@ class Config
                     'post_title'   => ['type' => 'string',  'description' => 'The title of the post. Required only when creating a new post.'],
                     'post_content' => [
                         'type'        => 'string',
-                        'description' => 'ONLY for fully empty pages/posts (no existing content and no pending_schema): synced pattern-ref markup using real IDs from manage-pattern, e.g. <!-- wp:block {"ref":123} /-->. Never full section HTML. Never use this for templates/template parts. If the target is not empty, use block_schema instead.',
+                        'description' => 'Do NOT use for Blockish layouts, pattern refs, or forms. Layouts must be staged via block_schema. Passing post_content for pages/posts/patterns/forms is rejected.',
                     ],
                     'post_status'  => ['type' => 'string',  'description' => 'draft, publish, private, etc. Defaults to "draft".'],
                     'post_excerpt' => ['type' => 'string'],
@@ -32,7 +32,7 @@ class Config
                     ],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'Use when the page/post is NOT empty (has post_content or pending_schema). Array of pattern-ref nodes only for full pages: {name:"core/block", attributes:{ref:<real_id>}}. Build sections with manage-pattern first — never invent refs. Do NOT include core/template-part header/footer on pages. Staged as pending for Accept — not written live. Pass an empty array to clear a previously staged schema. For empty targets prefer post_content pattern refs instead.',
+                        'description' => 'REQUIRED for layouts — including empty pages. Array of pattern-ref nodes for full pages: {name:"core/block", attributes:{ref:<real_id>}}. Build sections with manage-pattern first — never invent refs. Do NOT include core/template-part header/footer on pages. Staged as pending for Accept — not written live. Pass an empty array to clear a previously staged schema. After staging share edit_url (not post_url).',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [
@@ -82,7 +82,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'CRITICAL RULES (manage-post only): 1) Create patterns with manage-pattern FIRST; use returned real IDs only — never hallucinate refs. 2) Empty target (no post_content AND no pending_schema): assemble with post_content pattern-ref comments only (<!-- wp:block {"ref":ID} /-->), then share post_url. 3) Not empty (has content OR pending): pass block_schema pattern refs; staged for Accept — call trigger-refresh and share edit_url. Do NOT auto-accept unless the user asks (get-automation-guideline). 4) post_content markup must be pattern refs only — never full section HTML. 5) block_schema REPLACES any previously staged schema; it does not merge. 6) Monolithic / deeply nested full-page schemas are REJECTED — patterns + refs (get-designer-workflow). 7) NEVER put core/template-part header/footer on pages. 8) This empty→post_content path does NOT apply to manage-template. 9) Call get-block-docs first. 10) ALWAYS trigger-refresh after staging block_schema.',
+                'usage_notes' => 'CRITICAL RULES (manage-post): 1) Create patterns with manage-pattern FIRST; use returned real IDs only — never hallucinate refs. 2) ALWAYS assemble with block_schema pattern refs (empty or not) — staged for Accept. 3) NEVER write pattern-ref comments or block HTML into post_content — pending pattern/form schemas only resolve in the editor. 4) After staging: call trigger-refresh and share edit_url — never post_url / preview by default. 5) Do NOT auto-accept unless the user asks (get-automation-guideline). 6) block_schema REPLACES any previously staged schema; it does not merge. 7) Monolithic / deeply nested full-page schemas are REJECTED — patterns + refs (get-designer-workflow). 8) NEVER put core/template-part header/footer on pages. 9) Call get-block-docs first. 10) ALWAYS trigger-refresh after staging block_schema.',
             ],
         ];
     }

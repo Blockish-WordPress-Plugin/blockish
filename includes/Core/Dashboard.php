@@ -110,6 +110,7 @@ class Dashboard {
                     'blocksApiPath'     => '/blockish/v1/blocks',
                     'extensionsApiPath' => '/blockish/v1/extensions',
                     'dashboardToolsApiPath' => '/blockish/v1/dashboard-tools',
+                    'addonsApiPath'     => '/blockish/v1/addons',
                     'nonce'             => wp_create_nonce( 'wp_rest' ),
                     'siteUrl'           => admin_url(),
                     'currentUser'       => wp_get_current_user()->user_login,

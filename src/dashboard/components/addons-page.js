@@ -1,153 +1,810 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
-import { Button, Card, CardBody, Flex, __experimentalHeading as Heading, __experimentalText as Text, __experimentalVStack as VStack } from '@wordpress/components';
-import { check } from '@wordpress/icons';
+import { useMemo, useState, useCallback } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
+import {
+	Button,
+	Card,
+	CardBody,
+	Flex,
+	Modal,
+	Notice,
+	Spinner,
+	__experimentalHeading as Heading,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+
+function sortAddons(entries) {
+	return entries.sort((a, b) => {
+		if (a.is_bundle) return -1;
+		if (b.is_bundle) return 1;
+		return a.name.localeCompare(b.name);
+	});
+}
+
+function getAddonPlans(addon) {
+	if (!Array.isArray(addon?.plans)) {
+		return [];
+	}
+	return addon.plans.filter((plan) => plan?.id);
+}
+
+function normalizePlanLabel(value) {
+	return String(value || '')
+		.trim()
+		.toLowerCase();
+}
+
+function getCurrentPlanKey(addon) {
+	const planTitle = normalizePlanLabel(addon?.license?.plan_title);
+	if (!planTitle) {
+		return '';
+	}
+
+	const match = getAddonPlans(addon).find((plan) => {
+		const title = normalizePlanLabel(plan.title);
+		const key = normalizePlanLabel(plan.key);
+		return planTitle === title || planTitle === key || planTitle.includes(title) || title.includes(planTitle);
+	});
+
+	return match?.key || '';
+}
+
+function getDefaultPlanKey(addon) {
+	const plans = getAddonPlans(addon);
+	if (!plans.length) {
+		return 'personal';
+	}
+
+	const currentKey = getCurrentPlanKey(addon);
+	if (currentKey) {
+		const upgrade = plans.find((plan) => plan.key !== currentKey);
+		if (upgrade) {
+			return upgrade.key;
+		}
+	}
+
+	return plans[0].key;
+}
+
+function getInitialAddons() {
+	const list = window.blockishDashboardData?.addonsList || {};
+	return sortAddons(
+		Object.entries(list).map(([slug, item]) => ({
+			slug,
+			...item,
+		}))
+	);
+}
 
 export default function AddonsPage() {
-	const addons = useMemo(() => {
-		const list = window.blockishDashboardData?.addonsList || {};
-		// Convert to array and sort: Bundle first, then alphabetical
-		return Object.entries(list).map(([slug, item]) => ({
-			slug,
-			...item
-		})).sort((a, b) => {
-			if (a.is_bundle) return -1;
-			if (b.is_bundle) return 1;
-			return a.name.localeCompare(b.name);
+	const [addons, setAddons] = useState(getInitialAddons);
+	const [licenseKey, setLicenseKey] = useState('');
+	const [busySlug, setBusySlug] = useState(null);
+	const [busyAction, setBusyAction] = useState(null);
+	const [feedback, setFeedback] = useState(null);
+	const [modalAddon, setModalAddon] = useState(null);
+	const [modalFeedback, setModalFeedback] = useState(null);
+	const [selectedPlans, setSelectedPlans] = useState(() => {
+		const initial = {};
+		getInitialAddons().forEach((addon) => {
+			initial[addon.slug] = getDefaultPlanKey(addon);
 		});
-	}, []);
+		return initial;
+	});
 
-	const openFreemiusCheckout = (addon) => {
-		if (typeof window.FS === 'undefined') {
-			alert(__('Checkout is currently unavailable.', 'blockish'));
+	const addonsApiPath = window.blockishDashboardData?.addonsApiPath || '/blockish/v1/addons';
+
+	const startBusy = (slug, action) => {
+		setBusySlug(slug);
+		setBusyAction(action);
+	};
+
+	const clearBusy = () => {
+		setBusySlug(null);
+		setBusyAction(null);
+	};
+
+	const selectPlan = (slug, planKey) => {
+		setSelectedPlans((prev) => ({
+			...prev,
+			[slug]: planKey,
+		}));
+	};
+
+	const applyAddonsPayload = useCallback((payload) => {
+		if (!payload || typeof payload !== 'object') {
 			return;
 		}
-		
-		const handler = window.FS.Checkout.configure({
+
+		const next = sortAddons(
+			Object.entries(payload).map(([slug, item]) => ({
+				slug,
+				...item,
+			}))
+		);
+
+		setAddons(next);
+		setSelectedPlans((prev) => {
+			const nextPlans = { ...prev };
+			next.forEach((addon) => {
+				const plans = getAddonPlans(addon);
+				if (!plans.length) {
+					return;
+				}
+				const current = nextPlans[addon.slug];
+				if (!plans.some((plan) => plan.key === current)) {
+					nextPlans[addon.slug] = plans[0].key;
+				}
+			});
+			return nextPlans;
+		});
+		window.blockishDashboardData = {
+			...(window.blockishDashboardData || {}),
+			addonsList: payload,
+		};
+	}, []);
+
+	const closeLicenseModal = () => {
+		if (busySlug) {
+			return;
+		}
+		setModalAddon(null);
+		setLicenseKey('');
+		setModalFeedback(null);
+	};
+
+	const openLicenseModal = async (addon) => {
+		setFeedback(null);
+		setModalFeedback(null);
+		setLicenseKey('');
+		setModalAddon(addon);
+		startBusy(addon.slug, 'refresh');
+
+		try {
+			const response = await apiFetch({
+				path: addonsApiPath,
+				method: 'GET',
+			});
+			if (response?.addons) {
+				applyAddonsPayload(response.addons);
+				const fresh = response.addons?.[addon.slug];
+				if (fresh) {
+					setModalAddon({ slug: addon.slug, ...fresh });
+				}
+			}
+		} catch (error) {
+			// Keep the card payload if refresh fails.
+		} finally {
+			clearBusy();
+		}
+	};
+
+	const openFreemiusCheckout = async (addon) => {
+		if (typeof window.FS === 'undefined' || !window.FS.Checkout) {
+			setFeedback({
+				status: 'error',
+				message: __('Checkout is currently unavailable.', 'blockish'),
+			});
+			return;
+		}
+
+		if (
+			!addon.freemius_id ||
+			addon.public_key === 'pk_placeholder' ||
+			String(addon.freemius_id) === '12345' ||
+			String(addon.freemius_id) === '23456'
+		) {
+			setFeedback({
+				status: 'error',
+				message: __('Checkout is not configured for this product yet.', 'blockish'),
+			});
+			return;
+		}
+
+		const plans = getAddonPlans(addon);
+		const selectedKey = selectedPlans[addon.slug] || getDefaultPlanKey(addon);
+		const selectedPlan = plans.find((plan) => plan.key === selectedKey) || plans[0];
+		const currentPlanKey = getCurrentPlanKey(addon);
+
+		if (plans.length && !selectedPlan?.id) {
+			setFeedback({
+				status: 'error',
+				message: __('Select a plan before buying.', 'blockish'),
+			});
+			return;
+		}
+
+		if (currentPlanKey && selectedPlan?.key === currentPlanKey) {
+			setFeedback({
+				status: 'error',
+				message: __('This is already your active plan. Choose a different plan to upgrade.', 'blockish'),
+			});
+			return;
+		}
+
+		startBusy(addon.slug, 'checkout');
+
+		let checkoutOptions = {
 			plugin_id: addon.freemius_id,
 			public_key: addon.public_key,
-			// Additional options can be passed here (e.g., plan_id, billing_cycle)
-		});
-		
-		handler.open({
 			name: addon.name,
-			// For a bundle we might open a specific plan
-		});
+		};
+
+		if (selectedPlan?.id) {
+			checkoutOptions.plan_id = String(selectedPlan.id);
+		}
+
+		try {
+			const context = await apiFetch({
+				path: `${addonsApiPath}/checkout-context?slug=${encodeURIComponent(addon.slug)}`,
+				method: 'GET',
+			});
+
+			if (context?.plugin_id) {
+				checkoutOptions.plugin_id = context.plugin_id;
+			}
+			if (context?.public_key) {
+				checkoutOptions.public_key = context.public_key;
+			}
+			if (context?.name) {
+				checkoutOptions.name = context.name;
+			}
+			if (context?.license_key) {
+				checkoutOptions.license_key = context.license_key;
+			}
+		} catch (error) {
+			// Fall back to a fresh purchase checkout if context lookup fails.
+		} finally {
+			clearBusy();
+		}
+
+		const { name, license_key: licenseKeyForCheckout, ...configureOptions } = checkoutOptions;
+
+		const handler = window.FS.Checkout.configure(configureOptions);
+
+		const openPayload = {
+			name,
+			purchaseCompleted: () => {
+				setFeedback({
+					status: 'success',
+					message: licenseKeyForCheckout
+						? __('Upgrade / renewal complete. Your license will refresh on this site.', 'blockish')
+						: __(
+								'Purchase complete. Click Activate License and paste your key if it did not sync automatically.',
+								'blockish'
+						  ),
+				});
+				if (licenseKeyForCheckout) {
+					window.setTimeout(() => {
+						window.location.reload();
+					}, 1200);
+				}
+			},
+		};
+
+		if (selectedPlan?.id) {
+			openPayload.plan_id = String(selectedPlan.id);
+		}
+
+		// Agency = unlimited sites pricing on Freemius.
+		if (selectedPlan?.key === 'agency') {
+			openPayload.licenses = null;
+		} else if (selectedPlan?.key === 'personal') {
+			openPayload.licenses = 1;
+		}
+
+		if (licenseKeyForCheckout) {
+			openPayload.license_key = licenseKeyForCheckout;
+		}
+
+		handler.open(openPayload);
 	};
+
+	const activateLicense = async (addon) => {
+		const key = licenseKey.trim();
+		if (!key) {
+			setModalFeedback({
+				status: 'error',
+				message: __('Please enter a license key.', 'blockish'),
+			});
+			return;
+		}
+
+		startBusy(addon.slug, 'activate');
+		setModalFeedback(null);
+
+		try {
+			const response = await apiFetch({
+				path: `${addonsApiPath}/license/activate`,
+				method: 'POST',
+				data: {
+					slug: addon.slug,
+					license_key: key,
+				},
+			});
+
+			if (response?.addons) {
+				applyAddonsPayload(response.addons);
+			}
+
+			setModalFeedback({
+				status: 'success',
+				message: response?.message || __('License activated successfully.', 'blockish'),
+			});
+
+			setFeedback({
+				status: 'success',
+				message: response?.message || __('License activated successfully.', 'blockish'),
+			});
+
+			if (response?.addons?.[addon.slug]) {
+				setModalAddon({ slug: addon.slug, ...response.addons[addon.slug] });
+			}
+
+			if (response?.reload) {
+				setBusyAction('reloading');
+				window.setTimeout(() => {
+					window.location.reload();
+				}, 900);
+				return;
+			}
+
+			clearBusy();
+			closeLicenseModal();
+		} catch (error) {
+			setModalFeedback({
+				status: 'error',
+				message: error?.message || __('License activation failed.', 'blockish'),
+			});
+			clearBusy();
+		}
+	};
+
+	const deactivateLicense = async (addon) => {
+		startBusy(addon.slug, 'deactivate');
+		setModalFeedback(null);
+
+		try {
+			const response = await apiFetch({
+				path: `${addonsApiPath}/license/deactivate`,
+				method: 'POST',
+				data: {
+					slug: addon.slug,
+				},
+			});
+
+			if (response?.addons) {
+				applyAddonsPayload(response.addons);
+			}
+
+			setModalFeedback({
+				status: 'success',
+				message: response?.message || __('License deactivated.', 'blockish'),
+			});
+
+			if (response?.reload) {
+				setBusyAction('reloading');
+				window.setTimeout(() => {
+					window.location.reload();
+				}, 900);
+				return;
+			}
+
+			clearBusy();
+			closeLicenseModal();
+		} catch (error) {
+			setModalFeedback({
+				status: 'error',
+				message: error?.message || __('License deactivation failed.', 'blockish'),
+			});
+			clearBusy();
+		}
+	};
+
+	const cards = useMemo(() => addons, [addons]);
+	const isModalBusy = modalAddon ? busySlug === modalAddon.slug : false;
+	const modalLicense = modalAddon?.license || {};
+	const isModalLicensed = Boolean(modalLicense.is_active);
+	const isActivating = isModalBusy && (busyAction === 'activate' || busyAction === 'reloading');
+	const isDeactivating = isModalBusy && busyAction === 'deactivate';
+
+	const processingLabel = (() => {
+		switch (busyAction) {
+			case 'activate':
+				return __('Activating license…', 'blockish');
+			case 'deactivate':
+				return __('Deactivating license…', 'blockish');
+			case 'reloading':
+				return __('License updated. Reloading…', 'blockish');
+			case 'refresh':
+				return __('Loading license status…', 'blockish');
+			case 'checkout':
+				return __('Opening checkout…', 'blockish');
+			default:
+				return __('Please wait…', 'blockish');
+		}
+	})();
 
 	return (
 		<VStack className="blockish-blocks-page blockish-addons-page" spacing={5}>
-			{/* Hero Section */}
-			<div className="blockish-addons-hero" style={{ 
-				background: 'linear-gradient(135deg, #0f172a, #3b82f6)', 
-				color: 'white', 
-				padding: '48px 32px', 
-				borderRadius: '16px', 
-				marginBottom: '24px', 
-				textAlign: 'center',
-				boxShadow: '0 10px 25px rgba(59, 130, 246, 0.2)'
-			}}>
-				<Heading level={1} style={{ color: 'white', marginBottom: '16px', fontSize: '2.5rem', fontWeight: 800 }}>
-					{__('Unlock the Full Potential of Blockish', 'blockish')}
+			<header className="blockish-page-header">
+				<Heading className="blockish-heading-primary" level={1}>
+					{__('Addons', 'blockish')}
 				</Heading>
-				<Text style={{ fontSize: '1.15rem', opacity: 0.9, maxWidth: '650px', margin: '0 auto', display: 'block', lineHeight: 1.6, color: 'rgba(255, 255, 255, 0.9)' }}>
-					{__('Supercharge your website building experience with our premium addons. Add advanced features, dynamic data, and professional tools to your workflow.', 'blockish')}
+				<Text className="blockish-text-muted">
+					{__(
+						'Buy premium add-ons and activate license keys from one place — without leaving the Blockish dashboard.',
+						'blockish'
+					)}
 				</Text>
+			</header>
+
+			{feedback && (
+				<Notice
+					status={feedback.status === 'error' ? 'error' : 'success'}
+					isDismissible
+					onRemove={() => setFeedback(null)}
+				>
+					{feedback.message}
+				</Notice>
+			)}
+
+			<div className="blockish-block-grid blockish-addons-grid">
+				{cards.map((addon) => {
+					const license = addon.license || {};
+					const isLicenseActive = Boolean(license.is_active);
+					const showLicenseButton = Boolean(addon.supports_license_key);
+					const isCardBusy = busySlug === addon.slug;
+					const isCardCheckoutBusy = isCardBusy && busyAction === 'checkout';
+					const isCardLicenseBusy = isCardBusy && (busyAction === 'refresh' || busyAction === 'activate');
+					const plans = getAddonPlans(addon);
+					const currentPlanKey = getCurrentPlanKey(addon);
+					const selectedPlanKey = selectedPlans[addon.slug] || getDefaultPlanKey(addon);
+					const selectedPlan = plans.find((plan) => plan.key === selectedPlanKey) || plans[0];
+					const isSelectedCurrentPlan =
+						Boolean(isLicenseActive && currentPlanKey && selectedPlan?.key === currentPlanKey);
+					const buyLabel = selectedPlan?.title
+						? sprintf(__('Buy %s', 'blockish'), selectedPlan.title)
+						: __('Buy Now', 'blockish');
+					const upgradeLabel = isSelectedCurrentPlan
+						? __('Current plan', 'blockish')
+						: selectedPlan?.title
+							? sprintf(__('Upgrade to %s', 'blockish'), selectedPlan.title)
+							: __('Upgrade', 'blockish');
+
+					return (
+						<Card
+							key={addon.slug}
+							className={`blockish-block-card blockish-addon-card ${addon.is_bundle ? 'is-bundle' : ''} ${
+								isLicenseActive ? 'is-licensed' : ''
+							}`}
+							size="small"
+						>
+							{addon.is_bundle ? (
+								<div className="blockish-addon-ribbon">{__('Best Value', 'blockish')}</div>
+							) : (
+								<div
+									className={`blockish-status-badge ${
+										!addon.is_installed
+											? 'is-inactive'
+											: isLicenseActive
+												? 'is-active'
+												: 'is-inactive'
+									}`}
+								>
+									{!addon.is_installed
+										? __('Not Installed', 'blockish')
+										: isLicenseActive
+											? __('Licensed', 'blockish')
+											: __('Unlicensed', 'blockish')}
+								</div>
+							)}
+
+							<CardBody>
+								<VStack spacing={4}>
+									<Heading className="blockish-block-card-title blockish-heading-tertiary" level={3}>
+										{addon.name}
+									</Heading>
+									<Text className="blockish-block-card-description blockish-text-muted">
+										{addon.description}
+									</Text>
+
+									{addon.features?.length > 0 && (
+										<ul className="blockish-addon-features">
+											{addon.features.map((feature) => (
+												<li key={feature}>
+													<span className="blockish-addon-feature-check" aria-hidden="true">
+														<svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+															<path
+																d="M20 6L9 17L4 12"
+																stroke="currentColor"
+																strokeWidth="2.5"
+																strokeLinecap="round"
+																strokeLinejoin="round"
+															/>
+														</svg>
+													</span>
+													<span>{feature}</span>
+												</li>
+											))}
+										</ul>
+									)}
+
+									<div className="blockish-addon-actions">
+										{plans.length > 0 && (
+											<div
+												className="blockish-addon-plan-tabs"
+												role="tablist"
+												aria-label={__('Choose a plan', 'blockish')}
+											>
+												{plans.map((plan) => {
+													const isSelected = plan.key === selectedPlanKey;
+													const isCurrent = Boolean(
+														isLicenseActive && currentPlanKey && plan.key === currentPlanKey
+													);
+													return (
+														<button
+															key={plan.key}
+															type="button"
+															role="tab"
+															aria-selected={isSelected}
+															className={`blockish-addon-plan-tab ${
+																isSelected ? 'is-selected' : ''
+															} ${isCurrent ? 'is-current' : ''}`}
+															onClick={() => selectPlan(addon.slug, plan.key)}
+															disabled={isCardBusy}
+														>
+															<span className="blockish-addon-plan-tab-title">
+																{plan.title}
+																{isCurrent ? (
+																	<span className="blockish-addon-plan-current-badge">
+																		{__('Current', 'blockish')}
+																	</span>
+																) : null}
+															</span>
+															{plan.description && (
+																<span className="blockish-addon-plan-tab-meta">
+																	{plan.description}
+																</span>
+															)}
+														</button>
+													);
+												})}
+											</div>
+										)}
+
+										{isLicenseActive && (
+											<div className="blockish-addon-licensed-status">
+												<span className="blockish-addon-licensed-dot" aria-hidden="true" />
+												<span>
+													{license.plan_title
+														? sprintf(__('Licensed — %s', 'blockish'), license.plan_title)
+														: __('License active on this site', 'blockish')}
+												</span>
+											</div>
+										)}
+
+										{addon.is_bundle ? (
+											<Button
+												className="blockish-action-button is-primary"
+												variant="primary"
+												onClick={() => openFreemiusCheckout(addon)}
+												isBusy={isCardCheckoutBusy}
+												disabled={isCardBusy}
+											>
+												{isCardCheckoutBusy
+													? __('Opening…', 'blockish')
+													: __('Get Pro Bundle', 'blockish')}
+											</Button>
+										) : (
+											<Flex className="blockish-addon-action-row" gap={2}>
+												{isLicenseActive ? (
+													<>
+														<Button
+															className="blockish-action-button is-primary"
+															variant="primary"
+															onClick={() => openLicenseModal(addon)}
+															isBusy={isCardLicenseBusy}
+															disabled={isCardBusy}
+														>
+															{isCardLicenseBusy
+																? __('Loading…', 'blockish')
+																: __('Manage License', 'blockish')}
+														</Button>
+														<Button
+															className="blockish-action-button is-secondary"
+															variant="secondary"
+															onClick={() => openFreemiusCheckout(addon)}
+															isBusy={isCardCheckoutBusy}
+															disabled={isCardBusy || isSelectedCurrentPlan}
+														>
+															{isCardCheckoutBusy ? __('Opening…', 'blockish') : upgradeLabel}
+														</Button>
+													</>
+												) : (
+													<>
+														<Button
+															className="blockish-action-button is-primary"
+															variant="primary"
+															onClick={() => openFreemiusCheckout(addon)}
+															isBusy={isCardCheckoutBusy}
+															disabled={isCardBusy}
+														>
+															{isCardCheckoutBusy ? __('Opening…', 'blockish') : buyLabel}
+														</Button>
+														{showLicenseButton && (
+															<Button
+																className="blockish-action-button is-secondary"
+																variant="secondary"
+																onClick={() => openLicenseModal(addon)}
+																isBusy={isCardLicenseBusy}
+																disabled={isCardBusy}
+															>
+																{isCardLicenseBusy
+																	? __('Loading…', 'blockish')
+																	: __('Activate License', 'blockish')}
+															</Button>
+														)}
+													</>
+												)}
+											</Flex>
+										)}
+									</div>
+								</VStack>
+							</CardBody>
+						</Card>
+					);
+				})}
 			</div>
 
-			<div className="blockish-block-grid blockish-addons-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-				{addons.map((addon) => (
-					<Card 
-						key={addon.slug} 
-						className={`blockish-block-card ${addon.is_bundle ? 'is-bundle' : ''}`} 
-						size="small"
-						style={{ 
-							border: addon.is_bundle ? '2px solid var(--color-blue-600)' : '1px solid var(--color-gray-200)', 
-							position: 'relative', 
-							overflow: 'visible',
-							display: 'flex',
-							flexDirection: 'column'
-						}}
-					>
-						{addon.is_bundle && (
-							<div style={{ 
-								position: 'absolute', 
-								top: '-14px', 
-								right: '24px', 
-								background: 'linear-gradient(90deg, #f59e0b, #ef4444)', 
-								color: 'white', 
-								padding: '6px 16px', 
-								borderRadius: '20px', 
-								fontWeight: 'bold', 
-								fontSize: '11px', 
-								textTransform: 'uppercase', 
-								letterSpacing: '0.5px',
-								boxShadow: '0 4px 6px rgba(0,0,0,0.15)',
-								zIndex: 2
-							}}>
-								{__('Best Value', 'blockish')}
+			{modalAddon && (
+				<Modal
+					title={
+						isModalLicensed
+							? sprintf(__('Manage %s License', 'blockish'), modalAddon.name)
+							: sprintf(__('Activate %s License', 'blockish'), modalAddon.name)
+					}
+					onRequestClose={closeLicenseModal}
+					shouldCloseOnClickOutside={!isModalBusy}
+					shouldCloseOnEsc={!isModalBusy}
+					isDismissible={!isModalBusy}
+					className="blockish-configure-modal blockish-license-modal"
+				>
+					<VStack spacing={4} className="blockish-license-modal-content">
+						<Text className="blockish-schemas-modal-description">
+							{isModalLicensed
+								? __(
+										'This add-on is licensed on this site. You can deactivate the key to free a seat, or keep using it.',
+										'blockish'
+								  )
+								: __(
+										'Paste the license key from your purchase email or Freemius account to unlock this add-on.',
+										'blockish'
+								  )}
+						</Text>
+
+						{isModalBusy && (
+							<div className="blockish-license-processing" role="status" aria-live="polite">
+								<Spinner />
+								<span>{processingLabel}</span>
 							</div>
 						)}
-						<CardBody style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '32px 28px' }}>
-							<VStack spacing={5} style={{ flexGrow: 1 }}>
-								<Heading className="blockish-block-card-title" level={3} style={{ fontSize: '1.5rem', marginBottom: '8px' }}>
-									{addon.name}
-								</Heading>
-								<Text className="blockish-block-card-description blockish-text-muted" style={{ lineHeight: 1.6 }}>
-									{addon.description}
-								</Text>
-								
-								{addon.features && addon.features.length > 0 && (
-									<ul style={{ listStyle: 'none', padding: 0, margin: '16px 0 0 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-										{addon.features.map(feature => (
-											<li key={feature} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-												<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ color: 'var(--color-green-600)', flexShrink: 0, marginTop: '2px' }}>
-													<path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-												</svg>
-												<span style={{ color: 'var(--color-gray-700)', fontSize: '0.95rem', fontWeight: 500 }}>{feature}</span>
-											</li>
-										))}
-									</ul>
+
+						{modalFeedback && !isActivating && (
+							<Notice
+								status={modalFeedback.status === 'error' ? 'error' : 'success'}
+								isDismissible={!isModalBusy}
+								onRemove={() => setModalFeedback(null)}
+							>
+								{modalFeedback.message}
+							</Notice>
+						)}
+
+						{isModalLicensed ? (
+							<>
+								<div className="blockish-license-active-card">
+									<Text className="blockish-license-active-label">
+										{modalLicense.plan_title
+											? sprintf(__('Active plan: %s', 'blockish'), modalLicense.plan_title)
+											: __('License active', 'blockish')}
+									</Text>
+									{modalLicense.masked_key ? (
+										<code className="blockish-license-masked-key">{modalLicense.masked_key}</code>
+									) : null}
+								</div>
+
+								{!modalAddon.is_installed && (
+									<Notice status="warning" isDismissible={false}>
+										{__('Install the add-on plugin to use premium features after licensing.', 'blockish')}
+									</Notice>
 								)}
-							</VStack>
-							
-							<div style={{ marginTop: '32px' }}>
-								{addon.is_available ? (
-									<div style={{ background: 'var(--color-green-50)', color: 'var(--color-green-700)', padding: '16px', borderRadius: '8px', textAlign: 'center', fontWeight: 'bold', border: '1px solid var(--color-green-100)' }}>
-										{__('Installed & Active', 'blockish')}
-									</div>
-								) : (
+
+								<Flex className="blockish-license-modal-actions" justify="flex-end" gap={2}>
 									<Button
-										variant={addon.is_bundle ? 'primary' : 'secondary'}
-										onClick={() => openFreemiusCheckout(addon)}
-										style={addon.is_bundle ? { 
-											width: '100%', 
-											justifyContent: 'center', 
-											background: 'linear-gradient(135deg, #1e3a8a, #3b82f6)', 
-											border: 'none', 
-											padding: '24px 16px', 
-											fontSize: '16px', 
-											fontWeight: 'bold',
-											borderRadius: '8px'
-										} : { 
-											width: '100%', 
-											justifyContent: 'center', 
-											padding: '24px 16px', 
-											fontSize: '16px', 
-											fontWeight: 'bold',
-											borderRadius: '8px',
-											color: 'var(--color-gray-900)',
-											borderColor: 'var(--color-gray-300)'
-										}}
+										className="blockish-action-button is-secondary"
+										variant="secondary"
+										onClick={closeLicenseModal}
+										disabled={isModalBusy}
 									>
-										{addon.is_bundle ? __('Get Pro Bundle Now', 'blockish') : __('Buy Now', 'blockish')}
+										{__('Close', 'blockish')}
 									</Button>
+									<Button
+										className="blockish-action-button is-secondary"
+										variant="secondary"
+										isDestructive
+										onClick={() => deactivateLicense(modalAddon)}
+										isBusy={isDeactivating || busyAction === 'reloading'}
+										disabled={isModalBusy}
+									>
+										{isDeactivating
+											? __('Deactivating…', 'blockish')
+											: busyAction === 'reloading'
+												? __('Reloading…', 'blockish')
+												: __('Deactivate License', 'blockish')}
+									</Button>
+								</Flex>
+							</>
+						) : (
+							<>
+								{!modalAddon.is_installed && (
+									<Notice status="warning" isDismissible={false}>
+										{__('Install this add-on plugin first, then activate your license key.', 'blockish')}
+									</Notice>
 								)}
-							</div>
-						</CardBody>
-					</Card>
-				))}
-			</div>
+
+								{modalAddon.is_installed && !modalLicense.fs_ready && (
+									<Notice status="warning" isDismissible={false}>
+										{__('Freemius is not ready for this add-on yet. Finish product keys first.', 'blockish')}
+									</Notice>
+								)}
+
+								<div className="blockish-license-key-field">
+									<label className="blockish-license-key-label" htmlFor="blockish-license-key-input">
+										{__('License key', 'blockish')}
+									</label>
+									<input
+										id="blockish-license-key-input"
+										className="blockish-license-key-input"
+										type="text"
+										autoComplete="off"
+										spellCheck="false"
+										placeholder={__('Paste your license key', 'blockish')}
+										value={licenseKey}
+										onChange={(event) => setLicenseKey(event.target.value)}
+										disabled={isModalBusy}
+										autoFocus
+									/>
+								</div>
+
+								<Flex className="blockish-license-modal-actions" justify="flex-end" gap={2}>
+									<Button
+										className="blockish-action-button is-secondary"
+										variant="secondary"
+										onClick={closeLicenseModal}
+										disabled={isModalBusy}
+									>
+										{__('Cancel', 'blockish')}
+									</Button>
+									<Button
+										className="blockish-action-button is-primary"
+										variant="primary"
+										onClick={() => activateLicense(modalAddon)}
+										isBusy={isActivating}
+										disabled={isModalBusy || !licenseKey.trim()}
+									>
+										{busyAction === 'activate'
+											? __('Activating…', 'blockish')
+											: busyAction === 'reloading'
+												? __('Reloading…', 'blockish')
+												: __('Activate License', 'blockish')}
+									</Button>
+								</Flex>
+							</>
+						)}
+					</VStack>
+				</Modal>
+			)}
 		</VStack>
 	);
 }

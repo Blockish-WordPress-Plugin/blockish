@@ -26,6 +26,7 @@ use Blockish\Core\SEO;
 use Blockish\Core\StyleGenerator;
 use Blockish\Extensions\ExtensionsLoader;
 use Blockish\Mcp\Loader;
+use Blockish\Routes\AddonsV1;
 use Blockish\Routes\BlocksV1;
 use Blockish\Routes\DashboardToolsV1;
 use Blockish\Routes\EditorSyncV1;
@@ -158,6 +159,7 @@ final class Blockish
         ExtensionsV1::get_instance();
         EditorSyncV1::get_instance();
         DashboardToolsV1::get_instance();
+        AddonsV1::get_instance();
         SVGUploaderV1::get_instance();
         Blocks::get_instance();
         ExtensionsLoader::get_instance();

@@ -189,17 +189,15 @@ class Callbacks
     }
 
     /**
-     * Enforce manage-post post_content rules: pattern/form forbidden; pages/posts only pattern refs on empty targets.
+     * Reject post_content for Blockish layout assembly.
+     * Pending pattern/form schemas only resolve when the editor is open —
+     * live markup assembly + preview links do not work.
      */
     private static function validate_post_content_input( string $content, string $post_type, string $existing_content, int $post_id ): ?string {
         if ( in_array( $post_type, [ 'wp_block', 'blockish_form' ], true ) ) {
-            return 'Do not pass post_content for patterns or forms. Use block_schema / schema_file only.';
+            return 'Do not pass post_content for patterns or forms. Use block_schema / schema_file only. Share edit_url after staging so the user can Accept in the editor.';
         }
 
-        if ( ! SchemaUtils::is_assembly_target_empty( $existing_content, $post_id ) ) {
-            return 'This post already has content or a pending schema. Do not pass post_content — stage pattern refs with block_schema and ask the user to Accept.';
-        }
-
-        return SchemaUtils::validate_pattern_ref_markup( $content );
+        return 'Do not pass post_content for page/post layouts. Pending pattern and form schemas only resolve when the editor is open — live pattern-ref markup cannot be previewed reliably. Stage pattern refs with block_schema, call blockish/trigger-refresh, and share edit_url (not post_url).';
     }
 }

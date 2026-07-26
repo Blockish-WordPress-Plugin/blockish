@@ -81,15 +81,31 @@ const SidebarPatterns = () => {
 
 const SidebarPages = () => {
 	const { 
-		tags, categories,
+		tags, categories, packages,
 		selectedTag, setSelectedTag, 
-		selectedCategory, setSelectedCategory
+		selectedCategory, setSelectedCategory,
+		selectedPackage, setSelectedPackage,
 	} = useTemplateLibrary();
 
 	const pageTags = tags.filter(tag => tag.taxonomy === 'blockish_page_tag');
 
 	return (
 		<>
+			{packages.length > 0 && (
+				<div className="sidebar-section">
+					<div className="sidebar-package-list">
+						{packages.map(pkg => (
+							<PackageItem 
+								key={pkg.package_name}
+								label={formatSlugToTitle(pkg.package_name)} 
+								isSelected={selectedPackage === pkg.package_name} 
+								onClick={() => setSelectedPackage(selectedPackage === pkg.package_name ? 'All' : pkg.package_name)} 
+							/>
+						))}
+					</div>
+				</div>
+			)}
+
 			<div className="sidebar-section">
 				<h3>{__('Tags', 'blockish')}</h3>
 				<div className="sidebar-package-list">

@@ -89,13 +89,43 @@ class Enqueue {
 
         $library_url = BLOCKISH_TEMPLATE_LIBRARY_URL;
         $library_token = BLOCKISH_TEMPLATE_LIBRARY_TOKEN;
-        
+
+        $forms_installed      = class_exists( 'Blockish_Forms' );
+        $dynamicity_installed = class_exists( 'Blockish_Dynamicity' );
+        $addons               = \Blockish\Config\AddonsList::get_instance()->refresh_list();
+
+        $forms_licensed = ! empty( $addons['blockish-forms']['license']['is_active'] );
+        $dynamicity_licensed = ! empty( $addons['blockish-dynamicity']['license']['is_active'] );
+
+        // Local bypass mirrors AddonsList feature bypass for local/dev testing.
+        if ( function_exists( 'wp_get_environment_type' ) && in_array( wp_get_environment_type(), array( 'local', 'development' ), true ) ) {
+            $forms_licensed      = $forms_installed ? true : $forms_licensed;
+            $dynamicity_licensed = $dynamicity_installed ? true : $dynamicity_licensed;
+        }
+
         wp_localize_script(
             'blockish-template-library',
             'blockishTemplateLibraryData',
             array(
-                'token' => $library_token,
-                'url'   => rtrim($library_url, '/')
+                'token'     => $library_token,
+                'url'       => rtrim( $library_url, '/' ),
+                'addonsUrl' => admin_url( 'admin.php?page=blockish-dashboard&route=addons' ),
+                'packages'  => array(
+                    'forms' => array(
+                        'label'            => __( 'Forms', 'blockish' ),
+                        'aliases'          => array( 'forms', 'blockish-forms', 'blockish forms' ),
+                        'installed'        => $forms_installed,
+                        'licensed'         => $forms_licensed,
+                        'requires_license' => true,
+                    ),
+                    'dynamicity' => array(
+                        'label'            => __( 'Dynamicity', 'blockish' ),
+                        'aliases'          => array( 'dynamicity', 'blockish-dynamicity', 'blockish dynamicity' ),
+                        'installed'        => $dynamicity_installed,
+                        'licensed'         => $dynamicity_licensed,
+                        'requires_license' => true,
+                    ),
+                ),
             )
         );
     }

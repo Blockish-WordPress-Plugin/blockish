@@ -10,7 +10,7 @@ You (the AI) build a **schema**: a JSON tree of `{ name, attributes, innerBlocks
 
 **You never write block HTML, CSS classes, or hand-built block trees as markup.** Section design is always `{ name, attributes, innerBlocks }` schema (usually via `blockish/manage-pattern`). The HTML markup and CSS mappings in block docs are **examples for understanding** only — never reproduce a block's rendered HTML or write CSS directly (except in `customCss`). If you find yourself writing an HTML tag for a Blockish block, stop.
 
-**One exception — `blockish/manage-post` only:** when assembling a **fully empty** page/post, you may pass `post_content` that contains **only** synced pattern ref comments (see below). Never use that exception for templates, template parts, or section design.
+**Never write layouts into `post_content`.** Pages, templates, patterns, and forms are always staged as `block_schema` (pending). Pending pattern/form schemas only resolve when the editor is open — so do **not** assemble empty pages with live pattern-ref markup or share a preview/`post_url`. Always share `edit_url` and ask the user to Accept.
 
 *Note on CSS Mappings:* In the block docs, you will see CSS mappings like `.{{WRAPPER}} -> padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};`. These use reserved placeholders to show how your JSON data maps to CSS properties:
 - `{{WRAPPER}}`: Represents the unique, auto-generated class for that specific block instance (e.g., `.bb-[hash].blockish-block-wrapper`).
@@ -35,18 +35,18 @@ As a best practice, every top-level layout block you emit should carry a meaning
 
 **Create patterns before you include them.** Call `blockish/manage-pattern` for each section first and use only the **returned real pattern IDs**. Never invent or hallucinate `ref` values.
 
-**Empty vs not empty** (check with `blockish/get-posts`):
+**Always use `block_schema`** — empty page or not:
 
-| State | Meaning | What to send on `manage-post` |
-|---|---|---|
-| **Empty** | `post_content` is empty **and** there is no `pending_schema` | `post_content` = pattern refs only, e.g. `<!-- wp:block {"ref":163} /-->` (one per section). Goes live immediately — share `post_url`. |
-| **Not empty** | Has `post_content` **or** has `pending_schema` | `block_schema` = lightweight pattern-ref nodes only: `{"name":"core/block","attributes":{"ref":163}}`. Staged for Accept/Discard — share `edit_url`, call `trigger-refresh`. |
+| What to send | Notes |
+|---|---|
+| `block_schema` = lightweight pattern-ref nodes only | `{"name":"core/block","attributes":{"ref":163}}` (one per section). Staged for Accept/Discard. |
+| After staging | Call `trigger-refresh`, share **`edit_url`** (not `post_url` / preview). |
 
-- **Markup allowed on empty pages means only those pattern-ref comments** — never full section HTML, never hand-built Blockish trees in `post_content`.
+- **Never** write pattern-ref comments or section HTML into `post_content`. Pending pattern/form schemas only apply in the editor — live markup + preview is not reliable.
 - **Never** put `core/template-part` header/footer on a page (theme template already provides chrome).
-- This empty→`post_content` path is **`manage-post` only**. Templates / template parts always use `block_schema` via `manage-template` (Accept required). Do not invent a direct-markup path for them.
+- Templates / template parts always use `block_schema` via `manage-template` (Accept required).
 
-When `block_schema` is staged on a non-empty post, the editor shows a neon AI Preview wrapper; the user must Accept or Discard. Do not expect the live URL to change until Accept.
+When `block_schema` is staged, the editor shows a neon AI Preview wrapper; the user must Accept or Discard. Do not expect the live URL to change until Accept.
 
 **meta_input:** Never invent meta keys. The user must give exact key names, or (if Blockish Dynamicity is active) call `blockish-dynamicity/get-meta-list` and pick a real key. If Dynamicity is not active and the user needs meta discovery/bindings, ask them for the keys or mention that Dynamicity provides meta listing + dynamic bindings.
 
@@ -59,8 +59,8 @@ When `block_schema` is staged on a non-empty post, the editor shows a neon AI Pr
 1. **Fetch**: Call `blockish/get-posts` (for posts/pages) or `blockish/get-templates` (for templates/template parts) with the specific `post_id` or `slug`.
 2. **Inspect**: Look at the returned `schema` array. This is the exact live block structure. You will also receive `pending_schema` which shows any unaccepted changes currently in the editor, allowing you to understand what the user is seeing even if they haven't accepted it yet.
 3. **Modify**: Locate the specific block node you need to change and update its `attributes` or `innerBlocks` in memory.
-4. **Update**: For templates / template parts, always send `block_schema` via `manage-template`. For pages/posts via `manage-post`: if the target is **empty**, assemble with pattern-ref `post_content`; if **not empty**, send `block_schema` (pattern refs only).
-5. **Review**: If you staged `block_schema`, provide `edit_url`, call `blockish/trigger-refresh`, and tell the user to Accept. If you applied pattern-ref `post_content` on an empty page, share `post_url` (live). Never share a live URL for staged-only changes — it will look empty or unchanged until Accept.
+4. **Update**: Always send `block_schema` via `manage-post` / `manage-template` / `manage-pattern` — never layout markup in `post_content`.
+5. **Review**: Provide `edit_url`, call `blockish/trigger-refresh`, and tell the user to Accept. Never share a live/`post_url` for staged-only changes — it will look empty or unchanged until Accept.
 
 ---
 
