@@ -121,7 +121,7 @@ class Dashboard {
                         'wpVersion'=> get_bloginfo( 'version' ),
                         'links'    => array(
                             'documentation' => 'https://wordpress.org/plugins/blockish/',
-                            'support'       => 'https://wordpress.org/support/plugin/blockish/',
+                            'support'       => '', // Add own support forum URL when ready.
                             'changelog'     => 'https://wordpress.org/plugins/blockish/#developers',
                         ),
                     ),
