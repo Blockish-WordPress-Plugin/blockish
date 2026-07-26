@@ -26,6 +26,10 @@ class Config
                     ],
                     'post_status'  => ['type' => 'string',  'description' => 'draft, publish, private, etc. Defaults to "draft".'],
                     'post_excerpt' => ['type' => 'string'],
+                    'post_parent'  => [
+                        'type'        => 'integer',
+                        'description' => 'Optional parent post ID. Defaults to 0 (top-level). Omit on edit to leave unchanged.',
+                    ],
                     'featured_media' => [
                         'type'        => 'integer',
                         'description' => 'Attachment ID of an existing Media Library item to set as the featured image. This ability does not upload files: call blockish/get-media to find an existing image first, otherwise call blockish/upload-media with an image URL to create one and get its attachment_id, then pass it here. Do not guess an ID.',
@@ -72,6 +76,7 @@ class Config
                     'post_status'  => ['type' => 'string'],
                     'post_url'     => ['type' => 'string'],
                     'edit_url'     => ['type' => 'string'],
+                    'post_parent'  => ['type' => 'integer', 'description' => 'Parent post ID after save (0 = top-level).'],
                     'schema_staged' => ['type' => 'boolean', 'description' => 'True if block_schema was provided and saved as pending data on this post.'],
                     'featured_media_set' => ['type' => 'boolean', 'description' => 'True if featured_media was provided and successfully set as the post thumbnail.'],
                     'warnings'     => ['type' => 'array', 'description' => 'Non-blocking agent warnings (e.g. button double-border). Fix these when present.', 'items' => ['type' => 'string']],
@@ -82,7 +87,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'CRITICAL RULES (manage-post): 1) Create patterns with manage-pattern FIRST; use returned real IDs only — never hallucinate refs. 2) ALWAYS assemble with block_schema pattern refs (empty or not) — staged for Accept. 3) NEVER write pattern-ref comments or block HTML into post_content — pending pattern/form schemas only resolve in the editor. 4) After staging: call trigger-refresh and share edit_url — never post_url / preview by default. 5) Do NOT auto-accept unless the user asks (get-automation-guideline). 6) block_schema REPLACES any previously staged schema; it does not merge. 7) Monolithic / deeply nested full-page schemas are REJECTED — patterns + refs (get-designer-workflow). 8) NEVER put core/template-part header/footer on pages. 9) Call get-block-docs first. 10) ALWAYS trigger-refresh after staging block_schema.',
+                'usage_notes' => 'CRITICAL RULES (manage-post): 1) Create patterns with manage-pattern FIRST; use returned real IDs only — never hallucinate refs. 2) ALWAYS assemble with block_schema pattern refs (empty or not) — staged for Accept. 3) NEVER write pattern-ref comments or block HTML into post_content — pending pattern/form schemas only resolve in the editor. 4) After staging: call trigger-refresh and share edit_url — never post_url / preview by default. 5) Do NOT auto-accept unless the user asks (get-automation-guideline). 6) block_schema REPLACES any previously staged schema; it does not merge. 7) Monolithic / deeply nested full-page schemas are REJECTED — patterns + refs (get-designer-workflow). 8) NEVER put core/template-part header/footer on pages. 9) Call get-block-docs first. 10) ALWAYS trigger-refresh after staging block_schema. 11) Optional post_parent nests under a parent (0 / omit = top-level).',
             ],
         ];
     }

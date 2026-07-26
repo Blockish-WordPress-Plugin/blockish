@@ -122,6 +122,7 @@ class Callbacks
             $args['post_title'] = $input['post_title'];
             $args['post_status'] = $input['post_status'] ?? 'draft';
             $args['post_excerpt'] = $input['post_excerpt'] ?? '';
+            $args['post_parent'] = isset( $input['post_parent'] ) ? max( 0, (int) $input['post_parent'] ) : 0;
 
             if ( array_key_exists( 'post_content', $input ) ) {
                 $content_error = self::validate_post_content_input(
@@ -137,6 +138,11 @@ class Callbacks
             } else {
                 $args['post_content'] = '';
             }
+        }
+
+        // On edit, only change parent when the caller explicitly passes post_parent.
+        if ( $editing && array_key_exists( 'post_parent', $input ) ) {
+            $args['post_parent'] = max( 0, (int) $input['post_parent'] );
         }
 
         if ( isset( $input['meta_input'] ) && is_array( $input['meta_input'] ) ) {
@@ -179,6 +185,7 @@ class Callbacks
             'post_status'        => get_post_status( $post_id ),
             'post_url'           => get_permalink( $post_id ),
             'edit_url'           => get_edit_post_link( $post_id, 'raw' ),
+            'post_parent'        => (int) get_post_field( 'post_parent', $post_id ),
             'schema_staged'      => $schema_staged,
             'featured_media_set' => $featured_media_set,
         ];

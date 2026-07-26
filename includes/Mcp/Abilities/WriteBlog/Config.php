@@ -23,6 +23,10 @@ class Config
                     'post_content' => ['type' => 'string'],
                     'post_status'  => ['type' => 'string',  'description' => 'draft, publish, private, etc. Defaults to "draft".'],
                     'post_excerpt' => ['type' => 'string'],
+                    'post_parent'  => [
+                        'type'        => 'integer',
+                        'description' => 'Optional parent post ID. Defaults to 0 (top-level). Omit on edit to leave unchanged.',
+                    ],
                     'featured_media' => [
                         'type'        => 'integer',
                         'description' => 'Attachment ID of an existing Media Library item to set as the featured image.',
@@ -49,6 +53,7 @@ class Config
                     'post_status'  => ['type' => 'string'],
                     'post_url'     => ['type' => 'string'],
                     'edit_url'     => ['type' => 'string'],
+                    'post_parent'  => ['type' => 'integer', 'description' => 'Parent post ID after save (0 = top-level).'],
                     'schema_staged' => ['type' => 'boolean', 'description' => 'True if block_schema was provided and saved as pending data on this post.'],
                     'featured_media_set' => ['type' => 'boolean'],
                     'error'        => ['type' => 'string'],
@@ -58,7 +63,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use WordPress core blocks only (core/paragraph, core/heading, core/image, core/list, core/quote, etc.) — do not use blockish custom blocks. block_schema is never written into post_content — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself to approve. After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
+                'usage_notes' => 'Use WordPress core blocks only (core/paragraph, core/heading, core/image, core/list, core/quote, etc.) — do not use blockish custom blocks. block_schema is never written into post_content — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself to approve. After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor. Optional post_parent for nesting; defaults to 0.',
             ],
         ];
     }
