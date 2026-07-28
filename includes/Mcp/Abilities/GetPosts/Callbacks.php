@@ -74,13 +74,7 @@ class Callbacks
         // matching post's full content — only included when fetching one post by ID.
         if ( $with_content ) {
             $data['content'] = $post->post_content;
-            $parsed_blocks   = parse_blocks( $post->post_content );
-            $data['schema']  = \Blockish\Mcp\SchemaUtils::convert_to_js_schema( $parsed_blocks );
-            
-            $pending = get_post_meta( $post->ID, \Blockish\Mcp\BlockSchemaMeta::META_KEY, true );
-            if ( $pending ) {
-                $data['pending_schema'] = json_decode( $pending, true );
-            }
+            $data['schema']  = \Blockish\Mcp\SchemaUtils::resolve_schema_from_content( $post->post_content );
         }
 
         return $data;

@@ -7,6 +7,106 @@ defined('ABSPATH') || exit;
 class SchemaUtils
 {
     /**
+     * Find the first blockish/ai-preview block in content, if any.
+     */
+    public static function find_ai_preview_block( string $content ): ?array {
+        foreach ( parse_blocks( $content ) as $block ) {
+            if ( ! empty( $block['blockName'] ) && 'blockish/ai-preview' === $block['blockName'] ) {
+                return $block;
+            }
+        }
+        return null;
+    }
+
+    public static function content_has_ai_preview( string $content ): bool {
+        return null !== self::find_ai_preview_block( $content );
+    }
+
+    /**
+     * Decode a schema attribute (JSON string or array) to a schema node list.
+     */
+    public static function decode_schema_attr( $value ): array {
+        if ( is_array( $value ) ) {
+            if ( isset( $value['name'] ) && is_string( $value['name'] ) ) {
+                return [ $value ];
+            }
+            return $value;
+        }
+
+        if ( ! is_string( $value ) || '' === trim( $value ) ) {
+            return [];
+        }
+
+        $decoded = json_decode( $value, true );
+        if ( ! is_array( $decoded ) ) {
+            return [];
+        }
+
+        if ( isset( $decoded['name'] ) && is_string( $decoded['name'] ) ) {
+            return [ $decoded ];
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * Resolve the schema AI should edit:
+     * - ai-preview in content → pendingSchema (staged truth)
+     * - else → schema parsed from content
+     */
+    public static function resolve_schema_from_content( string $content ): array {
+        $preview = self::find_ai_preview_block( $content );
+        if ( $preview ) {
+            $pending = self::decode_schema_attr( $preview['attrs']['pendingSchema'] ?? '' );
+            if ( ! empty( $pending ) ) {
+                return $pending;
+            }
+            return self::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' );
+        }
+
+        return self::convert_to_js_schema( parse_blocks( $content ) );
+    }
+
+    /**
+     * Stage AI output as a single dynamic ai-preview block in content.
+     * Re-stage keeps previousSchema and only replaces pendingSchema.
+     * Empty pending clears content.
+     */
+    public static function build_staged_ai_preview_content( string $existing_content, array $pending_schema ): string {
+        if ( empty( $pending_schema ) ) {
+            return '';
+        }
+
+        $pending_schema = BlockSchemaMeta::force_required_attributes( $pending_schema );
+
+        $preview = self::find_ai_preview_block( $existing_content );
+        if ( $preview ) {
+            $previous = self::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' );
+        } else {
+            $previous = self::convert_to_js_schema( parse_blocks( $existing_content ) );
+        }
+
+        $previous_json = wp_json_encode( $previous );
+        $pending_json  = wp_json_encode( $pending_schema );
+        if ( false === $previous_json || false === $pending_json ) {
+            return '';
+        }
+
+        $block = [
+            'blockName'    => 'blockish/ai-preview',
+            'attrs'        => [
+                'previousSchema' => $previous_json,
+                'pendingSchema'  => $pending_json,
+            ],
+            'innerBlocks'  => [],
+            'innerHTML'    => '',
+            'innerContent' => [],
+        ];
+
+        return serialize_blocks( [ $block ] );
+    }
+
+    /**
      * Recursively formats a parsed Gutenberg block array into the JS block schema expected by Blockish MCP abilities.
      * Maps 'blockName' to 'name', 'attrs' to 'attributes', and strips null blocks and raw HTML content.
      */
@@ -105,21 +205,16 @@ class SchemaUtils
     }
 
     /**
-     * Whether post content + pending meta are empty enough for live pattern-ref assembly.
+     * Whether post content is empty enough for live pattern-ref assembly
+     * (no real blocks and no staged ai-preview).
      */
     public static function is_assembly_target_empty( string $content, int $post_id = 0 ): bool {
         if ( ! self::is_content_effectively_empty( $content ) ) {
             return false;
         }
 
-        if ( $post_id > 0 ) {
-            $pending = get_post_meta( $post_id, BlockSchemaMeta::META_KEY, true );
-            if ( is_string( $pending ) && '' !== trim( $pending ) ) {
-                return false;
-            }
-            if ( is_array( $pending ) && ! empty( $pending ) ) {
-                return false;
-            }
+        if ( self::content_has_ai_preview( $content ) ) {
+            return false;
         }
 
         return true;
@@ -155,7 +250,7 @@ class SchemaUtils
 
     /**
      * post_content for manage-post assembly must be only core/block pattern refs
-     * pointing at existing wp_block posts with no pending schema.
+     * pointing at existing wp_block posts with no staged ai-preview.
      *
      * @return string|null Error or null if ok.
      */
@@ -185,12 +280,9 @@ class SchemaUtils
                 return 'Pattern ref ' . $ref . ' is not a valid wp_block. Create the pattern with blockish/manage-pattern first and use the returned ID.';
             }
 
-            $pending = get_post_meta( $ref, BlockSchemaMeta::META_KEY, true );
-            $has_pending = ( is_string( $pending ) && '' !== trim( $pending ) )
-                || ( is_array( $pending ) && ! empty( $pending ) );
-            if ( $has_pending ) {
+            if ( self::content_has_ai_preview( (string) $pattern->post_content ) ) {
                 $edit = get_edit_post_link( $ref, 'raw' );
-                return 'Pattern ' . $ref . ' still has a pending schema. Accept it in the editor first'
+                return 'Pattern ' . $ref . ' still has a staged AI preview. Accept it in the editor first'
                     . ( $edit ? ( ': ' . $edit ) : '.' );
             }
 

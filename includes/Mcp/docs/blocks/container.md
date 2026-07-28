@@ -1,6 +1,6 @@
 ### `blockish/container`
 
-The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
+The primary layout block — flexbox, CSS grid, or plain block. **Accepts children: yes.**
 
 > [!WARNING]
 > **Hard rule — `alignItems` / `justifyContent`:** **Top-level** containers default to **Center** (via base CSS — omit the attrs). **Nested** (child) containers have **no default** — omit `alignItems`/`justifyContent` unless you intentionally need alignment (e.g. `flex-start` for copy columns, `stretch` for equal-height cards, `center` for a centered stack inside a column). Do **not** copy Center onto every nested container. Centering a button requires `buttonPlacement` on the button — parent align does not move buttons. After designing, re-check `flexDirection`, `alignItems`, and `justifyContent`.
@@ -10,7 +10,7 @@ The primary layout block — flexbox or CSS grid. **Accepts children: yes.**
 
 | `tagName` | Option | `{"label":"Div","value":"div"}` | Options: `[{"label":"Div","value":"div"},{"label":"Section","value":"section"},{"label":"Article","value":"article"},{"label":"Main","value":"main"},{"label":"a(Link)","value":"a"},{"label":"Nav","value":"nav"},{"label":"Aside","value":"aside"},{"label":"Header","value":"header"},{"label":"Footer","value":"footer"},{"label":"Ul(List)","value":"ul"},{"label":"Ol(List)","value":"ol"},{"label":"Li(List Item)","value":"li"},{"label":"Figure","value":"figure"}]` <br>**Note:** Do not use `header` or `footer` when building inside a Template Part, to avoid double `<header>`/`<footer>` tags. When `value` is `"a"`, also set `url` (BlockishLink object). Avoid nested links/buttons inside a linked container. |
 | `url` | Link object | unset | Used when `tagName.value` is `"a"`. Same shape as Button `url` (`url`, `newTab`, `noFollow`, optional dynamic). Renders as `href` / `target` / `rel` on the container wrapper. |
-| `display` | Scalar (string) | `"flex"` | `"flex"` `"grid"` <br>**CSS:** `.{{WRAPPER}}.blockish-container` -> `display: {{VALUE}};` |
+| `display` | Scalar (string) | `"flex"` | `"flex"` `"grid"` `"block"` <br>**CSS:** `.{{WRAPPER}}.blockish-container` -> `display: {{VALUE}};` |
 | `containerWidth` | Scalar (string) | `"alignfull"` | `"alignfull"` `"alignwide"` `"align-custom-width"` (with `customWidthContainer`) — **the custom option's value is the literal string `"align-custom-width"`, not `"custom"`**. **Nested containers:** the editor forces nested containers to `align-custom-width`. Keep `customWidthContainer` at the default `100%` unless you intentionally need a narrower inner shell (e.g. `1200px`). Do not rely on top-level centering margins on nested containers — see Base CSS below. |
 | `customWidthContainer` | Responsive | `{"Desktop":"100%"}` | Active when `containerWidth` = `"align-custom-width"` <br>**CSS:** `.{{WRAPPER}}.align-custom-width` -> `max-width: {{VALUE}};`. For a container nested inside another container, prefer leaving this at `100%` so it fills the parent; set a px/`rem` max-width only when you need a constrained content shell. |
 | `containerMinHeight` | Responsive | `{"Desktop":"0"}` | <br>**CSS:** `.{{WRAPPER}}` -> `min-height: {{VALUE}};` | `.{{WRAPPER}} > .block-list-appender` -> `min-height: {{VALUE}};` |

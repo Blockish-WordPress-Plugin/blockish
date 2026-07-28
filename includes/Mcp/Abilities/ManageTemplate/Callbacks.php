@@ -32,7 +32,8 @@ class Callbacks
             $input['block_schema'] = $loaded;
         }
 
-        if (array_key_exists('block_schema', $input) && is_array($input['block_schema']) && !empty($input['block_schema'])) {
+        $has_block_schema = array_key_exists('block_schema', $input) && is_array($input['block_schema']);
+        if ($has_block_schema && !empty($input['block_schema'])) {
             $shape_error = SchemaUtils::validate_schema_shape( $input['block_schema'] );
             if ( $shape_error ) {
                 return [ 'error' => $shape_error ];
@@ -74,13 +75,6 @@ class Callbacks
             }
             wp_delete_post($existing->ID, true);
 
-            $option_name = $type === 'wp_template' ? 'blockish_mcp_staged_template' : 'blockish_mcp_staged_template_part';
-            $staged_data = get_option($option_name, []);
-            if (is_array($staged_data) && isset($staged_data[$slug])) {
-                unset($staged_data[$slug]);
-                update_option($option_name, $staged_data, false);
-            }
-
             return [
                 'id' => $existing->ID,
                 'slug' => $slug,
@@ -96,6 +90,15 @@ class Callbacks
             'post_title'  => $input['title'] ?? ($existing ? $existing->post_title : $slug),
             'post_status' => 'publish',
         ];
+        if ( $has_block_schema ) {
+            $existing_content = $existing ? (string) $existing->post_content : '';
+            $post_data['post_content'] = wp_slash(
+                SchemaUtils::build_staged_ai_preview_content(
+                    $existing_content,
+                    $input['block_schema']
+                )
+            );
+        }
 
         if ($existing) {
             $post_data['ID'] = $existing->ID;
@@ -118,21 +121,11 @@ class Callbacks
 
         $schema_staged = false;
         $warnings      = [];
-        if (array_key_exists('block_schema', $input) && is_array($input['block_schema'])) {
-            $option_name = $type === 'wp_template' ? 'blockish_mcp_staged_template' : 'blockish_mcp_staged_template_part';
-            $staged_data = get_option($option_name, []);
-            if (!is_array($staged_data)) {
-                $staged_data = [];
-            }
-            
-            if (empty($input['block_schema'])) {
-                unset($staged_data[$slug]);
-            } else {
+        if ($has_block_schema) {
+            if (!empty($input['block_schema'])) {
                 $warnings = BlockSchemaMeta::get_schema_warnings($input['block_schema']);
-                $staged_data[$slug] = BlockSchemaMeta::force_required_attributes($input['block_schema']);
                 $schema_staged = true;
             }
-            update_option($option_name, $staged_data, false);
         }
 
         $result = [

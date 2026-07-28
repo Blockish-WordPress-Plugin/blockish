@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create, Edit or Delete Post', 'blockish'),
-            'description'         => __('Creates, edits, or deletes a post. To CREATE: omit post_id but provide post_title and post_type. To EDIT: provide post_id. To DELETE: provide post_id and set delete to true. ALWAYS create sections with blockish/manage-pattern first and use returned real pattern IDs (never hallucinate refs). Assemble pages/posts with block_schema pattern refs only — NEVER write pattern-ref markup or block HTML into post_content. Pending schemas (including nested patterns/forms) only resolve when the editor is open, so always stage block_schema, call trigger-refresh, and share edit_url (not post_url / preview). Never put core/template-part header/footer on pages. CRITICAL: call blockish/get-designer-workflow and blockish/get-block-docs before designing. For blog prose use blockish/write-blog, not this tool.', 'blockish'),
+            'description'         => __('Creates, edits, or deletes a post. To CREATE: omit post_id but provide post_title and post_type. To EDIT: provide post_id. To DELETE: provide post_id and set delete to true. For Blockish layouts, pass block_schema — this stages a blockish/ai-preview block into post_content (previousSchema + pendingSchema attrs). User Accept/Discard in the editor. Do NOT send pattern-ref markup or block HTML in post_content. Never put core/template-part header/footer on pages. CRITICAL: call blockish/get-designer-workflow and blockish/get-block-docs before designing. For blog prose use blockish/write-blog, not this tool.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -36,7 +36,7 @@ class Config
                     ],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'REQUIRED for layouts — including empty pages. Array of pattern-ref nodes for full pages: {name:"core/block", attributes:{ref:<real_id>}}. Build sections with manage-pattern first — never invent refs. Do NOT include core/template-part header/footer on pages. Staged as pending for Accept — not written live. Pass an empty array to clear a previously staged schema. After staging share edit_url (not post_url).',
+                        'description' => 'REQUIRED for layouts — including empty pages. Array of block schema nodes ({name, attributes, innerBlocks}); pattern refs recommended for large pages: {name:"core/block", attributes:{ref:<real_id>, align:"full"}} for full-bleed sections (omit align only for content-width). Build sections with manage-pattern first — never invent refs. Do NOT include core/template-part header/footer on pages. Staged into post_content as a single blockish/ai-preview block (pendingSchema + previousSchema). Pass an empty array to clear. After staging share edit_url for Accept/Discard.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [
@@ -77,7 +77,7 @@ class Config
                     'post_url'     => ['type' => 'string'],
                     'edit_url'     => ['type' => 'string'],
                     'post_parent'  => ['type' => 'integer', 'description' => 'Parent post ID after save (0 = top-level).'],
-                    'schema_staged' => ['type' => 'boolean', 'description' => 'True if block_schema was provided and saved as pending data on this post.'],
+                    'schema_staged' => ['type' => 'boolean', 'description' => 'True if non-empty block_schema was staged as an ai-preview block in post_content.'],
                     'featured_media_set' => ['type' => 'boolean', 'description' => 'True if featured_media was provided and successfully set as the post thumbnail.'],
                     'warnings'     => ['type' => 'array', 'description' => 'Non-blocking agent warnings (e.g. button double-border). Fix these when present.', 'items' => ['type' => 'string']],
                     'error'        => ['type' => 'string'],
@@ -87,7 +87,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'CRITICAL RULES (manage-post): 1) Create patterns with manage-pattern FIRST; use returned real IDs only — never hallucinate refs. 2) ALWAYS assemble with block_schema pattern refs (empty or not) — staged for Accept. 3) NEVER write pattern-ref comments or block HTML into post_content — pending pattern/form schemas only resolve in the editor. 4) After staging: call trigger-refresh and share edit_url — never post_url / preview by default. 5) Do NOT auto-accept unless the user asks (get-automation-guideline). 6) block_schema REPLACES any previously staged schema; it does not merge. 7) Monolithic / deeply nested full-page schemas are REJECTED — patterns + refs (get-designer-workflow). 8) NEVER put core/template-part header/footer on pages. 9) Call get-block-docs first. 10) ALWAYS trigger-refresh after staging block_schema. 11) Optional post_parent nests under a parent (0 / omit = top-level).',
+                'usage_notes' => 'CRITICAL RULES (manage-post): 1) Send block_schema for layouts — staged as blockish/ai-preview in post_content (not meta). 2) Create patterns with manage-pattern FIRST; use returned real IDs only for core/block refs. 3) Full-bleed section refs MUST set attributes.align to "full" (omit align only for content-width). 4) NEVER send pattern-ref comments or block HTML into post_content. 5) Re-stage replaces pendingSchema only; previousSchema stays until Accept/Discard. 6) Monolithic full-page schemas are REJECTED — patterns + refs. 7) NEVER put core/template-part header/footer on pages. 8) Call get-block-docs with required block_names (only blocks you need). 9) After staging: trigger-refresh and share edit_url. 10) Optional post_parent nests under a parent.',
             ],
         ];
     }

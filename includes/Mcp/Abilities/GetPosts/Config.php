@@ -52,9 +52,8 @@ class Config
                             'properties' => [
                                 'id'             => [ 'type' => 'integer' ],
                                 'title'          => [ 'type' => 'string' ],
-                                'content'        => [ 'type' => 'string', 'description' => 'Raw post_content. Only included when fetching a single post via post_id, not in list queries.' ],
-                                'schema'         => [ 'type' => 'array', 'description' => 'The LIVE schema array parsed from post_content. Present only if fetched by post_id.' ],
-                                'pending_schema' => [ 'type' => 'array', 'description' => 'The PENDING schema array waiting to be reviewed in the editor. Present only if fetched by post_id and if a pending schema exists.' ],
+                                'content'        => [ 'type' => 'string', 'description' => 'Raw post_content. Only included when fetching a single post via post_id, not in list queries. May be a staged blockish/ai-preview block.' ],
+                                'schema'         => [ 'type' => 'array', 'description' => 'Resolved schema for editing. If content has blockish/ai-preview, this is pendingSchema; otherwise parsed from content. Present only if fetched by post_id.' ],
                                 'status'         => [ 'type' => 'string' ],
                                 'type'           => [ 'type' => 'string' ],
                                 'url'            => [ 'type' => 'string' ],
@@ -71,7 +70,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use this to find a post by title or ID before editing it with blockish/manage-post, to check whether content already exists, or to list recent content. NOTE: The returned `content` field reflects only what has already been *applied* in the editor by a human. It will not show you the contents of an unapplied pending schema.',
+                'usage_notes' => 'Use this to find a post by title or ID before editing it with blockish/manage-post. When fetching by post_id, `schema` is the edit truth: pendingSchema if an ai-preview is staged in content, otherwise the live content schema. `content` is raw markup.',
             ],
         ];
     }

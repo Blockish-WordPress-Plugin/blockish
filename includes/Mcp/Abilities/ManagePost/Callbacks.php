@@ -35,7 +35,8 @@ class Callbacks
                 $schema_context = 'pattern';
             }
         }
-        if ( array_key_exists( 'block_schema', $input ) && is_array( $input['block_schema'] ) && ! empty( $input['block_schema'] ) ) {
+        $has_block_schema = array_key_exists( 'block_schema', $input ) && is_array( $input['block_schema'] );
+        if ( $has_block_schema && ! empty( $input['block_schema'] ) ) {
             $shape_error = SchemaUtils::validate_schema_shape( $input['block_schema'] );
             if ( $shape_error ) {
                 return [ 'error' => $shape_error ];
@@ -92,7 +93,15 @@ class Callbacks
             $args['post_status'] = isset( $input['post_status'] ) ? $input['post_status'] : $existing_post['post_status'];
             $args['post_excerpt'] = isset( $input['post_excerpt'] ) ? $input['post_excerpt'] : $existing_post['post_excerpt'];
 
-            if ( array_key_exists( 'post_content', $input ) ) {
+            if ( $has_block_schema ) {
+                $existing_content = $editing ? (string) $existing_post['post_content'] : '';
+                $args['post_content'] = wp_slash(
+                    SchemaUtils::build_staged_ai_preview_content(
+                        $existing_content,
+                        $input['block_schema']
+                    )
+                );
+            } elseif ( array_key_exists( 'post_content', $input ) ) {
                 $content_error = self::validate_post_content_input(
                     (string) $input['post_content'],
                     (string) $args['post_type'],
@@ -124,7 +133,14 @@ class Callbacks
             $args['post_excerpt'] = $input['post_excerpt'] ?? '';
             $args['post_parent'] = isset( $input['post_parent'] ) ? max( 0, (int) $input['post_parent'] ) : 0;
 
-            if ( array_key_exists( 'post_content', $input ) ) {
+            if ( $has_block_schema ) {
+                $args['post_content'] = wp_slash(
+                    SchemaUtils::build_staged_ai_preview_content(
+                        '',
+                        $input['block_schema']
+                    )
+                );
+            } elseif ( array_key_exists( 'post_content', $input ) ) {
                 $content_error = self::validate_post_content_input(
                     (string) $input['post_content'],
                     (string) $args['post_type'],
@@ -160,15 +176,13 @@ class Callbacks
 
         $schema_staged = false;
         $warnings      = [];
-        if ( array_key_exists( 'block_schema', $input ) && is_array( $input['block_schema'] ) ) {
+        if ( $has_block_schema ) {
             if ( ! empty( $input['block_schema'] ) ) {
                 $warnings = BlockSchemaMeta::get_schema_warnings( $input['block_schema'] );
             }
-            $encoded     = empty( $input['block_schema'] ) ? '' : wp_json_encode( $input['block_schema'] );
-            $schema_json = BlockSchemaMeta::sanitize( false === $encoded ? '' : $encoded );
-            $slushed     = wp_slash( $schema_json );
-            update_post_meta( $post_id, BlockSchemaMeta::META_KEY, $slushed );
-            $schema_staged = '' !== $slushed;
+            // One-shot cleanup of legacy pending meta from older staging path.
+            delete_post_meta( $post_id, BlockSchemaMeta::META_KEY );
+            $schema_staged = ! empty( $input['block_schema'] );
         }
 
         $featured_media_set = false;
@@ -197,14 +211,13 @@ class Callbacks
 
     /**
      * Reject post_content for Blockish layout assembly.
-     * Pending pattern/form schemas only resolve when the editor is open —
-     * live markup assembly + preview links do not work.
+     * Layouts must be staged via block_schema → ai-preview in content.
      */
     private static function validate_post_content_input( string $content, string $post_type, string $existing_content, int $post_id ): ?string {
         if ( in_array( $post_type, [ 'wp_block', 'blockish_form' ], true ) ) {
             return 'Do not pass post_content for patterns or forms. Use block_schema / schema_file only. Share edit_url after staging so the user can Accept in the editor.';
         }
 
-        return 'Do not pass post_content for page/post layouts. Pending pattern and form schemas only resolve when the editor is open — live pattern-ref markup cannot be previewed reliably. Stage pattern refs with block_schema, call blockish/trigger-refresh, and share edit_url (not post_url).';
+        return 'Do not pass post_content for page/post layouts. Stage pattern refs with block_schema (writes blockish/ai-preview into content), call blockish/trigger-refresh, and share edit_url (not post_url).';
     }
 }

@@ -15,11 +15,11 @@ class Loader
     {
         add_action('wp_abilities_api_categories_init', [$this, 'register_categories']);
         add_action('wp_abilities_api_init', [$this, 'register_abilities']);
-        add_action('init', [$this, 'register_settings']);
 
         // Expose each public ability as its own MCP tool (skip generic adapter bridge tools).
         add_filter('mcp_adapter_default_server_config', [$this, 'expose_abilities_as_mcp_tools']);
 
+        // Schema helpers (validation/warnings) — no longer registers pending meta storage.
         BlockSchemaMeta::get_instance();
     }
 
@@ -76,32 +76,6 @@ class Loader
             'label'       => __('Blockish', 'blockish'),
             'description' => __('Blockish AI abilities', 'blockish'),
         ]);
-    }
-
-
-    public function register_settings()
-    {
-        $schema = [
-            'type'                 => 'object',
-            'additionalProperties' => true,
-        ];
-
-        register_setting('blockish', 'blockish_mcp_staged_template', [
-            'type'         => 'object',
-            'show_in_rest' => [
-                'schema' => $schema,
-            ],
-            'default'      => [],
-        ]);
-
-        register_setting('blockish', 'blockish_mcp_staged_template_part', [
-            'type'         => 'object',
-            'show_in_rest' => [
-                'schema' => $schema,
-            ],
-            'default'      => [],
-        ]);
-
     }
 
     private array $abilities = [

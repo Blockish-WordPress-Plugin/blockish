@@ -8,9 +8,9 @@ You (the AI) build a **schema**: a JSON tree of `{ name, attributes, innerBlocks
 - `attributes` — only the attributes you want different from their default. Anything you omit automatically falls back to the block's registered default — you never need to repeat a default value, and you never need to compute what an omitted value "renders as." That is handled for you.
 - `innerBlocks` — array of child schema nodes, same shape, recursive. Only for blocks marked "Accepts children: yes" below.
 
-**You never write block HTML, CSS classes, or hand-built block trees as markup.** Section design is always `{ name, attributes, innerBlocks }` schema (usually via `blockish/manage-pattern`). The HTML markup and CSS mappings in block docs are **examples for understanding** only — never reproduce a block's rendered HTML or write CSS directly (except in `customCss`). If you find yourself writing an HTML tag for a Blockish block, stop.
+**You never write block HTML, CSS classes, or hand-built block trees as markup.** Section design is always `{ name, attributes, innerBlocks }` schema (usually via `blockish/manage-pattern`). **Do read** each block's Markup & CSS Generation, CSS mappings, and Base CSS — you know HTML/CSS well; Blockish attributes less so. Those sections are the bridge: compare the look you want to the documented DOM/CSS, then set attributes confidently for accurate, beautiful design. Never paste or reproduce a block's rendered HTML into content/schema, and do not write CSS directly except in `customCss` (last resort). If you find yourself writing an HTML tag for a Blockish block, stop.
 
-**Never write layouts into `post_content`.** Pages, templates, patterns, and forms are always staged as `block_schema` (pending). Pending pattern/form schemas only resolve when the editor is open — so do **not** assemble empty pages with live pattern-ref markup or share a preview/`post_url`. Always share `edit_url` and ask the user to Accept.
+**Never write layouts into `post_content` by hand.** Pages, templates, patterns, and forms are always staged via `block_schema`. Staging saves a `blockish/ai-preview` block into content (`previousSchema` + `pendingSchema`). Always share `edit_url` and ask the user to Accept (unwrap) or Discard (restore previous).
 
 *Note on CSS Mappings:* In the block docs, you will see CSS mappings like `.{{WRAPPER}} -> padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};`. These use reserved placeholders to show how your JSON data maps to CSS properties:
 - `{{WRAPPER}}`: Represents the unique, auto-generated class for that specific block instance (e.g., `.bb-[hash].blockish-block-wrapper`).
@@ -24,9 +24,9 @@ You (the AI) build a **schema**: a JSON tree of `{ name, attributes, innerBlocks
 Every Blockish block automatically receives the `blockish-block-wrapper` class and a unique `bb-[hash]` class on its outermost wrapper element. The individual block documentation files will show you the exact HTML structure, but keep in mind these global classes are injected server-side for every block.
 
 **Base CSS (`style.scss`):**
-At the bottom of each block's documentation, you will see a `Base CSS` section. This contains the static SCSS from the block's `style.scss` file. It shows the default styling applied to the block *before* any of your dynamic JSON attributes are applied. You should read this to understand the block's baseline behavior (e.g., if a block already has `display: flex` or `margin: 0` by default).
+At the bottom of each block's documentation, you will see a `Base CSS` section. This contains the static SCSS from the block's `style.scss` file — defaults applied *before* your dynamic JSON attributes (e.g. `display: flex`, hard-coded widths). Read it so you do not fight the baseline or re-encode what already exists; use it with the Markup section to map visual intent → attributes with confidence.
 
-These are just placeholders to help you understand which HTML elements and CSS properties are dynamically targeted.
+Markup/CSS placeholders (`{{WRAPPER}}`, etc.) show which elements and properties attributes target — use them as a design map, not as copy-paste HTML.
 
 **Naming Top-Level Blocks**
 As a best practice, every top-level layout block you emit should carry a meaningful `metadata.name` attribute (e.g., `"attributes": { "metadata": { "name": "Hero Section" } }`). This metadata.name is used for identifying blocks in the editor. It is recommended to make this meaningful for readability.
@@ -39,14 +39,15 @@ As a best practice, every top-level layout block you emit should carry a meaning
 
 | What to send | Notes |
 |---|---|
-| `block_schema` = lightweight pattern-ref nodes only | `{"name":"core/block","attributes":{"ref":163}}` (one per section). Staged for Accept/Discard. |
+| `block_schema` = lightweight pattern-ref nodes only | Full-bleed section (default for landing sections): `{"name":"core/block","attributes":{"ref":163,"align":"full"}}`. Content-width only when needed: omit `align` or use `"wide"`. Staged as `blockish/ai-preview` for Accept/Discard. |
 | After staging | Call `trigger-refresh`, share **`edit_url`** (not `post_url` / preview). |
 
-- **Never** write pattern-ref comments or section HTML into `post_content`. Pending pattern/form schemas only apply in the editor — live markup + preview is not reliable.
+- **Pattern `align` (editor):** Blockish enables `align` on `core/block`. For full-width sections set `"align":"full"` on the pattern ref. Omit `align` only when the section should stay content-width.
+- **Never** write pattern-ref comments or section HTML into `post_content` yourself — use `block_schema` so staging goes through ai-preview.
 - **Never** put `core/template-part` header/footer on a page (theme template already provides chrome).
 - Templates / template parts always use `block_schema` via `manage-template` (Accept required).
 
-When `block_schema` is staged, the editor shows a neon AI Preview wrapper; the user must Accept or Discard. Do not expect the live URL to change until Accept.
+When `block_schema` is staged, content holds a neon AI Preview wrapper; the user must Accept or Discard. Do not expect the live URL to change until Accept + save.
 
 **meta_input:** Never invent meta keys. The user must give exact key names, or (if Blockish Dynamicity is active) call `blockish-dynamicity/get-meta-list` and pick a real key. If Dynamicity is not active and the user needs meta discovery/bindings, ask them for the keys or mention that Dynamicity provides meta listing + dynamic bindings.
 
@@ -57,9 +58,9 @@ When `block_schema` is staged, the editor shows a neon AI Preview wrapper; the u
 **Do NOT build complex schema structures from scratch unless explicitly asked to create a brand new design.** It leads to hallucinated attributes and malformed layouts. Always prefer modifying existing schemas.
 
 1. **Fetch**: Call `blockish/get-posts` (for posts/pages) or `blockish/get-templates` (for templates/template parts) with the specific `post_id` or `slug`.
-2. **Inspect**: Look at the returned `schema` array. This is the exact live block structure. You will also receive `pending_schema` which shows any unaccepted changes currently in the editor, allowing you to understand what the user is seeing even if they haven't accepted it yet.
+2. **Inspect**: Look at the returned `schema` array — this is the edit truth. If content currently has a staged `blockish/ai-preview`, `schema` is the pending layout; otherwise it is parsed from live content. Raw `content` markup is also returned.
 3. **Modify**: Locate the specific block node you need to change and update its `attributes` or `innerBlocks` in memory.
-4. **Update**: Always send `block_schema` via `manage-post` / `manage-template` / `manage-pattern` — never layout markup in `post_content`.
+4. **Update**: Always send `block_schema` via `manage-post` / `manage-template` / `manage-pattern` — never hand-written layout markup in `post_content`.
 5. **Review**: Provide `edit_url`, call `blockish/trigger-refresh`, and tell the user to Accept. Never share a live/`post_url` for staged-only changes — it will look empty or unchanged until Accept.
 
 ---

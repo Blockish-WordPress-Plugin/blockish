@@ -87,6 +87,34 @@ addFilter(
     }
 );
 
+/**
+ * core/block has no align support by default. Enable wide/full so patterns can
+ * opt into editor full-bleed via the toolbar / align attribute (not always-on).
+ */
+addFilter(
+    'blocks.registerBlockType',
+    'blockish/core-block-align-support',
+    ( settings, name ) => {
+        if ( name !== 'core/block' ) {
+            return settings;
+        }
+
+        return {
+            ...settings,
+            supports: {
+                ...( settings.supports || {} ),
+                align: [ 'wide', 'full' ],
+            },
+            attributes: {
+                ...( settings.attributes || {} ),
+                align: {
+                    type: 'string',
+                },
+            },
+        };
+    }
+);
+
 addFilter(
     'editor.BlockEdit',
     'blockish/addAdvancedControls',

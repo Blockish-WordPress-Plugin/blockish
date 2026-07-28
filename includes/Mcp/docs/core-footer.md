@@ -95,7 +95,7 @@ Note what's omitted because it already matches the container's defaults: `displa
 
 **CRITICAL — pages vs templates:**
 
-1. **`manage-post` for a page/post:** Do **NOT** put `core/template-part` (header/footer) in the page `block_schema`. On block themes the active page template already wraps content with header + footer. Adding them again causes **duplicate** headers/footers. Create patterns first with real IDs, then assemble the page with `block_schema` pattern refs only (Accept in editor). Never write pattern-ref markup into `post_content`. Example ref node: `{"name":"core/block","attributes":{"ref":123}}`. Share `edit_url`, not preview.
+1. **`manage-post` for a page/post:** Do **NOT** put `core/template-part` (header/footer) in the page `block_schema`. On block themes the active page template already wraps content with header + footer. Adding them again causes **duplicate** headers/footers. Create patterns first with real IDs, then assemble the page with `block_schema` pattern refs only (Accept in editor). Never write pattern-ref markup into `post_content`. Full-bleed section example: `{"name":"core/block","attributes":{"ref":123,"align":"full"}}`. Omit `align` only for content-width sections. Share `edit_url`, not preview.
 
 2. **`manage-template` for a `wp_template` layout** (e.g. designing `page` / `single` / `home`): THEN you may include reusable header/footer parts:
 ```json

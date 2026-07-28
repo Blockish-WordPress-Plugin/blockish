@@ -33,7 +33,7 @@ class Config
                     ],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'Array of block schema nodes ({name, attributes, innerBlocks}) using WordPress CORE blocks only (e.g. core/paragraph, core/heading, core/image, core/list, core/quote) — do not use blockish custom blocks and do not pass hand-written HTML comments. Stored as pending data for a human to review and apply in the editor; never written directly into post_content.',
+                        'description' => 'Array of block schema nodes ({name, attributes, innerBlocks}) using WordPress CORE blocks only (e.g. core/paragraph, core/heading, core/image, core/list, core/quote) — do not use blockish custom blocks and do not pass hand-written HTML comments. Staged into post_content as blockish/ai-preview for Accept/Discard.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [
@@ -54,7 +54,7 @@ class Config
                     'post_url'     => ['type' => 'string'],
                     'edit_url'     => ['type' => 'string'],
                     'post_parent'  => ['type' => 'integer', 'description' => 'Parent post ID after save (0 = top-level).'],
-                    'schema_staged' => ['type' => 'boolean', 'description' => 'True if block_schema was provided and saved as pending data on this post.'],
+                    'schema_staged' => ['type' => 'boolean', 'description' => 'True if block_schema was staged as an ai-preview block in post_content.'],
                     'featured_media_set' => ['type' => 'boolean'],
                     'error'        => ['type' => 'string'],
                 ],
@@ -63,7 +63,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use WordPress core blocks only (core/paragraph, core/heading, core/image, core/list, core/quote, etc.) — do not use blockish custom blocks. IMPORTANT: If assembling with pattern refs, ALL pattern refs must be wrapped inside a single core/group block with {"layout":{"type":"constrained"}}. block_schema is never written into post_content — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself to approve. After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor. Optional post_parent for nesting; defaults to 0.',
+                'usage_notes' => 'Use WordPress core blocks only (core/paragraph, core/heading, core/image, core/list, core/quote, etc.) — do not use blockish custom blocks. IMPORTANT: If assembling with pattern refs, ALL pattern refs must be wrapped inside a single core/group block with {"layout":{"type":"constrained"}}. block_schema is staged as blockish/ai-preview in content. Open edit_url, Accept to unwrap, Discard to restore previous. After staging share edit_url; do not share post_url by default. Optional post_parent for nesting; defaults to 0.',
             ],
         ];
     }

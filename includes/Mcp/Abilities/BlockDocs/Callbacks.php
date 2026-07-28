@@ -8,50 +8,65 @@ class Callbacks
 {
     public static function get_block_docs( $_input ): array
     {
+        $requested_blocks = isset( $_input['block_names'] ) && is_array( $_input['block_names'] )
+            ? array_values( array_filter( array_map( 'strval', $_input['block_names'] ) ) )
+            : [];
+
+        if ( empty( $requested_blocks ) ) {
+            return [
+                'error'      => 'block_names is required. Do not fetch the full library — it wastes context. Choose the blocks you need from `blocks` (and related addons from `extensions`), then call again with those names, e.g. block_names: ["blockish/container", "blockish/heading", "blockish/button"].',
+                'blocks'     => get_option( 'blockish_block_list', [] ),
+                'extensions' => get_option( 'blockish_extension_list', [] ),
+            ];
+        }
+
         $docs_dir = plugin_dir_path( __FILE__ ) . '../../docs/';
-        
+
         $content = '';
-        
-        // Read core.md
+
         $core_file = $docs_dir . 'core.md';
         if ( is_readable( $core_file ) ) {
             $content .= file_get_contents( $core_file ) . "\n\n";
         }
-        
-        // Read requested block files or all if not specified
+
         $content .= "## 7. Per-block reference\n\n";
-        
-        $requested_blocks = isset( $_input['block_names'] ) && is_array( $_input['block_names'] ) ? $_input['block_names'] : [];
-        
-        if ( ! empty( $requested_blocks ) ) {
-            foreach ( $requested_blocks as $block_name ) {
-                // Strip "blockish/" prefix if present to get filename
-                $filename = str_replace( 'blockish/', '', $block_name ) . '.md';
-                $file = $docs_dir . 'blocks/' . basename($filename);
-                if ( is_readable( $file ) ) {
-                    $content .= file_get_contents( $file ) . "\n\n";
-                }
+
+        $missing = [];
+        foreach ( $requested_blocks as $block_name ) {
+            // Addon packages append their own docs via blockish_mcp_block_docs.
+            if (
+                'blockish-forms' === $block_name
+                || 'blockish-dynamicity' === $block_name
+                || str_starts_with( $block_name, 'blockish-forms/' )
+                || str_starts_with( $block_name, 'blockish-dynamicity/' )
+            ) {
+                continue;
             }
-        } else {
-            $block_files = glob( $docs_dir . 'blocks/*.md' );
-            if ( $block_files ) {
-                foreach ( $block_files as $file ) {
-                    if ( is_readable( $file ) ) {
-                        $content .= file_get_contents( $file ) . "\n\n";
-                    }
-                }
+            $slug     = str_replace( 'blockish/', '', $block_name );
+            $filename = $slug . '.md';
+            $file     = $docs_dir . 'blocks/' . basename( $filename );
+            if ( is_readable( $file ) ) {
+                $content .= file_get_contents( $file ) . "\n\n";
+            } else {
+                $missing[] = $block_name;
             }
         }
-        
-        // Read core-footer.md
+
         $footer_file = $docs_dir . 'core-footer.md';
         if ( is_readable( $footer_file ) ) {
             $content .= file_get_contents( $footer_file ) . "\n\n";
         }
-        
-        // Apply filter for extensions/addons to append their docs
+
         $content = apply_filters( 'blockish_mcp_block_docs', $content, $requested_blocks );
 
-        return [ 'docs' => $content ];
+        $result = [ 'docs' => $content ];
+
+        if ( ! empty( $missing ) ) {
+            $result['warning'] = 'No docs file for: ' . implode( ', ', $missing ) . '. Check `blocks` / `extensions` for valid names, then retry.';
+            $result['blocks']  = get_option( 'blockish_block_list', [] );
+            $result['extensions'] = get_option( 'blockish_extension_list', [] );
+        }
+
+        return $result;
     }
 }

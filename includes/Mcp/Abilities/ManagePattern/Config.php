@@ -14,7 +14,7 @@ class Config
     {
         return [
             'label'               => __('Create or Update a Component Pattern', 'blockish'),
-            'description'         => __('Use this tool to create or update reusable component patterns (Hero, Footer, etc.). This saves the JSON schema as a wp_block natively. CRITICAL: After staging a pattern, if the user is currently editing a parent page/template, you MUST also use manage-post or manage-template to re-stage that parent page/template with its current schema. This allows the user to see the AI preview block and accept it directly on their active page, without needing to navigate to the pattern editor.', 'blockish'),
+            'description'         => __('Use this tool to create or update reusable component patterns (Hero, Footer, etc.). Stages block_schema onto the wp_block as a blockish/ai-preview (previousSchema + pendingSchema). CRITICAL: After staging a pattern, if the user is currently editing a parent page/template, you MUST also use manage-post or manage-template to re-stage that parent with its current schema so they can Accept on the active page.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -55,7 +55,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'CRITICAL RULE: Always use this tool to build individual sections (Patterns) when designing a full page. Do NOT send one massive nested schema to manage-post. Send small patterns here, then assemble the final page in manage-post using core/block references.',
+                'usage_notes' => 'CRITICAL RULE: Always use this tool to build individual sections (Patterns) when designing a full page. Do NOT send one massive nested schema to manage-post. Send small patterns here, then assemble the final page in manage-post using core/block references with align:"full" for full-bleed sections (omit align only when content-width is intentional).',
             ],
         ];
     }

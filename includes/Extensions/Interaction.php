@@ -2,21 +2,42 @@
 
 namespace Blockish\Extensions;
 
+use Blockish\Config\ExtensionList;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Interactions runtime: page meta, view assets, and data-blockish-interactions markup.
+ * Editor assets + interactionData attribute come from block.json via Core\Extensions.
+ */
 class Interaction {
 	use \Blockish\Traits\SingletonTrait;
 
 	const PAGE_META_KEY = 'blockish_page_interactions';
 
+	/** Handles registered from build/extensions/interactions/block.json via Core\Extensions. */
+	const VIEW_SCRIPT_HANDLE = 'blockish-extension-interactions-viewScript';
+	const VIEW_STYLE_HANDLE  = 'blockish-extension-interactions-style';
+
 	private function __construct() {
 		add_action( 'init', array( $this, 'register_page_meta' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_scripts' ) );
+		add_action( 'init', array( $this, 'register_runtime_hooks' ), 20 );
+	}
+
+	public function register_runtime_hooks() {
+		if ( ! $this->is_extension_enabled() ) {
+			return;
+		}
+
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_view_assets' ) );
 		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
-		add_filter( 'register_block_type_args', array( $this, 'register_attributes' ), 20, 2 );
+	}
+
+	private function is_extension_enabled() {
+		$active = ExtensionList::get_instance()->get_list( 'active' );
+		return ! empty( $active['interactions'] );
 	}
 
 	public function register_page_meta() {
@@ -43,32 +64,18 @@ class Interaction {
 		);
 	}
 
-	public function enqueue_scripts() {
-		$asset_file = BLOCKISH_EXTENSIONS_DIR . 'interactions/view.asset.php';
-
-		if ( ! file_exists( $asset_file ) ) {
+	/**
+	 * Enqueue registered viewScript/style and inject global + page interaction JSON.
+	 */
+	public function enqueue_view_assets() {
+		if ( ! wp_script_is( self::VIEW_SCRIPT_HANDLE, 'registered' ) ) {
 			return;
 		}
 
-		$asset     = require $asset_file;
-		$script_url = BLOCKISH_URL . 'build/extensions/interactions/view.js';
+		wp_enqueue_script( self::VIEW_SCRIPT_HANDLE );
 
-		wp_enqueue_script(
-			'blockish-extension-interactions-view',
-			$script_url,
-			$asset['dependencies'] ?? array(),
-			$asset['version'] ?? BLOCKISH_VERSION,
-			true
-		);
-
-		$style_path = BLOCKISH_DIR . 'build/extensions/interactions/style-view.css';
-		if ( file_exists( $style_path ) ) {
-			wp_enqueue_style(
-				'blockish-extension-interactions-style',
-				BLOCKISH_URL . 'build/extensions/interactions/style-view.css',
-				array(),
-				$asset['version'] ?? BLOCKISH_VERSION
-			);
+		if ( wp_style_is( self::VIEW_STYLE_HANDLE, 'registered' ) ) {
+			wp_enqueue_style( self::VIEW_STYLE_HANDLE );
 		}
 
 		$global_interactions = get_option( 'blockish_global_interactions', array() );
@@ -97,56 +104,11 @@ class Interaction {
 		}
 
 		wp_add_inline_script(
-			'blockish-extension-interactions-view',
+			self::VIEW_SCRIPT_HANDLE,
 			'window.blockishGlobalInteractions = ' . $global_interactions_json . ';' .
 			'window.blockishPageInteractions = ' . $page_interactions_json . ';',
 			'before'
 		);
-	}
-
-	public function enqueue_editor_scripts() {
-		$asset_file = BLOCKISH_EXTENSIONS_DIR . 'interactions/editor.asset.php';
-
-		if ( ! file_exists( $asset_file ) ) {
-			return;
-		}
-
-		$asset      = require $asset_file;
-		$script_url = BLOCKISH_URL . 'build/extensions/interactions/editor.js';
-
-		wp_enqueue_script(
-			'blockish-extension-interactions-editor',
-			$script_url,
-			$asset['dependencies'] ?? array(),
-			$asset['version'] ?? BLOCKISH_VERSION,
-			true
-		);
-
-		$style_path = BLOCKISH_DIR . 'build/extensions/interactions/editor.css';
-		if ( file_exists( $style_path ) ) {
-			wp_enqueue_style(
-				'blockish-extension-interactions-editor',
-				BLOCKISH_URL . 'build/extensions/interactions/editor.css',
-				array(),
-				$asset['version'] ?? BLOCKISH_VERSION
-			);
-		}
-	}
-
-	public function register_attributes( $args, $block_type ) {
-		if ( str_starts_with( $block_type, 'blockish' ) ) {
-			if ( ! isset( $args['attributes'] ) ) {
-				$args['attributes'] = array();
-			}
-			$args['attributes']['interactionData'] = array(
-				'type'    => 'array',
-				'default' => array(),
-				'items'   => array(
-					'type' => 'object',
-				),
-			);
-		}
-		return $args;
 	}
 
 	public function render_block( $block_content, $block ) {

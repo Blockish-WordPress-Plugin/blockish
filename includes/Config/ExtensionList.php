@@ -50,6 +50,13 @@ class ExtensionList extends ConfigList {
                 'category'    => 'general',
                 'status'      => 'active',
             ),
+            'interactions' => array(
+                'name'        => __( 'Interactions', 'blockish' ),
+                'description' => __( 'Add entrance animations, click actions, and cross-block signals to Blockish blocks.', 'blockish' ),
+                'package'     => 'free',
+                'category'    => 'general',
+                'status'      => 'active',
+            ),
             'dynamic-data' => array(
                 'name'        => __( 'Dynamic Data', 'blockish' ),
                 'description' => __( 'Adds dynamic data binding capabilities to blocks.', 'blockish' ),

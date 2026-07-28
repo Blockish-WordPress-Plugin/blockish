@@ -5,61 +5,18 @@ namespace Blockish\Mcp;
 defined('ABSPATH') || exit;
 
 /**
- * Registers the post meta used to stage an AI-generated block schema
- * against a post before it is reviewed and applied in the editor.
+ * Schema validation / normalization helpers for MCP staging.
+ * Pending layouts are stored on content as blockish/ai-preview (not post meta).
  */
 class BlockSchemaMeta
 {
     use \Blockish\Traits\SingletonTrait;
 
+    /** @deprecated Legacy meta key; no longer written for new staging. Kept for one-shot cleanup. */
     const META_KEY = '_blockish_block_schema';
 
     private function __construct()
     {
-        add_action('init', [$this, 'register_meta']);
-    }
-
-    public function register_meta()
-    {
-        register_post_meta(
-            '', // Empty post type = registered for every post type.
-            self::META_KEY,
-            [
-                'type'              => 'string',
-                'single'            => true,
-                'default'           => '',
-                'show_in_rest'      => true,
-                'sanitize_callback' => [self::class, 'sanitize'],
-                'auth_callback'     => function ($allowed, $meta_key, $post_id) {
-                    return current_user_can('edit_post', $post_id);
-                },
-            ]
-        );
-    }
-
-    /**
-     * Stores the schema as-is when it is valid JSON, otherwise clears it.
-     * Avoids generic string sanitizers (e.g. sanitize_text_field) mangling
-     * whitespace/characters inside the JSON payload.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    public static function sanitize($value)
-    {
-        if (!is_string($value) || '' === trim($value)) {
-            return '';
-        }
-
-        $decoded = json_decode($value, true);
-
-        if (JSON_ERROR_NONE !== json_last_error() || !is_array($decoded)) {
-            return '';
-        }
-
-        $decoded = self::force_required_attributes($decoded);
-
-        return wp_json_encode($decoded);
     }
 
     /**
@@ -190,7 +147,7 @@ class BlockSchemaMeta
         // Absolute transport ceiling for every context.
         if ($m['json_bytes'] > 500000) {
             return sprintf(
-                'Schema too large (%d bytes). Write it to a scratch JSON file and pass schema_file, or split into smaller patterns via blockish/manage-pattern. Then assemble with {"name":"core/block","attributes":{"ref":<pattern_id>}}. See blockish/get-designer-workflow step 7–8.',
+                'Schema too large (%d bytes). Write it to a scratch JSON file and pass schema_file, or split into smaller patterns via blockish/manage-pattern. Then assemble with {"name":"core/block","attributes":{"ref":<pattern_id>,"align":"full"}}. See blockish/get-designer-workflow step 7–8.',
                 $m['json_bytes']
             );
         }
@@ -214,7 +171,7 @@ class BlockSchemaMeta
 
         if ($m['max_depth'] >= 6 || $m['node_count'] >= 80 || $m['json_bytes'] >= 100000) {
             return sprintf(
-                'Schema too large or too deeply nested for a full page/template (nodes=%d, depth=%d, bytes=%d). Do NOT send a monolithic layout. Build each section with blockish/manage-pattern, then assemble a lightweight schema of {"name":"core/block","attributes":{"ref":<pattern_id>}}. On block themes, omit header/footer template-parts from page content (the template already provides them); use core/template-part only when editing wp_template layouts. See blockish/get-designer-workflow step 7–8.',
+                'Schema too large or too deeply nested for a full page/template (nodes=%d, depth=%d, bytes=%d). Do NOT send a monolithic layout. Build each section with blockish/manage-pattern, then assemble a lightweight schema of {"name":"core/block","attributes":{"ref":<pattern_id>,"align":"full"}}. On block themes, omit header/footer template-parts from page content (the template already provides them); use core/template-part only when editing wp_template layouts. See blockish/get-designer-workflow step 7–8.',
                 $m['node_count'],
                 $m['max_depth'],
                 $m['json_bytes']
