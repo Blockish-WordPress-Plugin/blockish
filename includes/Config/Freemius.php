@@ -32,6 +32,8 @@ class Freemius {
 		$this->sdk = $this->initialize();
 
 		if ( $this->sdk ) {
+			$this->configure_parent_redirects( $this->sdk );
+
 			// Strip Freemius Plugins-row links before add-ons boot (they fire on this action).
 			$this->hide_plugins_row_links( $this->sdk );
 			add_action( 'blockish-forms/freemius/loaded', array( $this, 'hide_plugins_row_links' ) );
@@ -39,6 +41,26 @@ class Freemius {
 
 			do_action( 'blockish/freemius/loaded', $this->sdk );
 		}
+	}
+
+	/**
+	 * After install/opt-in, always land on the Blockish React dashboard.
+	 *
+	 * @param \Freemius $sdk Freemius instance.
+	 * @return void
+	 */
+	private function configure_parent_redirects( $sdk ) {
+		if ( ! is_object( $sdk ) || ! method_exists( $sdk, 'add_filter' ) ) {
+			return;
+		}
+
+		$dashboard = static function () {
+			return admin_url( 'admin.php?page=blockish-dashboard' );
+		};
+
+		$sdk->add_filter( 'after_connect_url', $dashboard );
+		$sdk->add_filter( 'after_skip_url', $dashboard );
+		$sdk->add_filter( 'after_pending_connect_url', $dashboard );
 	}
 
 	/**
@@ -111,8 +133,9 @@ class Freemius {
 	/**
 	 * Load and initialize the shared Freemius SDK.
 	 *
-	 * No Freemius menu is registered because Blockish owns its React dashboard
-	 * and Addons route.
+	 * Menu slug matches the Blockish dashboard so Freemius does not create a
+	 * second top-level page. Submenus (account/pricing/…) are disabled —
+	 * licensing lives under Blockish → Addons.
 	 *
 	 * @return \Freemius|false
 	 */
@@ -144,6 +167,16 @@ class Freemius {
 				'has_paid_plans'      => false,
 				'has_addons'          => true,
 				'is_org_compliant'    => true,
+				'menu'                => array(
+					'slug'        => 'blockish-dashboard',
+					'first-path'  => 'admin.php?page=blockish-dashboard',
+					'account'     => false,
+					'contact'     => false,
+					'support'     => false,
+					'affiliation' => false,
+					'pricing'     => false,
+					'addons'      => false,
+				),
 			)
 		);
 	}

@@ -248,6 +248,53 @@ export default function Edit( {
 	const trackRef = useRef( null );
 	const physicalRef = useRef( 0 );
 	const jumpingRef = useRef( false );
+	const animatingRef = useRef( false );
+	const animGuardRef = useRef( null );
+	const transitionMs = Math.max( 100, Number( transitionSpeed ) || 450 );
+
+	const clearAnimGuard = useCallback( () => {
+		if ( animGuardRef.current ) {
+			clearTimeout( animGuardRef.current );
+			animGuardRef.current = null;
+		}
+	}, [] );
+
+	const snapIfNeeded = useCallback( () => {
+		if ( ! loopEnabled || jumpingRef.current || ! slideCount ) {
+			return false;
+		}
+		const start = cloneCount;
+		const end = cloneCount + slideCount;
+		const p = physicalRef.current;
+
+		if ( p >= end ) {
+			jumpingRef.current = true;
+			const overflow = ( p - end ) % slideCount;
+			const next = start + overflow;
+			physicalRef.current = next;
+			setNoTransition( true );
+			setPhysical( next );
+			jumpingRef.current = false;
+			return true;
+		}
+		if ( p < start ) {
+			jumpingRef.current = true;
+			const underflow = ( start - p ) % slideCount;
+			const next = underflow === 0 ? start : end - underflow;
+			physicalRef.current = next;
+			setNoTransition( true );
+			setPhysical( next );
+			jumpingRef.current = false;
+			return true;
+		}
+		return false;
+	}, [ loopEnabled, cloneCount, slideCount ] );
+
+	const finishAnimation = useCallback( () => {
+		clearAnimGuard();
+		animatingRef.current = false;
+		snapIfNeeded();
+	}, [ clearAnimGuard, snapIfNeeded ] );
 
 	const goToPhysical = useCallback(
 		( next, withTransition = true ) => {
@@ -258,43 +305,40 @@ export default function Edit( {
 				setPhysical( idle );
 				return;
 			}
+			if ( withTransition && animatingRef.current ) {
+				return;
+			}
+			if ( loopEnabled && withTransition ) {
+				snapIfNeeded();
+			}
 			let target = next;
 			if ( ! loopEnabled ) {
 				target = Math.max( 0, Math.min( maxLogical, next ) );
 			}
 			if ( ! withTransition ) {
 				setNoTransition( true );
+			} else {
+				animatingRef.current = true;
+				clearAnimGuard();
+				animGuardRef.current = setTimeout(
+					finishAnimation,
+					transitionMs + 80
+				);
 			}
 			physicalRef.current = target;
 			setPhysical( target );
 		},
-		[ canSlide, loopEnabled, maxLogical, cloneCount ]
+		[
+			canSlide,
+			loopEnabled,
+			maxLogical,
+			cloneCount,
+			snapIfNeeded,
+			clearAnimGuard,
+			finishAnimation,
+			transitionMs,
+		]
 	);
-
-	const snapIfNeeded = useCallback( () => {
-		if ( ! loopEnabled || jumpingRef.current ) {
-			return;
-		}
-		const start = cloneCount;
-		const end = cloneCount + slideCount;
-		const p = physicalRef.current;
-
-		if ( p >= end ) {
-			jumpingRef.current = true;
-			const next = start + ( p - end );
-			physicalRef.current = next;
-			setNoTransition( true );
-			setPhysical( next );
-			jumpingRef.current = false;
-		} else if ( p < start ) {
-			jumpingRef.current = true;
-			const next = end - ( start - p );
-			physicalRef.current = next;
-			setNoTransition( true );
-			setPhysical( next );
-			jumpingRef.current = false;
-		}
-	}, [ loopEnabled, cloneCount, slideCount ] );
 
 	const goNext = useCallback( () => {
 		goToPhysical( physicalRef.current + 1 );
@@ -431,11 +475,17 @@ export default function Edit( {
 			if ( event.target !== track || event.propertyName !== 'transform' ) {
 				return;
 			}
-			snapIfNeeded();
+			finishAnimation();
 		};
 		track.addEventListener( 'transitionend', onEnd );
-		return () => track.removeEventListener( 'transitionend', onEnd );
-	}, [ loopEnabled, snapIfNeeded ] );
+		track.addEventListener( 'transitioncancel', onEnd );
+		return () => {
+			track.removeEventListener( 'transitionend', onEnd );
+			track.removeEventListener( 'transitioncancel', onEnd );
+			clearAnimGuard();
+			animatingRef.current = false;
+		};
+	}, [ loopEnabled, finishAnimation, clearAnimGuard ] );
 
 	useEffect( () => {
 		if ( ! autoplay || ! canSlide || paused ) {

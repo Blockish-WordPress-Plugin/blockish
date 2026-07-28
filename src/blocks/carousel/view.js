@@ -52,11 +52,13 @@
 		}
 
 		let timer = null;
+		let animGuard = null;
 		let perView = getPerView( settings );
 		let cloneCount = 0;
 		let physical = 0;
-		let isJumping = false;
+		let isAnimating = false;
 		let loopEnabled = false;
+		const transitionMs = Math.max( 100, Number( settings.transitionSpeed ) || 450 );
 
 		const gapPx = () => Number( settings.gap ) || 0;
 
@@ -194,24 +196,49 @@
 			root.style.setProperty( '--bc-gap', `${ gapPx() }px` );
 		};
 
+		/**
+		 * Jump from clone zone back onto the matching real slide.
+		 * Uses modulo so rapid multi-step overflow still lands on a real index.
+		 */
 		const snapIfNeeded = () => {
-			if ( ! loopEnabled || isJumping ) {
-				return;
+			if ( ! loopEnabled || ! cloneCount ) {
+				return false;
+			}
+			const count = realCount();
+			if ( count < 1 ) {
+				return false;
 			}
 			const start = cloneCount;
-			const end = cloneCount + realCount();
+			const end = cloneCount + count;
 
 			if ( physical >= end ) {
-				isJumping = true;
-				physical = start + ( physical - end );
+				const overflow = ( physical - end ) % count;
+				physical = start + overflow;
 				setTransform( false );
-				isJumping = false;
-			} else if ( physical < start ) {
-				isJumping = true;
-				physical = end - ( start - physical );
-				setTransform( false );
-				isJumping = false;
+				return true;
 			}
+			if ( physical < start ) {
+				const underflow = ( start - physical ) % count;
+				physical = underflow === 0 ? start : end - underflow;
+				setTransform( false );
+				return true;
+			}
+			return false;
+		};
+
+		const clearAnimGuard = () => {
+			if ( animGuard ) {
+				clearTimeout( animGuard );
+				animGuard = null;
+			}
+		};
+
+		const finishAnimation = () => {
+			clearAnimGuard();
+			isAnimating = false;
+			snapIfNeeded();
+			updateDots();
+			updateControls();
 		};
 
 		const update = ( withTransition = true ) => {
@@ -221,7 +248,31 @@
 		};
 
 		const goToPhysical = ( next, withTransition = true ) => {
-			physical = next;
+			if ( ! canSlide() ) {
+				return;
+			}
+			// Spam-clicks interrupt CSS transitions so transitionend never fires —
+			// lock until the current move finishes (or the safety timeout).
+			if ( withTransition && isAnimating ) {
+				return;
+			}
+
+			if ( loopEnabled && withTransition ) {
+				snapIfNeeded();
+			}
+
+			if ( loopEnabled ) {
+				physical = next;
+			} else {
+				physical = Math.max( 0, Math.min( maxLogical(), next ) );
+			}
+
+			if ( withTransition ) {
+				isAnimating = true;
+				clearAnimGuard();
+				animGuard = setTimeout( finishAnimation, transitionMs + 80 );
+			}
+
 			update( withTransition );
 			restartAutoplay();
 		};
@@ -279,13 +330,15 @@
 			startAutoplay();
 		};
 
-		track.addEventListener( 'transitionend', ( event ) => {
+		const onTrackTransitionEnd = ( event ) => {
 			if ( event.target !== track || event.propertyName !== 'transform' ) {
 				return;
 			}
-			snapIfNeeded();
-			updateDots();
-		} );
+			finishAnimation();
+		};
+
+		track.addEventListener( 'transitionend', onTrackTransitionEnd );
+		track.addEventListener( 'transitioncancel', onTrackTransitionEnd );
 
 		prevBtn?.addEventListener( 'click', prev );
 		nextBtn?.addEventListener( 'click', next );
@@ -318,6 +371,8 @@
 		);
 
 		const rebuild = () => {
+			clearAnimGuard();
+			isAnimating = false;
 			applyPerViewCss();
 			setupClones();
 			renderDots();

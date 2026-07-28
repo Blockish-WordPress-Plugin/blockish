@@ -143,18 +143,18 @@ Yes. Core Blockish is free on unlimited personal or client sites. Optional add-o
 
 This plugin connects to external services under the conditions described below. No data is ever sent without a clear user action or explicit opt-in.
 
-= 1. Usage Analytics / Data Insights (dashboard.wowdevs.com) =
+= 1. Freemius (freemius.com) =
 
-**What it does:** Sends non-sensitive plugin usage data to help improve the plugin. This is part of the optional Data Insights program powered by the DCI SDK.
+**What it does:** Powers optional product opt-in, licensing for companion add-ons (such as Forms and Dynamicity), software updates, and anonymous usage insights that help improve Blockish. This uses the Freemius WordPress SDK bundled with the plugin.
 
-**When it connects:** **Only if you explicitly opt in** when prompted. No data is ever sent without your consent. You can opt out at any time from the Blockish dashboard.
+**When it connects:** **Only if you explicitly opt in** (or activate a license) when Freemius prompts you in wp-admin. Skipping or declining opt-in means no Freemius analytics/licensing traffic for that flow. You can change your opt-in / license status later from the Blockish dashboard (Addons) or Freemius account controls.
 
-**Data sent:** Plugin version, WordPress version, active theme, site language, and similar non-personal environment data. No passwords, user content, or personally identifiable information is transmitted.
+**Data sent:** Non-sensitive environment and product data typical of Freemius (for example plugin version, WordPress version, site URL, and similar technical details used for licensing, updates, and insights). No passwords or post content are sent as part of this integration.
 
-**Service:** wowDevs Data Insights, operated by wowDevs.
-Service URL: https://dashboard.wowdevs.com/
-Privacy Policy: https://wowdevs.com/privacy-policy/
-Terms of Service: https://wowdevs.com/terms-and-conditions/
+**Service:** Freemius, Inc.
+Service URL: https://freemius.com/
+Privacy Policy: https://freemius.com/privacy/
+Terms of Service: https://freemius.com/terms/
 
 == Screenshots ==
 
