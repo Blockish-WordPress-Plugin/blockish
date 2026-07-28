@@ -32,8 +32,59 @@ class Freemius {
 		$this->sdk = $this->initialize();
 
 		if ( $this->sdk ) {
+			// Strip Freemius Plugins-row links before add-ons boot (they fire on this action).
+			$this->hide_plugins_row_links( $this->sdk );
+			add_action( 'blockish-forms/freemius/loaded', array( $this, 'hide_plugins_row_links' ) );
+			add_action( 'blockish-dynamicity/freemius/loaded', array( $this, 'hide_plugins_row_links' ) );
+
 			do_action( 'blockish/freemius/loaded', $this->sdk );
 		}
+	}
+
+	/**
+	 * Keep Plugins list clean — license/opt-out live in Blockish → Addons, not row links.
+	 *
+	 * @param \Freemius|false $sdk Freemius instance.
+	 * @return void
+	 */
+	public function hide_plugins_row_links( $sdk ) {
+		if ( ! is_object( $sdk ) || ! method_exists( $sdk, 'get_plugin_basename' ) ) {
+			return;
+		}
+
+		$basename = $sdk->get_plugin_basename();
+		if ( ! is_string( $basename ) || '' === $basename ) {
+			return;
+		}
+
+		$strip = static function ( $links ) {
+			if ( ! is_array( $links ) ) {
+				return $links;
+			}
+
+			foreach ( $links as $key => $html ) {
+				$key_s  = is_string( $key ) ? $key : '';
+				$html_s = is_string( $html ) ? $html : '';
+
+				$is_fs_key = (bool) preg_match(
+					'/(opt-in-or-opt-out|activate-license|upgrade|addons)/i',
+					$key_s
+				);
+				$is_fs_label = (bool) preg_match(
+					'/>\s*(Opt Out|Opt In|Change License|Activate License|Upgrade|Add-Ons)\s*</i',
+					$html_s
+				);
+
+				if ( $is_fs_key || $is_fs_label ) {
+					unset( $links[ $key ] );
+				}
+			}
+
+			return $links;
+		};
+
+		add_filter( 'plugin_action_links_' . $basename, $strip, 100 );
+		add_filter( 'network_admin_plugin_action_links_' . $basename, $strip, 100 );
 	}
 
 	/**

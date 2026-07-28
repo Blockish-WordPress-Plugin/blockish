@@ -63,7 +63,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use WordPress core blocks only (core/paragraph, core/heading, core/image, core/list, core/quote, etc.) — do not use blockish custom blocks. block_schema is never written into post_content — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself to approve. After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor. Optional post_parent for nesting; defaults to 0.',
+                'usage_notes' => 'Use WordPress core blocks only (core/paragraph, core/heading, core/image, core/list, core/quote, etc.) — do not use blockish custom blocks. IMPORTANT: If assembling with pattern refs, ALL pattern refs must be wrapped inside a single core/group block with {"layout":{"type":"constrained"}}. block_schema is never written into post_content — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself to approve. After staging, share edit_url so the user can approve; do not share post_url (preview) by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor. Optional post_parent for nesting; defaults to 0.',
             ],
         ];
     }

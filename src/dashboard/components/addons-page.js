@@ -430,11 +430,11 @@ export default function AddonsPage() {
 		<VStack className="blockish-blocks-page blockish-addons-page" spacing={5}>
 			<header className="blockish-page-header">
 				<Heading className="blockish-heading-primary" level={1}>
-					{__('Addons', 'blockish')}
+					{__('Addons & License', 'blockish')}
 				</Heading>
 				<Text className="blockish-text-muted">
 					{__(
-						'Buy premium add-ons and activate license keys from one place — without leaving the Blockish dashboard.',
+						'Buy Forms or Dynamicity here, then activate your license key on this site.',
 						'blockish'
 					)}
 				</Text>

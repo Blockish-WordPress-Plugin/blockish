@@ -37,6 +37,8 @@
 
 	.wp-block-template-part, .block-library-block__reusable-block-container{
 		max-width: none !important;
+		margin-right: unset !important;
+		margin-left: unset !important;
 	}
 }
 

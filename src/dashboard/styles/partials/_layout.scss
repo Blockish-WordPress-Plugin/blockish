@@ -4,6 +4,9 @@
 }
 
 .blockish-sidebar {
+	display: flex;
+	flex-direction: column;
+	align-self: stretch;
 	width: 260px;
 	border-right: 1px solid var(--color-gray-200);
 	background: var(--color-white);
@@ -26,38 +29,97 @@
 }
 
 .blockish-sidebar-nav {
-	display: grid;
+	display: flex;
+	flex-direction: column;
 	gap: 6px;
+}
 
-	button {
-		width: 100%;
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		border: 1px solid transparent;
-		background: transparent;
-		border-radius: 10px;
-		padding: 9px 10px;
-		cursor: pointer;
-		text-align: left;
+.blockish-sidebar-nav-item {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	border: 1px solid transparent;
+	background: transparent;
+	border-radius: 10px;
+	padding: 9px 10px;
+	cursor: pointer;
+	text-align: left;
+	color: var(--color-gray-900);
+}
+
+.blockish-sidebar-nav-item.has-hint {
+	align-items: flex-start;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.blockish-sidebar-nav-item .components-text {
+	margin: 0;
+}
+
+.blockish-sidebar-nav-icon {
+	display: inline-flex;
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	margin-top: 1px;
+	color: inherit;
+
+	svg {
+		width: 20px;
+		height: 20px;
+		display: block;
 	}
+}
 
-	button .components-text {
-		margin: 0;
+.blockish-sidebar-nav-copy {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.blockish-sidebar-nav-label {
+	font-weight: 600;
+	color: inherit;
+}
+
+.blockish-sidebar-nav-hint {
+	font-size: 11px;
+	line-height: 1.35;
+	color: var(--color-gray-500);
+	font-weight: 500;
+}
+
+.blockish-sidebar-nav-item:hover {
+	background: var(--color-gray-50);
+}
+
+.blockish-sidebar-nav-item.is-active {
+	background: var(--color-blue-50);
+	color: var(--color-blue-700);
+	border-color: var(--color-blue-100, #dbeafe);
+
+	.blockish-sidebar-nav-hint {
+		color: currentColor;
+		opacity: 0.85;
 	}
+}
 
-	button:hover {
-		background: var(--color-gray-50);
-	}
+/* Last menu item — slightly distinct, still in normal list flow */
+.blockish-sidebar-nav-item.is-addons {
+	margin-top: 8px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border-color: var(--color-gray-200);
+	background: var(--color-gray-50);
+}
 
-	button.is-active {
-		background: var(--color-blue-50);
-		color: var(--color-blue-700);
-
-		.components-text {
-			color: currentColor !important;
-		}
-	}
+.blockish-sidebar-nav-item.is-addons:hover,
+.blockish-sidebar-nav-item.is-addons.is-active {
+	background: var(--color-blue-50);
+	border-color: var(--color-blue-200, #bfdbfe);
 }
 
 .blockish-main-content {

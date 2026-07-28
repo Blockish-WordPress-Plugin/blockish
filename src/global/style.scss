@@ -21,4 +21,10 @@
         margin-right: calc(var(--wp--style--root--padding-right) * -1) !important;
         margin-left: calc(var(--wp--style--root--padding-left) * -1) !important;
     }
+
+    // AI preview: don't pull pattern full-bleed with negative margins.
+    &.has-global-padding .blockish-ai-preview-wrapper .block-library-block__reusable-block-container {
+        margin-right: unset !important;
+        margin-left: unset !important;
+    }
 }

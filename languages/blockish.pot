@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"POT-Creation-Date: 2026-07-26T17:01:31.597Z\n"
+"POT-Creation-Date: 2026-07-27T10:29:45.957Z\n"
 "PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
 "Last-Translator: wowdevs <hello@wowdevs.com>\n"
 "Language-Team: wowdevs <hello@wowdevs.com>\n"
@@ -234,34 +234,6 @@ msgstr ""
 
 #: includes/Extensions/ClassManager.php:61
 msgid "Class Manager"
-msgstr ""
-
-#: includes/Core/MagicLogin.php:43
-msgid "Invalid or expired magic login token."
-msgstr ""
-
-#: includes/Core/MagicLogin.php:43
-msgid "Login Failed"
-msgstr ""
-
-#: includes/Core/Enqueue.php:115
-msgid "Forms"
-msgstr ""
-
-#: includes/Core/Enqueue.php:122
-msgid "Dynamicity"
-msgstr ""
-
-#: includes/Core/Dashboard.php:43
-msgid "Blockish Dashboard"
-msgstr ""
-
-#: includes/Core/Dashboard.php:119
-msgid "Creative Gutenberg blocks for modern websites."
-msgstr ""
-
-#: includes/Core/Blocks.php:150
-msgid "Blockish Framework"
 msgstr ""
 
 #: includes/Config/ExtensionList.php:34
@@ -858,6 +830,34 @@ msgstr ""
 msgid "Custom Loop Templates"
 msgstr ""
 
+#: includes/Core/MagicLogin.php:43
+msgid "Invalid or expired magic login token."
+msgstr ""
+
+#: includes/Core/MagicLogin.php:43
+msgid "Login Failed"
+msgstr ""
+
+#: includes/Core/Enqueue.php:115
+msgid "Forms"
+msgstr ""
+
+#: includes/Core/Enqueue.php:122
+msgid "Dynamicity"
+msgstr ""
+
+#: includes/Core/Dashboard.php:43
+msgid "Blockish Dashboard"
+msgstr ""
+
+#: includes/Core/Dashboard.php:119
+msgid "Creative Gutenberg blocks for modern websites."
+msgstr ""
+
+#: includes/Core/Blocks.php:150
+msgid "Blockish Framework"
+msgstr ""
+
 #: includes/Mcp/Abilities/WriteBlog/Config.php:14
 msgid "Write Blog Post"
 msgstr ""
@@ -875,6 +875,14 @@ msgstr ""
 msgid "Trigger Editor Refresh"
 msgstr ""
 
+#: includes/Mcp/Abilities/SiteInfo/Config.php:14
+msgid "Get Site Info"
+msgstr ""
+
+#: includes/Mcp/Abilities/SiteInfo/Config.php:15
+msgid "Returns WordPress site name, description, URL and version."
+msgstr ""
+
 #: includes/Mcp/Abilities/RestoreRevision/Config.php:14
 msgid "Restore Post Revision"
 msgstr ""
@@ -885,12 +893,14 @@ msgid ""
 "Only call when the user explicitly asks to undo/restore."
 msgstr ""
 
-#: includes/Mcp/Abilities/SiteInfo/Config.php:14
-msgid "Get Site Info"
+#: includes/Mcp/Abilities/PostTypes/Config.php:14
+msgid "Get Post Types"
 msgstr ""
 
-#: includes/Mcp/Abilities/SiteInfo/Config.php:15
-msgid "Returns WordPress site name, description, URL and version."
+#: includes/Mcp/Abilities/PostTypes/Config.php:15
+msgid ""
+"Returns all registered WordPress post types with their label, public "
+"visibility, and hierarchy."
 msgstr ""
 
 #: includes/Mcp/Abilities/ManageThemeJson/Config.php:14
@@ -904,16 +914,6 @@ msgid ""
 "the database. NOTE: If you are applying custom typography, you MUST first "
 "use the `blockish/manage-fonts` ability to install the font before setting "
 "it here."
-msgstr ""
-
-#: includes/Mcp/Abilities/PostTypes/Config.php:14
-msgid "Get Post Types"
-msgstr ""
-
-#: includes/Mcp/Abilities/PostTypes/Config.php:15
-msgid ""
-"Returns all registered WordPress post types with their label, public "
-"visibility, and hierarchy."
 msgstr ""
 
 #: includes/Mcp/Abilities/ManageTerm/Config.php:14
@@ -1135,6 +1135,16 @@ msgstr ""
 msgid "Get Magic Login URL"
 msgstr ""
 
+#: includes/Mcp/Abilities/GetIcons/Config.php:14
+msgid "Get Icons"
+msgstr ""
+
+#: includes/Mcp/Abilities/GetIcons/Config.php:15
+msgid ""
+"Searches the built-in Font Awesome icon library and returns the SVG paths "
+"so you can use them with the Icon type."
+msgstr ""
+
 #: includes/Mcp/Abilities/GetFonts/Config.php:14
 msgid "Get Fonts"
 msgstr ""
@@ -1155,14 +1165,16 @@ msgid ""
 "workflow and best practices (SOP)."
 msgstr ""
 
-#: includes/Mcp/Abilities/GetIcons/Config.php:14
-msgid "Get Icons"
+#: includes/Mcp/Abilities/GetClasses/Config.php:14
+msgid "Get CSS Classes"
 msgstr ""
 
-#: includes/Mcp/Abilities/GetIcons/Config.php:15
+#: includes/Mcp/Abilities/GetClasses/Config.php:15
 msgid ""
-"Searches the built-in Font Awesome icon library and returns the SVG paths "
-"so you can use them with the Icon type."
+"Returns all classes registered in the Blockish Class Manager, keyed by "
+"name, each with its post_id, css_selector, parent_id, editable content and "
+"compiled css. Call this before creating or updating classes to avoid "
+"duplicates."
 msgstr ""
 
 #: includes/Mcp/Abilities/GetClassManagerDocs/Config.php:14
@@ -1186,18 +1198,6 @@ msgid ""
 "Provides critical instructions and code snippets for writing a Node.js "
 "Puppeteer script to automatically accept staged layouts, inspect the DOM, "
 "and take screenshots. MUST BE READ before attempting browser automation."
-msgstr ""
-
-#: includes/Mcp/Abilities/GetClasses/Config.php:14
-msgid "Get CSS Classes"
-msgstr ""
-
-#: includes/Mcp/Abilities/GetClasses/Config.php:15
-msgid ""
-"Returns all classes registered in the Blockish Class Manager, keyed by "
-"name, each with its post_id, css_selector, parent_id, editable content and "
-"compiled css. Call this before creating or updating classes to avoid "
-"duplicates."
 msgstr ""
 
 #: includes/Mcp/Abilities/FetchCloudTemplates/Config.php:14

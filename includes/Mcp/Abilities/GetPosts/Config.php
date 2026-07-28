@@ -17,7 +17,7 @@ class Config
             'input_schema'        => [
                 'type'       => 'object',
                 'properties' => [
-                    'post_id'   => [ 'type' => 'integer', 'description' => 'Fetch this exact post, ignoring all other filters.' ],
+                    'post_id'   => [ 'type' => 'integer', 'description' => 'Fetch this exact post, ignoring all other filters. NOTE: You MUST provide a post_id if you want to retrieve the full post content or schema.' ],
                     'post_type' => [ 'type' => 'string',  'description' => 'Post type slug. Defaults to "post".' ],
                     'search'    => [ 'type' => 'string',  'description' => 'Search term matched against title/content.' ],
                     'tax_query' => [

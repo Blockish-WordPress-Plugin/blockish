@@ -5,7 +5,7 @@ Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
-Tested up to: 7.0
+Tested up to: 7.0.2
 Stable tag: 1.2.0
 Requires at least: 6.1
 Requires PHP: 7.4
