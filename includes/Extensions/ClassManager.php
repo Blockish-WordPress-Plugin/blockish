@@ -28,6 +28,56 @@ class ClassManager {
 
 		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_used_class_styles' ), 9 );
+		add_filter( 'block_editor_settings_all', array( $this, 'add_editor_class_styles' ) );
+	}
+
+	/**
+	 * Seeds the editor canvas with compiled class CSS on load.
+	 *
+	 * render-style.js injects the same entry (keyed by __unstableType) only after
+	 * it recomputes styles — until then the canvas is unstyled. This baseline is
+	 * replaced in place once the JS pass runs.
+	 */
+	public function add_editor_class_styles( $settings ) {
+		$css = $this->get_all_class_styles();
+		if ( '' === $css ) {
+			return $settings;
+		}
+
+		if ( empty( $settings['styles'] ) || ! is_array( $settings['styles'] ) ) {
+			$settings['styles'] = array();
+		}
+
+		$settings['styles'][] = array(
+			'isGlobalStyles' => true,
+			'__unstableType' => 'blockish-classes-styles',
+			'css'            => $css,
+		);
+
+		return $settings;
+	}
+
+	private function get_all_class_styles() {
+		$class_posts = get_posts(
+			array(
+				'post_type'        => 'blockish-classes',
+				'post_status'      => 'publish',
+				'posts_per_page'   => -1,
+				'orderby'          => 'ID',
+				'order'            => 'ASC',
+				'suppress_filters' => false,
+			)
+		);
+
+		$css = '';
+		foreach ( $class_posts as $class_post ) {
+			$meta_css = trim( (string) get_post_meta( $class_post->ID, self::CSS_META_KEY, true ) );
+			if ( '' !== $meta_css ) {
+				$css .= $meta_css;
+			}
+		}
+
+		return $css;
 	}
 
 	private function is_extension_enabled() {

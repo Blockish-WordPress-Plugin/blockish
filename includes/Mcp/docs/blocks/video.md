@@ -16,7 +16,7 @@
 | `playOnMobile` | Scalar (boolean) | `true` | |
 | `controls` | Scalar (boolean) | `true` | |
 | `preload` | Scalar (string) | `"metadata"` | `"none"` `"metadata"` `"auto"` — self-hosted only |
-| `lazyLoad` | Scalar (boolean) | `true` | |
+| `lazyLoad` | Scalar (boolean) | `false` | Embeds get `loading="lazy"`; self-hosted defers the file until the player scrolls into view (poster still loads) |
 | `startTime` | Scalar (number, seconds) | `0` | |
 | `endTime` | Scalar (number, seconds) | `0` | `0` = play to end |
 | `captions` | Scalar (boolean) | `false` | |

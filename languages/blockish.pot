@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"POT-Creation-Date: 2026-07-27T10:29:45.957Z\n"
+"POT-Creation-Date: 2026-07-28T20:23:44.994Z\n"
 "PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
 "Last-Translator: wowdevs <hello@wowdevs.com>\n"
 "Language-Team: wowdevs <hello@wowdevs.com>\n"
@@ -41,139 +41,6 @@ msgstr ""
 #: blockish.php
 #. Author URI of the plugin
 msgid "https://wowdevs.com"
-msgstr ""
-
-#: dci/notice.php:21
-msgid "Never miss an important update."
-msgstr ""
-
-#: dci/notice.php:24
-msgid ""
-"Get notified when there are new updates available for your plugins and "
-"themes. In the current version of this message it is clear that you are "
-"being sent a confirmation email to confirm your opt-in."
-msgstr ""
-
-#: dci/notice.php:42
-msgid "Allow & Continue"
-msgstr ""
-
-#: dci/notice.php:46
-msgid "Skip"
-msgstr ""
-
-#: dci/notice.php:52
-msgid "Which permission are being granted?"
-msgstr ""
-
-#: dci/notice.php:64
-msgid "View Basic Profile Info."
-msgstr ""
-
-#: dci/notice.php:67
-msgid "Your WordPress user's first & last name, and email address."
-msgstr ""
-
-#: dci/notice.php:79
-msgid "View Basic Website Info."
-msgstr ""
-
-#: dci/notice.php:82
-msgid "Homepage URL & title, WP & PHP versions, and site language."
-msgstr ""
-
-#: dci/notice.php:94
-msgid "View Basic Plugin Info."
-msgstr ""
-
-#: dci/notice.php:97
-msgid "Current Plugin & SDK versions, and if active or uninstalled."
-msgstr ""
-
-#: dci/insights.php:659
-msgid "Learn More"
-msgstr ""
-
-#: dci/insights.php:668
-msgid "Yes, I'd Love To Contribute"
-msgstr ""
-
-#: dci/insights.php:671
-msgid "Skip For Now"
-msgstr ""
-
-#: dci/insights.php:674
-msgid "No Thanks"
-msgstr ""
-
-#: dci/insights.php:709
-msgid "What we"
-msgstr ""
-
-#: dci/insights.php:710
-msgid "collect"
-msgstr ""
-
-#: dci/insights.php:718
-msgid "Allow"
-msgstr ""
-
-#: dci/insights.php:721
-msgid "I'll Skip For Now"
-msgstr ""
-
-#: dci/insights.php:724
-msgid "Don't Allow"
-msgstr ""
-
-#: dci/deactivate-feedback.php:48
-msgid "Give feedback"
-msgstr ""
-
-#: dci/deactivate-feedback.php:50
-msgid ""
-"Goodbyes are never easy. If you have a moment, please share your feedback "
-"on how we can improve."
-msgstr ""
-
-#: dci/deactivate-feedback.php:76
-msgid "Switching Domain"
-msgstr ""
-
-#: dci/deactivate-feedback.php:99
-msgid "Couldn't understand"
-msgstr ""
-
-#: dci/deactivate-feedback.php:146
-msgid "Found a better plugin"
-msgstr ""
-
-#: dci/deactivate-feedback.php:163
-msgid "Missing a specific feature"
-msgstr ""
-
-#: dci/deactivate-feedback.php:201
-msgid "Not working"
-msgstr ""
-
-#: dci/deactivate-feedback.php:225
-msgid "Others"
-msgstr ""
-
-#: dci/deactivate-feedback.php:233
-msgid "What is the main reason for deactivating?"
-msgstr ""
-
-#: dci/deactivate-feedback.php:239
-msgid "Skip & Deactivate"
-msgstr ""
-
-#: dci/deactivate-feedback.php:243
-msgid "Cancel"
-msgstr ""
-
-#: dci/deactivate-feedback.php:248
-msgid "Submit & Deactivate"
 msgstr ""
 
 #: includes/Routes/AddonsV1.php:133
@@ -236,6 +103,34 @@ msgstr ""
 msgid "Class Manager"
 msgstr ""
 
+#: includes/Core/MagicLogin.php:43
+msgid "Invalid or expired magic login token."
+msgstr ""
+
+#: includes/Core/MagicLogin.php:43
+msgid "Login Failed"
+msgstr ""
+
+#: includes/Core/Enqueue.php:115
+msgid "Forms"
+msgstr ""
+
+#: includes/Core/Enqueue.php:122
+msgid "Dynamicity"
+msgstr ""
+
+#: includes/Core/Dashboard.php:43
+msgid "Blockish Dashboard"
+msgstr ""
+
+#: includes/Core/Dashboard.php:119
+msgid "Creative Gutenberg blocks for modern websites."
+msgstr ""
+
+#: includes/Core/Blocks.php:150
+msgid "Blockish Framework"
+msgstr ""
+
 #: includes/Config/ExtensionList.php:34
 msgid "Create reusable global CSS classes and apply them to any Blockish block."
 msgstr ""
@@ -257,19 +152,29 @@ msgid "Hide blocks on Desktop, Tablet, or Mobile."
 msgstr ""
 
 #: includes/Config/ExtensionList.php:54
-msgid "Dynamic Data"
+msgid "Interactions"
 msgstr ""
 
 #: includes/Config/ExtensionList.php:55
+msgid ""
+"Add entrance animations, click actions, and cross-block signals to Blockish "
+"blocks."
+msgstr ""
+
+#: includes/Config/ExtensionList.php:61
+msgid "Dynamic Data"
+msgstr ""
+
+#: includes/Config/ExtensionList.php:62
 msgid "Adds dynamic data binding capabilities to blocks."
 msgstr ""
 
-#: includes/Config/ExtensionList.php:63
+#: includes/Config/ExtensionList.php:70
 #: includes/Config/AddonsList.php:101
 msgid "Display Conditions"
 msgstr ""
 
-#: includes/Config/ExtensionList.php:64
+#: includes/Config/ExtensionList.php:71
 msgid "Conditionally show or hide blocks based on specific rules."
 msgstr ""
 
@@ -830,34 +735,6 @@ msgstr ""
 msgid "Custom Loop Templates"
 msgstr ""
 
-#: includes/Core/MagicLogin.php:43
-msgid "Invalid or expired magic login token."
-msgstr ""
-
-#: includes/Core/MagicLogin.php:43
-msgid "Login Failed"
-msgstr ""
-
-#: includes/Core/Enqueue.php:115
-msgid "Forms"
-msgstr ""
-
-#: includes/Core/Enqueue.php:122
-msgid "Dynamicity"
-msgstr ""
-
-#: includes/Core/Dashboard.php:43
-msgid "Blockish Dashboard"
-msgstr ""
-
-#: includes/Core/Dashboard.php:119
-msgid "Creative Gutenberg blocks for modern websites."
-msgstr ""
-
-#: includes/Core/Blocks.php:150
-msgid "Blockish Framework"
-msgstr ""
-
 #: includes/Mcp/Abilities/WriteBlog/Config.php:14
 msgid "Write Blog Post"
 msgstr ""
@@ -934,12 +811,11 @@ msgstr ""
 msgid ""
 "Creates, updates or deletes a Full Site Editing (FSE) template or template "
 "part (set delete to remove); returns id, slug, edit_url and action. Pass "
-"Blockish layouts as block_schema, never raw HTML. When a schema is staged, "
-"share edit_url (not the preview link) so the user can review it in the "
-"canvas and accept it. CRITICAL WARNING: Before calling this tool, you MUST "
-"call blockish/get-designer-workflow and blockish/get-block-docs, otherwise "
-"your design will fail. Always call blockish/trigger-refresh after staging a "
-"layout."
+"Blockish layouts as block_schema, never raw HTML. block_schema is staged "
+"into template content as a blockish/ai-preview block (previousSchema + "
+"pendingSchema). Share edit_url for Accept/Discard. CRITICAL: call "
+"blockish/get-designer-workflow and blockish/get-block-docs before "
+"designing. Always call blockish/trigger-refresh after staging."
 msgstr ""
 
 #: includes/Mcp/Abilities/ManagePost/Config.php:14
@@ -950,16 +826,13 @@ msgstr ""
 msgid ""
 "Creates, edits, or deletes a post. To CREATE: omit post_id but provide "
 "post_title and post_type. To EDIT: provide post_id. To DELETE: provide "
-"post_id and set delete to true. ALWAYS create sections with "
-"blockish/manage-pattern first and use returned real pattern IDs (never "
-"hallucinate refs). Assemble pages/posts with block_schema pattern refs only "
-"? NEVER write pattern-ref markup or block HTML into post_content. Pending "
-"schemas (including nested patterns/forms) only resolve when the editor is "
-"open, so always stage block_schema, call trigger-refresh, and share "
-"edit_url (not post_url / preview). Never put core/template-part "
-"header/footer on pages. CRITICAL: call blockish/get-designer-workflow and "
-"blockish/get-block-docs before designing. For blog prose use "
-"blockish/write-blog, not this tool."
+"post_id and set delete to true. For Blockish layouts, pass block_schema ? "
+"this stages a blockish/ai-preview block into post_content (previousSchema + "
+"pendingSchema attrs). User Accept/Discard in the editor. Do NOT send "
+"pattern-ref markup or block HTML in post_content. Never put "
+"core/template-part header/footer on pages. CRITICAL: call "
+"blockish/get-designer-workflow and blockish/get-block-docs before "
+"designing. For blog prose use blockish/write-blog, not this tool."
 msgstr ""
 
 #: includes/Mcp/Abilities/ManagePattern/Config.php:16
@@ -969,12 +842,11 @@ msgstr ""
 #: includes/Mcp/Abilities/ManagePattern/Config.php:17
 msgid ""
 "Use this tool to create or update reusable component patterns (Hero, "
-"Footer, etc.). This saves the JSON schema as a wp_block natively. CRITICAL: "
-"After staging a pattern, if the user is currently editing a parent "
-"page/template, you MUST also use manage-post or manage-template to re-stage "
-"that parent page/template with its current schema. This allows the user to "
-"see the AI preview block and accept it directly on their active page, "
-"without needing to navigate to the pattern editor."
+"Footer, etc.). Stages block_schema onto the wp_block as a "
+"blockish/ai-preview (previousSchema + pendingSchema). CRITICAL: After "
+"staging a pattern, if the user is currently editing a parent page/template, "
+"you MUST also use manage-post or manage-template to re-stage that parent "
+"with its current schema so they can Accept on the active page."
 msgstr ""
 
 #: includes/Mcp/Abilities/ManageOptions/Config.php:14
@@ -1155,16 +1027,6 @@ msgid ""
 "theme-provided fonts from global styles."
 msgstr ""
 
-#: includes/Mcp/Abilities/GetDesignerWorkflow/Config.php:14
-msgid "Get Designer Workflow"
-msgstr ""
-
-#: includes/Mcp/Abilities/GetDesignerWorkflow/Config.php:15
-msgid ""
-"Call this tool before starting any website design task to get the strict "
-"workflow and best practices (SOP)."
-msgstr ""
-
 #: includes/Mcp/Abilities/GetClasses/Config.php:14
 msgid "Get CSS Classes"
 msgstr ""
@@ -1222,6 +1084,16 @@ msgstr ""
 msgid "Returns total, active and inactive Blockish extension counts."
 msgstr ""
 
+#: includes/Mcp/Abilities/GetDesignerWorkflow/Config.php:14
+msgid "Get Designer Workflow"
+msgstr ""
+
+#: includes/Mcp/Abilities/GetDesignerWorkflow/Config.php:15
+msgid ""
+"Call this tool before starting any website design task to get the strict "
+"workflow and best practices (SOP)."
+msgstr ""
+
 #: includes/Mcp/Abilities/BlocksInfo/Config.php:14
 msgid "Get Blocks Info"
 msgstr ""
@@ -1238,7 +1110,8 @@ msgstr ""
 
 #: includes/Mcp/Abilities/BlockDocs/Config.php:15
 msgid ""
-"Returns the full Blockish block reference ? all blocks, their attributes, "
-"formats (responsive object, typography, background, border, spacing, icon, "
-"image) and markup examples."
+"Returns Blockish core docs plus attribute docs for the blocks you name. "
+"block_names is REQUIRED ? never call without it (full library dump is "
+"disabled to save context). If omitted or empty, returns an error plus the "
+"blocks/extensions catalogs so you can choose names and retry."
 msgstr ""

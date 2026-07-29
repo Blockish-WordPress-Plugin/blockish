@@ -83,7 +83,7 @@
     },
     "lazyLoad": {
       "type": "boolean",
-      "default": true
+      "default": false
     },
     "suggestedVideos": {
       "type": "object",
