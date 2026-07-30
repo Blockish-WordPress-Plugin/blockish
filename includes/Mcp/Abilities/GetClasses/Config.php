@@ -12,11 +12,17 @@ class Config
     {
         return [
             'label'               => __('Get CSS Classes', 'blockish'),
-            'description'         => __('Returns all classes registered in the Blockish Class Manager, keyed by name, each with its post_id, css_selector, parent_id, editable content and compiled css. Call this before creating or updating classes to avoid duplicates.', 'blockish'),
+            'description'         => __('Returns parent Class Manager classes (keyed by post_id) with name, css_selector, and combined raw css — including :hover / descendants rewritten as .name:hover etc. Child posts are internal; AI only sees this CSS surface. Call before creating to avoid duplicates.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
-                'properties' => [],
+                'properties' => [
+                    'include_usage' => [
+                        'type'        => 'boolean',
+                        'description' => 'When true, include usage_count and used_in for each parent class.',
+                        'default'     => false,
+                    ],
+                ],
             ],
             'output_schema'       => [
                 'type'                 => 'object',
@@ -25,10 +31,22 @@ class Config
                     'properties' => [
                         'post_id'      => ['type' => 'integer'],
                         'name'         => ['type' => 'string'],
-                        'css_selector' => ['type' => 'string', 'description' => 'The selector this class targets.'],
-                        'parent_id'    => ['type' => ['integer', 'null'], 'description' => 'Set if this is a child/subselector class; null for top-level classes.'],
-                        'content'      => ['type' => 'object', 'description' => 'The editable style object (post content). Use this when updating.'],
-                        'css'          => ['type' => 'string', 'description' => 'Read-only compiled CSS generated from content.'],
+                        'css_selector' => ['type' => 'string', 'description' => 'Root selector (e.g. .hero-card).'],
+                        'css'          => ['type' => 'string', 'description' => 'Combined raw CSS for this class (root + hover + descendants).'],
+                        'usage_count'  => ['type' => 'integer', 'description' => 'Present when include_usage is true.'],
+                        'used_in'      => [
+                            'type'  => 'array',
+                            'items' => [
+                                'type'       => 'object',
+                                'properties' => [
+                                    'post_id'   => ['type' => 'integer'],
+                                    'post_type' => ['type' => 'string'],
+                                    'title'     => ['type' => 'string'],
+                                    'status'    => ['type' => 'string'],
+                                    'edit_url'  => ['type' => 'string'],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -36,7 +54,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Call this before creating or updating classes to avoid duplicates. When updating a class, edit its content object; css is read-only compiled output and cannot be set directly.',
+                'usage_notes' => 'Read and write css only. Internally Blockish stores parent + child Class Manager posts so the editor UI can edit them — that structure is never exposed here.',
             ],
         ];
     }

@@ -38,18 +38,12 @@
     },
     "customWidthContainer": {
       "type": "object",
-      "default": {
-        "Desktop": "100%"
-      },
       "selectors": {
         ".{{WRAPPER}}.align-custom-width": "max-width: {{VALUE}};"
       }
     },
     "containerMinHeight": {
       "type": "object",
-      "default": {
-        "Desktop": "0"
-      },
       "selectors": {
         ".{{WRAPPER}}": "min-height: {{VALUE}};",
         ".{{WRAPPER}} > .block-list-appender": "min-height: {{VALUE}};"
@@ -70,12 +64,6 @@
     },
     "flexDirection": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "label": "Row",
-          "value": "row"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-flex": "flex-direction: {{VALUE}};"
       }
@@ -98,9 +86,6 @@
     },
     "autoGridWidth": {
       "type": "object",
-      "default": {
-        "Desktop": "12rem"
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-auto": "grid-template-columns: repeat(auto-fill,minmax(min({{VALUE}},100%),1fr));"
       }
@@ -113,20 +98,12 @@
     },
     "gridColumns": {
       "type": "object",
-      "default": {
-        "Desktop": 3,
-        "Tablet": 2,
-        "Mobile": 1
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-fixed": "grid-template-columns: repeat({{VALUE}}, minmax(0, 1fr));"
       }
     },
     "gridRows": {
       "type": "object",
-      "default": {
-        "Desktop": 1
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-fixed": "grid-template-rows: repeat({{VALUE}}, minmax(0, 1fr));"
       }

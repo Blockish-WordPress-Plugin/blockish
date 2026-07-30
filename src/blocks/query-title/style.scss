@@ -1,3 +1,7 @@
 .blockish-query-title {
 	margin: 0;
 }
+
+:where(.blockish-query-title) {
+	text-align: left;
+}

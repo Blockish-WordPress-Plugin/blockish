@@ -6,7 +6,13 @@
   "title": "Post Featured Image",
   "category": "blockish-framework",
   "description": "Displays the current post featured image with optional permalink.",
-  "keywords": ["blockish", "post", "featured", "image", "thumbnail"],
+  "keywords": [
+    "blockish",
+    "post",
+    "featured",
+    "image",
+    "thumbnail"
+  ],
   "textdomain": "blockish",
   "attributes": {
     "imageSize": {
@@ -26,18 +32,12 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }
     },
     "imageWidth": {
       "type": "object",
-      "default": {
-        "Desktop": "100%"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-post-featured-image__image": "width: {{VALUE}};"
       }
@@ -90,7 +90,10 @@
   "supports": {
     "html": false,
     "anchor": true,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",

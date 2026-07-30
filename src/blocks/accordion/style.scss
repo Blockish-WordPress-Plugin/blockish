@@ -40,9 +40,7 @@
 		color: inherit;
 		cursor: pointer;
 		display: flex;
-		flex-direction: row;
 		gap: 14px;
-		justify-content: start;
 		padding: 18px 22px;
 		position: relative;
 		text-align: left;
@@ -125,4 +123,9 @@
 		border-width: 0 1px 1px 1px;
 		grid-template-rows: minmax(0, 1fr);
 	}
+}
+
+:where(.blockish-accordion .blockish-accordion-item-trigger) {
+	flex-direction: row;
+	justify-content: start;
 }

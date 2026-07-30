@@ -28,6 +28,9 @@ class ClassManager {
 
 		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_used_class_styles' ), 9 );
+		if ( ! wp_is_block_theme() ) {
+			add_action( 'wp_footer', array( $this, 'print_used_class_styles' ) );
+		}
 		add_filter( 'block_editor_settings_all', array( $this, 'add_editor_class_styles' ) );
 	}
 

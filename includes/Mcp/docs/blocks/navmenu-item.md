@@ -1,122 +1,142 @@
 ### `blockish/navmenu-item`
 
-A single menu link. Must be a child of `blockish/navmenu` or `blockish/offcanvas`. **Accepts children: no.** Does **not** support `anchor`.
+Single menu link. **Parent: `blockish/navmenu` or `blockish/offcanvas`.** **Accepts children: yes** — only one nested `blockish/navmenu-submenu` (optional). Dynamic block (`render.php`). Does **not** support `anchor`.
 
-| Attribute | Type | Default | Notes/enum |
-|---|---|---|---|
-| `label` | Scalar (string, HTML allowed) | `""` | Link text (bold/italic allowed) |
-| `url` | Scalar (string, URL) | unset | Plain href, e.g. `"/about"` or `"https://…"`. (Internal `linkId`/`linkKind`/`linkType` exist for WP-entity links set via the editor UI — don't set them yourself; just use `url`.) |
-| `openInNewTab` | Scalar (boolean) | `false` | |
-| `rel` | Scalar (string) | `""` | `rel` attribute, space-separated |
-| `description` | Scalar (string) | `""` | Optional sub-text (theme-dependent) |
-| `icon` | Icon | unset | Optional icon next to the label |
-| `iconPosition` | Scalar (string) | `"left"` | `"left"` (before label) `"right"` (after) |
-| `iconSize` | Responsive (length) | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-navmenu-item-icon svg` -> `width: {{VALUE}}; height: {{VALUE}};` |
-| `itemTextColor` | Color | unset | Per-item text override (normal) — use to style one item as a button (combine with the global Advanced `background`/`border`/`padding`) <br>**CSS:** `.{{WRAPPER}} .blockish-navmenu-item-link` -> `color: {{VALUE}};` |
-| `itemTextColorHover` | Color | unset | Per-item text override (hover) <br>**CSS:** `.{{WRAPPER}} .blockish-navmenu-item-link:hover` -> `color: {{VALUE}};` |
-| `itemTypography` | Stringified-JSON (Typography) | unset | Per-item typography override <br>**CSS:** Uses `BlockishTypography` on `.{{WRAPPER}} .blockish-navmenu-item-link` |
+#### Content / structure
 
----
+| Attribute | Type | Notes |
+|---|---|---|
+| `label` | Scalar | Default `""`. Link text (bold/italic allowed). |
+| `url` | Scalar | Href string (e.g. `"/about"`). Prefer this over internal entity fields. |
+| `openInNewTab` | Scalar | `false` (default). Adds `target="_blank"` + `noopener noreferrer`. |
+| `rel` | Scalar | Optional extra `rel` tokens. |
+| `description` | Scalar | Optional; unused in default render markup. |
+| `icon` | Icon | Optional; prefer `get-icons`. |
+| `iconPosition` | Scalar | `"left"` (default) \| `"right"`. |
+| `linkId` / `linkKind` / `linkType` | Scalar | Editor entity link metadata — do not invent; use `url`. |
 
+For a dropdown, nest exactly one `blockish/navmenu-submenu` with further `navmenu-item` children.
 
+#### Markup
 
-### Markup & CSS Generation
+Default (no icon, no submenu) from `render.php`:
 
-**Generated HTML Structure (from `render.php`):**
 ```html
-<div class="blockish-block-navmenu-item" data-id="123">
-  
-  <a class="blockish-navmenu-item-link [has-icon] [icon-position-right]" href="..." target="_blank" rel="noopener noreferrer">
-    <!-- Icon rendered here if iconPosition is 'left' -->
-    <span class="blockish-navmenu-item-icon" aria-hidden="true"><svg>...</svg></span>
-    
-    <span>Menu Item Label</span>
-    
-    <!-- Icon rendered here if iconPosition is 'right' -->
+<div class="wp-block-blockish-navmenu-item blockish-block-navmenu-item">
+  <a class="blockish-navmenu-item-link" href="#">
+    <span><!-- label --></span>
   </a>
-
-  <!-- The following toggle button and inner content (blockish/navmenu-submenu) are ONLY rendered if the item has a submenu (inner blocks) -->
-  <button type="button" class="blockish-navmenu-submenu-toggle" aria-expanded="false" aria-label="Show submenu for Menu Item Label">
-    <svg class="blockish-navmenu-submenu-arrow">...</svg>
-  </button>
-  
-  <!-- Submenu content rendered here -->
-  ...
-  
 </div>
 ```
 
-**Base CSS (`style.scss`):**
-```scss
+| When | What changes |
+|---|---|
+| `linkId` set | Wrapper `data-id="…"`. |
+| `icon` set | Link gains `has-icon`; icon span before (or after if `iconPosition: "right"`) the label. |
+| `iconPosition: "right"` | Also class `icon-position-right`. |
+| `openInNewTab: true` | `target="_blank"` + `rel` including `noopener noreferrer`. |
+| Nested `navmenu-submenu` present | Sibling `<button class="blockish-navmenu-submenu-toggle">` with arrow SVG, then submenu markup. |
+
+`save.js` only serializes innerBlocks (submenu); chrome comes from `render.php`.
+
+Style with convert-css:
+- link chrome → `{{ROOT}} .blockish-navmenu-item-link { padding: …; color: …; }`
+- icon size → `{{ROOT}} .blockish-navmenu-item-icon svg { width: …; height: …; }`
+Shared item colors across the whole menu can also be converted on the parent `navmenu` (selectors target `.blockish-block-navmenu-item`).
+Do not invent markup.
+
+#### Already-there CSS
+
+```css
 .blockish-block-navmenu-item {
-	position: relative;
-	color: currentColor;
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
+  align-items: center;
+  color: currentColor;
+  display: inline-flex;
+  gap: 6px;
+  position: relative;
+}
 
-	.blockish-navmenu-item-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		color: inherit;
-		text-decoration: none;
-		border-radius: 4px;
-		white-space: nowrap;
-		transition: background 0.15s ease, color 0.15s ease;
-	}
+.blockish-block-navmenu-item .blockish-navmenu-item-link {
+  align-items: center;
+  border-radius: 4px;
+  color: inherit;
+  display: inline-flex;
+  gap: 6px;
+  text-decoration: none;
+  transition: background .15s ease,color .15s ease;
+  white-space: nowrap;
+}
 
-	.blockish-navmenu-item-icon {
-		display: inline-flex;
-		align-items: center;
-		line-height: 0;
-		flex-shrink: 0;
+.blockish-block-navmenu-item .blockish-navmenu-item-icon {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  line-height: 0;
+}
 
-		svg {
-			display: block;
-			width: 18px;
-			height: 18px;
-			fill: currentColor;
-		}
-	}
+.blockish-block-navmenu-item .blockish-navmenu-item-icon svg {
+  display: block;
+  fill: currentColor;
+  height: 18px;
+  width: 18px;
+}
 
-	.blockish-navmenu-submenu-toggle {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		padding: 4px;
-		background: none;
-		border: none;
-		color: inherit;
-		cursor: pointer;
+.blockish-block-navmenu-item .blockish-navmenu-submenu-toggle {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  justify-content: center;
+  padding: 4px;
+}
 
-		&:focus-visible {
-			outline: 2px solid currentColor;
-			outline-offset: 1px;
-		}
-	}
+.blockish-block-navmenu-item .blockish-navmenu-submenu-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
 
-	.blockish-navmenu-submenu-arrow {
-		flex-shrink: 0;
-		transition: transform 0.15s ease;
-	}
+.blockish-block-navmenu-item .blockish-navmenu-submenu-arrow {
+  flex-shrink: 0;
+  transition: transform .15s ease;
 }
 
 @keyframes blockishSubmenuRotateY {
-	0% {
-		transform: rotateY( 90deg );
-	}
-
-	80% {
-		transform: rotateY( -10deg );
-	}
-
-	100% {
-		transform: rotateY( 0 );
-	}
+  0% {
+    transform: rotateY(90deg);
+  }
+  80% {
+    transform: rotateY(-10deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
+  ;
 }
 ```
 
+#### Minimal schema
 
-
+```json
+{
+  "name": "blockish/navmenu-item",
+  "attributes": {
+    "label": "Products",
+    "url": "/products"
+  },
+  "innerBlocks": [
+    {
+      "name": "blockish/navmenu-submenu",
+      "attributes": {},
+      "innerBlocks": [
+        {
+          "name": "blockish/navmenu-item",
+          "attributes": { "label": "App", "url": "/app" }
+        }
+      ]
+    }
+  ]
+}
+```

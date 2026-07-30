@@ -12,31 +12,36 @@ class Config
     {
         return [
             'label'               => __('Create, Update or Delete CSS Class', 'blockish'),
-            'description'         => __('Creates, updates or deletes a reusable Blockish Class Manager class (a "blockish-classes" custom post) selected by the action param; returns post_id, name, css_selector and content. You write only name and the JSON style object (content) — never raw CSS, and on update content merges recursively; send null to remove a key, {} to clear. Only create a class for styling that has no equivalent block attribute.', 'blockish'),
+            'description'         => __('Creates, updates or deletes a reusable Class Manager class. AI writes raw CSS only — never style objects or child posts. Selectors must stay under .{name}; :hover / descendants in the same stylesheet are converted internally into Class Manager parent + child posts for the editor UI. Returns post_id, name, css_selector, and combined css.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
                 'properties' => [
                     'action'    => [
                         'type'        => 'string',
-                        'enum'        => [ 'create', 'update', 'delete' ],
-                        'description' => 'create (default; omit post_id, requires name), update (provide post_id), or delete (provide post_id; also deletes child classes).',
+                        'enum'        => [ 'create', 'update', 'delete', 'sweep' ],
+                        'description' => 'create (default; omit post_id, requires name), update (provide parent post_id), delete (provide post_id; also deletes child classes), or sweep (delete unused parent classes — dry-run unless confirm:true).',
                     ],
                     'post_id'   => [
                         'type'        => 'integer',
-                        'description' => 'Required for update and delete.',
+                        'description' => 'Required for update and delete. Must be a parent class when sending css. For sweep, optional single unused id to delete.',
+                    ],
+                    'post_ids'  => [
+                        'type'        => 'array',
+                        'items'       => [ 'type' => 'integer' ],
+                        'description' => 'Optional for sweep — whitelist of unused parent class IDs to delete. Omit to sweep all unused.',
+                    ],
+                    'confirm'   => [
+                        'type'        => 'boolean',
+                        'description' => 'Required true for action=sweep to permanently delete. Omit/false = dry-run listing unused classes.',
                     ],
                     'name'      => [
                         'type'        => 'string',
-                        'description' => 'The CSS class name; becomes the post title and is auto-normalized (lowercase, spaces → hyphens, only a-z/0-9/hyphen/underscore, must start with a letter or underscore).',
+                        'description' => 'CSS class name (auto-normalized). Required on create.',
                     ],
-                    'content'   => [
-                        'type'        => 'object',
-                        'description' => 'The style object (JSON) stored as the post content and the single source of truth — a structured map of style properties (padding, background, border, fontSize, transform, customCss, etc., each optionally responsive); see blockish/get-class-manager-docs for every key and value shape. Compiled to CSS automatically; do not write raw CSS and do not write to meta. On update, it MERGES recursively with the existing styles — only send the properties you want to add or change. To remove a specific property, explicitly set its value to null. To completely clear all styles and reset the class, pass an empty object {}.',
-                    ],
-                    'parent_id' => [
-                        'type'        => 'integer',
-                        'description' => 'Set to make this a child/variation class of an existing parent class. Children apply via the ".blockish-cm-{post_id}" selector (returned as css_selector); parents apply via ".{class-name}".',
+                    'css'       => [
+                        'type'        => 'string',
+                        'description' => 'Raw stylesheet. Every selector must start with .{name} (or {{SELECTOR}}). Include :hover and descendants in the same string. Declarations with !important are preserved via customCss. Full replace on update. Pass "" to clear.',
                     ],
                 ],
                 'required' => [],
@@ -46,10 +51,13 @@ class Config
                 'properties' => [
                     'post_id'      => [ 'type' => 'integer' ],
                     'name'         => [ 'type' => 'string' ],
-                    'css_selector' => [ 'type' => 'string', 'description' => 'The CSS selector this class produces — its style object targets this selector. Use it when applying the class to blocks.' ],
+                    'css_selector' => [ 'type' => 'string' ],
                     'parent_id'    => [ 'type' => [ 'integer', 'null' ] ],
-                    'content'      => [ 'type' => 'object', 'description' => 'The stored style object.' ],
-                    'deleted'      => [ 'type' => 'boolean' ],
+                    'css'          => [ 'type' => 'string', 'description' => 'Combined raw CSS returned to AI.' ],
+                    'deleted'      => [ 'type' => [ 'boolean', 'array' ] ],
+                    'dry_run'      => [ 'type' => 'boolean' ],
+                    'unused'       => [ 'type' => 'array' ],
+                    'note'         => [ 'type' => 'string' ],
                     'error'        => [ 'type' => 'string' ],
                 ],
             ],
@@ -57,7 +65,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Always call blockish/get-class-manager-docs before your first class operation in a session (it defines every style-object key and its value shape), and call blockish/get-classes before creating to avoid duplicates. Only use this ability for styling that has no equivalent block attribute or control (background, border, padding, typography, box-shadow, etc. — see blockish/get-block-docs); if an attribute already produces the style, set it on the block directly instead of creating a class.',
+                'usage_notes' => 'Call get-class-manager-docs then get-classes before creating. Write css only (!important → customCss automatically). Attach with classManager: "name1, name2". Prefer Class Manager over one-off convert-css when styles are reusable. Use get-class-usage then action=sweep to clean unused classes. Child posts are created automatically for UI — do not create them yourself.',
             ],
         ];
     }

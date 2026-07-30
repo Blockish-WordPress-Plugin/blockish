@@ -2,16 +2,29 @@
 
 namespace Blockish\Mcp\Abilities\GetClasses;
 
+use Blockish\Extensions\ClassUsage;
+use Blockish\Mcp\Converter\ClassStyleConverter;
+
 defined('ABSPATH') || exit;
 
 class Callbacks
 {
-    public static function get_classes( $_input ): array
+    /**
+     * AI-facing list: parent classes only, each with combined CSS
+     * (parent root + children rewritten as .slug:hover / .slug h2 / …).
+     * Child posts exist for the Class Manager UI but are hidden from AI.
+     */
+    public static function get_classes( $input ): array
     {
+        $include_usage = is_array( $input ) && ! empty( $input['include_usage'] );
+        $usage_report  = $include_usage ? ClassUsage::report() : null;
+        $usage_by_id   = is_array( $usage_report ) ? ( $usage_report['classes'] ?? [] ) : [];
+
         $posts = get_posts( [
             'post_type'      => 'blockish-classes',
             'post_status'    => 'publish',
             'posts_per_page' => -1,
+            'post_parent'    => 0,
             'orderby'        => 'title',
             'order'          => 'ASC',
         ] );
@@ -19,22 +32,66 @@ class Callbacks
         $result = [];
 
         foreach ( $posts as $post ) {
-            $is_child     = (int) $post->post_parent > 0;
-            $css_selector = self::build_selector( $post->ID, $post->post_title, $post->post_parent );
+            $css_selector = self::build_selector( $post->ID, $post->post_title, 0 );
 
-            $content = json_decode( (string) $post->post_content, true );
-
-            $result[ $post->ID ] = [
+            $item = [
                 'post_id'      => $post->ID,
                 'name'         => $post->post_title,
                 'css_selector' => $css_selector,
-                'parent_id'    => $is_child ? (int) $post->post_parent : null,
-                'content'      => is_array( $content ) ? $content : new \stdClass(),
-                'css'          => get_post_meta( $post->ID, 'blockishClassManagerStyles', true ),
+                'css'          => self::combined_css_for_parent( (int) $post->ID ),
             ];
+
+            if ( $include_usage ) {
+                $usage = $usage_by_id[ (int) $post->ID ] ?? null;
+                $item['usage_count'] = is_array( $usage ) ? (int) ( $usage['usage_count'] ?? 0 ) : 0;
+                $item['used_in']     = is_array( $usage ) ? ( $usage['used_in'] ?? [] ) : [];
+            }
+
+            $result[ $post->ID ] = $item;
         }
 
         return $result;
+    }
+
+    /**
+     * Rebuild the AI stylesheet for a parent: root + each child remainder.
+     */
+    public static function combined_css_for_parent( int $parent_id ): string
+    {
+        $parent = get_post( $parent_id );
+        if ( ! $parent || 'blockish-classes' !== $parent->post_type ) {
+            return '';
+        }
+
+        $slug = self::normalize_slug( (string) $parent->post_title );
+        if ( '' === $slug ) {
+            return '';
+        }
+
+        $parent_content = json_decode( (string) $parent->post_content, true );
+        if ( ! is_array( $parent_content ) ) {
+            $parent_content = [];
+        }
+
+        $children_posts = get_posts([
+            'post_type'      => 'blockish-classes',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'post_parent'    => $parent_id,
+            'orderby'        => 'title',
+            'order'          => 'ASC',
+        ]);
+
+        $children = [];
+        foreach ( $children_posts as $child ) {
+            $content = json_decode( (string) $child->post_content, true );
+            $children[] = [
+                'name'    => (string) $child->post_title,
+                'content' => is_array( $content ) ? $content : [],
+            ];
+        }
+
+        return ClassStyleConverter::class_tree_to_css( $parent_content, $children, $slug );
     }
 
     /**
@@ -64,14 +121,6 @@ class Callbacks
 
     public static function normalize_slug( string $value ): string
     {
-        $value = strtolower( trim( $value ) );
-        $value = str_replace( ' ', '-', $value );
-        $value = preg_replace( '/[^a-z0-9_-]/', '', $value );
-
-        if ( ! is_string( $value ) || ! preg_match( '/^[a-z_][a-z0-9_-]*$/', $value ) ) {
-            return '';
-        }
-
-        return $value;
+        return ClassStyleConverter::normalize_slug( $value );
     }
 }

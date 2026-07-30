@@ -63,6 +63,10 @@ class BlockSchemaMeta
                         }
                     }
                 }
+
+                if (isset($block['attributes']) && is_array($block['attributes'])) {
+                    $block['attributes'] = self::normalize_class_manager_attributes($block['attributes']);
+                }
             }
 
             if (!empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
@@ -71,6 +75,184 @@ class BlockSchemaMeta
             }
         }
         return $blocks;
+    }
+
+    /**
+     * Expand classManager from name string(s) into [{id, title}, …].
+     * Accepts: "hero-card, cta" | ["hero-card","cta"] | [{id,title}] (passthrough).
+     */
+    public static function normalize_class_manager_attributes(array $attributes): array
+    {
+        if (!array_key_exists('classManager', $attributes)) {
+            return $attributes;
+        }
+
+        $raw = $attributes['classManager'];
+        $names = self::parse_class_manager_names($raw);
+        if (null === $names) {
+            // Already structured objects (or empty) — leave as-is.
+            return $attributes;
+        }
+
+        $resolved = self::resolve_class_manager_by_names($names);
+        $attributes['classManager'] = $resolved;
+
+        // Child posts are required for Class Manager UI + frontend (.blockish-cm-{id}).
+        // When AI attaches by parent name only, auto-include every child.
+        $subselectors = self::resolve_class_manager_children($resolved);
+        if (!empty($subselectors)) {
+            $existing = [];
+            if (isset($attributes['classManagerSubselector']) && is_array($attributes['classManagerSubselector'])) {
+                foreach ($attributes['classManagerSubselector'] as $item) {
+                    if (is_array($item) && !empty($item['id'])) {
+                        $existing[(int) $item['id']] = $item;
+                    }
+                }
+            }
+            foreach ($subselectors as $child) {
+                $existing[(int) $child['id']] = $child;
+            }
+            $attributes['classManagerSubselector'] = array_values($existing);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @param mixed $raw
+     * @return string[]|null Null when $raw is already object items / should not convert.
+     */
+    private static function parse_class_manager_names($raw): ?array
+    {
+        if (is_string($raw)) {
+            $parts = preg_split('/\s*,\s*/', trim($raw));
+            $names = [];
+            foreach ($parts as $part) {
+                $part = trim($part);
+                if ('' === $part) {
+                    continue;
+                }
+                $part = ltrim($part, '.');
+                $names[] = $part;
+            }
+            return $names;
+        }
+
+        if (!is_array($raw)) {
+            return null;
+        }
+
+        if ($raw === []) {
+            return null;
+        }
+
+        // Already [{id, title}, …]
+        $first = reset($raw);
+        if (is_array($first) && (isset($first['id']) || isset($first['title']))) {
+            return null;
+        }
+
+        // ["hero-card", "cta"] or [".hero-card"]
+        $names = [];
+        foreach ($raw as $item) {
+            if (!is_string($item)) {
+                return null;
+            }
+            $item = trim($item);
+            if ('' === $item) {
+                continue;
+            }
+            $names[] = ltrim($item, '.');
+        }
+        return $names;
+    }
+
+    /**
+     * @param string[] $names
+     * @return array<int, array{id:int,title:string}>
+     */
+    private static function resolve_class_manager_by_names(array $names): array
+    {
+        if (empty($names)) {
+            return [];
+        }
+
+        static $index = null;
+        if (null === $index) {
+            $index = [];
+            $posts = get_posts([
+                'post_type'      => 'blockish-classes',
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'post_parent'    => 0,
+            ]);
+            foreach ($posts as $post) {
+                $slug = \Blockish\Mcp\Converter\ClassStyleConverter::normalize_slug((string) $post->post_title);
+                if ('' === $slug) {
+                    continue;
+                }
+                $index[$slug] = [
+                    'id'    => (int) $post->ID,
+                    'title' => (string) $post->post_title,
+                ];
+            }
+        }
+
+        $out = [];
+        $seen = [];
+        foreach ($names as $name) {
+            $slug = \Blockish\Mcp\Converter\ClassStyleConverter::normalize_slug($name);
+            if ('' === $slug || isset($seen[$slug])) {
+                continue;
+            }
+            if (!isset($index[$slug])) {
+                continue;
+            }
+            $seen[$slug] = true;
+            $out[] = $index[$slug];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param array<int, array{id:int,title:string}> $parents
+     * @return array<int, array{id:int,title:string,parent:int}>
+     */
+    private static function resolve_class_manager_children(array $parents): array
+    {
+        if (empty($parents)) {
+            return [];
+        }
+
+        $parent_ids = array_values(array_filter(array_map(static function ($p) {
+            return absint($p['id'] ?? 0);
+        }, $parents)));
+
+        if (empty($parent_ids)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($parent_ids as $parent_id) {
+            $children = get_posts([
+                'post_type'      => 'blockish-classes',
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'post_parent'    => $parent_id,
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+            ]);
+            foreach ($children as $child) {
+                $out[] = [
+                    'id'     => (int) $child->ID,
+                    'title'  => (string) $child->post_title,
+                    'parent' => (int) $child->post_parent,
+                ];
+            }
+        }
+
+        return $out;
     }
 
     /**

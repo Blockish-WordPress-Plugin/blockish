@@ -19,18 +19,12 @@
   "attributes": {
     "itemPosition": {
       "type": "object",
-      "default": {
-        "Desktop": "start"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-accordion-item-trigger": "justify-content: {{VALUE}};"
       }
     },
     "iconPosition": {
       "type": "object",
-      "default": {
-        "Desktop": "row"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-accordion-item-trigger": "flex-direction: {{VALUE}};"
       }

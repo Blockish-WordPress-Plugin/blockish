@@ -1,16 +1,43 @@
 ### `blockish/post-content`
 
-Current post content. **Accepts children: no.** Use inside single/post templates or loops that render the full post body.
+Current post body (`the_content`). **Accepts children: no.** Use in single/post templates or loops that need the full post body.
 
-| Attribute | Type | Default | Notes/enum |
-|---|---|---|---|
-| `tag` | Option | typically `div` | Semantic wrapper tag |
-| `alignment` | Responsive | `{"Desktop":"left"}` | <br>**CSS:** `.{{WRAPPER}}` -> `text-align: {{VALUE}};` |
-| `typography` | Stringified-JSON (Typography) | unset | |
-| `color` | Color | unset | |
-| `linkColor` | Color | unset | Links inside content |
-| `linkHoverColor` | Color | unset | |
+#### Content / structure
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `tag` | Option | Default `{"value":"div","label":"Div"}`. Allowed: `div`, `section`, `article`, `main`. |
+| `anchor` / `align` | Scalar | `"align"`: `"wide"` \| `"full"`. |
+
+#### Markup
+
+Default:
+
+```html
+<div class="wp-block-blockish-post-content blockish-post-content entry-content">
+  <!-- filtered post content -->
+</div>
+```
+
+| When | What changes |
+|---|---|
+| `tag.value` | Root element (`div` / `section` / `article` / `main`). |
+| Nested render of same post | Guarded — returns nothing (avoids recursion). |
+| Empty content | Renders nothing. |
+
+#### Already-there CSS
+
+```css
+:where(.blockish-post-content) { text-align: left; }
+```
+
+Style with convert-css against `.blockish-post-content` / `.entry-content`.
+
+#### Minimal schema
 
 ```json
-{ "name": "blockish/post-content", "attributes": {} }
+{
+  "name": "blockish/post-content",
+  "attributes": {}
+}
 ```

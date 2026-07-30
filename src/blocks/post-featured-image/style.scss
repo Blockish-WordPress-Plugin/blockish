@@ -20,3 +20,7 @@
 		height: auto;
 	}
 }
+
+:where(.blockish-post-featured-image) {
+	text-align: center;
+}

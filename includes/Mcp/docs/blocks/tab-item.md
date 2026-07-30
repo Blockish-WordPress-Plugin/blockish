@@ -1,35 +1,65 @@
 ### `blockish/tab-item`
 
-Must be a child of `blockish/tab`. **Accepts children: yes** (any blocks — this is the panel's content area).
+One tab panel. **Parent: `blockish/tab` only.** **Accepts children: yes** (panel body — any blocks).
 
-| Attribute | Type | Default | Notes/enum |
-|---|---|---|---|
-| `title` | Scalar (string) | `"Tab"` | |
-| `tabIcon` | Icon | unset | |
-| `defaultActive` | Scalar (boolean) | `false` | Set `true` on exactly one item — index must match parent's `defaultActiveTab` |
+#### Content / structure
 
+| Attribute | Type | Notes |
+|---|---|---|
+| `title` | Scalar | Default `"Tab"`. Becomes nav trigger label (`data-title`). |
+| `tabIcon` | Icon | Optional; serialized to `data-icon-path` / `data-icon-viewbox` for the view script. Prefer `get-icons`. |
+| `defaultActive` | Scalar | `false` (default). Set `true` on exactly one item; index must match parent `defaultActiveTab`. |
+| `anchor` | Scalar | Optional HTML `id`. |
 
+#### Markup
 
-### Markup & CSS Generation
+Default:
 
-**Generated HTML Structure:**
 ```html
-<!-- The `data-` attributes are read by `view.js` on the parent `tab` block to dynamically generate the navigation buttons. -->
-<!-- `data-default-active` sets whether this panel starts open. -->
-<div class="blockish-block-tab-item" data-title="Tab Title" data-icon-path="..." data-icon-viewbox="..." data-default-active="false" role="tabpanel">
-  
-  <!-- Inner blocks are rendered directly here -->
-  ...
-
+<div
+  class="wp-block-blockish-tab-item blockish-block-tab-item"
+  data-title="Tab"
+  data-icon-path=""
+  data-icon-viewbox=""
+  data-default-active="false"
+  role="tabpanel"
+>
+  <!-- innerBlocks -->
 </div>
 ```
 
-**Base CSS (`style.scss`):**
-```scss
+| When | What changes |
+|---|---|
+| `title` | `data-title` value. |
+| `tabIcon` set | `data-icon-path` / `data-icon-viewbox` filled; view script renders trigger icon. |
+| `defaultActive: true` | `data-default-active="true"`. |
+
+#### Already-there CSS
+
+```css
 .blockish-block-tab-item {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 ```
 
-**CSS Mapping per Attribute:**
-No dynamic CSS selectors defined in block.json.
+Panel chrome (background, border, padding) comes from the parent tab stylesheet — see `tab.md`.
+
+#### Minimal schema
+
+```json
+{
+  "name": "blockish/tab-item",
+  "attributes": {
+    "title": "Overview",
+    "defaultActive": true
+  },
+  "innerBlocks": [
+    {
+      "name": "core/paragraph",
+      "attributes": {
+        "content": "Overview content here."
+      }
+    }
+  ]
+}
+```

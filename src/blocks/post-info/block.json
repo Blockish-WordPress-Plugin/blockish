@@ -6,7 +6,15 @@
   "title": "Post Info",
   "category": "blockish-framework",
   "description": "Displays post metadata such as author, dates, comments, and terms.",
-  "keywords": ["blockish", "post", "meta", "author", "date", "comments", "terms"],
+  "keywords": [
+    "blockish",
+    "post",
+    "meta",
+    "author",
+    "date",
+    "comments",
+    "terms"
+  ],
   "textdomain": "blockish",
   "attributes": {
     "layout": {
@@ -27,51 +35,63 @@
       "type": "array",
       "default": [
         {
-          "type": { "value": "author", "label": "Author" },
+          "type": {
+            "value": "author",
+            "label": "Author"
+          },
           "beforeText": "",
           "link": true,
-          "icon": { "value": "default", "label": "Default" },
+          "icon": {
+            "value": "default",
+            "label": "Default"
+          },
           "showAvatar": false,
           "avatarSize": 16
         },
         {
-          "type": { "value": "date", "label": "Date" },
+          "type": {
+            "value": "date",
+            "label": "Date"
+          },
           "beforeText": "",
           "link": true,
-          "icon": { "value": "default", "label": "Default" },
-          "dateFormat": { "value": "default", "label": "Default" }
+          "icon": {
+            "value": "default",
+            "label": "Default"
+          },
+          "dateFormat": {
+            "value": "default",
+            "label": "Default"
+          }
         },
         {
-          "type": { "value": "comments", "label": "Comments" },
+          "type": {
+            "value": "comments",
+            "label": "Comments"
+          },
           "beforeText": "",
           "link": true,
-          "icon": { "value": "default", "label": "Default" }
+          "icon": {
+            "value": "default",
+            "label": "Default"
+          }
         }
       ]
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "flex-start"
-      },
       "selectors": {
         ".{{WRAPPER}}": "justify-content: {{VALUE}};"
       }
     },
     "alignItems": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}}": "align-items: {{VALUE}};"
       }
     },
     "gap": {
       "type": "object",
-      "default": {
-        "Desktop": "12px"
-      },
       "selectors": {
         ".{{WRAPPER}}": "gap: {{VALUE}};"
       }
@@ -109,9 +129,6 @@
     },
     "iconGap": {
       "type": "object",
-      "default": {
-        "Desktop": "6px"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-post-info__item": "gap: {{VALUE}};"
       }
@@ -124,11 +141,17 @@
       }
     }
   },
-  "usesContext": ["postId", "postType"],
+  "usesContext": [
+    "postId",
+    "postType"
+  ],
   "supports": {
     "html": false,
     "anchor": true,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",

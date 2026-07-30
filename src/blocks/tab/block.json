@@ -14,36 +14,24 @@
   "attributes": {
     "direction": {
       "type": "object",
-      "default": {
-        "Desktop": "column"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-block-tab-layout": "flex-direction: {{VALUE}};"
       }
     },
     "justify": {
       "type": "object",
-      "default": {
-        "Desktop": "flex-start"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-block-tab-nav": "justify-content: {{VALUE}};"
       }
     },
     "navAlign": {
       "type": "object",
-      "default": {
-        "Desktop": "stretch"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-block-tab-nav": "align-self: {{VALUE}};"
       }
     },
     "alignTitle": {
       "type": "object",
-      "default": {
-        "Desktop": "left"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-block-tab-trigger-title": "text-align: {{VALUE}};"
       }
@@ -54,18 +42,12 @@
     },
     "navGap": {
       "type": "object",
-      "default": {
-        "Desktop": "10px"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-block-tab-nav": "gap: {{VALUE}};"
       }
     },
     "distanceFromContent": {
       "type": "object",
-      "default": {
-        "Desktop": "10px"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-block-tab-layout": "gap: {{VALUE}};"
       }
@@ -240,9 +222,6 @@
     },
     "iconPosition": {
       "type": "object",
-      "default": {
-        "Desktop": "row"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-block-tab-trigger": "flex-direction: {{VALUE}};"
       }

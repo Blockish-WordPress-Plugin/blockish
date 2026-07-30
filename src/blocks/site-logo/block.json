@@ -6,7 +6,13 @@
   "title": "Site Logo",
   "category": "blockish-framework",
   "description": "Displays the site logo with an optional home link.",
-  "keywords": ["blockish", "site", "logo", "brand", "identity"],
+  "keywords": [
+    "blockish",
+    "site",
+    "logo",
+    "brand",
+    "identity"
+  ],
   "textdomain": "blockish",
   "attributes": {
     "linkToHome": {
@@ -19,18 +25,12 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "left"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }
     },
     "logoWidth": {
       "type": "object",
-      "default": {
-        "Desktop": "120px"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-site-logo__image": "width: {{VALUE}};"
       }
@@ -65,7 +65,10 @@
   "supports": {
     "html": false,
     "anchor": true,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",

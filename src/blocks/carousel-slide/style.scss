@@ -11,7 +11,6 @@
 
 	/* Soft fallback before StyleGenerator CSS lands */
 	&.is-default-styled {
-		min-height: 360px;
 		background: linear-gradient(
 			145deg,
 			#0f172a 0%,
@@ -34,27 +33,50 @@
 		position: relative;
 		z-index: 1;
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
 		box-sizing: border-box;
 		width: 100%;
 		height: 100%;
-		min-height: inherit;
 		min-width: 0;
-		padding: 48px 40px;
 		text-align: center;
-		gap: 16px;
+		min-height: inherit;
 	}
 }
 
-@media (max-width: 781px) {
+:where(.blockish-carousel__slide) {
+	min-height: 360px;
+}
+
+:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	padding: 48px 40px;
+	min-height: 360px;
+}
+
+@media (max-width: 1024px) {
+	:where(.blockish-carousel__slide),
+	:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
+		min-height: 320px;
+	}
+
+	:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
+		padding: 40px 28px;
+	}
+}
+
+@media (max-width: 768px) {
 	.blockish-carousel__slide.is-default-styled {
-		min-height: 280px;
 		border-radius: 16px;
 	}
 
-	.blockish-carousel__slide .blockish-carousel__slide-inner {
+	:where(.blockish-carousel__slide),
+	:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
+		min-height: 280px;
+	}
+
+	:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
 		padding: 32px 20px;
 	}
 }

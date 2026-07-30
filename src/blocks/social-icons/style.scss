@@ -8,8 +8,6 @@
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	column-gap: 12px;
-	row-gap: 12px;
 
 	&.is-color-official {
 		.blockish-social-icon-item__link {
@@ -52,7 +50,6 @@
 		align-items: center;
 		justify-content: center;
 		padding: 10px;
-		color: var(--blockish-social-icons-secondary-color, #ffffff);
 		border: 0;
 		line-height: 1;
 		text-decoration: none;
@@ -74,4 +71,17 @@
 
 :where(.blockish-social-icons){
 	width: 100%;
+	--blockish-social-icons-columns: auto-fit;
+	justify-content: center;
+	column-gap: 12px;
+	row-gap: 12px;
+	--blockish-social-icons-secondary-color: #ffffff;
+}
+
+:where(.blockish-social-icons .blockish-social-icon-item__link) {
+	color: var(--blockish-social-icons-secondary-color, #ffffff);
+}
+
+:where(.blockish-social-icons .blockish-social-icon-item__link:hover) {
+	animation-name: none;
 }

@@ -6,7 +6,12 @@
   "title": "Post Content",
   "category": "blockish-framework",
   "description": "Displays the current post content.",
-  "keywords": ["blockish", "post", "content", "body"],
+  "keywords": [
+    "blockish",
+    "post",
+    "content",
+    "body"
+  ],
   "textdomain": "blockish",
   "attributes": {
     "tag": {
@@ -18,9 +23,6 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "left"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }
@@ -51,12 +53,19 @@
       }
     }
   },
-  "usesContext": ["postId", "postType"],
+  "usesContext": [
+    "postId",
+    "postType"
+  ],
   "supports": {
     "html": false,
     "anchor": true,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   },
   "editorScript": "file:./index.js",
+  "style": "file:./style-index.css",
   "render": "file:./render.php"
 }

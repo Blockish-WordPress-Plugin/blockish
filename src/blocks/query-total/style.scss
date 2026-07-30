@@ -1,3 +1,7 @@
 .blockish-query-total {
 	margin: 0;
 }
+
+:where(.blockish-query-total) {
+	text-align: left;
+}

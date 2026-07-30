@@ -1,7 +1,4 @@
 .blockish-icon-list-item.blockish-icon-list-item {
-	--blockish-icon-list-item-icon-hover-transition: 0.2s;
-	--blockish-icon-list-item-text-hover-transition: 0.2s;
-
 	.blockish-icon-list-item-link {
 		color: inherit;
 	}
@@ -26,4 +23,9 @@
 			--blockish-icon-list-item-text-hover-transition
 		);
 	}
+}
+
+:where(.blockish-icon-list-item) {
+	--blockish-icon-list-item-icon-hover-transition: 0.2s;
+	--blockish-icon-list-item-text-hover-transition: 0.2s;
 }

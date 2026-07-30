@@ -91,3 +91,13 @@
 		}
 	}
 }
+
+:where(.blockish-post-info) {
+	justify-content: flex-start;
+	align-items: center;
+	gap: 12px;
+}
+
+:where(.blockish-post-info .blockish-post-info__item) {
+	gap: 6px;
+}

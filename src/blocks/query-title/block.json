@@ -6,7 +6,13 @@
   "title": "Query Title",
   "category": "blockish-framework",
   "description": "Displays the archive, search, or post type title for the current query.",
-  "keywords": ["blockish", "archive", "search", "title", "query"],
+  "keywords": [
+    "blockish",
+    "archive",
+    "search",
+    "title",
+    "query"
+  ],
   "textdomain": "blockish",
   "attributes": {
     "type": {
@@ -33,9 +39,6 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "left"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }
@@ -77,9 +80,14 @@
   "supports": {
     "html": false,
     "anchor": true,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   },
-  "usesContext": ["templateSlug"],
+  "usesContext": [
+    "templateSlug"
+  ],
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",

@@ -10,3 +10,7 @@ a.blockish-icon{
     text-decoration: none;
     display: block;
 }
+
+:where(.blockish-icon) {
+    text-align: center;
+}

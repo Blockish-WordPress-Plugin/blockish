@@ -1,38 +1,67 @@
 ### `blockish/navmenu-submenu`
 
-Dropdown/flyout panel for a `blockish/navmenu-item`. **Accepts children: yes** (nested `blockish/navmenu-item`s). **Parent: `blockish/navmenu-item` only.**
+Dropdown/flyout panel for a menu item. **Parent: `blockish/navmenu-item` only.** **Accepts children: yes** — only nested `blockish/navmenu-item`.
 
-Do not place this at the root of a page — nest it under a nav item that needs a submenu.
+> [!WARNING]
+> **Hard rule — nesting:** Do not place this at page root. Nest under the `navmenu-item` that opens the submenu. Allowed children are `blockish/navmenu-item` only.
 
-| Attribute | Type | Default | Notes/enum |
-|---|---|---|---|
-| `containerWidth` | Responsive | unset | Submenu panel width |
-| `alignment` | Responsive | unset | |
-| `itemGap` | Responsive | unset | Gap between sub-items |
-| `panelBg` | Stringified-JSON (Background) | unset | Panel background |
-| `panelBorder` | Stringified-JSON (Border) | unset | |
-| `panelBoxShadow` | Stringified-JSON (Box Shadow) | unset | |
-| `panelBorderRadius` | Border-Radius | unset | |
-| `panelPadding` | Spacing (Responsive) | unset | |
-| `subItemTypography` | Stringified-JSON (Typography) | unset | |
-| `subItemColorNormal` / `subItemBgNormal` / `subItemBorderNormal` | Color / Background / Border | unset | Default sub-item |
-| `subItemColorHover` / `subItemBgHover` / `subItemBorderColorHover` | Color | unset | Hover |
-| `subItemColorActive` / `subItemBgActive` / `subItemBorderColorActive` | Color | unset | Active/current |
-| `subItemPadding` | Spacing (Responsive) | unset | |
-| `subItemBorderRadius` | Border-Radius | unset | |
+#### Content / structure
+
+No content-only attributes (panel width/gap/colors are style via convert-css). Structure is the nested `navmenu-item` list.
+
+#### Markup
+
+Default:
+
+```html
+<ul class="wp-block-blockish-navmenu-submenu blockish-navmenu-submenu">
+  <!-- nested navmenu-item innerBlocks -->
+</ul>
+```
+
+| When | What changes |
+|---|---|
+| Nested items present | Rendered as list children; parent item’s `render.php` adds the submenu toggle when this block is present. |
+
+#### Already-there CSS
+
+```css
+:where(.blockish-navmenu-submenu) {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+  font-size: 16px;
+}
+
+.blockish-navmenu-submenu {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  min-width: 180px;
+  padding: 12px;
+}
+
+:where(.blockish-navmenu-submenu .blockish-block-navmenu-item) {
+  padding: 8px;
+}
+```
+
+#### Minimal schema
 
 ```json
 {
-  "name": "blockish/navmenu-item",
-  "attributes": { "label": "Products", "url": "/products" },
+  "name": "blockish/navmenu-submenu",
+  "attributes": {},
   "innerBlocks": [
     {
-      "name": "blockish/navmenu-submenu",
-      "attributes": {},
-      "innerBlocks": [
-        { "name": "blockish/navmenu-item", "attributes": { "label": "App", "url": "/app" } },
-        { "name": "blockish/navmenu-item", "attributes": { "label": "API", "url": "/api" } }
-      ]
+      "name": "blockish/navmenu-item",
+      "attributes": { "label": "App", "url": "/app" }
+    },
+    {
+      "name": "blockish/navmenu-item",
+      "attributes": { "label": "API", "url": "/api" }
     }
   ]
 }

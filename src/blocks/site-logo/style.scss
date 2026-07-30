@@ -10,3 +10,11 @@
 		height: auto;
 	}
 }
+
+:where(.blockish-site-logo) {
+	text-align: left;
+}
+
+:where(.blockish-site-logo .blockish-site-logo__image) {
+	width: 120px;
+}

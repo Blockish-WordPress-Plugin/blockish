@@ -105,19 +105,12 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-video-player": "text-align: {{VALUE}};"
       }
     },
     "videoAspectRatio": {
       "type": "object",
-      "default": {
-        "label": "16:9",
-        "value": "16 / 9"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-video-player": "aspect-ratio: {{VALUE}};"
       }

@@ -4,3 +4,7 @@
 		text-decoration: inherit;
 	}
 }
+
+:where(.blockish-site-title) {
+	text-align: left;
+}

@@ -136,6 +136,16 @@ class Callbacks
                     unset($form);
                 }
 
+                if (!empty($design['dependencies']['classes']) && is_array($design['dependencies']['classes'])) {
+                    // Classes are CSS/style-object deps — pass through as-is for local import + id remap.
+                    foreach ($design['dependencies']['classes'] as &$class_dep) {
+                        if (empty($class_dep['name']) && !empty($class_dep['title'])) {
+                            $class_dep['name'] = $class_dep['title'];
+                        }
+                    }
+                    unset($class_dep);
+                }
+
                 // Keep content + dependencies so the agent can recreate entities and remap IDs
                 // before applying schema. Do not unset content.
                 $filtered_designs[] = $design;
@@ -146,7 +156,7 @@ class Callbacks
             'total_pages'  => $data['total_pages'] ?? 1,
             'current_page' => $data['current_page'] ?? 1,
             'designs'      => $filtered_designs,
-            'note'         => 'Each design may include dependencies.patterns / dependencies.forms with cloud ids + content/schema. Create local wp_block / blockish_form entities, remap ref/formId from cloud→local, then use the remapped schema. Prefer edit_url staging — do not assume cloud refs work on this site.',
+            'note'         => 'Each design may include dependencies.patterns / dependencies.forms / dependencies.classes with cloud ids. Create local wp_block / blockish_form / blockish-classes entities (prefer manage-class css for classes), remap ref/formId/classManager id from cloud→local, then use the remapped schema. Prefer edit_url staging — do not assume cloud refs work on this site.',
         ];
     }
 

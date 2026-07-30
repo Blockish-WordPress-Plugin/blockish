@@ -26,7 +26,6 @@
     },
     "iconPosition": {
       "type": "string",
-      "default": "row",
       "selectors": {
         ".{{WRAPPER}} .blockish-button-link": "flex-direction: {{VALUE}};"
       }

@@ -2,51 +2,49 @@
 
 A single standalone SVG icon. **Accepts children: no.**
 
-| Attribute | Type | Default | Notes/enum |
-|---|---|---|---|
-| `icon` | Icon | 5-point star | |
-| `link` | Link | unset | Makes the icon a link |
-| `size` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} svg` -> `width: {{VALUE}}; height: {{VALUE}};` |
-| `color` | Color | unset | Normal <br>**CSS:** `.{{WRAPPER}} svg` -> `fill: {{VALUE}};` |
-| `hoverColor` | Color | unset | Hover <br>**CSS:** `.{{WRAPPER}} svg:hover` -> `fill: {{VALUE}};` |
-| `alignment` | Responsive | `{"Desktop":"center"}` | `"left"` `"center"` `"right"` <br>**CSS:** `.{{WRAPPER}}` -> `text-align: {{VALUE}};` |
-| `rotation` | Responsive | unset | Normal <br>**CSS:** `.{{WRAPPER}} svg` -> `transform: rotate({{VALUE}}deg);` |
-| `rotationHover` | Responsive | unset | Hover <br>**CSS:** `.{{WRAPPER}} svg:hover` -> `transform: rotate({{VALUE}}deg);` |
+#### Content / structure
 
-Minimal schema:
-```json
-{ "name": "blockish/icon", "attributes": {} }
-```
+| Attribute | Type | Notes |
+|---|---|---|
+| `icon` | Icon | Default 5-point star (`viewBox` + `path`). Prefer `get-icons`. |
+| `link` | Link | When set with `href`, root becomes `<a>`. |
+| `anchor` / `align` | Scalar | `"align"`: `"wide"` \| `"full"`. |
 
----
+#### Markup
 
+Default (empty attributes — default star icon, no link):
 
-
-### Markup & CSS Generation
-
-**Generated HTML Structure:**
 ```html
-<!-- The wrapper tag is <a> if a link is provided, otherwise it defaults to <div> -->
-<a class="blockish-icon" href="..." target="_blank" rel="noopener noreferrer">
-  
-  <!-- The icon <svg> is ONLY rendered if `icon` attribute exists AND has both `viewBox` and `path` -->
-  <svg class="blockish-icon" fill="currentColor" width="24" height="24">...</svg>
-
-</a>
+<div class="wp-block-blockish-icon blockish-icon">
+  <svg class="blockish-icon" width="24" height="24" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true" fill="currentColor">
+    <path d="…"></path>
+  </svg>
+</div>
 ```
 
-**Base CSS (`style.scss`):**
-```scss
-.blockish-icon{
-    line-height: 1;
-    svg{
-        transition: all .2s ease-in-out;
-        pointer-events: all !important;
-    }
-}
+| When | What changes |
+|---|---|
+| `link` with URL | Root element is `<a class="… blockish-icon" href="…" …>` instead of `<div>`. |
+| Custom `icon` | SVG `viewBox` / `path` (or custom SVG markup when `viewBox` is `"custom"`). |
 
-a.blockish-icon{
-    text-decoration: none;
-    display: block;
+Style with convert-css against `.blockish-icon` / `.blockish-icon svg` — not invented markup.
+
+#### Already-there CSS
+
+Stylesheet + defaults (omit = these already apply). Write only what differs.
+
+```css
+:where(.blockish-icon) { text-align: center; }
+.blockish-icon { line-height: 1; }
+.blockish-icon svg { pointer-events: all !important; transition: all .2s ease-in-out; }
+a.blockish-icon { display: block; text-decoration: none; }
+```
+
+#### Minimal schema
+
+```json
+{
+  "name": "blockish/icon",
+  "attributes": {}
 }
 ```

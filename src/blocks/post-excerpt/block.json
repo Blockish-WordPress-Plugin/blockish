@@ -6,7 +6,12 @@
   "title": "Post Excerpt",
   "category": "blockish-framework",
   "description": "Displays the current post excerpt with an optional read-more link.",
-  "keywords": ["blockish", "post", "excerpt", "summary"],
+  "keywords": [
+    "blockish",
+    "post",
+    "excerpt",
+    "summary"
+  ],
   "textdomain": "blockish",
   "attributes": {
     "excerptLength": {
@@ -23,9 +28,6 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "left"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }
@@ -56,12 +58,19 @@
       }
     }
   },
-  "usesContext": ["postId", "postType"],
+  "usesContext": [
+    "postId",
+    "postType"
+  ],
   "supports": {
     "html": false,
     "anchor": true,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   },
   "editorScript": "file:./index.js",
+  "style": "file:./style-index.css",
   "render": "file:./render.php"
 }

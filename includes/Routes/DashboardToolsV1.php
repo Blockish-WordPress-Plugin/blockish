@@ -2,6 +2,7 @@
 
 namespace Blockish\Routes;
 
+use Blockish\Extensions\ClassUsage;
 use WP_REST_Controller;
 use WP_REST_Request;
 
@@ -43,6 +44,52 @@ class DashboardToolsV1 extends WP_REST_Controller {
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'cleanup_schemas' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/class-manager/panel',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'get_class_manager_panel' ),
+					'permission_callback' => array( $this, 'panel_permissions_check' ),
+				),
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'create_class_manager_panel_item' ),
+					'permission_callback' => array( $this, 'panel_permissions_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/class-manager/panel/bulk-delete',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'bulk_delete_class_manager_panel_items' ),
+					'permission_callback' => array( $this, 'panel_permissions_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/class-manager/panel/(?P<id>\d+)',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'rename_class_manager_panel_item' ),
+					'permission_callback' => array( $this, 'panel_permissions_check' ),
+				),
+				array(
+					'methods'             => 'DELETE',
+					'callback'            => array( $this, 'delete_class_manager_panel_item' ),
+					'permission_callback' => array( $this, 'panel_permissions_check' ),
 				),
 			)
 		);
@@ -107,6 +154,20 @@ class DashboardToolsV1 extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/class-manager/import',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'import_class_manager_dependency' ),
+					'permission_callback' => function () {
+						return current_user_can( 'edit_posts' );
+					},
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/' . $this->rest_base . '/seo-settings',
 			array(
 				array(
@@ -132,6 +193,228 @@ class DashboardToolsV1 extends WP_REST_Controller {
 
 	public function permissions_check() {
 		return current_user_can( 'manage_options' );
+	}
+
+	public function panel_permissions_check() {
+		return current_user_can( 'edit_posts' );
+	}
+
+	public function get_class_manager_panel() {
+		return rest_ensure_response(
+			array(
+				'status' => 'success',
+				'panel'  => ClassUsage::panel_data(),
+			)
+		);
+	}
+
+	public function create_class_manager_panel_item( WP_REST_Request $request ) {
+		$title = sanitize_text_field( (string) $request->get_param( 'title' ) );
+		if ( '' === $title ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Class name is required.',
+				)
+			);
+		}
+
+		$slug = $this->normalize_class_slug( $title );
+		if ( '' === $slug ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Invalid class name. Use lowercase letters, numbers, hyphens, and underscores; must start with a letter or underscore.',
+				)
+			);
+		}
+
+		if ( $slug !== strtolower( trim( $title ) ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Class name must already be a valid CSS slug (e.g. hero-card). Spaces and uppercase are not allowed.',
+				)
+			);
+		}
+
+		foreach ( ClassUsage::parent_classes() as $row ) {
+			if ( $row['slug'] === $slug ) {
+				return rest_ensure_response(
+					array(
+						'status'  => 'fail',
+						'message' => 'Class already exists.',
+					)
+				);
+			}
+		}
+
+		$created_id = wp_insert_post(
+			array(
+				'post_type'    => 'blockish-classes',
+				'post_status'  => 'publish',
+				'post_title'   => $slug,
+				'post_content' => '{}',
+				'post_parent'  => 0,
+			),
+			true
+		);
+
+		if ( is_wp_error( $created_id ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => $created_id->get_error_message(),
+				)
+			);
+		}
+
+		return rest_ensure_response(
+			array(
+				'status'  => 'success',
+				'post_id' => (int) $created_id,
+				'panel'   => ClassUsage::panel_data(),
+			)
+		);
+	}
+
+	public function rename_class_manager_panel_item( WP_REST_Request $request ) {
+		$id = absint( $request['id'] );
+		if ( $id <= 0 || 'blockish-classes' !== get_post_type( $id ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Invalid class ID.',
+				)
+			);
+		}
+
+		if ( (int) wp_get_post_parent_id( $id ) > 0 ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Only parent classes can be renamed from the panel.',
+				)
+			);
+		}
+
+		$title = sanitize_text_field( (string) $request->get_param( 'title' ) );
+		if ( '' === $title ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Class name is required.',
+				)
+			);
+		}
+
+		$slug = $this->normalize_class_slug( $title );
+		if ( '' === $slug ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Invalid class name. Use lowercase letters, numbers, hyphens, and underscores; must start with a letter or underscore.',
+				)
+			);
+		}
+
+		if ( $slug !== strtolower( trim( $title ) ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Class name must already be a valid CSS slug (e.g. hero-card). Spaces and uppercase are not allowed.',
+				)
+			);
+		}
+
+		foreach ( ClassUsage::parent_classes() as $row ) {
+			if ( (int) $row['post_id'] !== $id && $row['slug'] === $slug ) {
+				return rest_ensure_response(
+					array(
+						'status'  => 'fail',
+						'message' => 'Another class already uses this name.',
+					)
+				);
+			}
+		}
+
+		wp_update_post(
+			array(
+				'ID'         => $id,
+				'post_title' => $slug,
+			)
+		);
+
+		return rest_ensure_response(
+			array(
+				'status'  => 'success',
+				'post_id' => $id,
+				'panel'   => ClassUsage::panel_data(),
+			)
+		);
+	}
+
+	public function delete_class_manager_panel_item( WP_REST_Request $request ) {
+		$id = absint( $request['id'] );
+		if ( $id <= 0 || 'blockish-classes' !== get_post_type( $id ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Invalid class ID.',
+				)
+			);
+		}
+
+		if ( (int) wp_get_post_parent_id( $id ) > 0 ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'Only parent classes can be deleted from the panel.',
+				)
+			);
+		}
+
+		wp_delete_post( $id, true );
+
+		return rest_ensure_response(
+			array(
+				'status' => 'success',
+				'panel'  => ClassUsage::panel_data(),
+			)
+		);
+	}
+
+	public function bulk_delete_class_manager_panel_items( WP_REST_Request $request ) {
+		$raw_ids = $request->get_param( 'post_ids' );
+		if ( ! is_array( $raw_ids ) || empty( $raw_ids ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => 'No classes selected.',
+				)
+			);
+		}
+
+		$deleted = array();
+		foreach ( $raw_ids as $raw_id ) {
+			$id = absint( $raw_id );
+			if ( $id <= 0 || 'blockish-classes' !== get_post_type( $id ) ) {
+				continue;
+			}
+			if ( (int) wp_get_post_parent_id( $id ) > 0 ) {
+				continue;
+			}
+			wp_delete_post( $id, true );
+			$deleted[] = $id;
+		}
+
+		return rest_ensure_response(
+			array(
+				'status'  => 'success',
+				'deleted' => $deleted,
+				'panel'   => ClassUsage::panel_data(),
+			)
+		);
 	}
 
 	public function get_tools_data() {
@@ -502,6 +785,44 @@ class DashboardToolsV1 extends WP_REST_Controller {
 			array(
 				'status' => 'success',
 				'classManager' => $this->get_class_manager_items(),
+			)
+		);
+	}
+
+	/**
+	 * Import a Class Manager dependency (template library / cloud bundle).
+	 *
+	 * Accepts raw css (preferred) or structured content + children.
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public function import_class_manager_dependency( WP_REST_Request $request ) {
+		$result = \Blockish\Extensions\ClassUsage::import_class_dependency(
+			array(
+				'name'     => $request->get_param( 'name' ),
+				'title'    => $request->get_param( 'title' ),
+				'css'      => $request->get_param( 'css' ),
+				'content'  => $request->get_param( 'content' ),
+				'children' => $request->get_param( 'children' ),
+			)
+		);
+
+		if ( isset( $result['error'] ) ) {
+			return rest_ensure_response(
+				array(
+					'status'  => 'fail',
+					'message' => (string) $result['error'],
+				)
+			);
+		}
+
+		return rest_ensure_response(
+			array(
+				'status'  => 'success',
+				'id'      => (int) $result['post_id'],
+				'name'    => (string) $result['name'],
+				'created' => ! empty( $result['created'] ),
 			)
 		);
 	}

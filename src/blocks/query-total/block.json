@@ -6,7 +6,14 @@
   "title": "Query Total",
   "category": "blockish-framework",
   "description": "Displays the total number of results for the current query (search, archive, or blog).",
-  "keywords": ["blockish", "search", "results", "count", "total", "query"],
+  "keywords": [
+    "blockish",
+    "search",
+    "results",
+    "count",
+    "total",
+    "query"
+  ],
   "textdomain": "blockish",
   "attributes": {
     "displayType": {
@@ -26,7 +33,7 @@
     },
     "rangeFormat": {
       "type": "string",
-      "default": "Displaying {start} – {end} of {total}"
+      "default": "Displaying {start} \u2013 {end} of {total}"
     },
     "rangeFormatSingle": {
       "type": "string",
@@ -41,9 +48,6 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "left"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }
@@ -85,7 +89,10 @@
   "supports": {
     "html": false,
     "anchor": true,
-    "align": ["wide", "full"]
+    "align": [
+      "wide",
+      "full"
+    ]
   },
   "usesContext": [
     "blockish-dynamicity/loopContext",

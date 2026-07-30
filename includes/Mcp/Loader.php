@@ -19,6 +19,9 @@ class Loader
         // Expose each public ability as its own MCP tool (skip generic adapter bridge tools).
         add_filter('mcp_adapter_default_server_config', [$this, 'expose_abilities_as_mcp_tools']);
 
+        // Third-party abilities can ship schemas that break strict clients; repair them on the way out.
+        add_filter('mcp_adapter_tools_list', [SchemaSanitizer::class, 'sanitize_tools'], 10, 2);
+
         // Schema helpers (validation/warnings) — no longer registers pending meta storage.
         BlockSchemaMeta::get_instance();
     }
@@ -88,6 +91,7 @@ class Loader
         Abilities\GetRevisions\Config::class,
         Abilities\RestoreRevision\Config::class,
         Abilities\GetClasses\Config::class,
+        Abilities\GetClassUsage\Config::class,
         Abilities\ManageClass\Config::class,
         Abilities\BlockDocs\Config::class,
         Abilities\GetClassManagerDocs\Config::class,
@@ -112,6 +116,7 @@ class Loader
         Abilities\ManageGlobalInteractions\Config::class,
         Abilities\TriggerRefresh\Config::class,
         Abilities\JsonHelper\Config::class,
+        Abilities\ConvertCss\Config::class,
         Abilities\GetMagicLogin\Config::class,
     ];
 

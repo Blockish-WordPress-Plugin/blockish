@@ -97,3 +97,7 @@
 html.blockish-lightbox-open {
 	overflow: hidden;
 }
+
+:where(.blockish-image-wrapper) {
+	text-align: center;
+}

@@ -56,9 +56,10 @@
     margin-right: unset;
 }
 
-// Top-level flex containers default to center. Nested containers have no
-// align/justify default (:where keeps specificity 0 so attribute CSS wins).
+// Flex defaults live here at specificity 0 (:where) so Class Manager / attribute
+// CSS can override. Attribute defaults must not emit high-specificity rules.
 :where(.wp-block-blockish-container.blockish-container.layout-type-flex) {
+    flex-direction: row;
     justify-content: center;
     align-items: center;
 }
@@ -66,4 +67,37 @@
 :where(.wp-block-blockish-container .wp-block-blockish-container.blockish-container.layout-type-flex) {
     justify-content: initial;
     align-items: initial;
+}
+
+:where(.wp-block-blockish-container) {
+    min-height: 0;
+}
+
+:where(.wp-block-blockish-container > .block-list-appender) {
+    min-height: 0;
+}
+
+:where(.wp-block-blockish-container.align-custom-width) {
+    max-width: 100%;
+}
+
+:where(.wp-block-blockish-container.blockish-container.layout-type-grid.grid-layout-type-auto) {
+    grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
+}
+
+:where(.wp-block-blockish-container.blockish-container.layout-type-grid.grid-layout-type-fixed) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(1, minmax(0, 1fr));
+}
+
+@media (max-width: 1024px) {
+    :where(.wp-block-blockish-container.blockish-container.layout-type-grid.grid-layout-type-fixed) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    :where(.wp-block-blockish-container.blockish-container.layout-type-grid.grid-layout-type-fixed) {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
 }

@@ -5,17 +5,19 @@
   "version": "1.1.0",
   "title": "Carousel Slide",
   "category": "blockish-framework",
-  "description": "A single slide inside a Carousel. Limited content blocks only — use the slide’s own background/layout (no nested Container).",
-  "parent": ["blockish/carousel"],
-  "keywords": ["blockish", "carousel", "slide", "slider"],
+  "description": "A single slide inside a Carousel. Limited content blocks only \u2014 use the slide\u2019s own background/layout (no nested Container).",
+  "parent": [
+    "blockish/carousel"
+  ],
+  "keywords": [
+    "blockish",
+    "carousel",
+    "slide",
+    "slider"
+  ],
   "attributes": {
     "minHeight": {
       "type": "object",
-      "default": {
-        "Desktop": "360px",
-        "Tablet": "320px",
-        "Mobile": "280px"
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-carousel__slide": "min-height: {{VALUE}};",
         ".{{WRAPPER}} .blockish-carousel__slide-inner": "min-height: {{VALUE}};"
@@ -23,71 +25,30 @@
     },
     "padding": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "top": "48px",
-          "right": "40px",
-          "bottom": "48px",
-          "left": "40px"
-        },
-        "Tablet": {
-          "top": "40px",
-          "right": "28px",
-          "bottom": "40px",
-          "left": "28px"
-        },
-        "Mobile": {
-          "top": "32px",
-          "right": "20px",
-          "bottom": "32px",
-          "left": "20px"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-carousel__slide-inner": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
       }
     },
     "flexDirection": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "label": "Column",
-          "value": "column"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-carousel__slide-inner": "flex-direction: {{VALUE}};"
       }
     },
     "alignItems": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "label": "Center",
-          "value": "center"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-carousel__slide-inner": "align-items: {{VALUE}};"
       }
     },
     "justifyContent": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "label": "Center",
-          "value": "center"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-carousel__slide-inner": "justify-content: {{VALUE}};"
       }
     },
     "gap": {
       "type": "object",
-      "default": {
-        "Desktop": "16px"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-carousel__slide-inner": "gap: {{VALUE}};"
       }

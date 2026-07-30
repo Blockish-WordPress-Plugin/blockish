@@ -6,7 +6,13 @@
   "title": "Post Title",
   "category": "blockish-framework",
   "description": "Displays the current post title with optional permalink.",
-  "keywords": ["blockish", "post", "title", "heading", "dynamic"],
+  "keywords": [
+    "blockish",
+    "post",
+    "title",
+    "heading",
+    "dynamic"
+  ],
   "textdomain": "blockish",
   "attributes": {
     "tag": {
@@ -26,9 +32,6 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "left"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }
