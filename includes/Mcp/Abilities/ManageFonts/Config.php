@@ -78,7 +78,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_theme_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use this to install new fonts. You must provide a direct URL to the font file in the src parameter of each fontFace. WordPress will download the font file and save it locally.',
+                'usage_notes' => 'Use this to install new fonts. You must provide a direct URL to the font file in the src parameter of each fontFace. WordPress will download the font file and save it locally. CRITICAL: If a font is already installed (exists in blockish-get-fonts installed_fonts) but is just deactivated from the UI, do NOT use this tool to install it again, as it will create duplicates. Instead, use blockish-manage-theme-json to add the existing font back to the wp_global_styles custom fontFamilies array.',
             ],
         ];
     }

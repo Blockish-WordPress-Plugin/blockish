@@ -219,12 +219,19 @@ class Callbacks
             }
         }
 
-        $post_name = 'wp-global-styles-' . urlencode(wp_get_theme()->get_stylesheet());
         $args = [
             'post_type' => 'wp_global_styles',
-            'name' => $post_name,
             'posts_per_page' => 1,
-            'post_status' => 'publish'
+            'post_status' => 'publish',
+            'ignore_sticky_posts' => true,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+            'tax_query' => [
+                [
+                    'taxonomy' => 'wp_theme',
+                    'field'    => 'name',
+                    'terms'    => wp_get_theme()->get_stylesheet(),
+                ],
+            ],
         ];
         $query = new \WP_Query($args);
         $post = !empty($query->posts) ? $query->posts[0] : null;
