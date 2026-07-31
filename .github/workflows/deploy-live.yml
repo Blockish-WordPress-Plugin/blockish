@@ -26,6 +26,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          
+      - name: Optimize Composer for Production
+        run: composer install --no-dev --optimize-autoloader
+
       - name: Build assets
         run: npm run build
 

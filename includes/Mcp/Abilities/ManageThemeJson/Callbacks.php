@@ -185,12 +185,30 @@ class Callbacks
 
     private static function replace_preset_leaves(array $final_data, array $incoming): array
     {
+        $origins = ['default', 'blocks', 'theme', 'custom'];
+        
         foreach (self::preset_paths() as $path) {
             $value = self::array_get($incoming, $path);
             if (!is_array($value)) {
                 continue;
             }
-            self::array_set($final_data, $path, $value);
+            
+            $has_origin = false;
+            foreach ($origins as $origin) {
+                if (isset($value[$origin])) {
+                    $has_origin = true;
+                    $current = self::array_get($final_data, $path) ?: [];
+                    if (!is_array($current)) {
+                        $current = [];
+                    }
+                    $current[$origin] = $value[$origin];
+                    self::array_set($final_data, $path, $current);
+                }
+            }
+            
+            if (!$has_origin) {
+                self::array_set($final_data, $path, $value);
+            }
         }
 
         return $final_data;

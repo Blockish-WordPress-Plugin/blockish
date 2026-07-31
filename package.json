@@ -17,7 +17,7 @@
 		"start": "wp-scripts start",
 		"start-hot": "wp-scripts start --hot",
 		"make-pot": "npx @wp-blocks/make-pot --exclude=node_modules,vendor,src",
-		"publish": "npm run build && npm run make-pot && npm run plugin-zip"
+		"publish": "composer install --no-dev --optimize-autoloader && npm run build && npm run make-pot && npm run plugin-zip && composer install"
 	},
 	"files": [
 		"blockish.php",
