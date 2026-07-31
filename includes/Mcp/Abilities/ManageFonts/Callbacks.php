@@ -44,10 +44,10 @@ class Callbacks
                 'post_title' => sanitize_text_field($args['name']),
                 'post_name' => $slug,
                 'post_status' => 'publish',
-                'post_content' => wp_json_encode([
+                'post_content' => wp_slash(wp_json_encode([
                     'fontFamily' => $args['fontFamily'],
                     'preview' => ''
-                ])
+                ]))
             ]);
 
             if (is_wp_error($family_id)) {
@@ -128,13 +128,13 @@ class Callbacks
                 'post_title' => $face_title,
                 'post_name' => $face_slug,
                 'post_status' => 'publish',
-                'post_content' => wp_json_encode($face_content)
+                'post_content' => wp_slash(wp_json_encode($face_content))
             ]);
 
             $installed_faces++;
         }
 
-        self::update_global_styles_font($slug, $args['name'], $args['fontFamily'], $args['fontFace']);
+        self::update_global_styles_font($slug, $args['name'], $args['fontFamily'], $family_id);
 
         return [
             'id' => $family_id,
@@ -192,7 +192,7 @@ class Callbacks
         ];
     }
 
-    private static function update_global_styles_font($slug, $name, $fontFamily, $fontFaces)
+    private static function update_global_styles_font($slug, $name, $fontFamily, $family_id)
     {
         $new_font = [
             'fontFamily' => $fontFamily,
@@ -201,20 +201,10 @@ class Callbacks
             'fontFace' => []
         ];
 
-        // Format fontFace for theme.json
-        foreach ($fontFaces as $face) {
-            if (empty($face['src'])) continue;
-            
-            // Get the local src URL that we saved
-            $wp_upload_dir = wp_upload_dir();
-            $fonts_url = $wp_upload_dir['baseurl'] . '/fonts';
-            $filename = sanitize_file_name(basename(wp_parse_url($face['src'], PHP_URL_PATH)));
-        }
-        
         // Quick fetch of the newly created faces to get their correct local src
         $faces = get_posts([
             'post_type' => 'wp_font_face',
-            'post_parent' => get_page_by_path($slug, OBJECT, 'wp_font_family')->ID ?? 0,
+            'post_parent' => $family_id,
             'posts_per_page' => -1,
             'post_status' => 'publish'
         ]);
