@@ -195,10 +195,13 @@ class Callbacks
     private static function update_global_styles_font($slug, $name, $fontFamily, $family_id)
     {
         $new_font = [
-            'fontFamily' => $fontFamily,
+            'id' => (int) $family_id,
             'name' => $name,
             'slug' => $slug,
-            'fontFace' => []
+            'fontFamily' => $fontFamily,
+            'preview' => '',
+            'fontFace' => [],
+            'source' => 'custom'
         ];
 
         // Quick fetch of the newly created faces to get their correct local src
