@@ -47,6 +47,7 @@ class Callbacks
                 }
             }
             if ( count( $tax_query ) > 1 ) {
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
                 $query_args['tax_query'] = $tax_query;
             }
         }

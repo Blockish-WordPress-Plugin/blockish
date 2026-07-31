@@ -10,4 +10,212 @@ return array(
 		'version' => '5.0.20',
 		'path'    => $vendorDir . '/automattic/jetpack-autoloader/src/AutoloadGenerator.php'
 	),
+	'PHPCSUtils\\AbstractSniffs\\AbstractArrayDeclarationSniff' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/AbstractSniffs/AbstractArrayDeclarationSniff.php'
+	),
+	'PHPCSUtils\\BackCompat\\BCFile' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/BackCompat/BCFile.php'
+	),
+	'PHPCSUtils\\BackCompat\\BCTokens' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/BackCompat/BCTokens.php'
+	),
+	'PHPCSUtils\\BackCompat\\Helper' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/BackCompat/Helper.php'
+	),
+	'PHPCSUtils\\Exceptions\\InvalidTokenArray' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/InvalidTokenArray.php'
+	),
+	'PHPCSUtils\\Exceptions\\LogicException' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/LogicException.php'
+	),
+	'PHPCSUtils\\Exceptions\\MissingArgumentError' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/MissingArgumentError.php'
+	),
+	'PHPCSUtils\\Exceptions\\OutOfBoundsStackPtr' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/OutOfBoundsStackPtr.php'
+	),
+	'PHPCSUtils\\Exceptions\\RuntimeException' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/RuntimeException.php'
+	),
+	'PHPCSUtils\\Exceptions\\TestFileNotFound' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/TestFileNotFound.php'
+	),
+	'PHPCSUtils\\Exceptions\\TestMarkerNotFound' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/TestMarkerNotFound.php'
+	),
+	'PHPCSUtils\\Exceptions\\TestTargetNotFound' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/TestTargetNotFound.php'
+	),
+	'PHPCSUtils\\Exceptions\\TypeError' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/TypeError.php'
+	),
+	'PHPCSUtils\\Exceptions\\UnexpectedTokenType' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/UnexpectedTokenType.php'
+	),
+	'PHPCSUtils\\Exceptions\\ValueError' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Exceptions/ValueError.php'
+	),
+	'PHPCSUtils\\Fixers\\SpacesFixer' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Fixers/SpacesFixer.php'
+	),
+	'PHPCSUtils\\Internal\\AttributeHelper' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Internal/AttributeHelper.php'
+	),
+	'PHPCSUtils\\Internal\\Cache' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Internal/Cache.php'
+	),
+	'PHPCSUtils\\Internal\\IsShortArrayOrList' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Internal/IsShortArrayOrList.php'
+	),
+	'PHPCSUtils\\Internal\\IsShortArrayOrListWithCache' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Internal/IsShortArrayOrListWithCache.php'
+	),
+	'PHPCSUtils\\Internal\\NoFileCache' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Internal/NoFileCache.php'
+	),
+	'PHPCSUtils\\Internal\\StableCollections' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Internal/StableCollections.php'
+	),
+	'PHPCSUtils\\TestUtils\\ConfigDouble' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/TestUtils/ConfigDouble.php'
+	),
+	'PHPCSUtils\\TestUtils\\RulesetDouble' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/TestUtils/RulesetDouble.php'
+	),
+	'PHPCSUtils\\TestUtils\\UtilityMethodTestCase' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/TestUtils/UtilityMethodTestCase.php'
+	),
+	'PHPCSUtils\\Tokens\\Collections' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Tokens/Collections.php'
+	),
+	'PHPCSUtils\\Tokens\\TokenHelper' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Tokens/TokenHelper.php'
+	),
+	'PHPCSUtils\\Utils\\Arrays' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Arrays.php'
+	),
+	'PHPCSUtils\\Utils\\AttributeBlock' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/AttributeBlock.php'
+	),
+	'PHPCSUtils\\Utils\\Conditions' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Conditions.php'
+	),
+	'PHPCSUtils\\Utils\\Constants' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Constants.php'
+	),
+	'PHPCSUtils\\Utils\\Context' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Context.php'
+	),
+	'PHPCSUtils\\Utils\\ControlStructures' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/ControlStructures.php'
+	),
+	'PHPCSUtils\\Utils\\FileInfo' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/FileInfo.php'
+	),
+	'PHPCSUtils\\Utils\\FilePath' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/FilePath.php'
+	),
+	'PHPCSUtils\\Utils\\FunctionDeclarations' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/FunctionDeclarations.php'
+	),
+	'PHPCSUtils\\Utils\\GetTokensAsString' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/GetTokensAsString.php'
+	),
+	'PHPCSUtils\\Utils\\Lists' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Lists.php'
+	),
+	'PHPCSUtils\\Utils\\MessageHelper' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/MessageHelper.php'
+	),
+	'PHPCSUtils\\Utils\\Namespaces' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Namespaces.php'
+	),
+	'PHPCSUtils\\Utils\\NamingConventions' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/NamingConventions.php'
+	),
+	'PHPCSUtils\\Utils\\Numbers' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Numbers.php'
+	),
+	'PHPCSUtils\\Utils\\ObjectDeclarations' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/ObjectDeclarations.php'
+	),
+	'PHPCSUtils\\Utils\\Operators' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Operators.php'
+	),
+	'PHPCSUtils\\Utils\\Orthography' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Orthography.php'
+	),
+	'PHPCSUtils\\Utils\\Parentheses' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Parentheses.php'
+	),
+	'PHPCSUtils\\Utils\\PassedParameters' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/PassedParameters.php'
+	),
+	'PHPCSUtils\\Utils\\Scopes' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Scopes.php'
+	),
+	'PHPCSUtils\\Utils\\TextStrings' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/TextStrings.php'
+	),
+	'PHPCSUtils\\Utils\\TypeString' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/TypeString.php'
+	),
+	'PHPCSUtils\\Utils\\UseStatements' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/UseStatements.php'
+	),
+	'PHPCSUtils\\Utils\\Variables' => array(
+		'version' => '1.2.3.0',
+		'path'    => $vendorDir . '/phpcsstandards/phpcsutils/PHPCSUtils/Utils/Variables.php'
+	),
 );

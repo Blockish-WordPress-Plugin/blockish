@@ -8,6 +8,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
 use Blockish\Core\Utilities;
 
 $blockish_post_info_post_id = isset( $block->context['postId'] )

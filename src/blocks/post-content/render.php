@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+
 /**
  * Post Content — server render.
  *
@@ -29,6 +31,7 @@ $GLOBALS['blockish_post_content_rendering'][ $blockish_content_post_id ] = true;
 
 try {
 	$blockish_post_content = apply_filters(
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		'the_content',
 		str_replace( ']]>', ']]&gt;', $blockish_content_post->post_content )
 	);

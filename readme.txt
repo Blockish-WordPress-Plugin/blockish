@@ -1,13 +1,13 @@
-=== Blockish – MCP AI Site Builder for Gutenberg ===
+=== Blockish – MCP AI Site Builder for Block Editor ===
 Author: wowdevs
 Author URI: https://wowdevs.com/
 Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
-Tested up to: 7.0.2
+Tested up to: 7.0
 Stable tag: 1.2.0
-Requires at least: 6.1
+Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ Build sites with AI via MCP (Cursor, Claude). 30+ Gutenberg blocks, Class Manage
 
 == Description ==
 
-**Blockish connects MCP-compatible AI assistants to the Gutenberg editor** so you can design real WordPress layouts with natural language — not just edit posts or run admin tasks.
+**Blockish connects MCP-compatible AI assistants to the Block Editor** so you can design real WordPress layouts with natural language — not just edit posts or run admin tasks.
 
 Connect Cursor, Claude Desktop, Windsurf, or another MCP client, then ask for a section or page. Blockish gives the AI **30+ structured Gutenberg blocks** and a **Class Manager** for reusable CSS, so generated layouts stay clean, responsive, and editable in the native block sidebar.
 

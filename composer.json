@@ -21,7 +21,17 @@
     },
     "config": {
         "allow-plugins": {
-            "automattic/jetpack-autoloader": true
+            "automattic/jetpack-autoloader": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^4.0",
+        "wp-coding-standards/wpcs": "dev-phpcs-4",
+        "phpcompatibility/phpcompatibility-wp": "^3.0@alpha"
+    },
+    "scripts": {
+        "phpcs": "phpcs",
+        "phpcbf": "phpcbf"
     }
 }

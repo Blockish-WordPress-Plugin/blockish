@@ -55,6 +55,7 @@ class Callbacks
             'name'           => $slug,
             'post_status'    => 'publish',
             'posts_per_page' => 1,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
             'tax_query'      => [
                 [
                     'taxonomy' => 'wp_theme',

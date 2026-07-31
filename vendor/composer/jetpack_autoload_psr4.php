@@ -14,6 +14,10 @@ return array(
 		'version' => '0.5.0.0',
 		'path'    => array( $vendorDir . '/wordpress/mcp-adapter/includes' )
 	),
+	'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => array(
+		'version' => '1.2.1.0',
+		'path'    => array( $vendorDir . '/dealerdirect/phpcodesniffer-composer-installer/src' )
+	),
 	'Blockish\\' => array(
 		'version' => 'dev-main',
 		'path'    => array( $baseDir . '/includes' )

@@ -99,7 +99,7 @@ class Dashboard {
             'freemius-checkout',
             'https://checkout.freemius.com/checkout.min.js',
             array(),
-            null,
+            BLOCKISH_VERSION,
             true
         );
 

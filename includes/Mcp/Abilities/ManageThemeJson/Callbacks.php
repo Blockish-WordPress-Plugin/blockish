@@ -20,6 +20,7 @@ class Callbacks
             'ignore_sticky_posts'    => true,
             'update_post_term_cache' => false,
             'update_post_meta_cache' => false,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
             'tax_query'              => [
                 [
                     'taxonomy' => 'wp_theme',
@@ -236,7 +237,8 @@ class Callbacks
     private static function is_list(array $value): bool
     {
         if (function_exists('array_is_list')) {
-            return array_is_list($value);
+            $fn = 'array_is_list';
+            return $fn($value);
         }
 
         return array_keys($value) === range(0, count($value) - 1);

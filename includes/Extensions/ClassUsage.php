@@ -74,7 +74,9 @@ class ClassUsage {
 		";
 
 		$params   = array_merge( $type_params, array( '%"classManager"%', '%"classManagerSubselector"%' ) );
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$prepared = $wpdb->prepare( $sql, $params );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$ids      = $wpdb->get_col( $prepared );
 
 		if ( empty( $ids ) ) {

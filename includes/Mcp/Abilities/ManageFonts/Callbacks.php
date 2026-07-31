@@ -51,6 +51,7 @@ class Callbacks
             ]);
 
             if (is_wp_error($family_id)) {
+                // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
                 throw new \Exception('Failed to create font family: ' . $family_id->get_error_message());
             }
         }
@@ -75,6 +76,7 @@ class Callbacks
             // Download file
             $tmp_file = download_url($src_url);
             if (is_wp_error($tmp_file)) {
+                // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
                 throw new \Exception('Failed to download font file: ' . $tmp_file->get_error_message());
             }
 
@@ -83,11 +85,11 @@ class Callbacks
             $fonts_url = $wp_upload_dir['baseurl'] . '/fonts';
 
             if (!wp_mkdir_p($fonts_dir)) {
-                @unlink($tmp_file);
+                wp_delete_file($tmp_file);
                 continue;
             }
 
-            $filename = basename(parse_url($src_url, PHP_URL_PATH));
+            $filename = basename(wp_parse_url($src_url, PHP_URL_PATH));
             // Sanitize filename
             $filename = sanitize_file_name($filename);
             
@@ -103,7 +105,7 @@ class Callbacks
             }
 
             $wp_filesystem->copy($tmp_file, $dest_file);
-            @unlink($tmp_file);
+            wp_delete_file($tmp_file);
 
             $local_src_url = $fonts_url . '/' . $filename;
 
@@ -206,7 +208,7 @@ class Callbacks
             // Get the local src URL that we saved
             $wp_upload_dir = wp_upload_dir();
             $fonts_url = $wp_upload_dir['baseurl'] . '/fonts';
-            $filename = sanitize_file_name(basename(parse_url($face['src'], PHP_URL_PATH)));
+            $filename = sanitize_file_name(basename(wp_parse_url($face['src'], PHP_URL_PATH)));
         }
         
         // Quick fetch of the newly created faces to get their correct local src

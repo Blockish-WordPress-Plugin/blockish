@@ -358,7 +358,7 @@ class ClassManager {
 
 		$handle = 'blockish-class-manager-inline';
 		if ( ! wp_style_is( $handle, 'registered' ) ) {
-			wp_register_style( $handle, false, array(), null );
+			wp_register_style( $handle, false, array(), BLOCKISH_VERSION );
 		}
 		wp_enqueue_style( $handle );
 		wp_add_inline_style( $handle, $styles );

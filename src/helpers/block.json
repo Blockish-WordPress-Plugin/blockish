@@ -1,3 +1,4 @@
 {
-	"editorScript": "file:./index.js"
+  "apiVersion": 3,
+  "editorScript": "file:./index.js"
 }

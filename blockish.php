@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Plugin Name:       Blockish – MCP AI Site Builder for Gutenberg
+ * Plugin Name:       Blockish – MCP AI Site Builder for Block Editor
  * Description:       Build sites with AI via MCP (Cursor, Claude). 30+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
- * Requires at least: 6.1
+ * Requires at least: 6.2
  * Requires PHP:      7.4
  * Version:           1.2.0
  * Author:            wowdevs

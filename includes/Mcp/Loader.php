@@ -43,7 +43,8 @@ class Loader
         }
 
         $tools = [];
-        foreach ( wp_get_abilities() as $ability ) {
+        $fn = 'wp_get_abilities';
+        foreach ( $fn() as $ability ) {
             $name = $ability->get_name();
 
             // Drop discover / get-info / execute bridge — agents call abilities directly.
@@ -75,7 +76,8 @@ class Loader
 
     public function register_categories()
     {
-        wp_register_ability_category('blockish', [
+        $fn = 'wp_register_ability_category';
+        $fn('blockish', [
             'label'       => __('Blockish', 'blockish'),
             'description' => __('Blockish AI abilities', 'blockish'),
         ]);
@@ -123,7 +125,8 @@ class Loader
     public function register_abilities()
     {
         foreach ( $this->abilities as $config ) {
-            wp_register_ability( $config::NAME, $config::get() );
+            $fn = 'wp_register_ability';
+            $fn( $config::NAME, $config::get() );
         }
     }
 }

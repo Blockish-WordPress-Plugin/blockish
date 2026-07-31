@@ -117,7 +117,7 @@ class AddonsList extends ConfigList {
             return true;
         }
 
-        $host = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '';
+        $host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
         if ( preg_match( '/\.(local|localhost|test)$/i', $host ) || $host === 'localhost' || $host === '127.0.0.1' ) {
             return true;
         }

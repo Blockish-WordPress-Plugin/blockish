@@ -20,6 +20,7 @@ class Config
                     'post_id'   => [ 'type' => 'integer', 'description' => 'Fetch this exact post, ignoring all other filters. NOTE: You MUST provide a post_id if you want to retrieve the full post content or schema.' ],
                     'post_type' => [ 'type' => 'string',  'description' => 'Post type slug. Defaults to "post".' ],
                     'search'    => [ 'type' => 'string',  'description' => 'Search term matched against title/content.' ],
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
                     'tax_query' => [
                         'type' => 'array',
                         'description' => 'Array of taxonomy query objects. Each object must have "taxonomy" (e.g. "category" or "post_tag") and "terms" (array of term slugs or IDs). Example: [{"taxonomy":"category", "terms":["news"]}]',
