@@ -1,7 +1,7 @@
 const generateBackgroundControlStyles = (background, device) => {
-    if (!background || typeof background !== 'string') return '';
+    if (!background || (typeof background !== 'string' && typeof background !== 'object')) return '';
 
-    const jsonBackground = JSON.parse(background);
+    const jsonBackground = typeof background === 'string' ? JSON.parse(background) : background;
     let styles = '';
     let backgroundType = jsonBackground['backgroundType'] || 'classic';
 

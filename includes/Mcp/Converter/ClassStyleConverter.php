@@ -79,6 +79,131 @@ class ClassStyleConverter {
 			return array( 'error' => implode( ' ', array_unique( $errors ) ) );
 		}
 
+		return self::build_tree_for_slug( $parsed['rules'], $parsed['raw_leftovers'], $slug );
+	}
+
+	/**
+	 * Convert a stylesheet that may declare several classes into one tree per
+	 * class. The class name is read from each rule's leftmost class selector,
+	 * so callers do not need to pass a name. `{{SELECTOR}}` is rejected here —
+	 * it has no name to derive; use css_to_class_tree with an explicit name.
+	 *
+	 * @return array{classes?: array<int, array{slug: string, name: string, content: array, children: array, css: string, mapped: string[], unmapped: string[]}>, error?: string}
+	 */
+	public static function css_to_class_trees( string $css ): array {
+		$css = trim( $css );
+		if ( '' === $css ) {
+			return array( 'classes' => array() );
+		}
+
+		if ( false !== strpos( $css, self::SELECTOR_TOKEN ) ) {
+			return array( 'error' => self::SELECTOR_TOKEN . ' has no class name to derive from. Use real ".class" selectors so the name can be read from the CSS, or pass an explicit name for a single class.' );
+		}
+
+		$parsed = CssParser::parse( $css );
+		$errors = array();
+		$groups = array(); // slug => array{ name: string, rules: array, leftovers: string[] }
+		$order  = array();
+
+		$ensure_group = static function ( string $slug, string $name ) use ( &$groups, &$order ): void {
+			if ( ! isset( $groups[ $slug ] ) ) {
+				$groups[ $slug ] = array(
+					'name'      => $name,
+					'rules'     => array(),
+					'leftovers' => array(),
+				);
+				$order[]         = $slug;
+			}
+		};
+
+		foreach ( $parsed['rules'] as $rule ) {
+			$root = self::root_class_of_selector( $rule['selector'] );
+			if ( '' === $root ) {
+				$errors[] = 'Selector "' . $rule['selector'] . '" must start with a class (e.g. .card, .card:hover, .card h2). Bare element / id / attribute selectors are not allowed.';
+				continue;
+			}
+			$slug = self::normalize_slug( $root );
+			if ( '' === $slug ) {
+				$errors[] = 'Class name in "' . $rule['selector'] . '" is not a valid CSS class (only a-z, 0-9, hyphen, underscore; start with a letter or underscore).';
+				continue;
+			}
+			$ensure_group( $slug, $root );
+			$groups[ $slug ]['rules'][] = $rule;
+		}
+
+		foreach ( $parsed['raw_leftovers'] as $leftover ) {
+			$leftover_slug = null;
+			if ( preg_match_all( '/([^{}@][^{]*)\{/', $leftover, $matches ) ) {
+				foreach ( $matches[1] as $sel_chunk ) {
+					foreach ( preg_split( '/\s*,\s*/', trim( $sel_chunk ) ) as $sel ) {
+						$sel = trim( $sel );
+						if ( '' === $sel || '@' === ( $sel[0] ?? '' ) ) {
+							continue;
+						}
+						$root = self::root_class_of_selector( $sel );
+						if ( '' === $root ) {
+							$errors[] = 'Selector "' . $sel . '" inside an at-rule must start with a class.';
+							continue;
+						}
+						$slug = self::normalize_slug( $root );
+						if ( '' === $slug ) {
+							continue;
+						}
+						if ( null === $leftover_slug ) {
+							$leftover_slug = $slug;
+							$ensure_group( $slug, $root );
+						} elseif ( $leftover_slug !== $slug ) {
+							$errors[] = 'An at-rule block targets more than one class ("' . $leftover_slug . '" and "' . $slug . '"). Split it so each at-rule scopes a single class.';
+						}
+					}
+				}
+			}
+			if ( null !== $leftover_slug ) {
+				$groups[ $leftover_slug ]['leftovers'][] = $leftover;
+			}
+		}
+
+		if ( ! empty( $errors ) ) {
+			return array( 'error' => implode( ' ', array_unique( $errors ) ) );
+		}
+
+		$classes = array();
+		foreach ( $order as $slug ) {
+			$group          = $groups[ $slug ];
+			$tree           = self::build_tree_for_slug( $group['rules'], $group['leftovers'], $slug );
+			$tree['slug']   = $slug;
+			$tree['name']   = $group['name'];
+			$classes[]      = $tree;
+		}
+
+		return array( 'classes' => $classes );
+	}
+
+	/**
+	 * Leftmost class token of a selector (without the dot), or '' when the
+	 * selector does not begin with a class. `.card h2` → `card`,
+	 * `.card:hover` → `card`, `div .card` / `#id` → ''.
+	 */
+	public static function root_class_of_selector( string $selector ): string {
+		$selector = preg_replace( '/\s+/', ' ', trim( (string) $selector ) );
+		if ( '' === $selector ) {
+			return '';
+		}
+		if ( preg_match( '/^\.([a-zA-Z_][a-zA-Z0-9_-]*)/', $selector, $match ) ) {
+			return $match[1];
+		}
+		return '';
+	}
+
+	/**
+	 * Build one parent + children tree from already-parsed rules/leftovers that
+	 * all belong to a single class slug.
+	 *
+	 * @param array<int, array{selector: string, declarations: array<string, string>, device: string}> $rules
+	 * @param string[] $leftovers
+	 * @return array{content: array, children: array, css: string, mapped: string[], unmapped: string[]}
+	 */
+	private static function build_tree_for_slug( array $rules, array $leftovers, string $slug ): array {
 		// Bucket rules by child name ('' = parent) then device.
 		$buckets = array(
 			'' => array(
@@ -89,7 +214,7 @@ class ClassStyleConverter {
 		);
 		$mapped = array();
 
-		foreach ( $parsed['rules'] as $rule ) {
+		foreach ( $rules as $rule ) {
 			$child_name = self::child_name_from_selector( $rule['selector'], $slug );
 			if ( ! isset( $buckets[ $child_name ] ) ) {
 				$buckets[ $child_name ] = array(
@@ -106,7 +231,7 @@ class ClassStyleConverter {
 		}
 
 		$parent_leftovers = array();
-		foreach ( $parsed['raw_leftovers'] as $leftover ) {
+		foreach ( $leftovers as $leftover ) {
 			$parent_leftovers[] = self::rewrite_selectors_in_css( $leftover, $slug );
 		}
 

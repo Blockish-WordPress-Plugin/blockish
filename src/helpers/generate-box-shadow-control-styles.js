@@ -44,7 +44,7 @@ const generateShadowControlStyles = (value, type = 'box') => {
     const cssProperty = normalizedType === 'text' ? 'text-shadow' : 'box-shadow';
 
     try {
-        const shadows = JSON.parse(value);
+        const shadows = typeof value === 'string' ? JSON.parse(value) : value;
         const shadowString = createShadowString(shadows, normalizedType);
 
         return shadowString ? `${cssProperty}: ${shadowString};` : '';

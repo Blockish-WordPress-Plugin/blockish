@@ -11,13 +11,14 @@ class Callbacks
         $delete     = $input['delete'] ?? false;
         $theme_json = $input['theme_json'] ?? null;
 
-        $post_name = 'wp-global-styles-' . urlencode(wp_get_theme()->get_stylesheet());
         $args      = [
             'post_type'              => 'wp_global_styles',
-            'name'                   => $post_name,
             'posts_per_page'         => 1,
-            'no_found_rows'          => true,
+            'post_status'            => 'publish',
             'ignore_sticky_posts'    => true,
+            'no_found_rows'          => true,
+            'order'                  => 'DESC',
+            'orderby'                => 'date',
             'update_post_term_cache' => false,
             'update_post_meta_cache' => false,
             // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
@@ -104,7 +105,7 @@ class Callbacks
         } else {
             $post_id = wp_insert_post([
                 'post_type'    => 'wp_global_styles',
-                'post_name'    => $post_name,
+                'post_name'    => 'wp-global-styles-' . urlencode(wp_get_theme()->get_stylesheet()),
                 'post_title'   => 'Custom Styles',
                 'post_status'  => 'publish',
                 'post_content' => $post_content,
@@ -153,6 +154,67 @@ class Callbacks
         }
         if (isset($theme_json['version']) && !is_numeric($theme_json['version'])) {
             return 'theme_json.version must be a number.';
+        }
+
+        // Deep validation for styles (AI often mistakenly passes objects instead of strings for values)
+        if (isset($theme_json['styles'])) {
+            $check_style_primitives = function($styles, $path = 'styles', $is_container = false) use (&$check_style_primitives) {
+                foreach ($styles as $k => $v) {
+                    $is_section = in_array($k, ['elements', 'blocks', 'color', 'typography', 'spacing', 'border'], true);
+                    if ($is_section || $is_container) {
+                        if (!is_array($v)) return "$path.$k must be an object.";
+                        // Elements and blocks contain arbitrary block/element names which act as containers
+                        $child_is_container = in_array($k, ['elements', 'blocks'], true);
+                        $res = $check_style_primitives($v, "$path.$k", $child_is_container);
+                        if ($res) return $res;
+                    } elseif (is_array($v) && !isset($v['top']) && !isset($v['bottom']) && !isset($v['left']) && !isset($v['right']) && $k !== 'css') {
+                        // e.g. styles.color.text should be a string, not an object. (padding/margin have top/bottom objects)
+                        return "$path.$k should be a primitive string, not an object.";
+                    }
+                }
+                return null;
+            };
+            $style_err = $check_style_primitives($theme_json['styles']);
+            if ($style_err) return $style_err;
+        }
+
+        // Deep validation for preset arrays (palette, fontFamilies)
+        if (isset($theme_json['settings'])) {
+            $check_presets = function($path_keys, $required_item_keys) use ($theme_json) {
+                $curr = $theme_json['settings'];
+                foreach ($path_keys as $k) {
+                    if (!isset($curr[$k])) return null;
+                    $curr = $curr[$k];
+                }
+                
+                // If it's an object with origins (theme/custom)
+                $lists_to_check = [];
+                if (is_array($curr) && !isset($curr[0])) {
+                    if (isset($curr['theme'])) $lists_to_check[] = $curr['theme'];
+                    if (isset($curr['custom'])) $lists_to_check[] = $curr['custom'];
+                } elseif (is_array($curr) && isset($curr[0])) {
+                    $lists_to_check[] = $curr; // flat array
+                }
+
+                foreach ($lists_to_check as $list) {
+                    if (!is_array($list)) return implode('.', array_merge(['settings'], $path_keys)) . " must contain arrays.";
+                    foreach ($list as $item) {
+                        if (!is_array($item)) return implode('.', array_merge(['settings'], $path_keys)) . " items must be objects.";
+                        foreach ($required_item_keys as $req) {
+                            if (!isset($item[$req])) {
+                                return implode('.', array_merge(['settings'], $path_keys)) . " items MUST have '$req' key.";
+                            }
+                        }
+                    }
+                }
+                return null;
+            };
+
+            $err = $check_presets(['color', 'palette'], ['color', 'slug']);
+            if ($err) return $err;
+
+            $err = $check_presets(['typography', 'fontFamilies'], ['fontFamily', 'slug']);
+            if ($err) return $err;
         }
 
         if (!isset($theme_json['settings']) && !isset($theme_json['styles']) && empty($theme_json['reset'])) {

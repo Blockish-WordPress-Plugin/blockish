@@ -187,11 +187,13 @@ Convert-css already puts unmapped rules into `customCss` — merge that output; 
 
 ## 5. Class Manager
 
-Prefer Class Manager over packing style attributes onto every block. Workflow: `get-class-manager-docs` → `get-classes` → `manage-class` raw `css` → attach by **name**:
+Prefer Class Manager over packing style attributes onto every block. Workflow: `get-class-manager-docs` → `get-classes` → `manage-class` with raw `css` → attach by **name**:
 
 ```json
 "classManager": "hero-card, section-title"
 ```
+
+`manage-class` reads the class name from the selector (`.hero-card { … }`), so you just send `css` — existing class → updated (full replace, resend the whole stylesheet), new → created. One css string may define several classes. On write, Blockish seeds the parent’s generated-CSS meta with the complete stylesheet so styles apply before the editor generator runs.
 
 - `get-class-usage` — where each class is used / unused list.
 - `manage-class` `{ "action": "sweep", "confirm": true }` — delete unused parents.

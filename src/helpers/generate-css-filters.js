@@ -9,9 +9,9 @@ const unitsForValues = {
     sepia: '%',
 }
 const generateCSSFilters = (value) => {
-    if (!value || typeof value != 'string') return '';
+    if (!value || (typeof value !== 'string' && typeof value !== 'object')) return '';
 
-    const filters = JSON.parse(value);
+    const filters = typeof value === 'string' ? JSON.parse(value) : value;
     let cssFilter = '';
 
     for (const filter in filters) {

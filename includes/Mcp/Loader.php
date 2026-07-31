@@ -112,6 +112,7 @@ class Loader
         Abilities\GetAutomationGuideline\Config::class,
         Abilities\GetIcons\Config::class,
         Abilities\GetFonts\Config::class,
+        Abilities\FetchGoogleFonts\Config::class,
         Abilities\ManageFonts\Config::class,
         Abilities\ManageOptions\Config::class,
         Abilities\ManageComments\Config::class,

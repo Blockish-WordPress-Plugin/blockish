@@ -37,7 +37,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_theme_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use this to see what fonts are currently available in the site. Returns both theme-provided fonts and manually installed fonts.',
+                'usage_notes' => 'Use this to see what fonts are currently available in the site. Returns both theme-provided fonts and manually installed fonts. Note: To verify if a font is active or deactivated, cross-reference this tool with blockish-get-theme-json-docs. If a font is in `installed_fonts` here but NOT in the active theme.json custom fontFamilies, it means the font is currently DEACTIVATED. If it is in both, it is ACTIVE.',
             ],
         ];
     }
