@@ -9,6 +9,7 @@ export default function EmbeddedYoutubeVideo( { mediaUrl, lazyLoad } ) {
 	return (
 		<SandBox
 			className="blockish-video-sandbox"
+			allowSameOrigin
 			html={ `
 				<iframe
 					style="width: 100%; height: 100%; z-index: 999999; border: 0;"

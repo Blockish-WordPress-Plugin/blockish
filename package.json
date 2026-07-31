@@ -25,7 +25,8 @@
 		"build",
 		"includes",
 		"vendor",
-		"languages"
+		"languages",
+		"assets"
 	],
 	"devDependencies": {
 		"@wordpress/scripts": "^32.5.0"

@@ -33,6 +33,7 @@ class Freemius {
 
 		if ( $this->sdk ) {
 			$this->configure_parent_redirects( $this->sdk );
+			$this->configure_local_icon( $this->sdk );
 
 			// Strip Freemius Plugins-row links before add-ons boot (they fire on this action).
 			$this->hide_plugins_row_links( $this->sdk );
@@ -41,6 +42,22 @@ class Freemius {
 
 			do_action( 'blockish/freemius/loaded', $this->sdk );
 		}
+	}
+
+	/**
+	 * Force Freemius to use a local plugin icon rather than fetching from WP.org.
+	 *
+	 * @param \Freemius $sdk Freemius instance.
+	 * @return void
+	 */
+	private function configure_local_icon( $sdk ) {
+		if ( ! is_object( $sdk ) || ! method_exists( $sdk, 'add_filter' ) ) {
+			return;
+		}
+
+		$sdk->add_filter( 'plugin_icon', static function () {
+			return BLOCKISH_DIR . 'assets/logo.png';
+		} );
 	}
 
 	/**
