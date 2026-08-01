@@ -37,7 +37,11 @@ class Config
                     ],
                     'schema_file' => [
                         'type'        => 'string',
-                        'description' => 'Absolute file path to a JSON file containing the block_schema. Use this if the block_schema payload is extremely large (e.g., >10KB) to avoid chat truncation issues. Write the JSON to a scratch file first, then pass the file path here instead of passing block_schema directly.',
+                        'description' => 'Absolute path on the WordPress SERVER only to a JSON file containing block_schema. Never a Cursor/client path when MCP points at a remote site.',
+                    ],
+                    'schema_url' => [
+                        'type'        => 'string',
+                        'description' => 'PREFERRED for large or client-local schemas on remote MCP. Write the block_schema JSON, upload that file to a third-party temporary hosting service (e.g. tmpfiles.org), take the DIRECT download URL that returns raw JSON (not an HTML page), then pass that HTTPS URL here. Do not inline huge block_schema when it risks truncation. Do not use base64. Max download 2 MB. Do not pass schema_file at the same time.',
                     ],
                 ],
                 'required' => ['slug'],

@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create, Edit or Delete Media', 'blockish'),
-            'description'         => __('Creates, edits, or deletes an attachment (image). To CREATE: provide url, file_path, or base64_data. To EDIT: provide attachment_id and title/alt_text. To DELETE: provide attachment_id and set delete to true. Images only.', 'blockish'),
+            'description'         => __('Creates, edits, or deletes an attachment (image). Preferred create path for a file on the AI/client machine: upload it to a third-party temporary file host, then pass the direct public HTTPS URL in url. Do not use client disk paths or base64 for remote MCP. file_path is WordPress-server only. To EDIT: provide attachment_id and title/alt_text. To DELETE: provide attachment_id and set delete to true. Images only.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -27,19 +27,19 @@ class Config
                     ],
                     'url'      => [
                         'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
-                        'description' => 'Public URL of the image to download, or an array of URLs for batch processing. Must end in .jpg, .jpeg, .png, .gif, or .webp (before any query string).',
+                        'description' => 'PREFERRED for client-local images. Upload the file to a third-party temporary hosting service (e.g. tmpfiles.org), take the DIRECT download URL that returns raw image bytes (not an HTML preview page), then pass that HTTPS URL here (or an array of URLs). Do not pass Cursor/client disk paths. Do not use base64_data — MCP payloads truncate and corrupt large base64. The URL path must end in .jpg, .jpeg, .png, .gif, or .webp (before any query string).',
                     ],
                     'file_path' => [
                         'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
-                        'description' => 'Absolute path to a local file on the server, or an array of paths.',
+                        'description' => 'Absolute path on the WordPress SERVER only (or an array of paths). Never a path from the AI client / Cursor machine when MCP points at a remote site.',
                     ],
                     'base64_data' => [
                         'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
-                        'description' => 'Base64 encoded string of the image data, or array of strings.',
+                        'description' => 'Avoid. Base64 in MCP requests often truncates and produces corrupted images. Prefer url after uploading to a temporary public host.',
                     ],
                     'filename' => [
                         'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
-                        'description' => 'Required if using base64_data, optional for file_path. The name of the file (e.g. "image.png"). If passing an array for base64_data, pass an array of filenames.',
+                        'description' => 'Required if using base64_data, optional for file_path. The name of the file (e.g. "image.png"). If passing an array for base64_data, pass an array of filenames. URL uploads derive their filename from the URL.',
                     ],
                     'title'    => [
                         'anyOf' => [ [ 'type' => 'string' ], [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ],
@@ -78,7 +78,7 @@ class Config
             'permission_callback' => fn() => current_user_can('upload_files'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use this to obtain an attachment_id for a featured image (blockish/manage-post featured_media) or an image-type block attribute when no suitable image already exists — call blockish/get-media first to avoid duplicate uploads. The returned {id, url, width, height} matches the Image object shape used in block attributes, so it can be plugged almost directly into an image-type attribute. Also use this to update alt_text or title of existing media, or delete them.',
+                'usage_notes' => 'Use this to obtain an attachment_id for a featured image (blockish/manage-post featured_media) or an image-type block attribute when no suitable image already exists — call blockish/get-media first to avoid duplicate uploads. HARD RULE for client-local files on remote MCP: (1) upload the image to a third-party temporary file host, (2) copy the direct raw-file HTTPS URL, (3) pass it as url. Never try client file_path or base64 first. The returned {id, url, width, height} matches the Image object shape used in block attributes. Also use this to update alt_text or title of existing media, or delete them.',
             ],
         ];
     }

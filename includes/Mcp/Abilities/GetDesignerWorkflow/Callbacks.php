@@ -15,7 +15,7 @@ class Callbacks
             '2b. Styles via convert-css (one-offs only): For truly one-off block chrome that will not be reused, build `block_schema` with content/data attributes set and put style CSS on each node as `css` using `{{ROOT}}`. Call `blockish/convert-css` once with `action:\"css_to_schema\"` + `block_schema`. Push the returned `block_schema` to manage-pattern / manage-post. Check `report.unmapped` / `report.warnings`. Do NOT call convert-css per block unless debugging. Never hand-build Typography/Background/Border/shadow/Stringified-JSON. Prefer Class Manager (2a) whenever the same look appears more than once — or when you want cleaner schemas with almost no style attrs.',
             '3. Set up the Design System (Global Variables): Call `blockish/get-theme-json-docs`. Use `blockish/manage-theme-json` to define the global color palette, typography, and spacing BEFORE designing pages. Prefer theme CSS variables in Class Manager / convert-css input instead of one-off hardcoded colors.',
             '4. Reuse existing classes: Always `get-classes` before creating duplicates. Attach by name. Do not re-create a class that already fits.',
-            '5. Utilize Assets & Cloud Templates: Call `blockish/get-media` to find existing images. (Optional: Call `blockish/fetch-cloud-templates` to find pre-designed sections). Cloud designs may include `dependencies.patterns`, `dependencies.forms`, and `dependencies.classes` — recreate locally and remap cloud IDs before staging.',
+            '5. Utilize Assets & Cloud Templates: Call `blockish/get-media` to find existing images. For a NEW image that exists only on the AI/client machine with remote MCP: upload it to a third-party temporary file host (e.g. tmpfiles.org), take the DIRECT raw-image HTTPS URL, pass it to `blockish/manage-media` as `url` — never client `file_path` or `base64_data` (base64 truncates). (Optional: Call `blockish/fetch-cloud-templates` to find pre-designed sections). Cloud designs may include `dependencies.patterns`, `dependencies.forms`, and `dependencies.classes` — recreate locally and remap cloud IDs before staging.',
         ];
 
         if ( defined('BLOCKISH_DYNAMICITY_VERSION') ) {
@@ -32,7 +32,10 @@ class Callbacks
         }
 
         $workflow = array_merge( $workflow, [
-            '7. Component-Driven Design (CRITICAL): NEVER send a monolithic, heavily nested JSON schema for a full page or template. manage-post / manage-template will REJECT oversized or deep trees with an actionable error. Instead, build each section (Hero, Features, Pricing, Footer content) as its own pattern via `blockish/manage-pattern` (use `schema_file` when a section JSON is large). HARD RULE — create before include: always create/update patterns first and use only the returned real pattern IDs. Never invent or hallucinate ref values when assembling a page.',
+            '7. Component-Driven Design (CRITICAL): NEVER send a monolithic, heavily nested JSON schema for a full page or template. manage-post / manage-template will REJECT oversized or deep trees with an actionable error. Instead, build each section (Hero, Features, Pricing, Footer content) as its own pattern via `blockish/manage-pattern`. When a section JSON is large or you are on remote MCP with a client-written file: upload the JSON to a third-party temporary host and pass `schema_url` (direct raw-JSON URL) — prefer that over inlining or `schema_file` (server path only) or base64. HARD RULE — create before include: always create/update patterns first and use only the returned real pattern IDs. Never invent or hallucinate ref values when assembling a page.',
+        ] );
+
+        $workflow = array_merge( $workflow, [
             '8. HARD RULE — No header/footer on pages: When assembling a page or post with `blockish/manage-post`, NEVER include `core/template-part` for header or footer (neither in block_schema nor in post_content). The block theme page template already renders them. Including them duplicates chrome. Only use `core/template-part` header/footer when editing an FSE `wp_template` via `blockish/manage-template`.',
             '9. Page assembly (`manage-post`): ALWAYS stage with `block_schema` — lightweight pattern refs using real IDs from manage-pattern. Full-bleed sections MUST include align on the ref: `{"name":"core/block","attributes":{"ref":123,"align":"full"}}`. Omit `align` (or use `"wide"`) only when the section should stay content-width. NEVER write pattern-ref markup (or any block HTML) into `post_content` to "go live". Staging writes a `blockish/ai-preview` block into content (`previousSchema` + `pendingSchema` attrs). After staging: call trigger-refresh and share edit_url (not post_url / preview). CRITICAL: never set attributes.content on core/block (especially not ""). WP expects content to be an overrides object or omitted.',
             '10. Template assembly (`manage-template`): Always use block_schema (pattern refs / layout schema). Staging writes `blockish/ai-preview` into template content (same attrs model as posts). Never invent raw post_content HTML. After staging, share edit_url and require Accept.',
@@ -44,7 +47,7 @@ class Callbacks
         ] );
 
         return [
-            'workflow' => $workflow
+            'workflow' => $workflow,
         ];
     }
 }

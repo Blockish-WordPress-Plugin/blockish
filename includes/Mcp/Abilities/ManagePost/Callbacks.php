@@ -17,9 +17,19 @@ class Callbacks
             return ['error' => BlockSchemaMeta::payload_truncated_error()];
         }
 
-        // Support loading large schemas from a file to avoid payload truncation
+        if ( ! empty( $input['schema_file'] ) && ! empty( $input['schema_url'] ) ) {
+            return [ 'error' => 'Provide only one of schema_file or schema_url.' ];
+        }
+
+        // Support loading large schemas without placing them in the MCP request body.
         if ( ! empty( $input['schema_file'] ) ) {
             $loaded = SchemaUtils::load_schema_file( (string) $input['schema_file'] );
+            if ( is_string( $loaded ) ) {
+                return [ 'error' => $loaded ];
+            }
+            $input['block_schema'] = $loaded;
+        } elseif ( ! empty( $input['schema_url'] ) ) {
+            $loaded = SchemaUtils::load_schema_url( (string) $input['schema_url'] );
             if ( is_string( $loaded ) ) {
                 return [ 'error' => $loaded ];
             }

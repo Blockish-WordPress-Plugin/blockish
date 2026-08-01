@@ -148,9 +148,49 @@ class SchemaUtils
             return 'Could not read schema_file: ' . $path;
         }
 
+        return self::decode_schema_json( $json, 'schema_file' );
+    }
+
+    /**
+     * Download schema JSON from a public HTTPS URL.
+     *
+     * @return array|string Decoded schema array, or error string.
+     */
+    public static function load_schema_url( string $url ) {
+        $url = esc_url_raw( trim( $url ) );
+        if ( '' === $url || 'https' !== wp_parse_url( $url, PHP_URL_SCHEME ) ) {
+            return 'schema_url must be a valid public HTTPS URL.';
+        }
+
+        $response = wp_safe_remote_get(
+            $url,
+            [
+                'timeout'             => 20,
+                'redirection'         => 3,
+                'limit_response_size' => 2 * MB_IN_BYTES,
+            ]
+        );
+        if ( is_wp_error( $response ) ) {
+            return 'Could not download schema_url: ' . $response->get_error_message();
+        }
+
+        $status = wp_remote_retrieve_response_code( $response );
+        if ( $status < 200 || $status >= 300 ) {
+            return 'schema_url returned HTTP ' . $status . '.';
+        }
+
+        return self::decode_schema_json( wp_remote_retrieve_body( $response ), 'schema_url' );
+    }
+
+    /**
+     * Decode and validate schema JSON from a file or URL.
+     *
+     * @return array|string Decoded schema array, or error string.
+     */
+    private static function decode_schema_json( string $json, string $source ) {
         $decoded = json_decode( $json, true );
         if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
-            return 'schema_file must contain valid JSON (array of block schema nodes).';
+            return $source . ' must contain valid JSON (array of block schema nodes).';
         }
 
         $shape_error = self::validate_schema_shape( $decoded );

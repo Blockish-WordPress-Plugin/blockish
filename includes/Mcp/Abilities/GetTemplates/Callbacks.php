@@ -10,6 +10,10 @@ class Callbacks
 {
     public static function get_templates($input): array
     {
+        if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
+            return [ 'error' => 'This tool is not available for the active theme because it is not a block theme.' ];
+        }
+
         $theme_slug = wp_get_theme()->get_stylesheet();
         $post_type = $input['type'] ?? ['wp_template', 'wp_template_part'];
         

@@ -89,16 +89,15 @@ class BlockSchemaMeta
 
         $raw = $attributes['classManager'];
         $names = self::parse_class_manager_names($raw);
-        if (null === $names) {
-            // Already structured objects (or empty) — leave as-is.
-            return $attributes;
+        if (null !== $names) {
+            $attributes['classManager'] = self::resolve_class_manager_by_names($names);
         }
 
-        $resolved = self::resolve_class_manager_by_names($names);
-        $attributes['classManager'] = $resolved;
+        $resolved = is_array($attributes['classManager']) ? $attributes['classManager'] : [];
 
         // Child posts are required for Class Manager UI + frontend (.blockish-cm-{id}).
-        // When AI attaches by parent name only, auto-include every child.
+        // Runs for structured [{id,title}] items too: agents hand-write those without
+        // subselectors, which silently drops every :hover / descendant rule.
         $subselectors = self::resolve_class_manager_children($resolved);
         if (!empty($subselectors)) {
             $existing = [];

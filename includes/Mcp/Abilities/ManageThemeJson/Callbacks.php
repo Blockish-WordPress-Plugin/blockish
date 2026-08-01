@@ -8,6 +8,10 @@ class Callbacks
 {
     public static function handle($input): array
     {
+        if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
+            return [ 'error' => 'This tool is not available for the active theme because it is not a block theme.' ];
+        }
+
         $delete     = $input['delete'] ?? false;
         $theme_json = $input['theme_json'] ?? null;
 

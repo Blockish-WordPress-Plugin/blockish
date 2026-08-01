@@ -12,6 +12,10 @@ class Callbacks
 {
     public static function manage_template($input): array
     {
+        if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
+            return [ 'error' => 'This tool is not available for the active theme because it is not a block theme.' ];
+        }
+
         $theme_slug = wp_get_theme()->get_stylesheet();
         $slug = $input['slug'] ?? '';
         
@@ -23,9 +27,19 @@ class Callbacks
             return ['error' => 'slug is required.'];
         }
         
-        // Support loading large schemas from a file to avoid payload truncation
+        if ( ! empty( $input['schema_file'] ) && ! empty( $input['schema_url'] ) ) {
+            return [ 'error' => 'Provide only one of schema_file or schema_url.' ];
+        }
+
+        // Support loading large schemas without placing them in the MCP request body.
         if ( ! empty( $input['schema_file'] ) ) {
             $loaded = SchemaUtils::load_schema_file( (string) $input['schema_file'] );
+            if ( is_string( $loaded ) ) {
+                return [ 'error' => $loaded ];
+            }
+            $input['block_schema'] = $loaded;
+        } elseif ( ! empty( $input['schema_url'] ) ) {
+            $loaded = SchemaUtils::load_schema_url( (string) $input['schema_url'] );
             if ( is_string( $loaded ) ) {
                 return [ 'error' => $loaded ];
             }

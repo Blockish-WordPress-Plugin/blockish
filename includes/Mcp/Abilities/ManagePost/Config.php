@@ -32,7 +32,7 @@ class Config
                     ],
                     'featured_media' => [
                         'type'        => 'integer',
-                        'description' => 'Attachment ID of an existing Media Library item to set as the featured image. This ability does not upload files: call blockish/get-media to find an existing image first, otherwise call blockish/upload-media with an image URL to create one and get its attachment_id, then pass it here. Do not guess an ID.',
+                        'description' => 'Attachment ID of an existing Media Library item to set as the featured image. This ability does not upload files: call blockish/get-media to find an existing image first, otherwise call blockish/manage-media with an image URL to create one and get its attachment_id, then pass it here. Do not guess an ID.',
                     ],
                     'block_schema' => [
                         'type'        => 'array',
@@ -49,7 +49,11 @@ class Config
                     ],
                     'schema_file' => [
                         'type'        => 'string',
-                        'description' => 'Absolute file path to a JSON file containing the block_schema. Prefer this for large section schemas to avoid chat/MCP truncation. Still subject to monolithic-schema rejection on pages/templates — use patterns + refs for full pages.',
+                        'description' => 'Absolute path on the WordPress SERVER only to a JSON file containing block_schema. Never a Cursor/client path when MCP points at a remote site.',
+                    ],
+                    'schema_url' => [
+                        'type'        => 'string',
+                        'description' => 'PREFERRED for large or client-local schemas on remote MCP. Write the block_schema JSON, upload that file to a third-party temporary hosting service (e.g. tmpfiles.org), take the DIRECT download URL that returns raw JSON (not an HTML page), then pass that HTTPS URL here. Do not inline huge block_schema when it risks truncation. Do not use base64. Max download 2 MB. Do not pass schema_file at the same time.',
                     ],
                     'meta_input' => [
                         'type'        => 'object',
