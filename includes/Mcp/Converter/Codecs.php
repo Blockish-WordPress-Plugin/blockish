@@ -738,7 +738,46 @@ class Codecs {
 	}
 
 	/**
-	 * Single box-shadow → Box Shadow stringified JSON array.
+	 * Splits a CSS value on top-level commas, so comma-separated shadow layers
+	 * survive while `rgba(0, 0, 0, .1)` stays intact.
+	 *
+	 * @return string[]
+	 */
+	public static function split_layers( string $value ): array {
+		$layers = array();
+		$buffer = '';
+		$depth  = 0;
+		$length = strlen( $value );
+
+		for ( $i = 0; $i < $length; $i++ ) {
+			$char = $value[ $i ];
+
+			if ( '(' === $char ) {
+				++$depth;
+			} elseif ( ')' === $char ) {
+				$depth = max( 0, $depth - 1 );
+			}
+
+			if ( 0 === $depth && ',' === $char ) {
+				if ( '' !== trim( $buffer ) ) {
+					$layers[] = trim( $buffer );
+				}
+				$buffer = '';
+				continue;
+			}
+
+			$buffer .= $char;
+		}
+
+		if ( '' !== trim( $buffer ) ) {
+			$layers[] = trim( $buffer );
+		}
+
+		return $layers;
+	}
+
+	/**
+	 * box-shadow (one or more comma-separated layers) → Box Shadow stringified JSON array.
 	 */
 	public static function box_shadow( string $value ): ?string {
 		$value = trim( $value );
@@ -746,6 +785,21 @@ class Codecs {
 			return null;
 		}
 
+		$shadows = array();
+		foreach ( self::split_layers( $value ) as $layer ) {
+			$shadow = self::parse_shadow_layer( $layer );
+			if ( null !== $shadow ) {
+				$shadows[] = $shadow;
+			}
+		}
+
+		return empty( $shadows ) ? null : wp_json_encode( $shadows );
+	}
+
+	/**
+	 * Parses one box-shadow layer into the Box Shadow attribute shape.
+	 */
+	private static function parse_shadow_layer( string $value ): ?array {
 		$inset = false;
 		if ( preg_match( '/\binset\b/i', $value ) ) {
 			$inset = true;
@@ -775,7 +829,7 @@ class Codecs {
 			$shadow['inset'] = true;
 		}
 
-		return wp_json_encode( array( $shadow ) );
+		return $shadow;
 	}
 
 	public static function box_shadow_css( $value ): string {
@@ -787,19 +841,29 @@ class Codecs {
 			return '';
 		}
 
-		$shadow = $value[0];
-		$parts = array(
-			$shadow['x'] ?? '0',
-			$shadow['y'] ?? '0',
-			$shadow['blur'] ?? '0',
-			$shadow['spread'] ?? '0',
-			$shadow['color'] ?? 'rgba(0,0,0,0.2)',
-		);
-		$out = implode( ' ', $parts );
-		if ( ! empty( $shadow['inset'] ) ) {
-			$out .= ' inset';
+		$layers = array();
+		foreach ( $value as $shadow ) {
+			if ( ! is_array( $shadow ) ) {
+				continue;
+			}
+
+			$layer = implode(
+				' ',
+				array(
+					$shadow['x'] ?? '0',
+					$shadow['y'] ?? '0',
+					$shadow['blur'] ?? '0',
+					$shadow['spread'] ?? '0',
+					$shadow['color'] ?? 'rgba(0,0,0,0.2)',
+				)
+			);
+			if ( ! empty( $shadow['inset'] ) ) {
+				$layer .= ' inset';
+			}
+			$layers[] = $layer;
 		}
-		return $out;
+
+		return implode( ', ', $layers );
 	}
 
 	public static function set_responsive( array &$attributes, string $key, string $device, $value ): void {

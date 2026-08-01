@@ -17,8 +17,12 @@ class Interaction {
 
 	const PAGE_META_KEY = 'blockish_page_interactions';
 
-	/** Handles registered from build/extensions/interactions/block.json via Core\Extensions. */
-	const VIEW_SCRIPT_HANDLE = 'blockish-extension-interactions-viewScript';
+	/**
+	 * Handles registered from build/extensions/interactions/block.json via Core\Extensions.
+	 * Core\Extensions runs the block.json field name through sanitize_key(), so the
+	 * generated handles are always lowercase ("viewScript" => "viewscript").
+	 */
+	const VIEW_SCRIPT_HANDLE = 'blockish-extension-interactions-viewscript';
 	const VIEW_STYLE_HANDLE  = 'blockish-extension-interactions-style';
 
 	private function __construct() {
