@@ -56,10 +56,11 @@ Do not invent markup.
 Stylesheet + defaults (omit = these already apply). Write only what differs.
 
 ```css
-/* Defaults from attributes (only emit when explicitly set) */
-.wp-block-blockish-container.blockish-container { display: flex; }
-
 /* Stylesheet */
+/* display comes from the layout-type-* class (flex | grid | block only), never per-block CSS */
+.wp-block-blockish-container.blockish-container.layout-type-flex { display: flex; }
+.wp-block-blockish-container.blockish-container.layout-type-grid { display: grid; }
+.wp-block-blockish-container.blockish-container.layout-type-block { display: block; }
 :where(.wp-block-blockish-container) { position: relative; min-height: 0; }
 :where(.wp-block-blockish-container > .block-list-appender) { min-height: 0; }
 .wp-block-blockish-container { transition: all 0.3s ease; }

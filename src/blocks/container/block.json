@@ -51,10 +51,7 @@
     },
     "display": {
       "type": "string",
-      "default": "flex",
-      "selectors": {
-        ".{{WRAPPER}}.blockish-container": "display: {{VALUE}};"
-      }
+      "default": "flex"
     },
     "flexWrap": {
       "type": "object",

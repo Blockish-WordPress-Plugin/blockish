@@ -3,6 +3,7 @@
 namespace Blockish\Routes;
 
 use Blockish\Extensions\ClassUsage;
+use Blockish\Extensions\ClassManager;
 use WP_REST_Controller;
 use WP_REST_Request;
 
@@ -162,6 +163,18 @@ class DashboardToolsV1 extends WP_REST_Controller {
 					'permission_callback' => function () {
 						return current_user_can( 'edit_posts' );
 					},
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/class-manager/regenerate-css',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'regenerate_class_manager_css' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 			)
 		);
@@ -714,6 +727,28 @@ class DashboardToolsV1 extends WP_REST_Controller {
 			array(
 				'status' => 'success',
 				'classManager' => $this->get_class_manager_items(),
+			)
+		);
+	}
+
+	public function regenerate_class_manager_css() {
+		$result = ClassManager::get_instance()->regenerate_css_cache();
+		$deleted = isset( $result['deleted'] ) ? (int) $result['deleted'] : 0;
+
+		return rest_ensure_response(
+			array(
+				'status'  => 'success',
+				'deleted' => $deleted,
+				'message' => sprintf(
+					/* translators: %d: number of deleted CSS cache files */
+					_n(
+						'Cleared %d Class Manager CSS cache file. It will rebuild on the next page view.',
+						'Cleared %d Class Manager CSS cache files. They will rebuild on the next page view.',
+						$deleted,
+						'blockish'
+					),
+					$deleted
+				),
 			)
 		);
 	}

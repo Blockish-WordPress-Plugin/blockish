@@ -3,6 +3,7 @@
 namespace Blockish\Extensions;
 
 use Blockish\Config\ExtensionList;
+use Blockish\Core\Utilities;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -12,6 +13,12 @@ class ClassManager {
 	use \Blockish\Traits\SingletonTrait;
 
 	private const CSS_META_KEY = 'blockishClassManagerStyles';
+	private const CSS_FAILED_KEY = 'blockish_class_manager_css_file_failed';
+	private const CSS_INDEX_KEY = 'blockish_class_manager_css_index';
+	private const CSS_DIR = 'blockish';
+	private const CSS_FILE_PREFIX = 'class-manager-';
+	/** Unused hashed files older than this are pruned from uploads. */
+	private const CSS_ORPHAN_TTL = WEEK_IN_SECONDS;
 	private $used_post_ids = array();
 	private $styles_enqueued = false;
 
@@ -32,6 +39,12 @@ class ClassManager {
 			add_action( 'wp_footer', array( $this, 'print_used_class_styles' ) );
 		}
 		add_filter( 'block_editor_settings_all', array( $this, 'add_editor_class_styles' ) );
+
+		add_action( 'save_post_blockish-classes', array( $this, 'invalidate_css_files' ) );
+		add_action( 'deleted_post', array( $this, 'invalidate_css_files_on_delete' ), 10, 2 );
+		foreach ( array( 'added_post_meta', 'updated_post_meta', 'deleted_post_meta' ) as $meta_hook ) {
+			add_action( $meta_hook, array( $this, 'invalidate_css_files_on_meta_change' ), 10, 3 );
+		}
 	}
 
 	/**
@@ -95,18 +108,12 @@ class ClassManager {
 			return;
 		}
 
-		$this->collect_used_post_ids_from_current_post();
+		$this->collect_used_post_ids_for_request();
 		if ( empty( $this->used_post_ids ) ) {
 			return;
 		}
 
-		$styles = $this->get_styles_for_classes();
-		
-		if ( '' === $styles ) {
-			return;
-		}
-
-		$this->enqueue_inline_styles( $styles, false );
+		$this->enqueue_styles_for_used_classes( false );
 	}
 
 	public function register_post_type() {
@@ -153,7 +160,6 @@ class ClassManager {
 
 		$class_items       = $block['attrs']['classManager'] ?? array();
 		$subselector_items = $block['attrs']['classManagerSubselector'] ?? array();
-		
 
 		if ( ! is_array( $class_items ) ) {
 			$class_items = array();
@@ -276,37 +282,61 @@ class ClassManager {
 			return;
 		}
 
-		$styles = $this->get_styles_for_classes();
-
-
-		if ( '' === $styles ) {
-			return;
-		}
-		$this->enqueue_inline_styles( $styles, true );
+		$this->enqueue_styles_for_used_classes( true );
 	}
 
-	private function collect_used_post_ids_from_current_post() {
+	/**
+	 * Collect class IDs for the current request: post content, synced patterns,
+	 * and shared template parts (so header/footer classes are not missed).
+	 */
+	private function collect_used_post_ids_for_request() {
+		$seen_content_ids = array();
+
 		$post_id = get_queried_object_id();
-		if ( ! $post_id ) {
-			return;
+		if ( $post_id ) {
+			$post = get_post( $post_id );
+			if ( $post && is_string( $post->post_content ) && '' !== $post->post_content ) {
+				$seen_content_ids[ (int) $post_id ] = true;
+				$this->collect_used_post_ids_from_blocks( parse_blocks( $post->post_content ), $seen_content_ids );
+			}
 		}
 
-		$post = get_post( $post_id );
-		if ( ! $post || ! is_string( $post->post_content ) || '' === $post->post_content ) {
-			return;
+		if ( wp_is_block_theme() ) {
+			$this->collect_used_post_ids_from_template_parts( $seen_content_ids );
 		}
-
-		$blocks = parse_blocks( $post->post_content );
-		if ( empty( $blocks ) ) {
-			return;
-		}
-
-		$this->collect_used_post_ids_from_blocks( $blocks );
 	}
 
-	private function collect_used_post_ids_from_blocks( $blocks ) {
+	private function collect_used_post_ids_from_template_parts( &$seen_content_ids ) {
+		$parts = get_posts(
+			array(
+				'post_type'              => 'wp_template_part',
+				'post_status'            => array( 'publish', 'private' ),
+				'posts_per_page'         => -1,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		foreach ( $parts as $part ) {
+			if ( ! $part instanceof \WP_Post || ! is_string( $part->post_content ) || '' === $part->post_content ) {
+				continue;
+			}
+			if ( ! empty( $seen_content_ids[ (int) $part->ID ] ) ) {
+				continue;
+			}
+			$seen_content_ids[ (int) $part->ID ] = true;
+			$this->collect_used_post_ids_from_blocks( parse_blocks( $part->post_content ), $seen_content_ids );
+		}
+	}
+
+	private function collect_used_post_ids_from_blocks( $blocks, &$seen_content_ids = null ) {
 		if ( ! is_array( $blocks ) ) {
 			return;
+		}
+
+		if ( null === $seen_content_ids ) {
+			$seen_content_ids = array();
 		}
 
 		foreach ( $blocks as $block ) {
@@ -314,8 +344,8 @@ class ClassManager {
 				continue;
 			}
 
-			$attrs = $block['attrs'] ?? array();
-			$class_items = $attrs['classManager'] ?? array();
+			$attrs             = $block['attrs'] ?? array();
+			$class_items       = $attrs['classManager'] ?? array();
 			$subselector_items = $attrs['classManagerSubselector'] ?? array();
 
 			if ( is_array( $class_items ) ) {
@@ -346,10 +376,235 @@ class ClassManager {
 				}
 			}
 
+			if ( 'core/block' === ( $block['blockName'] ?? '' ) ) {
+				$ref = absint( $attrs['ref'] ?? 0 );
+				if ( $ref > 0 && empty( $seen_content_ids[ $ref ] ) ) {
+					$seen_content_ids[ $ref ] = true;
+					$pattern                  = get_post( $ref );
+					if ( $pattern && is_string( $pattern->post_content ) && '' !== $pattern->post_content ) {
+						$this->collect_used_post_ids_from_blocks( parse_blocks( $pattern->post_content ), $seen_content_ids );
+					}
+				}
+			}
+
 			$inner_blocks = $block['innerBlocks'] ?? array();
 			if ( ! empty( $inner_blocks ) ) {
-				$this->collect_used_post_ids_from_blocks( $inner_blocks );
+				$this->collect_used_post_ids_from_blocks( $inner_blocks, $seen_content_ids );
 			}
+		}
+	}
+
+	/**
+	 * Serve used-class CSS as a content-hashed stylesheet, falling back to inline.
+	 *
+	 * Each page only gets the classes it uses. Identical CSS across pages shares
+	 * the same hashed file; any change produces a new hash / file.
+	 *
+	 * @param bool $print_now Print the tag immediately (footer fallback path).
+	 */
+	private function enqueue_styles_for_used_classes( $print_now = false ) {
+		$css = $this->get_styles_for_classes();
+		if ( '' === $css ) {
+			return;
+		}
+
+		$file = $this->get_or_create_css_file( $css );
+		if ( null === $file ) {
+			$this->enqueue_inline_styles( $css, $print_now );
+			return;
+		}
+
+		$this->enqueue_css_file( $file, $print_now );
+	}
+
+	/**
+	 * @param array{url: string, version: string} $file
+	 * @param bool                                $print_now Print the tag immediately.
+	 */
+	private function enqueue_css_file( $file, $print_now = false ) {
+		$handle = 'blockish-class-manager';
+		if ( ! wp_style_is( $handle, 'registered' ) ) {
+			wp_register_style( $handle, $file['url'], array(), $file['version'] );
+		}
+		wp_enqueue_style( $handle );
+		if ( $print_now ) {
+			wp_print_styles( array( $handle ) );
+		}
+		$this->styles_enqueued = true;
+	}
+
+	/**
+	 * @param string $css Compiled CSS for the classes used on this request.
+	 * @return array{url: string, version: string}|null
+	 */
+	private function get_or_create_css_file( $css ) {
+		$version  = md5( $css );
+		$filename = self::CSS_FILE_PREFIX . $version . '.css';
+		$upload   = wp_get_upload_dir();
+		$dir      = $upload['basedir'] . '/' . self::CSS_DIR;
+		$path     = $dir . '/' . $filename;
+
+		if ( file_exists( $path ) ) {
+			$this->touch_css_hash( $version );
+			$this->prune_orphan_css_files( $version );
+			return array(
+				'url'     => $upload['baseurl'] . '/' . self::CSS_DIR . '/' . $filename,
+				'version' => $version,
+			);
+		}
+
+		if ( get_transient( self::CSS_FAILED_KEY ) ) {
+			return null;
+		}
+
+		if ( ! wp_mkdir_p( $dir ) || ! $this->write_css_file( $path, $css ) ) {
+			set_transient( self::CSS_FAILED_KEY, 1, HOUR_IN_SECONDS );
+			return null;
+		}
+
+		$this->touch_css_hash( $version );
+		$this->prune_orphan_css_files( $version );
+
+		return array(
+			'url'     => $upload['baseurl'] . '/' . self::CSS_DIR . '/' . $filename,
+			'version' => $version,
+		);
+	}
+
+	private function write_css_file( $path, $css ) {
+		global $wp_filesystem;
+
+		Utilities::get_filesystem();
+		if ( ! $wp_filesystem instanceof \WP_Filesystem_Base ) {
+			return false;
+		}
+
+		$chmod = defined( 'FS_CHMOD_FILE' ) ? FS_CHMOD_FILE : false;
+
+		return (bool) $wp_filesystem->put_contents( $path, $css, $chmod );
+	}
+
+	public function invalidate_css_files() {
+		delete_transient( self::CSS_FAILED_KEY );
+		$this->delete_all_css_files();
+		delete_option( self::CSS_INDEX_KEY );
+		// Drop the previous single-file option if an older version left it behind.
+		delete_option( 'blockish_class_manager_css_file' );
+	}
+
+	/**
+	 * Wipe every cached Class Manager CSS file so the next frontend hit rebuilds.
+	 *
+	 * @return array{deleted: int}
+	 */
+	public function regenerate_css_cache() {
+		$deleted = $this->count_css_files();
+		$this->invalidate_css_files();
+
+		return array(
+			'deleted' => $deleted,
+		);
+	}
+
+	public function invalidate_css_files_on_delete( $post_id, $post = null ) {
+		$post_type = $post instanceof \WP_Post ? $post->post_type : get_post_type( $post_id );
+		if ( 'blockish-classes' === $post_type ) {
+			$this->invalidate_css_files();
+		}
+	}
+
+	public function invalidate_css_files_on_meta_change( $meta_id, $post_id, $meta_key ) {
+		if ( self::CSS_META_KEY === $meta_key ) {
+			$this->invalidate_css_files();
+		}
+	}
+
+	private function touch_css_hash( $hash ) {
+		$index = get_option( self::CSS_INDEX_KEY, array() );
+		if ( ! is_array( $index ) ) {
+			$index = array();
+		}
+
+		$index[ (string) $hash ] = time();
+		update_option( self::CSS_INDEX_KEY, $index, false );
+	}
+
+	/**
+	 * Drop hashed files that have not been used recently (page mix changed, old hash left behind).
+	 *
+	 * @param string $keep_hash Hash for the current request — never deleted here.
+	 */
+	private function prune_orphan_css_files( $keep_hash = '' ) {
+		$upload = wp_get_upload_dir();
+		$files  = glob( $upload['basedir'] . '/' . self::CSS_DIR . '/' . self::CSS_FILE_PREFIX . '*.css' );
+		if ( empty( $files ) ) {
+			return;
+		}
+
+		$index = get_option( self::CSS_INDEX_KEY, array() );
+		if ( ! is_array( $index ) ) {
+			$index = array();
+		}
+
+		$now     = time();
+		$changed = false;
+
+		foreach ( $files as $file ) {
+			if ( ! preg_match( '/^' . preg_quote( self::CSS_FILE_PREFIX, '/' ) . '([a-f0-9]+)\.css$/', basename( $file ), $matches ) ) {
+				continue;
+			}
+
+			$hash = $matches[1];
+			if ( '' !== $keep_hash && $hash === $keep_hash ) {
+				continue;
+			}
+
+			$last_used = isset( $index[ $hash ] ) ? (int) $index[ $hash ] : 0;
+			if ( $last_used <= 0 ) {
+				$mtime = (int) filemtime( $file );
+				if ( $mtime > 0 && ( $now - $mtime ) <= self::CSS_ORPHAN_TTL ) {
+					continue;
+				}
+			} elseif ( ( $now - $last_used ) <= self::CSS_ORPHAN_TTL ) {
+				continue;
+			}
+
+			wp_delete_file( $file );
+			if ( isset( $index[ $hash ] ) ) {
+				unset( $index[ $hash ] );
+				$changed = true;
+			}
+		}
+
+		foreach ( array_keys( $index ) as $hash ) {
+			$path = $upload['basedir'] . '/' . self::CSS_DIR . '/' . self::CSS_FILE_PREFIX . $hash . '.css';
+			if ( ! file_exists( $path ) ) {
+				unset( $index[ $hash ] );
+				$changed = true;
+			}
+		}
+
+		if ( $changed ) {
+			update_option( self::CSS_INDEX_KEY, $index, false );
+		}
+	}
+
+	private function count_css_files() {
+		$upload = wp_get_upload_dir();
+		$files  = glob( $upload['basedir'] . '/' . self::CSS_DIR . '/' . self::CSS_FILE_PREFIX . '*.css' );
+
+		return empty( $files ) ? 0 : count( $files );
+	}
+
+	private function delete_all_css_files() {
+		$upload = wp_get_upload_dir();
+		$files  = glob( $upload['basedir'] . '/' . self::CSS_DIR . '/' . self::CSS_FILE_PREFIX . '*.css' );
+		if ( empty( $files ) ) {
+			return;
+		}
+
+		foreach ( $files as $file ) {
+			wp_delete_file( $file );
 		}
 	}
 
@@ -375,6 +630,8 @@ class ClassManager {
 		if ( empty( $post_ids ) ) {
 			return '';
 		}
+
+		sort( $post_ids, SORT_NUMERIC );
 
 		$css = '';
 		foreach ( $post_ids as $post_id ) {

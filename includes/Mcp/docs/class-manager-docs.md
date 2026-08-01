@@ -66,6 +66,17 @@ Child generated-CSS meta is cleared during that seed to prevent stale/duplicate
 rules; the editor generator repopulates the normal parent/child split after it
 initializes.
 
+On the frontend each page only loads the Class Manager CSS it actually uses
+(post/pattern content plus shared template parts). That CSS is written to a
+content-hashed file in `wp-content/uploads/blockish/`
+(`class-manager-<md5>.css`) and enqueued as a normal stylesheet. Unchanged CSS
+keeps the same file; any class change produces a new hash/file and old files are
+cleared. Pages that resolve to the same CSS share one cached file. Unused hashed
+files that are not requested for a week are pruned automatically. Admins can also
+force a wipe via Dashboard → Class Manager → **Clear CSS cache** (REST:
+`POST /blockish/v1/dashboard-tools/class-manager/regenerate-css`). If the uploads
+directory is not writable, Blockish falls back to inline CSS for that request.
+
 ---
 
 ## 4. Selector rules (break = error)

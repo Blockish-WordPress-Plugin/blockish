@@ -56,6 +56,22 @@
     margin-right: unset;
 }
 
+// Display is resolved from the layout-type-* class (UI: flex | grid | block only),
+// once in this stylesheet instead of per-block generated CSS.
+.wp-block-blockish-container.blockish-container {
+    &.layout-type-flex {
+        display: flex;
+    }
+
+    &.layout-type-grid {
+        display: grid;
+    }
+
+    &.layout-type-block {
+        display: block;
+    }
+}
+
 // Flex defaults live here at specificity 0 (:where) so Class Manager / attribute
 // CSS can override. Attribute defaults must not emit high-specificity rules.
 :where(.wp-block-blockish-container.blockish-container.layout-type-flex) {
