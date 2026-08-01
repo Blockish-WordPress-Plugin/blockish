@@ -5,68 +5,30 @@ namespace Blockish\Mcp;
 defined('ABSPATH') || exit;
 
 /**
- * Registers the post meta used to stage an AI-generated block schema
- * against a post before it is reviewed and applied in the editor.
+ * Schema validation / normalization helpers for MCP staging.
+ * Pending layouts are stored on content as blockish/ai-preview (not post meta).
  */
 class BlockSchemaMeta
 {
     use \Blockish\Traits\SingletonTrait;
 
+    /** @deprecated Legacy meta key; no longer written for new staging. Kept for one-shot cleanup. */
     const META_KEY = '_blockish_block_schema';
 
     private function __construct()
     {
-        add_action('init', [$this, 'register_meta']);
-    }
-
-    public function register_meta()
-    {
-        register_post_meta(
-            '', // Empty post type = registered for every post type.
-            self::META_KEY,
-            [
-                'type'              => 'string',
-                'single'            => true,
-                'default'           => '',
-                'show_in_rest'      => true,
-                'sanitize_callback' => [self::class, 'sanitize'],
-                'auth_callback'     => function ($allowed, $meta_key, $post_id) {
-                    return current_user_can('edit_post', $post_id);
-                },
-            ]
-        );
-    }
-
-    /**
-     * Stores the schema as-is when it is valid JSON, otherwise clears it.
-     * Avoids generic string sanitizers (e.g. sanitize_text_field) mangling
-     * whitespace/characters inside the JSON payload.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    public static function sanitize($value)
-    {
-        if (!is_string($value) || '' === trim($value)) {
-            return '';
-        }
-
-        $decoded = json_decode($value, true);
-
-        if (JSON_ERROR_NONE !== json_last_error() || !is_array($decoded)) {
-            return '';
-        }
-
-        $decoded = self::force_required_attributes($decoded);
-
-        return wp_json_encode($decoded);
     }
 
     /**
      * Recursively forces non-obvious required attributes that default to false.
      * e.g., isVariationPicked on blockish/container, hasStarted on blockish/navigation.
+     * Nested containers: strip alignItems/justifyContent so they do not pick up the
+     * top-level Center CSS default (omit = unset; set only when intentional).
+     *
+     * @param array $blocks
+     * @param bool  $inside_container Whether walking children of a blockish/container.
      */
-    public static function force_required_attributes(array $blocks): array
+    public static function force_required_attributes(array $blocks, bool $inside_container = false): array
     {
         foreach ($blocks as &$block) {
             if (isset($block['name'])) {
@@ -75,6 +37,17 @@ class BlockSchemaMeta
                         $block['attributes'] = [];
                     }
                     $block['attributes']['isVariationPicked'] = true;
+
+                    if ($inside_container) {
+                        // Empty objects survive serialization and prevent accidental
+                        // center/start from older schema defaults / AI habit.
+                        if (!isset($block['attributes']['alignItems'])) {
+                            $block['attributes']['alignItems'] = new \stdClass();
+                        }
+                        if (!isset($block['attributes']['justifyContent'])) {
+                            $block['attributes']['justifyContent'] = new \stdClass();
+                        }
+                    }
                 } elseif ($block['name'] === 'blockish/navigation') {
                     if (!isset($block['attributes']) || !is_array($block['attributes'])) {
                         $block['attributes'] = [];
@@ -90,13 +63,195 @@ class BlockSchemaMeta
                         }
                     }
                 }
+
+                if (isset($block['attributes']) && is_array($block['attributes'])) {
+                    $block['attributes'] = self::normalize_class_manager_attributes($block['attributes']);
+                }
             }
 
             if (!empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
-                $block['innerBlocks'] = self::force_required_attributes($block['innerBlocks']);
+                $child_inside = $inside_container || (isset($block['name']) && $block['name'] === 'blockish/container');
+                $block['innerBlocks'] = self::force_required_attributes($block['innerBlocks'], $child_inside);
             }
         }
         return $blocks;
+    }
+
+    /**
+     * Expand classManager from name string(s) into [{id, title}, …].
+     * Accepts: "hero-card, cta" | ["hero-card","cta"] | [{id,title}] (passthrough).
+     */
+    public static function normalize_class_manager_attributes(array $attributes): array
+    {
+        if (!array_key_exists('classManager', $attributes)) {
+            return $attributes;
+        }
+
+        $raw = $attributes['classManager'];
+        $names = self::parse_class_manager_names($raw);
+        if (null !== $names) {
+            $attributes['classManager'] = self::resolve_class_manager_by_names($names);
+        }
+
+        $resolved = is_array($attributes['classManager']) ? $attributes['classManager'] : [];
+
+        // Child posts are required for Class Manager UI + frontend (.blockish-cm-{id}).
+        // Runs for structured [{id,title}] items too: agents hand-write those without
+        // subselectors, which silently drops every :hover / descendant rule.
+        $subselectors = self::resolve_class_manager_children($resolved);
+        if (!empty($subselectors)) {
+            $existing = [];
+            if (isset($attributes['classManagerSubselector']) && is_array($attributes['classManagerSubselector'])) {
+                foreach ($attributes['classManagerSubselector'] as $item) {
+                    if (is_array($item) && !empty($item['id'])) {
+                        $existing[(int) $item['id']] = $item;
+                    }
+                }
+            }
+            foreach ($subselectors as $child) {
+                $existing[(int) $child['id']] = $child;
+            }
+            $attributes['classManagerSubselector'] = array_values($existing);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @param mixed $raw
+     * @return string[]|null Null when $raw is already object items / should not convert.
+     */
+    private static function parse_class_manager_names($raw): ?array
+    {
+        if (is_string($raw)) {
+            $parts = preg_split('/\s*,\s*/', trim($raw));
+            $names = [];
+            foreach ($parts as $part) {
+                $part = trim($part);
+                if ('' === $part) {
+                    continue;
+                }
+                $part = ltrim($part, '.');
+                $names[] = $part;
+            }
+            return $names;
+        }
+
+        if (!is_array($raw)) {
+            return null;
+        }
+
+        if ($raw === []) {
+            return null;
+        }
+
+        // Already [{id, title}, …]
+        $first = reset($raw);
+        if (is_array($first) && (isset($first['id']) || isset($first['title']))) {
+            return null;
+        }
+
+        // ["hero-card", "cta"] or [".hero-card"]
+        $names = [];
+        foreach ($raw as $item) {
+            if (!is_string($item)) {
+                return null;
+            }
+            $item = trim($item);
+            if ('' === $item) {
+                continue;
+            }
+            $names[] = ltrim($item, '.');
+        }
+        return $names;
+    }
+
+    /**
+     * @param string[] $names
+     * @return array<int, array{id:int,title:string}>
+     */
+    private static function resolve_class_manager_by_names(array $names): array
+    {
+        if (empty($names)) {
+            return [];
+        }
+
+        static $index = null;
+        if (null === $index) {
+            $index = [];
+            $posts = get_posts([
+                'post_type'      => 'blockish-classes',
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'post_parent'    => 0,
+            ]);
+            foreach ($posts as $post) {
+                $slug = \Blockish\Mcp\Converter\ClassStyleConverter::normalize_slug((string) $post->post_title);
+                if ('' === $slug) {
+                    continue;
+                }
+                $index[$slug] = [
+                    'id'    => (int) $post->ID,
+                    'title' => (string) $post->post_title,
+                ];
+            }
+        }
+
+        $out = [];
+        $seen = [];
+        foreach ($names as $name) {
+            $slug = \Blockish\Mcp\Converter\ClassStyleConverter::normalize_slug($name);
+            if ('' === $slug || isset($seen[$slug])) {
+                continue;
+            }
+            if (!isset($index[$slug])) {
+                continue;
+            }
+            $seen[$slug] = true;
+            $out[] = $index[$slug];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param array<int, array{id:int,title:string}> $parents
+     * @return array<int, array{id:int,title:string,parent:int}>
+     */
+    private static function resolve_class_manager_children(array $parents): array
+    {
+        if (empty($parents)) {
+            return [];
+        }
+
+        $parent_ids = array_values(array_filter(array_map(static function ($p) {
+            return absint($p['id'] ?? 0);
+        }, $parents)));
+
+        if (empty($parent_ids)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($parent_ids as $parent_id) {
+            $children = get_posts([
+                'post_type'      => 'blockish-classes',
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'post_parent'    => $parent_id,
+                'orderby'        => 'title',
+                'order'          => 'ASC',
+            ]);
+            foreach ($children as $child) {
+                $out[] = [
+                    'id'     => (int) $child->ID,
+                    'title'  => (string) $child->post_title,
+                    'parent' => (int) $child->post_parent,
+                ];
+            }
+        }
+
+        return $out;
     }
 
     /**
@@ -173,7 +328,7 @@ class BlockSchemaMeta
         // Absolute transport ceiling for every context.
         if ($m['json_bytes'] > 500000) {
             return sprintf(
-                'Schema too large (%d bytes). Write it to a scratch JSON file and pass schema_file, or split into smaller patterns via blockish/manage-pattern. Then assemble with {"name":"core/block","attributes":{"ref":<pattern_id>}}. See blockish/get-designer-workflow step 7–8.',
+                'Schema too large (%d bytes). Write it to a scratch JSON file and pass schema_file, or split into smaller patterns via blockish/manage-pattern. Then assemble with {"name":"core/block","attributes":{"ref":<pattern_id>,"align":"full"}}. See blockish/get-designer-workflow step 7–8.',
                 $m['json_bytes']
             );
         }
@@ -197,7 +352,7 @@ class BlockSchemaMeta
 
         if ($m['max_depth'] >= 6 || $m['node_count'] >= 80 || $m['json_bytes'] >= 100000) {
             return sprintf(
-                'Schema too large or too deeply nested for a full page/template (nodes=%d, depth=%d, bytes=%d). Do NOT send a monolithic layout. Build each section with blockish/manage-pattern, then assemble a lightweight schema of {"name":"core/block","attributes":{"ref":<pattern_id>}} (plus core/template-part for header/footer). See blockish/get-designer-workflow step 7–8.',
+                'Schema too large or too deeply nested for a full page/template (nodes=%d, depth=%d, bytes=%d). Do NOT send a monolithic layout. Build each section with blockish/manage-pattern, then assemble a lightweight schema of {"name":"core/block","attributes":{"ref":<pattern_id>,"align":"full"}}. On block themes, omit header/footer template-parts from page content (the template already provides them); use core/template-part only when editing wp_template layouts. See blockish/get-designer-workflow step 7–8.',
                 $m['node_count'],
                 $m['max_depth'],
                 $m['json_bytes']
@@ -244,6 +399,49 @@ class BlockSchemaMeta
         $walk($blocks);
 
         return array_values(array_unique($warnings));
+    }
+
+    /**
+     * Pages/posts must not embed header/footer template parts (theme template already does).
+     *
+     * @param array  $blocks
+     * @param string $post_type
+     * @return string|null
+     */
+    public static function get_page_template_part_error(array $blocks, string $post_type): ?string
+    {
+        // Only enforce on normal content; templates may include header/footer parts.
+        if (in_array($post_type, ['wp_template', 'wp_template_part', 'wp_block'], true)) {
+            return null;
+        }
+
+        $found = [];
+        $walk  = function ($nodes) use (&$walk, &$found) {
+            if (!is_array($nodes)) {
+                return;
+            }
+            foreach ($nodes as $node) {
+                if (!is_array($node) || empty($node['name'])) {
+                    continue;
+                }
+                if ('core/template-part' === $node['name']) {
+                    $slug = isset($node['attributes']['slug']) ? (string) $node['attributes']['slug'] : '';
+                    if (in_array($slug, ['header', 'footer'], true) || '' === $slug) {
+                        $found[] = $slug !== '' ? $slug : 'template-part';
+                    }
+                }
+                if (!empty($node['innerBlocks']) && is_array($node['innerBlocks'])) {
+                    $walk($node['innerBlocks']);
+                }
+            }
+        };
+        $walk($blocks);
+
+        if (empty($found)) {
+            return null;
+        }
+
+        return 'Do not put core/template-part header/footer in page/post block_schema — the block theme template already renders them (duplicates otherwise). Assemble pages with core/block pattern refs only. Use core/template-part only when editing a wp_template via blockish/manage-template. See blockish/get-designer-workflow step 8.';
     }
 
     /**

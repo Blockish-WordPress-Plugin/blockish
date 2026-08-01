@@ -40,27 +40,18 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }
     },
     "iconSize": {
       "type": "object",
-      "default": {
-        "Desktop": "24px"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-rating-icon svg": "width: {{VALUE}}; height: {{VALUE}};"
       }
     },
     "iconSpacing": {
       "type": "object",
-      "default": {
-        "Desktop": "6px"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-rating-icons": "gap: {{VALUE}};"
       }

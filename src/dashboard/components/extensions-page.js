@@ -38,6 +38,7 @@ export default function ExtensionsPage({
 	onToggleExtension,
 	onSetAllExtensionStatus,
 	onSaveExtensionSettings,
+	onNavigate,
 }) {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [activeFilter, setActiveFilter] = useState('all');
@@ -50,7 +51,7 @@ export default function ExtensionsPage({
 			return {
 				slug,
 				name: item?.name || humanizeSlug(slug),
-				status: item?.status === 'inactive' ? 'inactive' : 'active',
+				status: item?.status === 'locked' ? 'locked' : (item?.status === 'inactive' ? 'inactive' : 'active'),
 				categoryKey,
 				categoryLabel:
 					categoryKey === 'animation' ? __('Animation', 'blockish') : __('General', 'blockish'),
@@ -184,6 +185,7 @@ export default function ExtensionsPage({
 						isSaving={isSaving}
 						onToggle={onToggleExtension}
 						onOpenSettings={setSelectedExtensionSlug}
+						onNavigate={onNavigate}
 					/>
 				))}
 			</div>

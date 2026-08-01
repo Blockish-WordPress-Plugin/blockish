@@ -1,0 +1,77 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/site-logo",
+  "version": "1.0.0",
+  "title": "Site Logo",
+  "category": "blockish-framework",
+  "description": "Displays the site logo with an optional home link.",
+  "keywords": [
+    "blockish",
+    "site",
+    "logo",
+    "brand",
+    "identity"
+  ],
+  "textdomain": "blockish",
+  "attributes": {
+    "linkToHome": {
+      "type": "boolean",
+      "default": true
+    },
+    "openInNewTab": {
+      "type": "boolean",
+      "default": false
+    },
+    "alignment": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "logoWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-site-logo__image": "width: {{VALUE}};"
+      }
+    },
+    "logoMaxWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-site-logo__image": "max-width: {{VALUE}};"
+      }
+    },
+    "border": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-site-logo__image"
+      }
+    },
+    "borderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-site-logo__image": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "boxShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBoxShadow",
+        "selector": ".{{WRAPPER}} .blockish-site-logo__image"
+      }
+    }
+  },
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

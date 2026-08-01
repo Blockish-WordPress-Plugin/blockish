@@ -23,6 +23,24 @@ const useToolbarElement = () => {
 const TemplateLibraryApp = () => {
 	const [isOpen, setIsOpen] = useState(false);
 
+	useEffect(() => {
+		window.blockishTemplateLibrary = {
+			open: (options = {}) => {
+				if (options.package && window.blockishTemplateLibraryData) {
+					window.blockishTemplateLibraryData.defaultPackage = options.package;
+				}
+				setIsOpen(true);
+			},
+			close: () => setIsOpen(false),
+		};
+		return () => {
+			if (window.blockishTemplateLibrary) {
+				delete window.blockishTemplateLibrary.open;
+				delete window.blockishTemplateLibrary.close;
+			}
+		};
+	}, []);
+
 	return (
 		<>
 			<button

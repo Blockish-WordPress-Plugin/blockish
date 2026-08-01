@@ -2,7 +2,7 @@
 
 namespace Blockish\Mcp\Abilities\GetTemplates;
 
-use Blockish\Mcp\BlockSchemaMeta;
+use Blockish\Mcp\SchemaUtils;
 
 defined('ABSPATH') || exit;
 
@@ -10,6 +10,10 @@ class Callbacks
 {
     public static function get_templates($input): array
     {
+        if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
+            return [ 'error' => 'This tool is not available for the active theme because it is not a block theme.' ];
+        }
+
         $theme_slug = wp_get_theme()->get_stylesheet();
         $post_type = $input['type'] ?? ['wp_template', 'wp_template_part'];
         
@@ -28,9 +32,7 @@ class Callbacks
             $block_templates = get_block_templates($query_args, $pt);
 
             foreach ($block_templates as $template) {
-                $option_name = $pt === 'wp_template' ? 'blockish_mcp_staged_template' : 'blockish_mcp_staged_template_part';
-                $staged_data = get_option($option_name, []);
-                $has_schema = isset($staged_data[$template->slug]);
+                $has_preview = SchemaUtils::content_has_ai_preview( (string) $template->content );
 
                 $template_data = [
                     'id'            => $template->wp_id ?? 0,
@@ -41,17 +43,12 @@ class Callbacks
                     'source'        => $template->source,
                     'is_custom'     => $template->is_custom,
                     'has_theme_file'=> $template->has_theme_file,
-                    'schema_staged' => $has_schema,
+                    'schema_staged' => $has_preview,
                 ];
 
                 if (!empty($input['slug'])) {
                     $template_data['content'] = $template->content;
-                    $parsed_blocks = parse_blocks($template->content);
-                    $template_data['schema']  = \Blockish\Mcp\SchemaUtils::convert_to_js_schema($parsed_blocks);
-                    
-                    if ($has_schema) {
-                        $template_data['pending_schema'] = $staged_data[$template->slug];
-                    }
+                    $template_data['schema']  = SchemaUtils::resolve_schema_from_content( (string) $template->content );
                 }
 
                 $templates[] = $template_data;

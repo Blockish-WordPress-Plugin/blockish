@@ -47,6 +47,9 @@ const Width = (props) => {
                             options={[
                                 { value: 'auto', label: __('Auto', 'blockish') },
                                 { value: '100%', label: __('Full', 'blockish') },
+                                { value: 'fit-content', label: __('Fit Content', 'blockish') },
+                                { value: 'max-content', label: __('Max Content', 'blockish') },
+                                { value: 'min-content', label: __('Min Content', 'blockish') },
                                 { value: 'custom', label: __('Custom', 'blockish') },
                             ]}
                         />

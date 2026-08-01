@@ -65,36 +65,24 @@
     },
     "titleHorizontalAlignment": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}}": "--blockish-counter-title-horizontal: {{VALUE}};"
       }
     },
     "titleVerticalAlignment": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}}": "--blockish-counter-title-vertical: {{VALUE}};"
       }
     },
     "titleGap": {
       "type": "object",
-      "default": {
-        "Desktop": "8px"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-counter__inner": "gap: {{VALUE}};"
       }
     },
     "numberPosition": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-counter__number": "align-self: {{VALUE}};"
       }

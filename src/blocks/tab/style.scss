@@ -9,7 +9,6 @@
 
 	.blockish-block-tab-layout {
 		display: flex;
-		flex-direction: column;
 		gap: var(--blockish-tab-gap);
 	}
 
@@ -102,4 +101,23 @@
 		height: 100%;
 		padding: 16px;
 	}
+}
+
+:where(.blockish-block-tab .blockish-block-tab-layout) {
+	flex-direction: column;
+	gap: 10px;
+}
+
+:where(.blockish-block-tab .blockish-block-tab-nav) {
+	justify-content: flex-start;
+	align-self: stretch;
+	gap: 10px;
+}
+
+:where(.blockish-block-tab .blockish-block-tab-trigger) {
+	flex-direction: row;
+}
+
+:where(.blockish-block-tab .blockish-block-tab-trigger-title) {
+	text-align: left;
 }

@@ -1,0 +1,95 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/query-title",
+  "version": "1.0.0",
+  "title": "Query Title",
+  "category": "blockish-framework",
+  "description": "Displays the archive, search, or post type title for the current query.",
+  "keywords": [
+    "blockish",
+    "archive",
+    "search",
+    "title",
+    "query"
+  ],
+  "textdomain": "blockish",
+  "attributes": {
+    "type": {
+      "type": "object",
+      "default": {
+        "label": "Archive",
+        "value": "archive"
+      }
+    },
+    "showPrefix": {
+      "type": "boolean",
+      "default": true
+    },
+    "showSearchTerm": {
+      "type": "boolean",
+      "default": true
+    },
+    "tag": {
+      "type": "object",
+      "default": {
+        "label": "H1",
+        "value": "h1"
+      }
+    },
+    "alignment": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "typography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "color": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}": "color: {{VALUE}};"
+      }
+    },
+    "hoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}:hover": "color: {{VALUE}};"
+      }
+    },
+    "textShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "textShadowHover": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}:hover"
+      }
+    }
+  },
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "usesContext": [
+    "templateSlug"
+  ],
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

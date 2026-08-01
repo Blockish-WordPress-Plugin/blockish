@@ -46,10 +46,36 @@ class ExtensionsV1 extends WP_REST_Controller {
 	}
 
 	public function get_extensions() {
+		$hardcoded_extensions = \Blockish\Config\ExtensionList::get_instance()->get_list('list');
+		$saved_extensions = $this->get_saved_extensions();
+		$addons = \Blockish\Config\AddonsList::get_instance()->get_list('list');
+
+		foreach ( $hardcoded_extensions as $slug => &$extension ) {
+			// Restore the user's saved status
+			if ( isset( $saved_extensions[ $slug ]['status'] ) ) {
+				$status = $saved_extensions[ $slug ]['status'];
+				if ( in_array( $status, array( 'active', 'inactive' ), true ) ) {
+					$extension['status'] = $status;
+				}
+			}
+
+			// Restore settings if they exist
+			if ( isset( $saved_extensions[ $slug ]['settings'] ) ) {
+				$extension['settings'] = $saved_extensions[ $slug ]['settings'];
+			}
+
+			// Override with locked if required addon is not available (installed & licensed)
+			if ( ! empty( $extension['addon'] ) && isset( $addons[ $extension['addon'] ] ) ) {
+				if ( empty( $addons[ $extension['addon'] ]['is_available'] ) ) {
+					$extension['status'] = 'locked';
+				}
+			}
+		}
+
 		return rest_ensure_response(
 			array(
 				'status'     => 'success',
-				'extensions' => $this->get_saved_extensions(),
+				'extensions' => $hardcoded_extensions,
 				'message'    => array( 'Extensions list has been fetched successfully.' ),
 			)
 		);

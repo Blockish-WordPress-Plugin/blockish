@@ -1,0 +1,85 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/site-title",
+  "version": "1.0.0",
+  "title": "Site Title",
+  "category": "blockish-framework",
+  "description": "Displays the site title with an optional home link.",
+  "keywords": [
+    "blockish",
+    "site",
+    "title",
+    "brand",
+    "logo"
+  ],
+  "textdomain": "blockish",
+  "attributes": {
+    "tag": {
+      "type": "object",
+      "default": {
+        "label": "H1",
+        "value": "h1"
+      }
+    },
+    "linkToHome": {
+      "type": "boolean",
+      "default": true
+    },
+    "openInNewTab": {
+      "type": "boolean",
+      "default": false
+    },
+    "alignment": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "typography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "color": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}, .{{WRAPPER}} a": "color: {{VALUE}};"
+      }
+    },
+    "hoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}:hover, .{{WRAPPER}} a:hover": "color: {{VALUE}};"
+      }
+    },
+    "textShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "textShadowHover": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTextShadow",
+        "selector": ".{{WRAPPER}}:hover"
+      }
+    }
+  },
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

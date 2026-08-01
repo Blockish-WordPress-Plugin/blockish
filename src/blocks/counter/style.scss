@@ -1,10 +1,6 @@
 .blockish-counter {
-	--blockish-counter-title-horizontal: center;
-	--blockish-counter-title-vertical: center;
-
 	.blockish-counter__inner {
 		display: flex;
-		gap: 8px;
 	}
 
 	&.is-title-before .blockish-counter__inner {
@@ -49,4 +45,17 @@
 	.blockish-counter__title {
 		line-height: 1.3;
 	}
+}
+
+:where(.blockish-counter) {
+	--blockish-counter-title-horizontal: center;
+	--blockish-counter-title-vertical: center;
+}
+
+:where(.blockish-counter .blockish-counter__inner) {
+	gap: 8px;
+}
+
+:where(.blockish-counter .blockish-counter__number) {
+	align-self: center;
 }

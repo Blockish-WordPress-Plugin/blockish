@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create, Edit or Delete Post', 'blockish'),
-            'description'         => __('Creates, edits, or deletes a post. To CREATE: omit post_id but provide post_title and post_type. To EDIT: provide post_id. To DELETE: provide post_id and set delete to true. Pass Blockish layouts as block_schema, never raw "<!-- wp:... -->" markup. When a schema is staged, share edit_url (not post_url) so the user can approve. CRITICAL WARNING: Before calling this tool to design a layout, you MUST call blockish/get-designer-workflow and blockish/get-block-docs, otherwise your design will fail. Always call blockish/trigger-refresh after staging a layout. NOTE: If you are asked to "write a blog post", DO NOT use this tool. Use blockish/write-blog instead. This tool is strictly for publishing layout schemas or deleting/editing posts.', 'blockish'),
+            'description'         => __('Creates, edits, or deletes a post. To CREATE: omit post_id but provide post_title and post_type. To EDIT: provide post_id. To DELETE: provide post_id and set delete to true. For Blockish layouts, pass block_schema — this stages a blockish/ai-preview block into post_content (previousSchema + pendingSchema attrs). User Accept/Discard in the editor. Do NOT send pattern-ref markup or block HTML in post_content. Never put core/template-part header/footer on pages. CRITICAL: call blockish/get-designer-workflow and blockish/get-block-docs before designing. For blog prose use blockish/write-blog, not this tool.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -20,16 +20,23 @@ class Config
                     'post_id'      => ['type' => 'integer', 'description' => 'Required to edit or delete an existing post. Omit to create a new post.'],
                     'post_type'    => ['type' => 'string',  'description' => 'Post type slug (e.g., "post", "page"). Required only when creating a new post.'],
                     'post_title'   => ['type' => 'string',  'description' => 'The title of the post. Required only when creating a new post.'],
-                    'post_content' => ['type' => 'string'],
+                    'post_content' => [
+                        'type'        => 'string',
+                        'description' => 'Do NOT use for Blockish layouts, pattern refs, or forms. Layouts must be staged via block_schema. Passing post_content for pages/posts/patterns/forms is rejected.',
+                    ],
                     'post_status'  => ['type' => 'string',  'description' => 'draft, publish, private, etc. Defaults to "draft".'],
                     'post_excerpt' => ['type' => 'string'],
+                    'post_parent'  => [
+                        'type'        => 'integer',
+                        'description' => 'Optional parent post ID. Defaults to 0 (top-level). Omit on edit to leave unchanged.',
+                    ],
                     'featured_media' => [
                         'type'        => 'integer',
-                        'description' => 'Attachment ID of an existing Media Library item to set as the featured image. This ability does not upload files: call blockish/get-media to find an existing image first, otherwise call blockish/upload-media with an image URL to create one and get its attachment_id, then pass it here. Do not guess an ID.',
+                        'description' => 'Attachment ID of an existing Media Library item to set as the featured image. This ability does not upload files: call blockish/get-media to find an existing image first, otherwise call blockish/manage-media with an image URL to create one and get its attachment_id, then pass it here. Do not guess an ID.',
                     ],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'Array of Blockish block schema nodes ({name, attributes, innerBlocks}) to stage on this post. For full pages, pass a LIGHTWEIGHT assembly of core/block pattern refs — monolithic nested pages are rejected. Build sections with blockish/manage-pattern first. Build from blockish/get-block-docs. Stored as pending data for a human to Accept — never written directly into post_content. Pass an empty array to clear a previously staged schema.',
+                        'description' => 'REQUIRED for layouts — including empty pages. Array of block schema nodes ({name, attributes, innerBlocks}); pattern refs recommended for large pages: {name:"core/block", attributes:{ref:<real_id>, align:"full"}} for full-bleed sections (omit align only for content-width). Build sections with manage-pattern first — never invent refs. Do NOT include core/template-part header/footer on pages. Staged into post_content as a single blockish/ai-preview block (pendingSchema + previousSchema). Pass an empty array to clear. After staging share edit_url for Accept/Discard.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [
@@ -42,7 +49,11 @@ class Config
                     ],
                     'schema_file' => [
                         'type'        => 'string',
-                        'description' => 'Absolute file path to a JSON file containing the block_schema. Prefer this for large section schemas to avoid chat/MCP truncation. Still subject to monolithic-schema rejection on pages/templates — use patterns + refs for full pages.',
+                        'description' => 'Absolute path on the WordPress SERVER only to a JSON file containing block_schema. Never a Cursor/client path when MCP points at a remote site.',
+                    ],
+                    'schema_url' => [
+                        'type'        => 'string',
+                        'description' => 'PREFERRED for large or client-local schemas on remote MCP. Write the block_schema JSON, upload that file to a third-party temporary hosting service (e.g. tmpfiles.org), take the DIRECT download URL that returns raw JSON (not an HTML page), then pass that HTTPS URL here. Do not inline huge block_schema when it risks truncation. Do not use base64. Max download 2 MB. Do not pass schema_file at the same time.',
                     ],
                     'meta_input' => [
                         'type'        => 'object',
@@ -69,7 +80,8 @@ class Config
                     'post_status'  => ['type' => 'string'],
                     'post_url'     => ['type' => 'string'],
                     'edit_url'     => ['type' => 'string'],
-                    'schema_staged' => ['type' => 'boolean', 'description' => 'True if block_schema was provided and saved as pending data on this post.'],
+                    'post_parent'  => ['type' => 'integer', 'description' => 'Parent post ID after save (0 = top-level).'],
+                    'schema_staged' => ['type' => 'boolean', 'description' => 'True if non-empty block_schema was staged as an ai-preview block in post_content.'],
                     'featured_media_set' => ['type' => 'boolean', 'description' => 'True if featured_media was provided and successfully set as the post thumbnail.'],
                     'warnings'     => ['type' => 'array', 'description' => 'Non-blocking agent warnings (e.g. button double-border). Fix these when present.', 'items' => ['type' => 'string']],
                     'error'        => ['type' => 'string'],
@@ -79,7 +91,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'CRITICAL RULES: 1) block_schema is staged as pending data — never written live. After staging, call blockish/trigger-refresh and share edit_url so the human can Accept in the canvas. Do NOT auto-accept unless the user explicitly asks (then use blockish/get-automation-guideline). Accept exists so a bad AI schema cannot destroy a live site. 2) Submitting a block_schema REPLACES any previously staged schema; it does not merge. 3) There is no single-attribute patch for an already-applied block. To patch something, read the post content, rebuild the full block schema, stage it, and tell the human to Accept. 4) Monolithic / deeply nested full-page schemas are REJECTED — build sections with blockish/manage-pattern, assemble with core/block refs (see get-designer-workflow steps 7–8). Use schema_file for large section JSON. 5) Call blockish/get-block-docs first. 6) ALWAYS call blockish/trigger-refresh immediately after staging.',
+                'usage_notes' => 'CRITICAL RULES (manage-post): 1) Send block_schema for layouts — staged as blockish/ai-preview in post_content (not meta). 2) Create patterns with manage-pattern FIRST; use returned real IDs only for core/block refs. 3) Full-bleed section refs MUST set attributes.align to "full" (omit align only for content-width). 4) NEVER send pattern-ref comments or block HTML into post_content. 5) Re-stage replaces pendingSchema only; previousSchema stays until Accept/Discard. 6) Monolithic full-page schemas are REJECTED — patterns + refs. 7) NEVER put core/template-part header/footer on pages. 8) Call get-block-docs with required block_names (only blocks you need). 9) After staging: trigger-refresh and share edit_url. 10) Optional post_parent nests under a parent.',
             ],
         ];
     }

@@ -17,9 +17,10 @@ class Config
             'input_schema'        => [
                 'type'       => 'object',
                 'properties' => [
-                    'post_id'   => [ 'type' => 'integer', 'description' => 'Fetch this exact post, ignoring all other filters.' ],
+                    'post_id'   => [ 'type' => 'integer', 'description' => 'Fetch this exact post, ignoring all other filters. NOTE: You MUST provide a post_id if you want to retrieve the full post content or schema.' ],
                     'post_type' => [ 'type' => 'string',  'description' => 'Post type slug. Defaults to "post".' ],
                     'search'    => [ 'type' => 'string',  'description' => 'Search term matched against title/content.' ],
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
                     'tax_query' => [
                         'type' => 'array',
                         'description' => 'Array of taxonomy query objects. Each object must have "taxonomy" (e.g. "category" or "post_tag") and "terms" (array of term slugs or IDs). Example: [{"taxonomy":"category", "terms":["news"]}]',
@@ -52,9 +53,8 @@ class Config
                             'properties' => [
                                 'id'             => [ 'type' => 'integer' ],
                                 'title'          => [ 'type' => 'string' ],
-                                'content'        => [ 'type' => 'string', 'description' => 'Raw post_content. Only included when fetching a single post via post_id, not in list queries.' ],
-                                'schema'         => [ 'type' => 'array', 'description' => 'The LIVE schema array parsed from post_content. Present only if fetched by post_id.' ],
-                                'pending_schema' => [ 'type' => 'array', 'description' => 'The PENDING schema array waiting to be reviewed in the editor. Present only if fetched by post_id and if a pending schema exists.' ],
+                                'content'        => [ 'type' => 'string', 'description' => 'Raw post_content. Only included when fetching a single post via post_id, not in list queries. May be a staged blockish/ai-preview block.' ],
+                                'schema'         => [ 'type' => 'array', 'description' => 'Resolved schema for editing. If content has blockish/ai-preview, this is pendingSchema; otherwise parsed from content. Present only if fetched by post_id.' ],
                                 'status'         => [ 'type' => 'string' ],
                                 'type'           => [ 'type' => 'string' ],
                                 'url'            => [ 'type' => 'string' ],
@@ -71,7 +71,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use this to find a post by title or ID before editing it with blockish/manage-post, to check whether content already exists, or to list recent content. NOTE: The returned `content` field reflects only what has already been *applied* in the editor by a human. It will not show you the contents of an unapplied pending schema.',
+                'usage_notes' => 'Use this to find a post by title or ID before editing it with blockish/manage-post. When fetching by post_id, `schema` is the edit truth: pendingSchema if an ai-preview is staged in content, otherwise the live content schema. `content` is raw markup.',
             ],
         ];
     }

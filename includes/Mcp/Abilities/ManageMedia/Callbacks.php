@@ -29,6 +29,10 @@ class Callbacks
             }
             foreach ( $attachment_ids as $id ) {
                 $id = absint( $id );
+                if ( ! current_user_can( 'delete_post', $id ) ) {
+                    $results[] = [ 'id' => $id, 'error' => 'You do not have access to delete this attachment.' ];
+                    continue;
+                }
                 if ( wp_delete_attachment( $id, true ) ) {
                     $results[] = [ 'id' => $id, 'deleted' => true ];
                 } else {

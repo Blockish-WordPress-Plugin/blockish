@@ -12,31 +12,37 @@ class Config
     {
         return [
             'label'               => __('Get Block Docs', 'blockish'),
-            'description'         => __('Returns the full Blockish block reference — all blocks, their attributes, formats (responsive object, typography, background, border, spacing, icon, image) and markup examples.', 'blockish'),
+            'description'         => __('Returns Blockish core docs plus attribute docs for the blocks you name. block_names is REQUIRED — never call without it (full library dump is disabled to save context). If omitted or empty, returns an error plus the blocks/extensions catalogs so you can choose names and retry.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
+                'required'   => [ 'block_names' ],
                 'properties' => [
                     'block_names' => [
-                        'type' => 'array',
-                        'description' => 'Optional array of block names (e.g. ["blockish/container", "blockish/heading"]) to fetch documentation for specific blocks only. To save context, call blockish/get-blocks-info first to find the blocks you need, then pass their names here.',
-                        'items' => [
-                            'type' => 'string'
-                        ]
-                    ]
+                        'type'        => 'array',
+                        'minItems'    => 1,
+                        'description' => 'Required. Block names to document (e.g. ["blockish/container", "blockish/heading", "blockish/button"]). Pass only blocks you will use. If unsure which exist, call blockish/get-blocks-info first, or call this tool without names to receive the catalogs in the error response.',
+                        'items'       => [
+                            'type' => 'string',
+                        ],
+                    ],
                 ],
             ],
             'output_schema'       => [
                 'type'       => 'object',
                 'properties' => [
-                    'docs' => [ 'type' => 'string', 'description' => 'Markdown documentation for the requested Blockish blocks (or all blocks if no specific names were provided).' ],
+                    'docs'       => [ 'type' => 'string', 'description' => 'Markdown: core reference + requested per-block docs + footer. Present only when block_names was provided.' ],
+                    'error'      => [ 'type' => 'string', 'description' => 'Present when block_names is missing/empty. Explains how to retry.' ],
+                    'warning'    => [ 'type' => 'string', 'description' => 'Present when some requested names had no docs file.' ],
+                    'blocks'     => [ 'type' => 'object', 'description' => 'Block catalog (same as get-blocks-info). Returned with error/warning so you can pick valid names.' ],
+                    'extensions' => [ 'type' => 'object', 'description' => 'Extension catalog (same as get-extensions-info). Returned with error/warning.' ],
                 ],
             ],
             'execute_callback'    => [Callbacks::class, 'get_block_docs'],
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Do not call this without parameters unless you want the entire library. To save context, call blockish/get-blocks-info first to find the blocks you need, then pass their names here in the block_names array.',
+                'usage_notes' => 'ALWAYS pass block_names with only the blocks you need. Omitting it does NOT return the full library — you get an error plus blocks/extensions catalogs; choose names from those and call again. Prefer get-blocks-info first when exploring.',
             ],
         ];
     }

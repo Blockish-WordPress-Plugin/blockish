@@ -46,10 +46,31 @@ class BlocksV1 extends WP_REST_Controller {
 	}
 
 	public function get_blocks() {
+		$hardcoded_blocks = \Blockish\Config\BlocksList::get_instance()->get_list('list');
+		$saved_blocks = $this->get_saved_blocks();
+		$addons = \Blockish\Config\AddonsList::get_instance()->get_list('list');
+
+		foreach ( $hardcoded_blocks as $slug => &$block ) {
+			// Restore the user's saved status
+			if ( isset( $saved_blocks[ $slug ]['status'] ) ) {
+				$status = $saved_blocks[ $slug ]['status'];
+				if ( in_array( $status, array( 'active', 'inactive' ), true ) ) {
+					$block['status'] = $status;
+				}
+			}
+
+			// Override with locked if required addon is not available (installed & licensed)
+			if ( ! empty( $block['addon'] ) && isset( $addons[ $block['addon'] ] ) ) {
+				if ( empty( $addons[ $block['addon'] ]['is_available'] ) ) {
+					$block['status'] = 'locked';
+				}
+			}
+		}
+
 		return rest_ensure_response(
 			array(
 				'status'  => 'success',
-				'blocks'  => $this->get_saved_blocks(),
+				'blocks'  => $hardcoded_blocks,
 				'message' => array( 'Blocks list has been fetched successfully.' ),
 			)
 		);

@@ -2,7 +2,6 @@
 	.blockish-rating-icons {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
 	}
 
 	.blockish-rating-icon {
@@ -23,12 +22,6 @@
 		);
 	}
 
-	.blockish-rating-icon-base svg,
-	.blockish-rating-icon-fill svg {
-		width: 24px;
-		height: 24px;
-	}
-
 	.blockish-rating-icon-fill svg {
 		fill: #f5c518;
 	}
@@ -36,4 +29,18 @@
 	.blockish-rating-icon-base svg {
 		fill: #d0d5dd;
 	}
+}
+
+:where(.blockish-rating) {
+	text-align: center;
+}
+
+:where(.blockish-rating .blockish-rating-icons) {
+	gap: 6px;
+}
+
+:where(.blockish-rating .blockish-rating-icon-base svg),
+:where(.blockish-rating .blockish-rating-icon-fill svg) {
+	width: 24px;
+	height: 24px;
 }

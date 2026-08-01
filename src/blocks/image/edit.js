@@ -19,7 +19,9 @@ export default function Edit({ attributes, setAttributes, advancedControls, isSe
 	const { BlockishImagePlaceholder } = window.blockish.components;
 	const [ isUploading, setIsUploading ] = useState( false );
 	const blockProps = useBlockProps({
-		className: 'blockish-image-wrapper',
+		className: clsx( 'blockish-image-wrapper', {
+			'has-lightbox': !! attributes?.lightbox,
+		} ),
 	});
 
 	const { createErrorNotice } = useDispatch( noticesStore );

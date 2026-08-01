@@ -1,0 +1,20 @@
+.blockish-site-logo {
+	margin: 0;
+
+	a {
+		display: inline-block;
+	}
+
+	.blockish-site-logo__image {
+		display: block;
+		height: auto;
+	}
+}
+
+:where(.blockish-site-logo) {
+	text-align: left;
+}
+
+:where(.blockish-site-logo .blockish-site-logo__image) {
+	width: 120px;
+}

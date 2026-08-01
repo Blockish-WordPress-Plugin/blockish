@@ -38,6 +38,7 @@ class StyleGenerator
         global $wpdb;
 
         // Fetch all transient keys related to blockish_style_
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $transient_keys = $wpdb->get_col($wpdb->prepare(
             "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
             '_transient_blockish_style_%',
@@ -59,7 +60,7 @@ class StyleGenerator
 
     private function set_current_url()
     {
-        $this->current_url = isset($_SERVER['REQUEST_URI']) ? home_url($_SERVER['REQUEST_URI']) : home_url('/');
+        $this->current_url = isset($_SERVER['REQUEST_URI']) ? home_url(esc_url_raw(wp_unslash($_SERVER['REQUEST_URI']))) : home_url('/');
     }
 
     private function get_cache_key()
@@ -338,7 +339,7 @@ class StyleGenerator
     public function enqueue_block_styles()
     {
         if (!empty($this->collected_block_css)) {
-            wp_register_style('blockish-block-styles', false);
+            wp_register_style('blockish-block-styles', false, [], BLOCKISH_VERSION);
             wp_enqueue_style('blockish-block-styles');
             wp_add_inline_style('blockish-block-styles', $this->collected_block_css);
         }

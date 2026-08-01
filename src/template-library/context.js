@@ -10,7 +10,10 @@ export const TemplateLibraryProvider = ({ children }) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedTag, setSelectedTag] = useState('');
 	const [selectedCategory, setSelectedCategory] = useState('');
-	const [selectedPackage, setSelectedPackage] = useState('All');
+	const [selectedPackage, setSelectedPackage] = useState(() => {
+		const fromData = window.blockishTemplateLibraryData?.defaultPackage;
+		return fromData || 'All';
+	});
 	
 	const [designs, setDesigns] = useState([]);
 	const [tags, setTags] = useState([]);
@@ -56,6 +59,9 @@ export const TemplateLibraryProvider = ({ children }) => {
 
 				
 				if (typeSlug === 'patterns' && selectedTag && selectedTag !== 'All') {
+					path += `&tag=${encodeURIComponent(selectedTag)}`;
+				}
+				if (typeSlug === 'pages' && selectedTag && selectedTag !== 'All') {
 					path += `&tag=${encodeURIComponent(selectedTag)}`;
 				}
 				if (typeSlug === 'pages' && selectedCategory && selectedCategory !== 'All') {

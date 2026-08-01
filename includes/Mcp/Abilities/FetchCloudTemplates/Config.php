@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Fetch Cloud Templates', 'blockish'),
-            'description'         => __('Fetches boilerplate design templates (patterns and pages) from the Blockish Cloud Template Library. CRITICAL: The returned block schemas are starting points. You MUST modify colors, placeholder text, and structure based on the user\'s prompt before inserting them.', 'blockish'),
+            'description'         => __('Fetches boilerplate design templates (patterns and pages) from the Blockish Cloud Template Library. Designs may include dependencies.patterns, dependencies.forms, and dependencies.classes (cloud id + content/css). Recreate those as local wp_block / blockish_form / blockish-classes posts, remap ref/formId/classManager ids cloud→local, then adapt the schema to the user request. CRITICAL: Never use cloud IDs as-is on the destination site.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -63,7 +63,7 @@ class Config
             'permission_callback' => fn() => true,
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'NOTE TO AI: The fetched designs are boilerplate starter templates. YOU MUST NOT USE THEM EXACTLY AS THEY ARE. Analyze the user\'s request and modify the returned block_schema to match the user\'s requested colors, typography, layout preferences, and placeholder text before returning or inserting the final schema.',
+                'usage_notes' => 'NOTE TO AI: Designs include content + optional dependencies (patterns/forms/classes with cloud ids). 1) Create local entities from dependencies (classes via manage-class css or template-library import). 2) Remap ref/formId/classManager id from cloud IDs to new local IDs in content/schema. 3) Modify colors/copy/layout for the user. 4) Stage via manage-pattern / manage-post block_schema and share edit_url — never paste unresolved cloud refs.',
             ],
         ];
     }

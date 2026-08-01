@@ -19,25 +19,18 @@
   "attributes": {
     "layout": {
       "type": "string",
-      "default": "column",
       "selectors": {
         ".{{WRAPPER}}": "flex-direction: {{VALUE}};"
       }
     },
     "rowGap": {
       "type": "object",
-      "default": {
-        "Desktop": "12px"
-      },
       "selectors": {
         ".{{WRAPPER}}": "row-gap: {{VALUE}};"
       }
     },
     "columnGap": {
       "type": "object",
-      "default": {
-        "Desktop": "12px"
-      },
       "selectors": {
         ".{{WRAPPER}}": "column-gap: {{VALUE}};"
       }
@@ -50,9 +43,6 @@
     },
     "itemContentSpacing": {
       "type": "object",
-      "default": {
-        "Desktop": "10px"
-      },
       "selectors": {
         ".{{WRAPPER}} .blockish-icon-list-item-link": "column-gap: {{VALUE}};"
       }
@@ -96,14 +86,12 @@
     },
     "itemIconHoverTransition": {
       "type": "number",
-      "default": 0.2,
       "selectors": {
         ".{{WRAPPER}}": "--blockish-icon-list-icon-hover-transition: {{VALUE}}s;"
       }
     },
     "itemTextHoverTransition": {
       "type": "number",
-      "default": 0.2,
       "selectors": {
         ".{{WRAPPER}}": "--blockish-icon-list-text-hover-transition: {{VALUE}}s;"
       }

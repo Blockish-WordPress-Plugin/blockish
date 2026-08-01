@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Plugin Name:       Blockish - AI site builder for WordPress
- * Description:       An AI-powered site building toolkit with creative Gutenberg blocks, an advanced Class Manager, and native MCP integration for autonomous web design.
- * Requires at least: 6.1
+ * Plugin Name:       Blockish – MCP AI Site Builder for Block Editor
+ * Description:       Build sites with AI via MCP (Cursor, Claude). 30+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
+ * Requires at least: 6.2
  * Requires PHP:      7.4
- * Version:           1.1.3
+ * Version:           1.2.0
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/
@@ -18,6 +18,7 @@
  */
 
 use Blockish\Config\ExtensionList;
+use Blockish\Config\Freemius as FreemiusConfig;
 use Blockish\Core\Blocks;
 use Blockish\Core\Dashboard;
 use Blockish\Core\Enqueue;
@@ -25,6 +26,7 @@ use Blockish\Core\SEO;
 use Blockish\Core\StyleGenerator;
 use Blockish\Extensions\ExtensionsLoader;
 use Blockish\Mcp\Loader;
+use Blockish\Routes\AddonsV1;
 use Blockish\Routes\BlocksV1;
 use Blockish\Routes\DashboardToolsV1;
 use Blockish\Routes\EditorSyncV1;
@@ -48,7 +50,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.1.3';
+    const VERSION = '1.2.0';
 
     /**
      * Holds the instance of this class.
@@ -71,6 +73,9 @@ final class Blockish
 
         // Load autoloader (vendor/autoload.php).
         require_once BLOCKISH_DIR . 'vendor/autoload_packages.php';
+
+        // Initialize Freemius after the Blockish autoloader is available.
+        FreemiusConfig::get_instance();
 
         // Initialize plugin hooks.
         add_action('plugins_loaded', array($this, 'plugins_loaded'));
@@ -143,8 +148,6 @@ final class Blockish
         });
 
         add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
-        add_action('admin_enqueue_scripts', [$this, 'override_dci_styles'], 999);
-        add_action('admin_init', [$this, 'init_dci']);
 
         // Load plugin classes.
         Dashboard::get_instance();
@@ -154,6 +157,7 @@ final class Blockish
         ExtensionsV1::get_instance();
         EditorSyncV1::get_instance();
         DashboardToolsV1::get_instance();
+        AddonsV1::get_instance();
         SVGUploaderV1::get_instance();
         Blocks::get_instance();
         ExtensionsLoader::get_instance();
@@ -190,57 +194,6 @@ final class Blockish
         ]);
     }
 
-    public function override_dci_styles()
-    {
-        if (! wp_style_is('dci-sdk-wowdevs', 'enqueued')) {
-            return;
-        }
-
-        wp_add_inline_style('dci-sdk-wowdevs', '
-            :root {
-                --dci-primary:       #2563eb;
-                --dci-primary-dark:  #1d4ed8;
-                --dci-primary-light: #eff6ff;
-                --dci-secondary:     #3b82f6;
-                --dci-skip-bg:       #f9fafb;
-                --dci-skip-hover:    #f3f4f6;
-                --dci-border:        #e5e7eb;
-                --dci-text:          #4b5563;
-                --dci-radius:        8px;
-            }
-            .dci-global-notice.notice-success {
-                border-left-color: #2563eb;
-                background: #fff;
-            }
-        ');
-    }
-
-    public function init_dci()
-    {
-        require_once BLOCKISH_DIR . 'dci/start.php';
-
-        dci_dynamic_init(array(
-            'product_id'           => 5,
-            'plugin_name'          => 'Blockish - Creative Gutenberg Blocks',
-            'plugin_title'         => 'Love using Blockish? Congrats 🎉  ( Never miss an Important Update )',
-            'plugin_icon'          => 'https://ps.w.org/blockish/assets/icon-256x256.png',
-
-            'api_endpoint'         => 'https://dashboard.wowdevs.com/wp-json/dci/v1/data-insights',
-            'slug'                 => 'blockish',
-            'core_file'            => false,
-            'plugin_deactivate_id' => false,
-            'menu'                 => array(
-                'slug' => 'blockish-dashboard',
-            ),
-            'public_key'           => 'pk_AyXCKb51WP7urdbX5vdqe2ScQewFI3Bn',
-            'is_premium'           => false,
-            'popup_notice'         => false,
-            'deactivate_feedback'  => true,
-            'text_domain'          => 'blockish',
-            'plugin_msg'           => '<p>Be Top-contributor by sharing non-sensitive plugin data and create an impact to the global WordPress community today! You can receive valuable emails periodically.</p>',
-        ));
-    }
-
     /**
      * Ensures that only one instance of the plugin is running.
      *
@@ -274,4 +227,15 @@ function blockish()
 {
     return Blockish::instance();
 }
+
+/**
+ * Retrieve the Blockish Freemius SDK instance.
+ *
+ * @return \Freemius|false
+ */
+function blockish_fs()
+{
+    return FreemiusConfig::get_instance()->get_sdk();
+}
+
 blockish();

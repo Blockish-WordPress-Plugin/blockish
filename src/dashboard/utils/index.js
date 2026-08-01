@@ -1,7 +1,9 @@
+import { applyFilters } from '@wordpress/hooks';
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 import {
 	blocks as blocksIcon,
 	layoutDashboard,
+	packageIcon,
 	plugIcon,
 	settingsIcon,
 	zap,
@@ -11,12 +13,30 @@ export const SIDEBAR_MENUS = [
 	{ key: 'dashboard', label: 'Dashboard', icon: layoutDashboard },
 	{ key: 'blocks', label: 'Blocks', icon: blocksIcon },
 	{ key: 'extensions', label: 'Extensions', icon: plugIcon },
-	{ key: 'addons', label: 'Addons', icon: plugIcon },
 	{ key: 'mcp-config', label: 'MCP Server', icon: zap },
 	{ key: 'settings', label: 'Settings', icon: settingsIcon },
+	// Always last — buy add-ons + activate licenses live here (not Plugins row).
+	{
+		key: 'addons',
+		label: 'Addons & License',
+		hint: 'Buy add-ons · Activate keys',
+		icon: packageIcon,
+	},
 	// { key: 'integrations', label: 'Integrations', icon: plugIcon },
-	// { key: 'license', label: 'License', icon: keyIcon },
 ];
+
+/**
+ * Keep Addons pinned under every other sidebar item (including filter-injected ones).
+ *
+ * @param {Array} menus Sidebar menu definitions.
+ * @return {Array}
+ */
+export function orderSidebarMenus(menus = []) {
+	const list = Array.isArray(menus) ? [ ...menus ] : [];
+	const addons = list.find( ( menu ) => menu?.key === 'addons' );
+	const rest = list.filter( ( menu ) => menu?.key !== 'addons' );
+	return addons ? [ ...rest, addons ] : rest;
+}
 
 export const BLOCK_FILTERS = [
 	{ key: 'all', label: 'All' },
@@ -36,7 +56,10 @@ export const EXTENSION_CONTROL_MAP = {
 };
 
 export function isValidMenu(menuKey) {
-	return SIDEBAR_MENUS.some((menu) => menu.key === menuKey);
+	const menus = orderSidebarMenus(
+		applyFilters('blockish.dashboard.sidebarMenus', SIDEBAR_MENUS)
+	);
+	return menus.some((menu) => menu.key === menuKey);
 }
 
 export function getBlockCategoryKey(item = {}, slug = '') {

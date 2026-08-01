@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Manage WordPress & Blockish Options', 'blockish'),
-            'description'         => __('Retrieve or update specific WordPress core settings and Blockish options.', 'blockish'),
+            'description'         => __('Retrieve or update allowlisted WordPress core settings and Blockish options. Cannot change siteurl or home (those break the site).', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -48,7 +48,8 @@ class Config
             'execute_callback'    => [Callbacks::class, 'manage_options'],
             'permission_callback' => fn() => current_user_can('manage_options'),
             'meta'                => [
-                'mcp' => ['public' => true],
+                'mcp'         => ['public' => true],
+                'usage_notes' => 'Do not update siteurl or home — they are blocked. Prefer blogname, blogdescription, reading settings, and blockish_* keys.',
             ],
         ];
     }

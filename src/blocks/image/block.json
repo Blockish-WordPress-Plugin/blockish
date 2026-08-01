@@ -40,11 +40,12 @@
     "customCaption": {
       "type": "string"
     },
+    "lightbox": {
+      "type": "boolean",
+      "default": false
+    },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }
@@ -228,6 +229,7 @@
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
+  "viewScript": "file:./view.js",
   "usesContext": [
     "postId",
     "postType"

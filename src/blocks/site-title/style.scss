@@ -1,0 +1,10 @@
+.blockish-site-title {
+	a {
+		color: inherit;
+		text-decoration: inherit;
+	}
+}
+
+:where(.blockish-site-title) {
+	text-align: left;
+}

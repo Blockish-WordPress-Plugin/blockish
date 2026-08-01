@@ -1,8 +1,8 @@
 const generateBackgroundOverlayStyles = (overlay) => {
     const { generateCSSFilters } = window.blockish.helpers;
-    if (!overlay || typeof overlay !== 'string') return '';
+    if (!overlay || (typeof overlay !== 'string' && typeof overlay !== 'object')) return '';
 
-    const jsonOverlay = JSON.parse(overlay);
+    const jsonOverlay = typeof overlay === 'string' ? JSON.parse(overlay) : overlay;
     let styles = '';
     
     switch (jsonOverlay.type || 'color') {

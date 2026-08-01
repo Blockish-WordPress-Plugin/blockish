@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create or Edit Template', 'blockish'),
-            'description'         => __('Creates, updates or deletes a Full Site Editing (FSE) template or template part (set delete to remove); returns id, slug, edit_url and action. Pass Blockish layouts as block_schema, never raw HTML. When a schema is staged, share edit_url (not the preview link) so the user can review it in the canvas and accept it. CRITICAL WARNING: Before calling this tool, you MUST call blockish/get-designer-workflow and blockish/get-block-docs, otherwise your design will fail. Always call blockish/trigger-refresh after staging a layout.', 'blockish'),
+            'description'         => __('Creates, updates or deletes a Full Site Editing (FSE) template or template part (set delete to remove); returns id, slug, edit_url and action. Pass Blockish layouts as block_schema, never raw HTML. block_schema is staged into template content as a blockish/ai-preview block (previousSchema + pendingSchema). Share edit_url for Accept/Discard. CRITICAL: call blockish/get-designer-workflow and blockish/get-block-docs before designing. Always call blockish/trigger-refresh after staging.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -24,7 +24,7 @@ class Config
                     'delete'       => ['type' => 'boolean', 'description' => 'Set to true to delete this template customization, falling back to the theme default.'],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'Array of Blockish block schema nodes ({name, attributes, innerBlocks}) to stage on this template. Build it from blockish/get-block-docs; do not pass raw HTML. When adding a header or footer to a template layout, use {"name": "core/template-part", "attributes": {"slug": "header", "theme": "twentytwentyfive"}} (or "footer"). Stored as pending data for a human to review and apply in the Site Editor — never written directly into the template. Pass an empty array to clear previously staged schema.',
+                        'description' => 'Array of Blockish block schema nodes ({name, attributes, innerBlocks}) to stage on this template. Build from blockish/get-block-docs; do not pass raw HTML. When adding header/footer use {"name":"core/template-part","attributes":{"slug":"header","theme":"<active_theme_slug>"}}. Staged as ai-preview in content. Pass an empty array to clear.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [
@@ -37,7 +37,11 @@ class Config
                     ],
                     'schema_file' => [
                         'type'        => 'string',
-                        'description' => 'Absolute file path to a JSON file containing the block_schema. Use this if the block_schema payload is extremely large (e.g., >10KB) to avoid chat truncation issues. Write the JSON to a scratch file first, then pass the file path here instead of passing block_schema directly.',
+                        'description' => 'Absolute path on the WordPress SERVER only to a JSON file containing block_schema. Never a Cursor/client path when MCP points at a remote site.',
+                    ],
+                    'schema_url' => [
+                        'type'        => 'string',
+                        'description' => 'PREFERRED for large or client-local schemas on remote MCP. Write the block_schema JSON, upload that file to a third-party temporary hosting service (e.g. tmpfiles.org), take the DIRECT download URL that returns raw JSON (not an HTML page), then pass that HTTPS URL here. Do not inline huge block_schema when it risks truncation. Do not use base64. Max download 2 MB. Do not pass schema_file at the same time.',
                     ],
                 ],
                 'required' => ['slug'],
@@ -58,7 +62,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_theme_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'block_schema is never written into the template — it is staged as pending data. A human must open edit_url where the layout will appear inside a neon preview block in the canvas. They must click "Accept" on the block itself before it goes live. Monolithic / deeply nested full-template schemas are REJECTED — build sections with blockish/manage-pattern and assemble with core/block refs (get-designer-workflow steps 7–8). Call blockish/get-block-docs first. ALWAYS call blockish/trigger-refresh immediately after staging. After staging and refreshing, share edit_url so the user can approve; do not share the preview link by default — if the user insists, warn them the page appears empty or unchanged until they approve the pending layout in the editor.',
+                'usage_notes' => 'block_schema is staged as blockish/ai-preview in template content (not options). Monolithic full-template schemas are REJECTED — patterns + core/block refs with align:"full" for full-bleed sections. Call get-block-docs with required block_names. ALWAYS trigger-refresh after staging and share edit_url for Accept/Discard.',
             ],
         ];
     }

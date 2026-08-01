@@ -1,59 +1,55 @@
 ### `blockish/heading`
 
-A heading element with full text styling. **Accepts children: no.**
+Heading / text element. **Accepts children: no.**
 
-| Attribute | Type | Default | Notes/enum |
-|---|---|---|---|
-| `content` | Scalar (string, HTML allowed) | `"Heading Text"` | |
-| `tag` | Option | `{"label":"H2","value":"h2"}` | Options: `[{"label":"H1","value":"h1"},{"label":"H2","value":"h2"},{"label":"H3","value":"h3"},{"label":"H4","value":"h4"},{"label":"H5","value":"h5"},{"label":"H6","value":"h6"},{"label":"P","value":"p"},{"label":"Span","value":"span"},{"label":"Div","value":"div"}]` — only these 9, no `section`/`article`/`main`/etc. (those belong to `blockish/container`'s `tagName`, a different attribute) |
-| `alignment` | Responsive | `{"Desktop":"left"}` | `"left"` `"center"` `"right"` <br>**CSS:** `.{{WRAPPER}}` -> `text-align: {{VALUE}};` |
-| `typography` | Stringified-JSON (Typography) | unset | <br>**CSS:** Uses `BlockishTypography` on `.{{WRAPPER}}` |
-| `color` | Color | unset | Normal <br>**CSS:** `.{{WRAPPER}}` -> `color: {{VALUE}};` |
-| `hoverColor` | Color | unset | Hover <br>**CSS:** `.{{WRAPPER}}:hover` -> `color: {{VALUE}};` |
-| `textShadow` | Stringified-JSON (Box Shadow) | unset | Normal <br>**CSS:** Uses `BlockishTextShadow` on `.{{WRAPPER}}` |
-| `textShadowHover` | Stringified-JSON (Box Shadow) | unset | Hover <br>**CSS:** Uses `BlockishTextShadow` on `.{{WRAPPER}}:hover` |
+#### Content / structure
 
-Minimal schema:
+| Attribute | Type | Notes |
+|---|---|---|
+| `content` | Scalar (HTML ok) | Required — no block.json default. |
+| `tag` | Option | Default `{"label":"H2","value":"h2"}`. Only `h1`–`h6`, `p`, `span`, `div`. For section semantics use container `tagName`, not a fake heading. |
+| `url` | Link | Optional wrap. Shape: `{"url":"/path","newTab":false,"noFollow":false}`. |
+| `anchor` / `align` | Scalar | `"align"`: `"wide"` \| `"full"`. |
+
+#### Markup
+
+Default (empty attributes — `tag` defaults to `h2`):
+
+```html
+<h2 class="wp-block-blockish-heading blockish-heading"></h2>
+```
+
+| When | What changes |
+|---|---|
+| `tag.value` | Root element is that tag. |
+| `url.url` set | Content wrapped in inner `<a …>` inside the tag. |
+| `content` set | Text/HTML inside the tag (or inside the `<a>`). |
+
+Style with convert-css:
+- text → `{{ROOT}} { font-size: …; color: …; text-align: …; }`
+- linked text inherits color/size from Already-there (`a { color: inherit … }`) — style the root, not a nested invented selector.
+
+#### Already-there CSS
+
+Stylesheet + defaults (omit = these already apply). Write only what differs.
+
+```css
+/* Stylesheet */
+:where(.blockish-heading) { margin: 0; padding: 0; text-align: left; }
+:where(.blockish-heading) a { color: inherit !important; font-size: inherit !important; font-weight: inherit; text-decoration: inherit !important; }
+```
+
+#### Minimal schema
+
 ```json
 {
   "name": "blockish/heading",
-  "attributes": { "content": "Build Faster", "tag": { "label": "H1", "value": "h1" } }
+  "attributes": {
+    "content": "Build Faster",
+    "tag": {
+      "label": "H1",
+      "value": "h1"
+    }
+  }
 }
 ```
-
----
-
-
-
-### Markup & CSS Generation
-
-**Generated HTML Structure:**
-```html
-<!-- The tag is dynamic based on the 'tag' attribute (h1-h6, p, div, span). Default is h2. -->
-<h2 class="blockish-heading">
-  
-  <!-- The <a> tag is ONLY rendered if a static URL (url.url) OR a dynamic URL (dynamicData.url) is set -->
-  <a href="..." target="_blank" rel="noopener noreferrer">
-    Heading Text Content
-  </a>
-
-</h2>
-```
-
-**Base CSS (`style.scss`):**
-```scss
-.blockish-heading {
-	margin: 0;
-	padding: 0;
-
-	a {
-		color: inherit !important;
-		font-size: inherit !important;
-		text-decoration: inherit !important;
-		font-weight: inherit;
-	}
-}
-```
-
-
-

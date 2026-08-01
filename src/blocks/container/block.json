@@ -23,6 +23,9 @@
         "value": "div"
       }
     },
+    "url": {
+      "type": "object"
+    },
     "overflow": {
       "type": "object",
       "selectors": {
@@ -35,18 +38,12 @@
     },
     "customWidthContainer": {
       "type": "object",
-      "default": {
-        "Desktop": "100%"
-      },
       "selectors": {
         ".{{WRAPPER}}.align-custom-width": "max-width: {{VALUE}};"
       }
     },
     "containerMinHeight": {
       "type": "object",
-      "default": {
-        "Desktop": "0"
-      },
       "selectors": {
         ".{{WRAPPER}}": "min-height: {{VALUE}};",
         ".{{WRAPPER}} > .block-list-appender": "min-height: {{VALUE}};"
@@ -54,10 +51,7 @@
     },
     "display": {
       "type": "string",
-      "default": "flex",
-      "selectors": {
-        ".{{WRAPPER}}.blockish-container": "display: {{VALUE}};"
-      }
+      "default": "flex"
     },
     "flexWrap": {
       "type": "object",
@@ -67,36 +61,18 @@
     },
     "flexDirection": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "label": "Row",
-          "value": "row"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-flex": "flex-direction: {{VALUE}};"
       }
     },
     "justifyContent": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "label": "Center",
-          "value": "center"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-flex": "justify-content: {{VALUE}};"
       }
     },
     "alignItems": {
       "type": "object",
-      "default": {
-        "Desktop": {
-          "label": "Center",
-          "value": "center"
-        }
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-flex": "align-items: {{VALUE}};"
       }
@@ -107,9 +83,6 @@
     },
     "autoGridWidth": {
       "type": "object",
-      "default": {
-        "Desktop": "12rem"
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-auto": "grid-template-columns: repeat(auto-fill,minmax(min({{VALUE}},100%),1fr));"
       }
@@ -122,20 +95,12 @@
     },
     "gridColumns": {
       "type": "object",
-      "default": {
-        "Desktop": 3,
-        "Tablet": 2,
-        "Mobile": 1
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-fixed": "grid-template-columns: repeat({{VALUE}}, minmax(0, 1fr));"
       }
     },
     "gridRows": {
       "type": "object",
-      "default": {
-        "Desktop": 1
-      },
       "selectors": {
         ".{{WRAPPER}}.blockish-container.layout-type-grid.grid-layout-type-fixed": "grid-template-rows: repeat({{VALUE}}, minmax(0, 1fr));"
       }
@@ -219,6 +184,17 @@
         "type": "BlockishBoxShadow",
         "selector": ".{{WRAPPER}}:hover"
       }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "url": [
+          {
+            "slug": "url",
+            "title": "Link URL"
+          }
+        ]
+      }
     }
   },
   "supports": {
@@ -236,6 +212,5 @@
   "textdomain": "blockish",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css",
-  "viewScript": "file:./view.js"
+  "style": "file:./style-index.css"
 }

@@ -1,106 +1,119 @@
-=== Blockish - AI site builder for WordPress ===
+=== Blockish – MCP AI Site Builder for Block Editor ===
 Author: wowdevs
 Author URI: https://wowdevs.com/
 Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
-Tags: mcp, ai, ai site builder, ai page builder, ai web design
+Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.0
-Stable tag: 1.1.3
-Requires at least: 6.1
+Stable tag: 1.2.0
+Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Connect WordPress to AI clients like Cursor and Claude via MCP. Let AI build pixel-perfect layouts using 18+ specially engineered Gutenberg blocks.
+Build sites with AI via MCP (Cursor, Claude). 30+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
 
 == Description ==
 
-**Blockish is a powerful WordPress MCP Server built specifically for AI-driven web design inside the native Gutenberg Editor.** 
+**Blockish connects MCP-compatible AI assistants to the Block Editor** so you can design real WordPress layouts with natural language — not just edit posts or run admin tasks.
 
-While other generic MCP plugins let AI read posts or perform basic admin tasks, Blockish turns any MCP-compatible AI assistant (such as Claude Desktop, Cursor, Windsurf, and others) into an autonomous web designer directly inside your Gutenberg Block Editor.
+Connect Cursor, Claude Desktop, Windsurf, or another MCP client, then ask for a section or page. Blockish gives the AI **30+ structured Gutenberg blocks** and a **Class Manager** for reusable CSS, so generated layouts stay clean, responsive, and editable in the native block sidebar.
 
-Currently, AI struggles to build beautiful WordPress pages because standard core blocks generate messy HTML and lack structured styling systems. We solved this by building **18+ AI-Optimized Gutenberg Blocks** and a unified **Class Manager**. 
+You can still build manually. When AI helps, you review an inline preview and Accept before anything goes live.
 
-You don't just drag and drop blocks manually anymore (though you can!). You connect Blockish to your AI and simply say: *"Build a dark-mode pricing page with 3 tiers."* The AI will use Blockish's clean structural blocks and Class Manager to instantly generate a pixel-perfect, fully responsive layout right in your Gutenberg canvas.
-
-= 🚀 The AI Site Building Workflow =
-1. **Connect:** Use our 1-click config wizard in the dashboard to connect your site to any MCP-enabled AI client (Cursor, Claude, Windsurf, etc.).
+= AI Site Building Workflow =
+1. **Connect:** Use the 1-click config wizard to connect your site to an MCP-enabled AI client (Cursor, Claude, Windsurf, etc.).
 2. **Prompt:** Tell your AI what kind of page or section you need.
-3. **Generate:** The AI acts as a designer, leveraging Blockish blocks to construct the layout natively directly inside the Gutenberg editor.
-4. **Refine:** Accept the inline preview, or ask the AI to tweak colors, spacing, and typography on the fly.
+3. **Generate:** The AI builds with Blockish blocks directly in the Gutenberg editor.
+4. **Refine:** Review the inline preview and Accept, or ask for tweaks to colors, spacing, and typography.
 
 == Why Blockish Blocks are Different ==
 
-Unlike traditional block libraries built exclusively for human clicks, Blockish is engineered for AI comprehension:
+Blockish is built so both humans and AI assistants can work in the same Gutenberg canvas:
 
-* **Clean Architecture:** Semantic, predictable block structures that LLMs easily understand.
+* **Clean Architecture:** Semantic, predictable block structures that AI tools can reason about reliably.
 
-* **Class Manager System:** Instead of writing messy inline CSS for every block, the AI is trained to create reusable CSS classes (just like a real web developer). This keeps your site fast and code incredibly clean.
+* **Class Manager System:** Create and apply reusable CSS classes instead of one-off inline styles — cleaner markup and a consistent design system.
 
-* **Theme.json Integration:** AI can natively update your global typography and colors via our custom MCP abilities.
+* **Theme.json Integration:** Update global typography and colors through MCP abilities.
 
-* **Human-Friendly:** Once the AI builds it, you have full visual control to edit everything via standard Gutenberg sidebars.
+* **Human-Friendly:** After generation, edit everything with standard Gutenberg sidebars.
 
 == Powerful Features ==
 
-* **Template Library:** Access our built-in Template Library with 1-click page and pattern import directly in the Block Editor.
-* **Magic Login:** Seamless and secure 1-click login directly from your AI agent.
-* **EditorSync:** Real-time updates between the AI agent and the WordPress editor for a smooth workflow.
+* **Template Library:** 1-click page and pattern import in the Block Editor.
+* **Magic Login:** Secure 1-click login from your AI agent.
+* **EditorSync:** Keep the open editor in sync when the AI stages changes.
+* **Interactions:** Entrance presets, emit/listen signals, custom JS, plus page-level and global libraries.
+* **Visibility:** Hide blocks per device (desktop / tablet / mobile) without custom CSS.
+* **Add-ons hub:** Discover companion products (Forms, Dynamicity) from the Blockish dashboard.
 
-== 18+ AI-Optimized Blocks ==
+== 30+ AI-Optimized Blocks ==
 
-Even though they are built for AI to understand, they are incredibly powerful for manual site building:
+Built for AI-assisted design — and fully usable for manual site building:
 
 = Layout =
 
-* **Container** — Flexible section wrapper with background, spacing, flexbox, and layout controls.
+* **Container** — Flexible section wrapper with background, spacing, flexbox/grid, and layout controls.
+
+* **Carousel** — InnerBlocks carousel for heroes, testimonials, and logo strips (with Carousel Slide children).
+
+* **Before/After Slider** — Interactive image comparison with a draggable handle.
 
 = Typography =
 
-* **Heading** — Highly customizable headings with powerful typography, colors, and shadow options.
+* **Heading** — Customizable headings with typography, colors, and shadow options.
 
-* **Paragraph** — AI-optimized paragraph block with advanced typography and spacing controls.
+* **Paragraph** — Paragraph block with advanced typography and spacing controls.
 
 = Media =
 
-* **Image** — Enhanced image block with overlay, border, mask, and alignment controls.
+* **Image** — Image block with overlay, border, mask, alignment, and optional lightbox.
 
 * **Video** — Embed and style videos with custom play buttons and wrapper controls.
 
-* **Icon** — Add scalable SVG icons with custom color, size, and hover effects.
+* **Icon** — Scalable SVG icons with color, size, and hover effects.
+
+= Theme & Query =
+
+* **Site Title / Tagline / Logo** — Site identity blocks for headers and footers.
+
+* **Post Title / Excerpt / Content / Featured Image / Post Info** — Single-post and loop-ready content blocks.
+
+* **Query Title / Query Total / Archive Description** — Archive and search context blocks.
 
 = Interactive =
 
 * **Accordion** — Collapsible content sections for FAQs, features, and more.
 
-* **Tab** — Tabbed content panels for organizing large amounts of information.
+* **Tab** — Tabbed content panels for organizing information.
 
-* **Navigation** — Robust, flexible navigation block for building complex headers.
+* **Navigation** — Flexible navigation for headers (nav menu, items, submenu, offcanvas).
 
-* **Offcanvas** — Slide-out side panel for menus, filters, and secondary content.
+* **Offcanvas** — Slide-out panel for menus, filters, and secondary content.
 
 = Data & Stats =
 
-* **Counter** — Animated number counter for statistics, milestones, and metrics.
+* **Counter** — Animated number counter for statistics and milestones.
 
-* **Progress Bar** — Stylish progress bars with customizable labels, colors, and animations.
+* **Progress Bar** — Progress bars with labels, colors, and animations.
 
-* **Rating** — Star rating display for reviews, testimonials, and product features.
+* **Rating** — Star rating display for reviews and testimonials.
 
 = Lists & Icons =
 
-* **Icon List** — Beautiful icon-based lists to replace standard bullet points with SVG icons.
+* **Icon List** — Icon-based lists instead of plain bullets.
 
 = Social & CTA =
 
-* **Social Icons** — Social media icon links with customizable shapes, colors, and sizes.
+* **Social Icons** — Social links with shapes, colors, and sizes.
 
-* **Button** — Fully styled call-to-action buttons with hover effects and icons.
+* **Button** — Call-to-action buttons with hover effects and icons.
 
 = Maps =
 
-* **Google Map** — Embed Google Maps with custom zoom, height, and location settings.
+* **Google Map** — Embed maps with zoom, height, and location settings.
 
 == Installation ==
 
@@ -112,36 +125,36 @@ Even though they are built for AI to understand, they are incredibly powerful fo
 
 = What is the MCP AI Engine? =
 
-Blockish includes a native MCP (Model Context Protocol) server. This means you can connect any MCP-compatible AI agent (like Claude Desktop, Cursor, Windsurf, and many more) to instantly generate and style complex Gutenberg layouts using simple natural language commands.
+Blockish includes a native MCP (Model Context Protocol) server. Connect an MCP-compatible AI agent (Claude Desktop, Cursor, Windsurf, and more) to generate and style Gutenberg layouts with natural language.
 
 = Do I need a separate page builder? =
 
-No! Blockish extends the native WordPress Gutenberg editor with powerful layout blocks and styling controls. When paired with your AI assistant, it completely replaces the need for bloated page builders like Elementor or Divi.
+No. Blockish extends the native Gutenberg editor with layout blocks and styling controls. With an AI assistant connected over MCP, you can design full sections and pages without a third-party page builder.
 
 = What is the Class Manager? =
 
-The built-in Class Manager lets you (and the AI) create, edit, and apply reusable CSS classes directly within the editor. This guarantees a consistent design system across your entire website and speeds up workflow.
+The Class Manager lets you (and the AI) create, edit, and apply reusable CSS classes in the editor — a consistent design system without messy one-off styles.
 
 = Is this plugin free? =
 
-Yes, the core Blockish plugin is 100% free to use on unlimited personal or client websites.
+Yes. Core Blockish is free on unlimited personal or client sites. Optional add-ons (such as Forms and Dynamicity) add forms and dynamic query/loop features when you need them.
 
 == External Services ==
 
 This plugin connects to external services under the conditions described below. No data is ever sent without a clear user action or explicit opt-in.
 
-= 1. Usage Analytics / Data Insights (dashboard.wowdevs.com) =
+= 1. Freemius (freemius.com) =
 
-**What it does:** Sends non-sensitive plugin usage data to help improve the plugin. This is part of the optional Data Insights program powered by the DCI SDK.
+**What it does:** Powers optional product opt-in, licensing for companion add-ons (such as Forms and Dynamicity), software updates, and anonymous usage insights that help improve Blockish. This uses the Freemius WordPress SDK bundled with the plugin.
 
-**When it connects:** **Only if you explicitly opt in** when prompted. No data is ever sent without your consent. You can opt out at any time from the Blockish dashboard.
+**When it connects:** **Only if you explicitly opt in** (or activate a license) when Freemius prompts you in wp-admin. Skipping or declining opt-in means no Freemius analytics/licensing traffic for that flow. You can change your opt-in / license status later from the Blockish dashboard (Addons) or Freemius account controls.
 
-**Data sent:** Plugin version, WordPress version, active theme, site language, and similar non-personal environment data. No passwords, user content, or personally identifiable information is transmitted.
+**Data sent:** Non-sensitive environment and product data typical of Freemius (for example plugin version, WordPress version, site URL, and similar technical details used for licensing, updates, and insights). No passwords or post content are sent as part of this integration.
 
-**Service:** wowDevs Data Insights, operated by wowDevs.
-Service URL: https://dashboard.wowdevs.com/
-Privacy Policy: https://wowdevs.com/privacy-policy/
-Terms of Service: https://wowdevs.com/terms-and-conditions/
+**Service:** Freemius, Inc.
+Service URL: https://freemius.com/
+Privacy Policy: https://freemius.com/privacy/
+Terms of Service: https://freemius.com/terms/
 
 == Screenshots ==
 
@@ -154,6 +167,23 @@ Terms of Service: https://wowdevs.com/terms-and-conditions/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.2.0 =
+
+* Added: Carousel + Carousel Slide blocks for hero, testimonial, and logo-strip layouts
+* Added: Before/After Slider block for interactive image comparison
+* Added: Theme & query blocks — Site Title, Site Tagline, Site Logo, Post Title, Post Excerpt, Post Content, Post Featured Image, Post Info, Query Title, Query Total, Archive Description
+* Added: Visibility extension to hide blocks per device
+* Added: Interactions system (entrance presets, emit/listen, custom JS) with block, page, and global scopes
+* Added: Image lightbox option
+* Added: Nav menu submenu support and improved navigation building
+* Added: MCP abilities for Get Revisions and Restore Revision
+* Added: Add-ons marketing hub and Freemius license checks for companion products
+* Improved: MCP Accept workflow — safer editor sync, pattern + form pending resolve, preview save lock until Accept/Discard
+* Improved: Empty-page assembly via pattern-ref `post_content`; non-empty pages stage for Accept
+* Improved: Container flex defaults — top-level Center, nested unset; cleaner variations
+* Improved: Manage Theme JSON, Manage Post, designer workflow, and block docs for AI agents
+* Improved: Tab styling and overall editor polish
 
 = 1.1.3 =
 

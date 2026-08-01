@@ -1,63 +1,53 @@
 ### `blockish/google-map`
 
-**Accepts children: no.**
+Embedded Google Map for a location. **Accepts children: no.**
 
-| Attribute | Type | Default | Notes/enum |
-|---|---|---|---|
-| `location` | Scalar (string) | `"New York, NY"` | Always override |
-| `zoom` | Scalar (integer) | `14` | `1` (world) – `20` (building) |
-| `mapHeight` | Scalar (string, CSS length) | `"360px"` | <br>**CSS:** `.{{WRAPPER}} .blockish-google-map__iframe` -> `height: {{VALUE}};` |
-| `mapCSSFiltersNormal` | Stringified-JSON (CSS Filters) | unset | <br>**CSS:** Uses `BlockishCSSFilters` on `.{{WRAPPER}} .blockish-google-map__iframe` |
-| `mapCSSFiltersHover` | Stringified-JSON (CSS Filters) | unset | <br>**CSS:** Uses `BlockishCSSFilters` on `.{{WRAPPER}} .blockish-google-map__iframe:hover` |
-| `mapHoverTransition` | Scalar (number, seconds) | unset | <br>**CSS:** `.{{WRAPPER}}` -> `--blockish-google-map-hover-transition: {{VALUE}}s;` |
+> [!WARNING]
+> Default `location` is `"New York, NY"` — always override.
 
-Minimal schema:
-```json
-{
-  "name": "blockish/google-map",
-  "attributes": { "location": "1600 Amphitheatre Parkway, Mountain View, CA", "zoom": 14 }
-}
-```
+#### Content / structure
 
----
+| Attribute | Type | Notes |
+|---|---|---|
+| `location` | Scalar | Default `"New York, NY"` — always override. Query string for the embed. |
+| `zoom` | Scalar (integer) | Default `14`. Roughly `1` (world) – `20` (building); clamped in save. |
+| `anchor` / `align` | Scalar | `"align"`: `"wide"` \| `"full"`. |
 
+#### Markup
 
+Default (empty attributes):
 
-### Markup & CSS Generation
-
-**Generated HTML Structure:**
 ```html
-<div class="blockish-google-map-wrapper">
-  
-  <!-- `src` is dynamically generated using Google Maps Embed API based on `location` and `zoom` attributes -->
-  <iframe
-    class="blockish-google-map__iframe"
-    title="Google Map"
-    src="..."
-    loading="lazy"
-    allowfullscreen
-    referrerpolicy="no-referrer-when-downgrade"
-  ></iframe>
-
+<div class="wp-block-blockish-google-map blockish-google-map-wrapper">
+  <iframe class="blockish-google-map__iframe" title="Google Map" src="https://maps.google.com/maps?hl=en&q=New%20York%2C%20NY&z=14&t=m&iwloc=near&output=embed" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
 </div>
 ```
 
-**Base CSS (`style.scss`):**
-```scss
-.blockish-google-map-wrapper {
-	--blockish-google-map-hover-transition: 0s;
-	width: 100%;
+| When | What changes |
+|---|---|
+| `location` / `zoom` | Embed `src` query (`q`, `z`). |
 
-	.blockish-google-map__iframe {
-		display: block;
-		width: 100%;
-		height: 360px;
-		max-width: 100%;
-		border: 0;
-		transition: filter var(--blockish-google-map-hover-transition);
-	}
-}
+Style with convert-css against `.blockish-google-map-wrapper`, `.blockish-google-map__iframe` — not invented markup.
+
+#### Already-there CSS
+
+Stylesheet + defaults (omit = these already apply). Write only what differs.
+
+```css
+/* Stylesheet */
+.blockish-google-map-wrapper { --blockish-google-map-hover-transition: 0s; width: 100%; }
+:where(.blockish-google-map-wrapper .blockish-google-map__iframe) { height: 360px; }
+.blockish-google-map-wrapper .blockish-google-map__iframe { border: 0; display: block; max-width: 100%; transition: filter var(--blockish-google-map-hover-transition); width: 100%; }
 ```
 
+#### Minimal schema
 
-
+```json
+{
+  "name": "blockish/google-map",
+  "attributes": {
+    "location": "1600 Amphitheatre Parkway, Mountain View, CA",
+    "zoom": 14
+  }
+}
+```

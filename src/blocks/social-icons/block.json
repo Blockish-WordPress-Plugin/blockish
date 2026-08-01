@@ -23,18 +23,12 @@
     },
     "columns": {
       "type": "object",
-      "default": {
-        "Desktop": "auto-fit"
-      },
       "selectors": {
         ".{{WRAPPER}}": "--blockish-social-icons-columns: {{VALUE}};"
       }
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}}": "justify-content: {{VALUE}};"
       }
@@ -51,7 +45,6 @@
     },
     "iconSecondaryColor": {
       "type": "string",
-      "default": "#FFFFFF",
       "selectors": {
         ".{{WRAPPER}}": "--blockish-social-icons-secondary-color: {{VALUE}};"
       }
@@ -70,18 +63,12 @@
     },
     "iconSpacing": {
       "type": "object",
-      "default": {
-        "Desktop": "12px"
-      },
       "selectors": {
         ".{{WRAPPER}}": "column-gap: {{VALUE}};"
       }
     },
     "iconRowsGap": {
       "type": "object",
-      "default": {
-        "Desktop": "12px"
-      },
       "selectors": {
         ".{{WRAPPER}}": "row-gap: {{VALUE}};"
       }
@@ -101,7 +88,6 @@
     },
     "hoverAnimation": {
       "type": "string",
-      "default": "none",
       "selectors": {
         ".{{WRAPPER}} .blockish-social-icon-item__link:hover": "animation-name: {{VALUE}};"
       }

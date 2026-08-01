@@ -5,6 +5,16 @@
 .wp-block-blockish-container {
     transition: all 0.3s ease;
 
+    // Linked container (tag = a): don't underline child text/markup.
+    &:is(a) {
+        text-decoration: none;
+        color: inherit;
+
+        * {
+            text-decoration: none;
+        }
+    }
+
     &.has-background-video {
         position: relative;
         overflow: hidden;
@@ -33,15 +43,77 @@
         object-fit: cover;
         pointer-events: none;
     }
-    
-    :where(.wp-block-blockish-container.align-custom-width) {
-        margin-left: auto;
-        margin-right: auto;
+}
+
+:where(.wp-block-blockish-container.align-custom-width) {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+// Low specificity so block margin attributes can override when set.
+:where(.wp-block-blockish-container .wp-block-blockish-container.align-custom-width) {
+    margin-left: unset;
+    margin-right: unset;
+}
+
+// Display is resolved from the layout-type-* class (UI: flex | grid | block only),
+// once in this stylesheet instead of per-block generated CSS.
+.wp-block-blockish-container.blockish-container {
+    &.layout-type-flex {
+        display: flex;
     }
 
-    // Low specificity so block margin attributes can override when set.
-    :where(.wp-block-blockish-container .wp-block-blockish-container.align-custom-width) {
-        margin-left: unset;
-        margin-right: unset;
+    &.layout-type-grid {
+        display: grid;
+    }
+
+    &.layout-type-block {
+        display: block;
+    }
+}
+
+// Flex defaults live here at specificity 0 (:where) so Class Manager / attribute
+// CSS can override. Attribute defaults must not emit high-specificity rules.
+:where(.wp-block-blockish-container.blockish-container.layout-type-flex) {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+:where(.wp-block-blockish-container .wp-block-blockish-container.blockish-container.layout-type-flex) {
+    justify-content: initial;
+    align-items: initial;
+}
+
+:where(.wp-block-blockish-container) {
+    min-height: 0;
+}
+
+:where(.wp-block-blockish-container > .block-list-appender) {
+    min-height: 0;
+}
+
+:where(.wp-block-blockish-container.align-custom-width) {
+    max-width: 100%;
+}
+
+:where(.wp-block-blockish-container.blockish-container.layout-type-grid.grid-layout-type-auto) {
+    grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr));
+}
+
+:where(.wp-block-blockish-container.blockish-container.layout-type-grid.grid-layout-type-fixed) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(1, minmax(0, 1fr));
+}
+
+@media (max-width: 1024px) {
+    :where(.wp-block-blockish-container.blockish-container.layout-type-grid.grid-layout-type-fixed) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    :where(.wp-block-blockish-container.blockish-container.layout-type-grid.grid-layout-type-fixed) {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
     }
 }

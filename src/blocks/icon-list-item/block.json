@@ -54,7 +54,6 @@
     },
     "iconHoverTransition": {
       "type": "number",
-      "default": 0.2,
       "selectors": {
         ".{{WRAPPER}}.blockish-icon-list-item": "--blockish-icon-list-item-icon-hover-transition: {{VALUE}}s;"
       }
@@ -73,7 +72,6 @@
     },
     "textHoverTransition": {
       "type": "number",
-      "default": 0.2,
       "selectors": {
         ".{{WRAPPER}}.blockish-icon-list-item": "--blockish-icon-list-item-text-hover-transition: {{VALUE}}s;"
       }

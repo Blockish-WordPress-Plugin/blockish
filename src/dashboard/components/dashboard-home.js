@@ -148,11 +148,13 @@ export default function DashboardHome({ data, onNavigate }) {
 								{__('Documentation', 'blockish')}
 							</Text>
 						</li>
-						<li>
-							<Text as="a" href={safeLink(links.support, '#')} target="_blank" rel="noreferrer">
-								{__('Support Forum', 'blockish')}
-							</Text>
-						</li>
+						{links.support ? (
+							<li>
+								<Text as="a" href={safeLink(links.support, '#')} target="_blank" rel="noreferrer">
+									{__('Support Forum', 'blockish')}
+								</Text>
+							</li>
+						) : null}
 						<li>
 							<Text as="a" href={safeLink(links.changelog, '#')} target="_blank" rel="noreferrer">
 								{__('Changelog', 'blockish')}

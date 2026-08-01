@@ -139,6 +139,7 @@ class Extensions
         $next_payload = [
             'name' => $display_name,
             'include' => isset($metadata['include']) && is_array($metadata['include']) ? $metadata['include'] : [],
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
             'exclude' => isset($metadata['exclude']) && is_array($metadata['exclude']) ? $metadata['exclude'] : [],
             'attributes' => isset($metadata['attributes']) && is_array($metadata['attributes']) ? $metadata['attributes'] : [],
             'usesContext' => isset($metadata['usesContext']) && is_array($metadata['usesContext']) ? $metadata['usesContext'] : [],
@@ -175,6 +176,7 @@ class Extensions
             $clean[$slug] = [
                 'name' => isset($schema['name']) && is_string($schema['name']) ? $schema['name'] : $slug,
                 'include' => isset($schema['include']) && is_array($schema['include']) ? $schema['include'] : [],
+                // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
                 'exclude' => isset($schema['exclude']) && is_array($schema['exclude']) ? $schema['exclude'] : [],
                 'attributes' => isset($schema['attributes']) && is_array($schema['attributes']) ? $schema['attributes'] : [],
                 'usesContext' => isset($schema['usesContext']) && is_array($schema['usesContext']) ? $schema['usesContext'] : [],

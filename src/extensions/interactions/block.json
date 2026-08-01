@@ -1,14 +1,22 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/interactions",
+	"title": "Interactions",
+	"category": "blockish-extensions",
 	"attributes": {
 		"interactionData": {
 			"type": "array",
-			"default": []
+			"default": [],
+			"items": {
+				"type": "object"
+			}
 		}
 	},
-	"include": [
-		"*"
-	],
+	"include": ["*"],
 	"exclude": [],
 	"editorScript": "file:./editor.js",
-	"viewScript": "file:./view.js"
+	"editorStyle": "file:./editor.css",
+	"viewScript": "file:./view.js",
+	"style": "file:./style-view.css"
 }

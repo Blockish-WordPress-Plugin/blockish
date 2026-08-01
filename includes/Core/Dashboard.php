@@ -95,6 +95,14 @@ class Dashboard {
             $script_asset['version'] ?? BLOCKISH_VERSION
         );
 
+        wp_enqueue_script(
+            'freemius-checkout',
+            'https://checkout.freemius.com/checkout.min.js',
+            array(),
+            BLOCKISH_VERSION,
+            true
+        );
+
         wp_add_inline_script(
             'blockish-dashboard',
             'window.blockishDashboardData = ' . wp_json_encode(
@@ -102,6 +110,7 @@ class Dashboard {
                     'blocksApiPath'     => '/blockish/v1/blocks',
                     'extensionsApiPath' => '/blockish/v1/extensions',
                     'dashboardToolsApiPath' => '/blockish/v1/dashboard-tools',
+                    'addonsApiPath'     => '/blockish/v1/addons',
                     'nonce'             => wp_create_nonce( 'wp_rest' ),
                     'siteUrl'           => admin_url(),
                     'currentUser'       => wp_get_current_user()->user_login,
@@ -112,10 +121,11 @@ class Dashboard {
                         'wpVersion'=> get_bloginfo( 'version' ),
                         'links'    => array(
                             'documentation' => 'https://wordpress.org/plugins/blockish/',
-                            'support'       => 'https://wordpress.org/support/plugin/blockish/',
+                            'support'       => '', // Add own support forum URL when ready.
                             'changelog'     => 'https://wordpress.org/plugins/blockish/#developers',
                         ),
                     ),
+                    'addonsList'        => \Blockish\Config\AddonsList::get_instance()->get_list(),
                 )
             ) . ';',
             'before'

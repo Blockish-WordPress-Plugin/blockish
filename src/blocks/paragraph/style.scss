@@ -9,3 +9,7 @@
 		font-weight: inherit;
 	}
 }
+
+:where(.blockish-paragraph) {
+	text-align: left;
+}

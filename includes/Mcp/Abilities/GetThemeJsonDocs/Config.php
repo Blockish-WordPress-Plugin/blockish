@@ -24,6 +24,11 @@ class Config
                     'theme_json' => [
                         'type' => 'object',
                         'additionalProperties' => true,
+                    ],
+                    'schema' => [
+                        'type' => ['object', 'null'],
+                        'description' => 'The official JSON Schema for theme.json extracted from the theme.',
+                        'additionalProperties' => true,
                     ]
                 ],
             ],

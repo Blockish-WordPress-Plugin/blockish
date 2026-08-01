@@ -1,0 +1,120 @@
+# PHPCompatibilityParagonie
+
+[![Latest Stable Version](https://img.shields.io/packagist/v/phpcompatibility/phpcompatibility-paragonie?label=stable)][packagist]
+[![Latest Unstable Version](https://img.shields.io/packagist/v/phpcompatibility/phpcompatibility-paragonie?include_prereleases&label=pre-release)][packagist]
+[![License](https://img.shields.io/github/license/PHPCompatibility/PHPCompatibilityParagonie?color=00a7a7)](https://github.com/PHPCompatibility/PHPCompatibilityParagonie/blob/master/LICENSE)
+[![Build Status](https://github.com/PHPCompatibility/PHPCompatibilityParagonie/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/PHPCompatibility/PHPCompatibilityParagonie/actions/workflows/ci.yml)
+
+Using PHPCompatibilityParagonie, you can analyse the codebase of a project using either of the Paragonie polyfills, for PHP cross-version compatibility.
+
+
+## What's in this repo ?
+
+Two rulesets for PHP_CodeSniffer to check for PHP cross-version compatibility issues in projects, while accounting for polyfills provided by the Paragonie polyfill libraries.
+
+These rulesets prevent false positives from the [PHPCompatibility standard][PHPCompatibility] by excluding back-fills and polyfills which are provided by those libraries.
+
+| Paragonie Polyfill Library       | Corresponding PHPCompatibility Ruleset  | Includes                                |
+|----------------------------------|-----------------------------------------|-----------------------------------------|
+| [`random_compat`][random_compat] | `PHPCompatibilityParagonieRandomCompat` |                                         |
+| [`sodium_compat`][sodium_compat] | `PHPCompatibilityParagonieSodiumCompat` | `PHPCompatibilityParagonieRandomCompat` |
+
+> [!NOTE]
+> As the `sodium_compat` library has `random_compat` [as a dependency](https://github.com/paragonie/sodium_compat/blob/master/composer.json), the `PHPCompatibilityParagonieSodiumCompat` ruleset includes the `PHPCompatibilityParagonieRandomCompat` ruleset.
+>
+> In practice, this means that if your project uses both libraries, you just need to use the `PHPCompatibilityParagonieSodiumCompat` ruleset to prevent false positives from both.
+
+
+## Funding
+
+**This project needs funding.**
+
+The project team has spend thousands of hours creating and maintaining the PHPCompatibility packages. This is unsustainable without funding.
+
+If you use PHPCompatibility, please fund this work by setting up a monthly contribution to the [PHP_CodeSniffer Open Collective].
+
+
+## Requirements
+
+* PHP > 5.4
+* [PHP_CodeSniffer] >= 3.13.3.
+    Use the latest stable release of PHP_CodeSniffer for the best results.
+* [PHPCompatibility] 10.0.0+.
+
+
+## Installation instructions
+
+The only supported installation method is via [Composer].
+
+[Composer] will automatically install the project dependencies and register the external rulesets with PHP_CodeSniffer using the [Composer PHPCS plugin].
+
+Run the following from the root of your project:
+```bash
+composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+composer require --dev phpcompatibility/phpcompatibility-paragonie:"^2.0@dev"
+```
+
+Next, run:
+```bash
+vendor/bin/phpcs -i
+```
+If all went well, you will now see that the `PHPCompatibility`, `PHPCompatibilityParagonieRandomCompat` and `PHPCompatibilityParagonieSodiumCompat` standards are installed for PHP_CodeSniffer.
+
+
+## Upgrade instructions
+
+To upgrade this package, run the following command:
+```bash
+composer update --dev phpcompatibility/phpcompatibility-paragonie --with-dependencies
+```
+
+> [!TIP]
+> If you have a _root_ requirement in your project for one of the packages used by this project, you may need to update with `--with-all-dependencies` instead.
+
+
+## How to use
+
+You can now use the following commands to inspect the code in your project for PHP cross-version compatibility:
+```bash
+vendor/bin/phpcs -p . --standard=PHPCompatibilityParagonieRandomCompat
+
+vendor/bin/phpcs -p . --standard=PHPCompatibilityParagonieSodiumCompat
+```
+
+By default, you will only receive notifications about deprecated and/or removed PHP features.
+
+To get the most out of the PHPCompatibilityParagonie rulesets, you should specify a `testVersion` to check against. That will enable the checks for both deprecated/removed PHP features as well as the detection of code using new PHP features.
+
+For example:
+```bash
+# For a project which should be compatible with PHP 5.3 up to and including PHP 7.0:
+vendor/bin/phpcs -p . --standard=PHPCompatibilityParagonieRandomCompat --runtime-set testVersion 5.3-7.0
+
+# For a project which should be compatible with PHP 5.4 and higher:
+vendor/bin/phpcs -p . --standard=PHPCompatibilityParagonieSodiumCompat --runtime-set testVersion 5.4-
+```
+
+For more detailed information about setting the `testVersion`, see the README of the generic [PHPCompatibility][PHPCompatibility-testVersion] standard.
+
+
+### Testing PHP files only
+
+By default PHP_CodeSniffer < 4.0 will analyse PHP, JavaScript and CSS files. As the PHPCompatibility sniffs only target PHP code, you can make the run slightly faster by telling PHP_CodeSniffer to only check PHP files, like so:
+```bash
+vendor/bin/phpcs -p . --standard=PHPCompatibilityParagonieRandomCompat --extensions=php --runtime-set testVersion 5.3-
+```
+
+## License
+
+All code within the PHPCompatibility organisation is released under the GNU Lesser General Public License (LGPL). For more information, visit <https://www.gnu.org/licenses/lgpl-3.0.html>.
+
+
+[packagist]:                       https://packagist.org/packages/phpcompatibility/phpcompatibility-paragonie
+[Composer]:                        https://getcomposer.org/
+[Composer PHPCS plugin]:           https://github.com/PHPCSStandards/composer-installer/
+[PHP_CodeSniffer]:                 https://github.com/PHPCSStandards/PHP_CodeSniffer
+[PHP_CodeSniffer Open Collective]: https://opencollective.com/php_codesniffer
+[PHPCompatibility]:                https://github.com/PHPCompatibility/PHPCompatibility
+[PHPCompatibility-testVersion]:    https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions
+[random_compat]:                   https://github.com/paragonie/random_compat
+[sodium_compat]:                   https://github.com/paragonie/sodium_compat

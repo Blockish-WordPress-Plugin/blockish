@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Get Class Manager Docs', 'blockish'),
-            'description'         => __('Returns the full Blockish Class Manager reference — how classes work, how to write CSS, block attribute formats (classManager, classManagerSubselector), parent vs child classes, responsive CSS, and ready-to-use CSS patterns.', 'blockish'),
+            'description'         => __('Returns the Class Manager reference — raw CSS create/update via manage-class (!important → customCss), attaching classes by name, usage tracking (get-class-usage), unused sweep, and template-library class dependencies.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -28,7 +28,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Call this before creating or updating any class (via blockish/manage-class) so you write the correct style object and apply it correctly to blocks.',
+                'usage_notes' => 'Call before creating or updating any class via blockish/manage-class. Write raw css only; attach with classManager names.',
             ],
         ];
     }

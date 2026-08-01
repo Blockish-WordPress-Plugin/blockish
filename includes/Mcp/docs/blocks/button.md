@@ -1,104 +1,75 @@
 ### `blockish/button`
 
-A call-to-action link. **Accepts children: no.**
+Call-to-action link. **Accepts children: no.**
 
-**Hard rule — check this every single time you place a button:** does this button need to be centered, right-aligned, or anything other than flush-left in its parent? If yes, you **must** set `buttonPlacement` on the button itself. Setting `alignItems`/`justifyContent` on the parent `blockish/container` has **no effect** on a button's position — that is the single most common mistake when placing buttons. There is no other attribute, on any block, that positions a button. If a button looks stuck on the left when it should be centered, the fix is always `buttonPlacement`, never a parent attribute.
+> [!WARNING]
+> **Hard rule — placement:** Center/right-align with `{{ROOT}} { justify-content: center; }` → `buttonPlacement`. Parent container alignment does **not** move the visible button.
 
-**Hard rule — button chrome uses `button*` attributes only:** Style the visible button (background, border, radius, padding, typography, shadow) with `buttonBackground`, `buttonBorder`, `buttonBorderRadius`, `buttonPadding`, etc. Do **not** also apply Class Manager `border`/`background` on the same button, and do **not** set the global `border` attribute alongside `buttonBorder` — that paints a second border on the wrapper and looks like a double outline. Prefer either (a) `button*` attributes, or (b) a Class Manager class that targets `.blockish-button-link` via `customCss` — never both borders.
+> [!WARNING]
+> **Hard rule — no double chrome:** Visible button chrome maps to `button*` attrs (`.blockish-button-link`). Do **not** also put border/background on the wrapper or Class Manager for the same chrome — double border/background.
 
-**The button's own wrapper is hard-coded `width: 100%`** in its stylesheet (unlike other blocks, where the global `widthType` defaults to unset/auto-sizing). This is harmless for `buttonPlacement` (which works regardless), but if you instead need to move the button using `position`/`margin`/transform-style attributes, the 100% wrapper width will fight you. In that case set the global `widthType` to `{"value":"auto"}` on the button first — that emits an explicit `width: auto` that overrides the hard-coded 100%, only then will positioning attributes move the visible button rather than just shifting empty space.
+> [!WARNING]
+> **Wrapper is full width** (`width: 100%` in Already-there). To shrink/position the wrapper: `{{ROOT}} { width: auto; }`. No `anchor` / `align` support.
 
-| Attribute | Type | Default | Notes/enum |
-|---|---|---|---|
-| `text` | Scalar (string) | `"Click Here"` | |
-| `url` | Link | unset | |
-| `icon` | Icon | unset | |
-| `iconPosition` | Scalar (string) | `"row"` | Options: `[{"value":"row-reverse","label":"Left"},{"value":"row","label":"Right"}]` — order of icon vs. text inside the button <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `flex-direction: {{VALUE}};` |
-| `buttonPlacement` | Responsive-Option | unset | **Required whenever the button isn't meant to sit flush-left.** Options: `[{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}]` — horizontal position of the **whole button** within its parent container. The parent's `alignItems`/`justifyContent` does NOT center a button; use this instead. Mobile-only centering: `{"Desktop":{"value":"flex-end"},"Mobile":{"value":"center"}}` <br>**CSS:** `.{{WRAPPER}}` -> `justify-content: {{VALUE}};` |
-| `buttonAlignment` | Responsive-Option | unset | Options: `[{"value":"start","label":"Left"},{"value":"center","label":"Center"},{"value":"end","label":"Right"}]` — aligns the icon+text **inside** the button (text-align + justify-content on the inner link), independent of `buttonPlacement` <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `text-align: {{VALUE}}; justify-content: {{VALUE}};` |
-| `buttonContentSpacing` | Responsive | unset | Gap between icon and text inside the button <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `gap: {{VALUE}};` |
-| `buttonTextColor` | Color | unset | Normal <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `color: {{VALUE}};` |
-| `buttonHoverTextColor` | Color | unset | Hover <br>**CSS:** `.{{WRAPPER}} .blockish-button-link:hover` -> `color: {{VALUE}};` |
-| `buttonBackground` | Stringified-JSON (Background) | unset | Normal <br>**CSS:** Uses `BlockishBackground` on `.{{WRAPPER}} .blockish-button-link` |
-| `buttonHoverBackground` | Stringified-JSON (Background) | unset | Hover <br>**CSS:** Uses `BlockishBackground` on `.{{WRAPPER}} .blockish-button-link:hover` |
-| `buttonBorder` | Stringified-JSON (Border) | unset | Normal <br>**CSS:** Uses `BlockishBorder` on `.{{WRAPPER}} .blockish-button-link` |
-| `buttonHoverBorderColor` | Color | unset | Hover border color override <br>**CSS:** `.{{WRAPPER}} .blockish-button-link:hover` -> `border-color: {{VALUE}};` |
-| `buttonBorderRadius` | Border-Radius | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};` |
-| `buttonPadding` | Spacing | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};` |
-| `buttonTypography` | Stringified-JSON (Typography) | unset | <br>**CSS:** Uses `BlockishTypography` on `.{{WRAPPER}} .blockish-button-link` |
-| `buttonTextShadow` | Stringified-JSON (Text Shadow) | unset | <br>**CSS:** Uses `BlockishTextShadow` on `.{{WRAPPER}} .blockish-button-link` |
-| `buttonBoxShadow` | Stringified-JSON (Box Shadow) | unset | Normal <br>**CSS:** Uses `BlockishBoxShadow` on `.{{WRAPPER}} .blockish-button-link` |
-| `buttonHoverBoxShadow` | Stringified-JSON (Box Shadow) | unset | Hover <br>**CSS:** Uses `BlockishBoxShadow` on `.{{WRAPPER}} .blockish-button-link:hover` |
-| `buttonHoverTransition` | Scalar (number, seconds) | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `--blockish-button-hover-transition: {{VALUE}}s;` |
-| `buttonWidth` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `width: {{VALUE}};` |
-| `buttonMinHeight` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link` -> `min-height: {{VALUE}};` |
-| `buttonIconSize` | Responsive | unset | <br>**CSS:** `.{{WRAPPER}} .blockish-button-link .blockish-button-icon` -> `width: {{VALUE}}; height: {{VALUE}};` |
+#### Content / structure
 
-`blockish/button` does **not** support `anchor` or `align` (no `id`, no wide/full alignment) — unlike almost every other Blockish block. See §7.1.
+| Attribute | Type | Notes |
+|---|---|---|
+| `text` | Scalar | Default `"Click Here"`. |
+| `url` | Link | Optional. Shape: `{"url":"/signup","newTab":false,"noFollow":false}`. |
+| `icon` | Icon | Prefer `blockish/get-icons`. When set, renders `<svg class="blockish-icon blockish-button-icon">`. |
+| `iconPosition` | Scalar | `"row"` (stylesheet default = icon after text) \| `"row-reverse"` (icon before). Also produced by convert-css `flex-direction` on `.blockish-button-link`. |
 
-Minimal schema:
-```json
-{
-  "name": "blockish/button",
-  "attributes": { "text": "Get Started Free", "url": { "url": "/signup", "newTab": false } }
-}
-```
+#### Markup
 
----
+Default (empty attributes — text default still applies; no icon):
 
-
-
-### Markup & CSS Generation
-
-**Generated HTML Structure:**
 ```html
-<div class="blockish-button">
-  
-  <!-- The <a> tag is always rendered, even if URL is empty -->
-  <a class="blockish-button-link" href="..." target="_blank" rel="noopener noreferrer">
-    
-    <!-- Button text is rendered as a span -->
-    <span>Button Text Content</span>
-    
-    <!-- The icon <svg> is ONLY rendered if `icon` attribute exists AND has both `viewBox` and `path` -->
-    <svg class="blockish-icon blockish-button-icon" fill="currentColor">...</svg>
-
+<div class="wp-block-blockish-button blockish-button">
+  <a class="blockish-button-link">
+    <span>Click Here</span>
   </a>
-
 </div>
 ```
 
-**Base CSS (`style.scss`):**
-```scss
-.blockish-button {
-	display: flex;
-	align-items: center;
-	width: 100%;
+| When | What changes |
+|---|---|
+| `url` set | Link props on `.blockish-button-link`. |
+| `icon` set | Child `<svg class="blockish-icon blockish-button-icon">` inside the `<a>` (after the text span). |
+| `iconPosition: "row-reverse"` / convert `flex-direction: row-reverse` | CSS on `.blockish-button-link` — not a class. |
 
-	.blockish-button-link {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 6px;
-		text-decoration: none;
-		cursor: pointer;
-		box-sizing: border-box;
-		background-color: #000;
-		color: #fff;
-		padding: 10px 20px;
-		transition: all 0.3s ease;
+Style with convert-css:
+- placement → `{{ROOT}} { justify-content: center; }` (and `width: auto` if the wrapper must shrink)
+- visible chrome → `{{ROOT}} .blockish-button-link { background: …; color: …; padding: …; border-radius: …; }`
+- hover chrome → `{{ROOT}} .blockish-button-link:hover { … }`
+- icon size → `{{ROOT}} .blockish-button-icon { width: …; height: …; }`
+- icon side → `{{ROOT}} .blockish-button-link { flex-direction: row-reverse; }`
+Do not invent markup.
 
-		& > span {
-			white-space: nowrap;
-		}
-	}
+#### Already-there CSS
 
-	.blockish-button-icon {
-		width: 1em;
-		height: 1em;
-	}
-}
+Stylesheet + defaults (omit = these already apply). Write only what differs.
+
+```css
+/* Stylesheet */
+.blockish-button { align-items: center; display: flex; width: 100%; }
+:where(.blockish-button .blockish-button-link) { flex-direction: row; }
+.blockish-button .blockish-button-link { align-items: center; background-color: #000; box-sizing: border-box; color: #fff; cursor: pointer; display: inline-flex; gap: 6px; justify-content: center; padding: 10px 20px; text-decoration: none; transition: all .3s ease; }
+.blockish-button .blockish-button-link > span { white-space: nowrap; }
+.blockish-button .blockish-button-icon { height: 1em; width: 1em; }
 ```
 
+#### Minimal schema
 
-
+```json
+{
+  "name": "blockish/button",
+  "attributes": {
+    "text": "Get Started Free",
+    "url": {
+      "url": "/signup",
+      "newTab": false
+    }
+  }
+}
+```

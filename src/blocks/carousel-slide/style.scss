@@ -1,0 +1,82 @@
+.blockish-carousel__slide {
+	position: relative;
+	box-sizing: border-box;
+	min-width: 0;
+	isolation: isolate;
+	overflow: hidden;
+	border-radius: 20px;
+	box-shadow:
+		0 1px 0 rgba(255, 255, 255, 0.06) inset,
+		0 18px 48px rgba(15, 23, 42, 0.18);
+
+	/* Soft fallback before StyleGenerator CSS lands */
+	&.is-default-styled {
+		background: linear-gradient(
+			145deg,
+			#0f172a 0%,
+			#1e293b 52%,
+			#334155 100%
+		);
+		color: #f8fafc;
+	}
+
+	&.has-background-overlay::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		pointer-events: none;
+		border-radius: inherit;
+	}
+
+	.blockish-carousel__slide-inner {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		box-sizing: border-box;
+		width: 100%;
+		height: 100%;
+		min-width: 0;
+		text-align: center;
+		min-height: inherit;
+	}
+}
+
+:where(.blockish-carousel__slide) {
+	min-height: 360px;
+}
+
+:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	padding: 48px 40px;
+	min-height: 360px;
+}
+
+@media (max-width: 1024px) {
+	:where(.blockish-carousel__slide),
+	:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
+		min-height: 320px;
+	}
+
+	:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
+		padding: 40px 28px;
+	}
+}
+
+@media (max-width: 768px) {
+	.blockish-carousel__slide.is-default-styled {
+		border-radius: 16px;
+	}
+
+	:where(.blockish-carousel__slide),
+	:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
+		min-height: 280px;
+	}
+
+	:where(.blockish-carousel__slide .blockish-carousel__slide-inner) {
+		padding: 32px 20px;
+	}
+}

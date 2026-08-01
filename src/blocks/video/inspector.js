@@ -183,37 +183,39 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 										/>
 									) }
 
+									<BlockishControl
+										type="ToggleControl"
+										label={ __( 'Lazy Load', 'blockish' ) }
+										slug="lazyLoad"
+										help={
+											sourceType === 'selfHosted'
+												? __(
+														'Holds back the video file until the player scrolls into view. The poster image still loads right away.',
+														'blockish'
+												  )
+												: undefined
+										}
+									/>
+
 									{ sourceType === 'youtube' && (
-										<>
-											<BlockishControl
-												type="ToggleControl"
-												label={ __(
-													'Lazy Load',
-													'blockish'
-												) }
-												slug="lazyLoad"
-											/>
-											<BlockishControl
-												type="BlockishSelect"
-												label={ __(
-													'Suggested Videos',
-													'blockish'
-												) }
-												value={ normalizeSuggestedVideosOption(
-													attributes?.suggestedVideos
-												) }
-												options={
-													suggestedVideosOptions
-												}
-												onChange={ ( option ) => {
-													setAttributes( {
-														suggestedVideos:
-															option ||
-															suggestedVideosOptions[ 0 ],
-													} );
-												} }
-											/>
-										</>
+										<BlockishControl
+											type="BlockishSelect"
+											label={ __(
+												'Suggested Videos',
+												'blockish'
+											) }
+											value={ normalizeSuggestedVideosOption(
+												attributes?.suggestedVideos
+											) }
+											options={ suggestedVideosOptions }
+											onChange={ ( option ) => {
+												setAttributes( {
+													suggestedVideos:
+														option ||
+														suggestedVideosOptions[ 0 ],
+												} );
+											} }
+										/>
 									) }
 								</BlockishControl>
 

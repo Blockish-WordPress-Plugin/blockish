@@ -344,6 +344,17 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                                             ]}
                                             __nextHasNoMarginBottom={true}
                                         />
+                                        {attributes?.tagName?.value === 'a' ? (
+                                            <BlockishControl
+                                                type="BlockishLink"
+                                                label={__('Link', 'blockish')}
+                                                slug="url"
+                                                help={__(
+                                                    'Avoid nested links or buttons inside a linked container — that creates invalid HTML.',
+                                                    'blockish'
+                                                )}
+                                            />
+                                        ) : null}
                                         <BlockishControl
                                             type="BlockishSelect"
                                             label={__('Overflow', 'blockish')}

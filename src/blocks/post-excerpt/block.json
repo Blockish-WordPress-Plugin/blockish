@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/post-excerpt",
+  "version": "1.0.0",
+  "title": "Post Excerpt",
+  "category": "blockish-framework",
+  "description": "Displays the current post excerpt with an optional read-more link.",
+  "keywords": [
+    "blockish",
+    "post",
+    "excerpt",
+    "summary"
+  ],
+  "textdomain": "blockish",
+  "attributes": {
+    "excerptLength": {
+      "type": "number",
+      "default": 55
+    },
+    "moreText": {
+      "type": "string",
+      "default": ""
+    },
+    "showMoreOnNewLine": {
+      "type": "boolean",
+      "default": true
+    },
+    "alignment": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "typography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}}"
+      }
+    },
+    "color": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}}": "color: {{VALUE}};"
+      }
+    },
+    "moreColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-excerpt__more-link": "color: {{VALUE}};"
+      }
+    },
+    "moreHoverColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-excerpt__more-link:hover": "color: {{VALUE}};"
+      }
+    }
+  },
+  "usesContext": [
+    "postId",
+    "postType"
+  ],
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "file:./index.js",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

@@ -62,16 +62,45 @@ export default function Edit({ attributes, setAttributes, advancedControls, clie
 	};
 
 	useEffect(() => {
-		if (hasParent) {
-			setAttributes({
-				isVariationPicked: true,
-				containerWidth: 'align-custom-width'
-			});
+		if (!hasParent) {
+			return;
 		}
+
+		const isEmptyAlign = (value) =>
+			!value || (typeof value === 'object' && Object.keys(value).length === 0);
+
+		// Strip only the short-lived Start default — do not wipe intentional Center.
+		const isLegacyStartDefault = (value) => {
+			if (isEmptyAlign(value)) {
+				return false;
+			}
+			const keys = Object.keys(value);
+			if (keys.length !== 1 || keys[0] !== 'Desktop') {
+				return false;
+			}
+			const desktop = value.Desktop?.value ?? value.Desktop;
+			return desktop === 'flex-start';
+		};
+
+		const updates = {
+			isVariationPicked: true,
+			containerWidth: 'align-custom-width',
+		};
+
+		if (isLegacyStartDefault(attributes?.alignItems)) {
+			updates.alignItems = {};
+		}
+		if (isLegacyStartDefault(attributes?.justifyContent)) {
+			updates.justifyContent = {};
+		}
+
+		setAttributes(updates);
 	}, [hasParent]);
 
 	let content = null;
 	let Tag = attributes?.tagName?.value || 'div';
+	const { getLinkProps } = window.blockish.helpers;
+	const linkProps = Tag === 'a' ? getLinkProps(attributes?.url) : null;
 
 	if (attributes?.isVariationPicked) {
 		content = (
@@ -82,7 +111,10 @@ export default function Edit({ attributes, setAttributes, advancedControls, clie
 					advancedControls={advancedControls}
 					hasParent={hasParent}
 				/>
-				<Tag {...innerBlockProps}>
+				<Tag
+					{...innerBlockProps}
+					{...(linkProps || {})}
+				>
 					{backgroundVideo?.url && (
 						<video
 							className="blockish-container-background-video"

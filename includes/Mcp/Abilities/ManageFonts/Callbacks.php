@@ -8,15 +8,52 @@ class Callbacks
 {
     public static function manage_fonts(array $args): array
     {
-        $action = $args['action'] ?? '';
-
-        if ($action === 'delete') {
-            return self::delete_font($args);
-        } elseif ($action === 'install') {
-            return self::install_font($args);
+        $actions = $args['actions'] ?? [];
+        if (!is_array($actions) || empty($actions)) {
+            // fallback to single action for backward compatibility
+            if (!empty($args['action'])) {
+                $actions = [$args['action']];
+            }
         }
 
-        throw new \Exception('Invalid action. Use "install" or "delete".');
+        if (empty($actions)) {
+            throw new \Exception('No action(s) provided. Use "actions" array.');
+        }
+
+        $messages = [];
+        $family_id = null;
+
+        foreach ($actions as $action) {
+            if ($action === 'install' || $action === 'update') {
+                $result = self::install_font($args);
+                $family_id = $result['id'];
+                $messages[] = $result['message'];
+            } elseif ($action === 'activate') {
+                $result = self::activate_font($args, $family_id);
+                $family_id = $result['id'];
+                $messages[] = $result['message'];
+            } elseif ($action === 'deactivate') {
+                $result = self::deactivate_font($args, $family_id);
+                $family_id = $result['id'];
+                $messages[] = $result['message'];
+            } elseif ($action === 'delete') {
+                $result = self::delete_font($args, $family_id);
+                $messages[] = $result['message'];
+            } else {
+                throw new \Exception(sprintf('Invalid action "%s".', $action));
+            }
+        }
+
+        $output = [
+            'message' => implode(' ', $messages)
+        ];
+        
+        $final_id = $family_id ?? ($args['font_family_id'] ?? null);
+        if ($final_id !== null) {
+            $output['id'] = $final_id;
+        }
+
+        return $output;
     }
 
     private static function install_font(array $args): array
@@ -35,8 +72,31 @@ class Callbacks
             'post_status' => 'any'
         ]);
 
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        WP_Filesystem();
+        global $wp_filesystem;
+
         if (!empty($existing)) {
             $family_id = $existing[0]->ID;
+
+            // Map existing font faces to avoid duplicates and update them if needed
+            $font_faces = get_posts([
+                'post_type' => 'wp_font_face',
+                'post_parent' => $family_id,
+                'posts_per_page' => -1,
+                'post_status' => 'any'
+            ]);
+
+            foreach ($font_faces as $face) {
+                $face_data = json_decode($face->post_content, true);
+                if (is_array($face_data) && isset($face_data['fontWeight']) && isset($face_data['fontStyle'])) {
+                    $key = $face_data['fontWeight'] . '-' . $face_data['fontStyle'];
+                    $existing_faces_map[$key] = [
+                        'post_id' => $face->ID,
+                        'src' => $face_data['src'] ?? ''
+                    ];
+                }
+            }
         } else {
             // Create wp_font_family post
             $family_id = wp_insert_post([
@@ -44,22 +104,19 @@ class Callbacks
                 'post_title' => sanitize_text_field($args['name']),
                 'post_name' => $slug,
                 'post_status' => 'publish',
-                'post_content' => wp_json_encode([
+                'post_content' => wp_slash(wp_json_encode([
                     'fontFamily' => $args['fontFamily'],
                     'preview' => ''
-                ])
+                ]))
             ]);
 
             if (is_wp_error($family_id)) {
+                // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
                 throw new \Exception('Failed to create font family: ' . $family_id->get_error_message());
             }
         }
 
         $installed_faces = 0;
-
-        require_once ABSPATH . 'wp-admin/includes/file.php';
-        WP_Filesystem();
-        global $wp_filesystem;
 
         // Process font faces
         foreach ($args['fontFace'] as $face) {
@@ -75,6 +132,7 @@ class Callbacks
             // Download file
             $tmp_file = download_url($src_url);
             if (is_wp_error($tmp_file)) {
+                // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
                 throw new \Exception('Failed to download font file: ' . $tmp_file->get_error_message());
             }
 
@@ -83,11 +141,11 @@ class Callbacks
             $fonts_url = $wp_upload_dir['baseurl'] . '/fonts';
 
             if (!wp_mkdir_p($fonts_dir)) {
-                @unlink($tmp_file);
+                wp_delete_file($tmp_file);
                 continue;
             }
 
-            $filename = basename(parse_url($src_url, PHP_URL_PATH));
+            $filename = basename(wp_parse_url($src_url, PHP_URL_PATH));
             // Sanitize filename
             $filename = sanitize_file_name($filename);
             
@@ -103,7 +161,7 @@ class Callbacks
             }
 
             $wp_filesystem->copy($tmp_file, $dest_file);
-            @unlink($tmp_file);
+            wp_delete_file($tmp_file);
 
             $local_src_url = $fonts_url . '/' . $filename;
 
@@ -119,34 +177,144 @@ class Callbacks
             }
 
             $face_title = $slug . ';' . $face['fontStyle'] . ';' . $face['fontWeight'] . ';100%;U+0-10FFFF';
+            $key = $face['fontWeight'] . '-' . $face['fontStyle'];
 
-            wp_insert_post([
-                'post_type' => 'wp_font_face',
-                'post_parent' => $family_id,
-                'post_title' => $face_title,
-                'post_name' => $face_slug,
-                'post_status' => 'publish',
-                'post_content' => wp_json_encode($face_content)
-            ]);
+            if (isset($existing_faces_map[$key])) {
+                $existing_face = $existing_faces_map[$key];
+
+                // Delete old font file
+                if (!empty($existing_face['src'])) {
+                    $old_src = $existing_face['src'];
+                    $wp_upload_dir = wp_upload_dir();
+                    if (str_starts_with($old_src, $wp_upload_dir['baseurl'])) {
+                        $local_path = str_replace($wp_upload_dir['baseurl'], $wp_upload_dir['basedir'], $old_src);
+                        if ($wp_filesystem->exists($local_path)) {
+                            $wp_filesystem->delete($local_path);
+                        }
+                    }
+                }
+
+                // Update existing post
+                wp_update_post([
+                    'ID' => $existing_face['post_id'],
+                    'post_title' => $face_title,
+                    'post_name' => $face_slug,
+                    'post_content' => wp_slash(wp_json_encode($face_content))
+                ]);
+
+                unset($existing_faces_map[$key]);
+            } else {
+                wp_insert_post([
+                    'post_type' => 'wp_font_face',
+                    'post_parent' => $family_id,
+                    'post_title' => $face_title,
+                    'post_name' => $face_slug,
+                    'post_status' => 'publish',
+                    'post_content' => wp_slash(wp_json_encode($face_content))
+                ]);
+            }
 
             $installed_faces++;
         }
 
-        self::update_global_styles_font($slug, $args['name'], $args['fontFamily'], $args['fontFace']);
+        // Delete any existing faces that were not included in this install request
+        foreach ($existing_faces_map as $old_face) {
+            if (!empty($old_face['src'])) {
+                $old_src = $old_face['src'];
+                $wp_upload_dir = wp_upload_dir();
+                if (str_starts_with($old_src, $wp_upload_dir['baseurl'])) {
+                    $local_path = str_replace($wp_upload_dir['baseurl'], $wp_upload_dir['basedir'], $old_src);
+                    if ($wp_filesystem->exists($local_path)) {
+                        $wp_filesystem->delete($local_path);
+                    }
+                }
+            }
+            wp_delete_post($old_face['post_id'], true);
+        }
 
         return [
             'id' => $family_id,
-            'message' => sprintf('Successfully installed and activated font family "%s" with %d font faces.', $args['name'], $installed_faces)
+            'message' => sprintf('Successfully installed font family "%s" with %d font faces.', $args['name'], $installed_faces)
         ];
     }
 
-    private static function delete_font(array $args): array
+    private static function activate_font(array $args, $chained_family_id = null): array
     {
-        if (empty($args['font_family_id'])) {
-            throw new \Exception('font_family_id is required for delete.');
+        $family_id = $chained_family_id ?? ($args['font_family_id'] ?? null);
+        
+        if (!$family_id) {
+            // Try to find it by slug if provided
+            if (!empty($args['name'])) {
+                $slug = $args['slug'] ?? sanitize_title($args['name']);
+                $existing = get_posts([
+                    'post_type' => 'wp_font_family',
+                    'name' => $slug,
+                    'posts_per_page' => 1,
+                    'post_status' => 'any'
+                ]);
+                if (!empty($existing)) {
+                    $family_id = $existing[0]->ID;
+                }
+            }
         }
 
-        $family_id = intval($args['font_family_id']);
+        if (!$family_id) {
+            throw new \Exception('font_family_id or valid name/slug is required for activate.');
+        }
+
+        $family = get_post($family_id);
+        if (!$family || $family->post_type !== 'wp_font_family') {
+            throw new \Exception('Invalid font family ID for activation.');
+        }
+
+        $content = json_decode($family->post_content, true);
+        $fontFamily = $content['fontFamily'] ?? $family->post_title;
+        $name = $family->post_title;
+        $slug = $family->post_name;
+
+        self::update_global_styles_font($slug, $name, $fontFamily, $family_id);
+
+        return [
+            'id' => $family_id,
+            'message' => sprintf('Successfully activated font family "%s" in global styles.', $name)
+        ];
+    }
+
+    private static function deactivate_font(array $args, $chained_family_id = null): array
+    {
+        $family_id = $chained_family_id ?? ($args['font_family_id'] ?? null);
+        
+        if (!$family_id) {
+            if (!empty($args['name'])) {
+                $slug = $args['slug'] ?? sanitize_title($args['name']);
+                self::remove_global_styles_font($slug);
+                return [
+                    'id' => null,
+                    'message' => sprintf('Successfully deactivated font family slug "%s".', $slug)
+                ];
+            }
+            throw new \Exception('font_family_id or valid name is required for deactivate.');
+        }
+
+        $family = get_post($family_id);
+        if (!$family || $family->post_type !== 'wp_font_family') {
+            throw new \Exception('Invalid font family ID for deactivation.');
+        }
+
+        self::remove_global_styles_font($family->post_name);
+
+        return [
+            'id' => $family_id,
+            'message' => sprintf('Successfully deactivated font family "%s" from global styles.', $family->post_title)
+        ];
+    }
+
+    private static function delete_font(array $args, $chained_family_id = null): array
+    {
+        $family_id = $chained_family_id ?? ($args['font_family_id'] ?? null);
+        if (!$family_id) {
+            throw new \Exception('font_family_id is required for delete.');
+        }
         $family = get_post($family_id);
 
         if (!$family || $family->post_type !== 'wp_font_family') {
@@ -190,29 +358,22 @@ class Callbacks
         ];
     }
 
-    private static function update_global_styles_font($slug, $name, $fontFamily, $fontFaces)
+    private static function update_global_styles_font($slug, $name, $fontFamily, $family_id)
     {
         $new_font = [
-            'fontFamily' => $fontFamily,
+            'id' => (int) $family_id,
             'name' => $name,
             'slug' => $slug,
-            'fontFace' => []
+            'fontFamily' => $fontFamily,
+            'preview' => '',
+            'fontFace' => [],
+            'source' => 'custom'
         ];
 
-        // Format fontFace for theme.json
-        foreach ($fontFaces as $face) {
-            if (empty($face['src'])) continue;
-            
-            // Get the local src URL that we saved
-            $wp_upload_dir = wp_upload_dir();
-            $fonts_url = $wp_upload_dir['baseurl'] . '/fonts';
-            $filename = sanitize_file_name(basename(parse_url($face['src'], PHP_URL_PATH)));
-        }
-        
         // Quick fetch of the newly created faces to get their correct local src
         $faces = get_posts([
             'post_type' => 'wp_font_face',
-            'post_parent' => get_page_by_path($slug, OBJECT, 'wp_font_family')->ID ?? 0,
+            'post_parent' => $family_id,
             'posts_per_page' => -1,
             'post_status' => 'publish'
         ]);
@@ -224,12 +385,22 @@ class Callbacks
             }
         }
 
-        $post_name = 'wp-global-styles-' . urlencode(wp_get_theme()->get_stylesheet());
         $args = [
             'post_type' => 'wp_global_styles',
-            'name' => $post_name,
             'posts_per_page' => 1,
-            'post_status' => 'publish'
+            'post_status' => 'publish',
+            'ignore_sticky_posts' => true,
+            'no_found_rows' => true,
+            'order' => 'DESC',
+            'orderby' => 'date',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+            'tax_query' => [
+                [
+                    'taxonomy' => 'wp_theme',
+                    'field'    => 'name',
+                    'terms'    => wp_get_theme()->get_stylesheet(),
+                ],
+            ],
         ];
         $query = new \WP_Query($args);
         $post = !empty($query->posts) ? $query->posts[0] : null;

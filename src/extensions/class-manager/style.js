@@ -50,9 +50,12 @@ const toLength = (value) => {
     return '';
 };
 
-const toSpacingShorthand = (value) => {
+const buildSpacingCss = (property, value) => {
     if (value === undefined || value === null || value === '') return '';
-    if (typeof value === 'string' || typeof value === 'number') return toLength(value);
+    if (typeof value === 'string' || typeof value === 'number') {
+        const length = toLength(value);
+        return length ? `${property}: ${length};` : '';
+    }
     if (typeof value !== 'object' || Array.isArray(value)) return '';
 
     const top = toLength(value.top ?? value.TOP);
@@ -60,11 +63,43 @@ const toSpacingShorthand = (value) => {
     const bottom = toLength(value.bottom ?? value.BOTTOM);
     const left = toLength(value.left ?? value.LEFT);
 
-    if (!top && !right && !bottom && !left) {
-        return '';
+    if (top && right && bottom && left) {
+        return `${property}: ${top} ${right} ${bottom} ${left};`;
     }
 
-    return `${top || 0} ${right || 0} ${bottom || 0} ${left || 0}`;
+    let css = '';
+    if (top) css += `${property}-top: ${top}; `;
+    if (right) css += `${property}-right: ${right}; `;
+    if (bottom) css += `${property}-bottom: ${bottom}; `;
+    if (left) css += `${property}-left: ${left}; `;
+
+    return css.trim();
+};
+
+const buildBorderRadiusCss = (value) => {
+    if (value === undefined || value === null || value === '') return '';
+    if (typeof value === 'string' || typeof value === 'number') {
+        const length = toLength(value);
+        return length ? `border-radius: ${length};` : '';
+    }
+    if (typeof value !== 'object' || Array.isArray(value)) return '';
+
+    const topLeft = toLength(value.topLeft);
+    const topRight = toLength(value.topRight);
+    const bottomRight = toLength(value.bottomRight);
+    const bottomLeft = toLength(value.bottomLeft);
+
+    if (topLeft && topRight && bottomRight && bottomLeft) {
+        return `border-radius: ${topLeft} ${topRight} ${bottomRight} ${bottomLeft};`;
+    }
+
+    let css = '';
+    if (topLeft) css += `border-top-left-radius: ${topLeft}; `;
+    if (topRight) css += `border-top-right-radius: ${topRight}; `;
+    if (bottomRight) css += `border-bottom-right-radius: ${bottomRight}; `;
+    if (bottomLeft) css += `border-bottom-left-radius: ${bottomLeft}; `;
+
+    return css.trim();
 };
 
 const isResponsiveValueShape = (value) => {
@@ -197,8 +232,8 @@ const generateRuleSet = (styles, device) => {
     }
     if (layoutType === 'auto' && autoGridHeight) pushRule(`grid-auto-rows: ${autoGridHeight};`, true);
 
-    addRule('padding', generateCSS({ attributes: styles, key: 'padding', device, getValue: (v) => `padding: ${toSpacingShorthand(v)};` }));
-    addRule('margin', generateCSS({ attributes: styles, key: 'margin', device, getValue: (v) => `margin: ${toSpacingShorthand(v)};` }));
+    addRule('padding', generateCSS({ attributes: styles, key: 'padding', device, getValue: (v) => buildSpacingCss('padding', v) }));
+    addRule('margin', generateCSS({ attributes: styles, key: 'margin', device, getValue: (v) => buildSpacingCss('margin', v) }));
     addRule('width', generateCSS({ attributes: styles, key: 'width', device, getValue: (v) => `width: ${toLength(v)};` }));
     addRule('height', generateCSS({ attributes: styles, key: 'height', device, getValue: (v) => `height: ${toLength(v)};` }));
     addRule('minWidth', generateCSS({ attributes: styles, key: 'minWidth', device, getValue: (v) => `min-width: ${toLength(v)};` }));
@@ -237,7 +272,7 @@ const generateRuleSet = (styles, device) => {
     addRule('backgroundClip', generateCSS({ attributes: styles, key: 'backgroundClip', device, getValue: (v) => `background-clip: ${v};` }));
     pushRule(textStroke, true);
     pushRule(border, true);
-    addRule('borderRadius', generateCSS({ attributes: styles, key: 'borderRadius', device, getValue: (v) => `border-radius: ${toLength(v)};` }));
+    addRule('borderRadius', generateCSS({ attributes: styles, key: 'borderRadius', device, getValue: (v) => buildBorderRadiusCss(v) }));
 
     pushRule(boxShadow, false);
     pushRule(textShadow, false);

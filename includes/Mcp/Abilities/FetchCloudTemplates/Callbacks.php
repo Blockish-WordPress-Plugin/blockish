@@ -102,13 +102,52 @@ class Callbacks
             }
 
             if ($is_installed) {
+                // Enrich with dependencies from single-design endpoint when missing.
+                if (empty($design['dependencies']) && !empty($design['id'])) {
+                    $design = self::fetch_design_with_dependencies((int) $design['id']) ?: $design;
+                }
+
                 if (!empty($design['content'])) {
                     $parsed_blocks = parse_blocks($design['content']);
                     $design['schema'] = \Blockish\Mcp\SchemaUtils::convert_to_js_schema($parsed_blocks);
                 } else {
                     $design['schema'] = [];
                 }
-                unset($design['content']);
+
+                if (!empty($design['dependencies']['patterns']) && is_array($design['dependencies']['patterns'])) {
+                    foreach ($design['dependencies']['patterns'] as &$pattern) {
+                        if (!empty($pattern['content'])) {
+                            $pattern['schema'] = \Blockish\Mcp\SchemaUtils::convert_to_js_schema(
+                                parse_blocks($pattern['content'])
+                            );
+                        }
+                    }
+                    unset($pattern);
+                }
+
+                if (!empty($design['dependencies']['forms']) && is_array($design['dependencies']['forms'])) {
+                    foreach ($design['dependencies']['forms'] as &$form) {
+                        if (!empty($form['content'])) {
+                            $form['schema'] = \Blockish\Mcp\SchemaUtils::convert_to_js_schema(
+                                parse_blocks($form['content'])
+                            );
+                        }
+                    }
+                    unset($form);
+                }
+
+                if (!empty($design['dependencies']['classes']) && is_array($design['dependencies']['classes'])) {
+                    // Classes are CSS/style-object deps — pass through as-is for local import + id remap.
+                    foreach ($design['dependencies']['classes'] as &$class_dep) {
+                        if (empty($class_dep['name']) && !empty($class_dep['title'])) {
+                            $class_dep['name'] = $class_dep['title'];
+                        }
+                    }
+                    unset($class_dep);
+                }
+
+                // Keep content + dependencies so the agent can recreate entities and remap IDs
+                // before applying schema. Do not unset content.
                 $filtered_designs[] = $design;
             }
         }
@@ -116,8 +155,34 @@ class Callbacks
         return [
             'total_pages'  => $data['total_pages'] ?? 1,
             'current_page' => $data['current_page'] ?? 1,
-            'designs'      => $filtered_designs
+            'designs'      => $filtered_designs,
+            'note'         => 'Each design may include dependencies.patterns / dependencies.forms / dependencies.classes with cloud ids. Create local wp_block / blockish_form / blockish-classes entities (prefer manage-class css for classes), remap ref/formId/classManager id from cloud→local, then use the remapped schema. Prefer edit_url staging — do not assume cloud refs work on this site.',
         ];
+    }
+
+    /**
+     * Fetch one design with dependency bundle.
+     *
+     * @param int $design_id Cloud design ID.
+     * @return array|null
+     */
+    private static function fetch_design_with_dependencies(int $design_id): ?array
+    {
+        $url = BLOCKISH_TEMPLATE_LIBRARY_URL . '/designs/' . $design_id;
+        $url = add_query_arg('token', BLOCKISH_TEMPLATE_LIBRARY_TOKEN, $url);
+
+        $response = wp_remote_get($url, [
+            'timeout'   => 30,
+            'sslverify' => false,
+            'headers'   => ['Accept' => 'application/json'],
+        ]);
+
+        if (is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)) {
+            return null;
+        }
+
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        return is_array($data) ? $data : null;
     }
 
     private static function get_cloud_taxonomies(): array
@@ -153,6 +218,12 @@ class Callbacks
                 if (isset($data['success']) && $data['success'] && !empty($data['data'])) {
                     // Collect slugs from the API response
                     foreach ($data['data'] as $term) {
+                        if (!empty($term['slug'])) {
+                            $taxonomies[$key][] = $term['slug'];
+                        }
+                    }
+                } elseif (is_array($data)) {
+                    foreach ($data as $term) {
                         if (!empty($term['slug'])) {
                             $taxonomies[$key][] = $term['slug'];
                         }

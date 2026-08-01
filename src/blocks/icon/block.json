@@ -29,9 +29,6 @@
     },
     "alignment": {
       "type": "object",
-      "default": {
-        "Desktop": "center"
-      },
       "selectors": {
         ".{{WRAPPER}}": "text-align: {{VALUE}};"
       }

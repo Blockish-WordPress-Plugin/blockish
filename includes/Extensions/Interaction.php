@@ -2,88 +2,117 @@
 
 namespace Blockish\Extensions;
 
+use Blockish\Config\ExtensionList;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Interactions runtime: page meta, view assets, and data-blockish-interactions markup.
+ * Editor assets + interactionData attribute come from block.json via Core\Extensions.
+ */
 class Interaction {
 	use \Blockish\Traits\SingletonTrait;
 
+	const PAGE_META_KEY = 'blockish_page_interactions';
+
+	/**
+	 * Handles registered from build/extensions/interactions/block.json via Core\Extensions.
+	 * Core\Extensions runs the block.json field name through sanitize_key(), so the
+	 * generated handles are always lowercase ("viewScript" => "viewscript").
+	 */
+	const VIEW_SCRIPT_HANDLE = 'blockish-extension-interactions-viewscript';
+	const VIEW_STYLE_HANDLE  = 'blockish-extension-interactions-style';
+
 	private function __construct() {
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_scripts' ) );
-		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
-		add_filter( 'register_block_type_args', array( $this, 'register_attributes' ), 20, 2 );
+		add_action( 'init', array( $this, 'register_page_meta' ) );
+		add_action( 'init', array( $this, 'register_runtime_hooks' ), 20 );
 	}
 
-	public function enqueue_scripts() {
-		$asset_file = BLOCKISH_EXTENSIONS_DIR . 'interactions/view.asset.php';
-		
-		if ( ! file_exists( $asset_file ) ) {
+	public function register_runtime_hooks() {
+		if ( ! $this->is_extension_enabled() ) {
 			return;
 		}
 
-		$asset = require $asset_file;
-		$script_url = BLOCKISH_URL . 'build/extensions/interactions/view.js';
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_view_assets' ) );
+		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
+	}
 
-		wp_enqueue_script(
-			'blockish-extension-interactions-view',
-			$script_url,
-			$asset['dependencies'] ?? array(),
-			$asset['version'] ?? BLOCKISH_VERSION,
-			true
+	private function is_extension_enabled() {
+		$active = ExtensionList::get_instance()->get_list( 'active' );
+		return ! empty( $active['interactions'] );
+	}
+
+	public function register_page_meta() {
+		register_post_meta(
+			'',
+			self::PAGE_META_KEY,
+			array(
+				'type'              => 'array',
+				'single'            => true,
+				'default'           => array(),
+				'show_in_rest'      => array(
+					'schema' => array(
+						'type'  => 'array',
+						'items' => array(
+							'type'                 => 'object',
+							'additionalProperties' => true,
+						),
+					),
+				),
+				'auth_callback'     => function ( $allowed, $meta_key, $post_id ) {
+					return current_user_can( 'edit_post', $post_id );
+				},
+			)
 		);
+	}
 
-		$global_interactions = get_option( 'blockish_global_interactions', [] );
+	/**
+	 * Enqueue registered viewScript/style and inject global + page interaction JSON.
+	 */
+	public function enqueue_view_assets() {
+		if ( ! wp_script_is( self::VIEW_SCRIPT_HANDLE, 'registered' ) ) {
+			return;
+		}
 
+		wp_enqueue_script( self::VIEW_SCRIPT_HANDLE );
 
+		if ( wp_style_is( self::VIEW_STYLE_HANDLE, 'registered' ) ) {
+			wp_enqueue_style( self::VIEW_STYLE_HANDLE );
+		}
+
+		$global_interactions = get_option( 'blockish_global_interactions', array() );
 		if ( is_string( $global_interactions ) ) {
 			$global_interactions_json = $global_interactions;
 		} else {
 			$global_interactions_json = wp_json_encode( $global_interactions );
 		}
-		
+
 		if ( empty( $global_interactions_json ) ) {
 			$global_interactions_json = '[]';
 		}
 
+		$page_interactions_json = '[]';
+		if ( is_singular() ) {
+			$page_interactions = get_post_meta( get_the_ID(), self::PAGE_META_KEY, true );
+			if ( is_array( $page_interactions ) && ! empty( $page_interactions ) ) {
+				$page_interactions_json = wp_json_encode( $page_interactions );
+			} elseif ( is_string( $page_interactions ) && '' !== trim( $page_interactions ) ) {
+				$page_interactions_json = $page_interactions;
+			}
+		}
+
+		if ( empty( $page_interactions_json ) ) {
+			$page_interactions_json = '[]';
+		}
+
 		wp_add_inline_script(
-			'blockish-extension-interactions-view',
-			'window.blockishGlobalInteractions = ' . $global_interactions_json . ';',
+			self::VIEW_SCRIPT_HANDLE,
+			'window.blockishGlobalInteractions = ' . $global_interactions_json . ';' .
+			'window.blockishPageInteractions = ' . $page_interactions_json . ';',
 			'before'
 		);
-	}
-
-	public function enqueue_editor_scripts() {
-		$asset_file = BLOCKISH_EXTENSIONS_DIR . 'interactions/editor.asset.php';
-		
-		if ( ! file_exists( $asset_file ) ) {
-			return;
-		}
-
-		$asset = require $asset_file;
-		$script_url = BLOCKISH_URL . 'build/extensions/interactions/editor.js';
-
-		wp_enqueue_script(
-			'blockish-extension-interactions-editor',
-			$script_url,
-			$asset['dependencies'] ?? array(),
-			$asset['version'] ?? BLOCKISH_VERSION,
-			true
-		);
-	}
-
-	public function register_attributes( $args, $block_type ) {
-		if ( str_starts_with( $block_type, 'blockish' ) ) {
-			if ( ! isset( $args['attributes'] ) ) {
-				$args['attributes'] = array();
-			}
-			$args['attributes']['interactionData'] = array(
-				'type'    => 'array',
-				'default' => array(),
-			);
-		}
-		return $args;
 	}
 
 	public function render_block( $block_content, $block ) {
@@ -92,7 +121,7 @@ class Interaction {
 		}
 
 		$interaction_data = $block['attrs']['interactionData'];
-		
+
 		if ( ! is_array( $interaction_data ) || empty( $interaction_data ) ) {
 			return $block_content;
 		}
@@ -103,7 +132,7 @@ class Interaction {
 		}
 
 		$tag_processor->set_attribute( 'data-blockish-interactions', wp_json_encode( $interaction_data ) );
-		
+
 		return $tag_processor->get_updated_html();
 	}
 }

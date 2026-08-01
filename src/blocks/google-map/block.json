@@ -28,7 +28,6 @@
     },
     "mapHeight": {
       "type": "string",
-      "default": "360px",
       "selectors": {
         ".{{WRAPPER}} .blockish-google-map__iframe": "height: {{VALUE}};"
       }

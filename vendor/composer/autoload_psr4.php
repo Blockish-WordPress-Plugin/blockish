@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'WP\\McpSchema\\' => array($vendorDir . '/wordpress/php-mcp-schema/src'),
     'WP\\MCP\\' => array($vendorDir . '/wordpress/mcp-adapter/includes'),
+    'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => array($vendorDir . '/dealerdirect/phpcodesniffer-composer-installer/src'),
     'Blockish\\' => array($baseDir . '/includes'),
     'Automattic\\Jetpack\\Autoloader\\' => array($vendorDir . '/automattic/jetpack-autoloader/src'),
 );

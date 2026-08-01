@@ -1,0 +1,28 @@
+.blockish-visibility-help {
+	margin: 0 0 12px;
+	font-size: 12px;
+	line-height: 1.4;
+	color: #757575;
+}
+
+.blockish-visibility-preview-desktop,
+.blockish-visibility-preview-tablet,
+.blockish-visibility-preview-mobile {
+	position: relative;
+}
+
+/* Dim in editor so the block stays selectable. */
+.blockish-visibility-preview-desktop,
+.blockish-visibility-preview-tablet,
+.blockish-visibility-preview-mobile {
+	opacity: 0.45;
+	outline: 1px dashed rgba(117, 117, 117, 0.7);
+	outline-offset: 2px;
+}
+
+.blockish-visibility-preview-desktop::after,
+.blockish-visibility-preview-tablet::after,
+.blockish-visibility-preview-mobile::after {
+	content: '';
+	pointer-events: none;
+}

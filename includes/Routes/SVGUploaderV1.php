@@ -95,17 +95,20 @@ class SVGUploaderV1 extends WP_REST_Controller
     public function create_icon(WP_REST_Request $request)
     {
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing
         if (empty($_FILES['file'])) {
             return new \WP_Error('no_file', 'SVG file is required.', ['status' => 400]);
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $svg = $this->sanitize_svg_file($_FILES['file']);
     
         if (is_wp_error($svg)) {
             return $svg;
         }
 
-        $file_name = sanitize_file_name($_FILES['file']['name']);
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotValidated
+        $file_name = sanitize_file_name(wp_unslash($_FILES['file']['name']));
         $label     = $this->create_label_from_name($file_name);
         $slug      = sanitize_title($label);
 
@@ -145,7 +148,9 @@ class SVGUploaderV1 extends WP_REST_Controller
         }
 
         // optional file upload
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing
         if (!empty($_FILES['file'])) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
             $svg = $this->sanitize_svg_file($_FILES['file']);
             if (is_wp_error($svg)) {
                 return $svg;

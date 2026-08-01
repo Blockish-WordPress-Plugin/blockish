@@ -1,0 +1,102 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/post-featured-image",
+  "version": "1.0.0",
+  "title": "Post Featured Image",
+  "category": "blockish-framework",
+  "description": "Displays the current post featured image with optional permalink.",
+  "keywords": [
+    "blockish",
+    "post",
+    "featured",
+    "image",
+    "thumbnail"
+  ],
+  "textdomain": "blockish",
+  "attributes": {
+    "imageSize": {
+      "type": "object",
+      "default": {
+        "value": "full",
+        "label": "Full Size"
+      }
+    },
+    "linkToPost": {
+      "type": "boolean",
+      "default": false
+    },
+    "openInNewTab": {
+      "type": "boolean",
+      "default": false
+    },
+    "alignment": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}": "text-align: {{VALUE}};"
+      }
+    },
+    "imageWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-featured-image__image": "width: {{VALUE}};"
+      }
+    },
+    "imageMaxWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-featured-image__image": "max-width: {{VALUE}};"
+      }
+    },
+    "imageHeight": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-featured-image__image": "height: {{VALUE}};"
+      }
+    },
+    "objectFit": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-featured-image__image": "object-fit: {{VALUE}};"
+      }
+    },
+    "border": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-post-featured-image__image"
+      }
+    },
+    "borderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-post-featured-image__image": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "boxShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBoxShadow",
+        "selector": ".{{WRAPPER}} .blockish-post-featured-image__image"
+      }
+    }
+  },
+  "usesContext": [
+    "postId",
+    "postType",
+    "queryId",
+    "blockish-dynamicity/queryId"
+  ],
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "render": "file:./render.php"
+}

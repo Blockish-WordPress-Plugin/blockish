@@ -12,15 +12,23 @@ class Config
     {
         return [
             'label'               => __('Manage Fonts', 'blockish'),
-            'description'         => __('Installs or deletes custom fonts in the WordPress Font Library.', 'blockish'),
+            'description'         => __('Installs, updates, activates, deactivates, or deletes custom fonts in the WordPress Font Library and Global Styles.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
                 'properties' => [
+                    'actions' => [
+                        'type' => 'array',
+                        'description' => 'List of actions to perform sequentially (e.g. ["install", "activate"]).',
+                        'items' => [
+                            'type' => 'string',
+                            'enum' => ['install', 'update', 'delete', 'activate', 'deactivate']
+                        ]
+                    ],
                     'action' => [
                         'type' => 'string',
-                        'enum' => ['install', 'delete'],
-                        'description' => 'Action to perform: install or delete.'
+                        'enum' => ['install', 'update', 'delete', 'activate', 'deactivate'],
+                        'description' => 'Single action to perform (legacy, use actions instead).'
                     ],
                     'font_family_id' => [
                         'type' => 'integer',
@@ -65,7 +73,7 @@ class Config
                         ]
                     ]
                 ],
-                'required' => ['action']
+                // neither is strictly required by JSON schema since we accept either, but we check in PHP.
             ],
             'output_schema'       => [
                 'type'       => 'object',
@@ -78,7 +86,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_theme_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use this to install new fonts. You must provide a direct URL to the font file in the src parameter of each fontFace. WordPress will download the font file and save it locally.',
+                'usage_notes' => "Use this to manage fonts. You can pass an array of `actions` to run sequentially (e.g., [\"install\", \"activate\"]). Action `install` downloads the font and creates the posts. Action `activate` adds it to the theme.json custom fontFamilies array. Action `deactivate` removes it from theme.json without deleting files. Action `delete` permanently deletes the posts and files. Note: 'install' alone NO LONGER activates the font; you must explicitly pass 'activate' as well if you want it applied to the site immediately. IMPORTANT: NEVER manually guess the `src` or `fontFace` data when installing a Google Font. You MUST first use the `blockish-fetch-google-fonts` tool to get the accurate variation data and source URLs directly from WordPress, and then pass its exact output as the payload here.",
             ],
         ];
     }

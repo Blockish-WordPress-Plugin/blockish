@@ -26,3 +26,7 @@
 		height: 1em;
 	}
 }
+
+:where(.blockish-button .blockish-button-link) {
+	flex-direction: row;
+}

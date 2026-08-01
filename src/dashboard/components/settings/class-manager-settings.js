@@ -63,7 +63,9 @@ export default function ClassManagerSettings({ isOpen, onRequestClose }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [isCreating, setIsCreating] = useState(false);
+	const [isRegeneratingCss, setIsRegeneratingCss] = useState(false);
 	const [error, setError] = useState('');
+	const [notice, setNotice] = useState('');
 	const [search, setSearch] = useState('');
 	const [items, setItems] = useState([]);
 	const [editingId, setEditingId] = useState(null);
@@ -87,6 +89,26 @@ export default function ClassManagerSettings({ isOpen, onRequestClose }) {
 			setError(err?.message || __('Failed to load class manager data', 'blockish'));
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const regenerateCssCache = async () => {
+		setIsRegeneratingCss(true);
+		setError('');
+		setNotice('');
+		try {
+			const response = await apiFetch({
+				path: '/blockish/v1/dashboard-tools/class-manager/regenerate-css',
+				method: 'POST',
+			});
+			setNotice(
+				response?.message ||
+					__('CSS cache cleared. It will rebuild on the next page view.', 'blockish')
+			);
+		} catch (err) {
+			setError(err?.message || __('Failed to clear Class Manager CSS cache', 'blockish'));
+		} finally {
+			setIsRegeneratingCss(false);
 		}
 	};
 
@@ -321,15 +343,27 @@ export default function ClassManagerSettings({ isOpen, onRequestClose }) {
 								onChange={(event) => setSearch(event.target.value)}
 							/>
 						</div>
-						<Button
-							className="blockish-class-manager-new-btn"
-							variant="primary"
-							icon="plus"
-							disabled={!canCreateNewClass}
-							onClick={createClass}
-						>
-							{__('New Class', 'blockish')}
-						</Button>
+						<Flex gap={2} align="center">
+							<Button
+								className="blockish-class-manager-regenerate-btn"
+								variant="secondary"
+								icon="update"
+								isBusy={isRegeneratingCss}
+								disabled={isRegeneratingCss || isLoading}
+								onClick={regenerateCssCache}
+							>
+								{__('Clear CSS cache', 'blockish')}
+							</Button>
+							<Button
+								className="blockish-class-manager-new-btn"
+								variant="primary"
+								icon="plus"
+								disabled={!canCreateNewClass}
+								onClick={createClass}
+							>
+								{__('New Class', 'blockish')}
+							</Button>
+						</Flex>
 					</Flex>
 				)}
 				{!editingId && Boolean(normalizedNewClass) && !isProperClassName && (
@@ -340,6 +374,7 @@ export default function ClassManagerSettings({ isOpen, onRequestClose }) {
 				{!editingId && Boolean(normalizedNewClass) && isProperClassName && hasDuplicateClassName && (
 					<Text className="blockish-text-muted">{__('Class already exists.', 'blockish')}</Text>
 				)}
+				{notice && <Text>{notice}</Text>}
 				{error && <Text className="blockish-error">{error}</Text>}
 
 				<div className="blockish-settings-list blockish-class-manager-list">

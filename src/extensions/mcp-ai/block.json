@@ -1,6 +1,7 @@
 {
-	"include": [],
-	"exclude": [],
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./index.css"
+  "apiVersion": 3,
+  "include": [],
+  "exclude": [],
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css"
 }

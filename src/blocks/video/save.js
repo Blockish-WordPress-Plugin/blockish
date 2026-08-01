@@ -35,6 +35,9 @@ export default function Save( { attributes } ) {
 
 	const selfHostedUrl =
 		attributes?.selfHostedVideo?.url || attributes?.selfHostedUrl;
+	// A self-hosted source can't use loading="lazy", so the URL is held in a
+	// data attribute and view.js swaps it in once the player nears the viewport.
+	const lazySelfHosted = isSelfHosted && !! attributes?.lazyLoad;
 	const overlayImageUrl = attributes?.overlayImage?.url;
 	const shouldShowOverlay =
 		!! attributes?.showOverlay &&
@@ -77,12 +80,26 @@ export default function Save( { attributes } ) {
 					? selfHostedUrl && (
 							<video
 								className="blockish-video"
-								src={ selfHostedUrl }
+								src={
+									lazySelfHosted ? undefined : selfHostedUrl
+								}
+								data-blockish-video-src={
+									lazySelfHosted ? selfHostedUrl : undefined
+								}
+								data-blockish-video-preload={
+									lazySelfHosted
+										? attributes?.preload || 'metadata'
+										: undefined
+								}
 								controls={ attributes?.controls ?? true }
 								autoPlay={ !! attributes?.autoplay }
 								loop={ !! attributes?.loop }
 								muted={ !! attributes?.muted }
-								preload={ attributes?.preload || 'metadata' }
+								preload={
+									lazySelfHosted
+										? 'none'
+										: attributes?.preload || 'metadata'
+								}
 								playsInline={ playOnMobile }
 								poster={
 									attributes?.poster ||

@@ -1,6 +1,7 @@
-.blockish-heading {
+:where(.blockish-heading) {
 	margin: 0;
 	padding: 0;
+	text-align: left;
 
 	a {
 		color: inherit !important;

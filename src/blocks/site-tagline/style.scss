@@ -1,0 +1,7 @@
+.blockish-site-tagline {
+	margin: 0;
+}
+
+:where(.blockish-site-tagline) {
+	text-align: left;
+}

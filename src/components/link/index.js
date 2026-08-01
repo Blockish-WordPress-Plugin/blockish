@@ -110,7 +110,7 @@ const BlockishLink = ({ value, onChange, label, help = '' }) => {
     return (
         <div className="blockish-control blockish-link" ref={blockishLinkRef}>
             <BaseControl label={label || __('Link', 'blockish')} help={help} __nextHasNoMarginBottom>
-                <Flex gap={0}>
+                <Flex gap={0} align="flex-start">
                     <FlexBlock className='blockish-link-input-wrapper'>
                         <TextControl
                             __next40pxDefaultSize
@@ -121,7 +121,6 @@ const BlockishLink = ({ value, onChange, label, help = '' }) => {
                             id='blockish-link-input'
                             autoComplete='off'
                             onChange={handleSearchInput}
-                            help={help}
                             value={searchInput || value?.url || ''}
                         />
                         {isLoading ? <Spinner className='blockish-link-spinner' /> : null}

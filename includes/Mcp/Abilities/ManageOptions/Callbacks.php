@@ -19,9 +19,8 @@ class Callbacks
         'default_category',
         'default_comment_status',
         'timezone_string',
-        'siteurl',
-        'home',
-        
+        // siteurl / home intentionally omitted — wrong values break the whole site.
+
         // Blockish Options
         'blockish_global_meta_description',
         'blockish_device_list'

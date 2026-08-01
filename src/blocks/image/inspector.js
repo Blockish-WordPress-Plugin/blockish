@@ -139,6 +139,20 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                                             />
                                                         )
                                                     }
+                                                    <BlockishControl
+                                                        type="ToggleControl"
+                                                        label={__('Open in lightbox', 'blockish')}
+                                                        slug="lightbox"
+                                                        value={!!attributes?.lightbox}
+                                                        checked={!!attributes?.lightbox}
+                                                        onChange={(value) => {
+                                                            setAttributes({ lightbox: !!value });
+                                                        }}
+                                                        help={__(
+                                                            'Clicking the image opens a larger view overlay.',
+                                                            'blockish'
+                                                        )}
+                                                    />
                                                 </>
                                             )
                                         }

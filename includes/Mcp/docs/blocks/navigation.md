@@ -1,103 +1,122 @@
 ### `blockish/navigation`
 
-Top-level navigation wrapper that orchestrates a responsive site header. It handles the structural switching between a desktop navigation menu (`blockish/navmenu`) and a mobile-friendly slide-in offcanvas drawer (`blockish/offcanvas`) based on a specified breakpoint. This block acts as the primary container ensuring seamless transition between desktop and mobile layouts for site navigation. **Accepts children: yes** (only `blockish/navmenu` and `blockish/offcanvas`).
+Responsive nav wrapper that pairs a desktop `navmenu` with a mobile `offcanvas`, switching at a breakpoint. **Accepts children: yes** — only `blockish/navmenu` and `blockish/offcanvas`.
 
-| Attribute | Type | Default | Notes/enum |
-|---|---|---|---|
+#### Content / structure
 
-| `menuBreakpoint` | Scalar (string) | `"tablet"` | `"tablet"` (collapse ≤1024px) `"mobile"` (collapse ≤768px) `"custom"` (use `menuCustomBreakpoint`) — below this width the desktop `navmenu` hides and the `offcanvas` hamburger shows |
-| `menuCustomBreakpoint` | Scalar (number, px) | `1024` | Max-width threshold, used when `menuBreakpoint` = `"custom"` |
-| `justifyContent` | Responsive-Option | unset | Options: `[{"label":"Start","value":"flex-start"},{"label":"Center","value":"center"},{"label":"End","value":"flex-end"},{"label":"Space Between","value":"space-between"}]` — horizontal placement of the menu/hamburger row <br>**CSS:** `.{{WRAPPER}} .blockish-navigation-inner` -> `justify-content: {{VALUE}};` |
-| `anchor` | Scalar (string) | unset | WP-core HTML `id`. See §7.1. |
-| `align` | Scalar (string) | unset | `"wide"` `"full"`. See §7.1. |
+| Attribute | Type | Notes |
+|---|---|---|
+| `menuBreakpoint` | Scalar | `"tablet"` (default, ≤1024px) \| `"mobile"` (≤768px) \| `"custom"`. Written to `data-menu-breakpoint`. |
+| `menuCustomBreakpoint` | Scalar | Default `1024`. Used only when `menuBreakpoint` is `"custom"` → `data-custom-breakpoint`. |
+| `hasStarted` | Scalar | Editor bootstrap flag — leave unset / `true` after children exist; do not invent. |
+| `anchor` / `align` | Scalar | `"align"`: `"wide"` \| `"full"`. |
 
----
+Typical children: one `blockish/navmenu` + one `blockish/offcanvas`. With offcanvas `syncWithMenu: true`, put menu items only under the navmenu.
 
+#### Markup
 
+Default:
 
-### Markup & CSS Generation
-
-**Generated HTML Structure:**
 ```html
-<!-- `data-menu-breakpoint` specifies when the nav collapses ('tablet', 'mobile', or 'custom'). -->
-<!-- `data-custom-breakpoint` holds the custom width value if breakpoint is 'custom'. -->
-<div class="blockish-navigation" data-menu-breakpoint="tablet" data-custom-breakpoint="">
-  
+<div
+  class="wp-block-blockish-navigation blockish-navigation"
+  data-menu-breakpoint="tablet"
+  data-custom-breakpoint=""
+>
   <div class="blockish-navigation-inner">
-    <!-- Inner blocks (typically `blockish/navmenu` and `blockish/offcanvas`) are rendered directly here -->
-    ...
+    <!-- navmenu + offcanvas -->
   </div>
-
 </div>
 ```
 
-**Base CSS (`style.scss`):**
-```scss
-// Shared collapsed state: hide the desktop nav, let the offcanvas fill the
-// row (so its hamburger alignment works), and force the hamburger visible
-// (overrides the offcanvas's own desktop-hidden rule below).
-@mixin blockish-navigation-collapsed {
-	.blockish-navmenu {
-		display: none;
-	}
+| When | What changes |
+|---|---|
+| `menuBreakpoint: "mobile"` / `"custom"` | `data-menu-breakpoint` updates. |
+| `menuBreakpoint: "custom"` + `menuCustomBreakpoint` | `data-custom-breakpoint` set to that px value. |
+| Collapsed (view / editor) | Root gains `is-collapsed` — hides `.blockish-navmenu`, shows offcanvas hamburger. |
 
-	.blockish-offcanvas {
-		flex: 1;
-	}
+Style with convert-css against `{{ROOT}} .blockish-navigation-inner` for justify/align — not invented chrome.
 
-	.blockish-offcanvas-hamburger {
-		display: inline-flex;
-	}
+#### Already-there CSS
+
+```css
+.blockish-navigation,
+.blockish-navigation:hover {
+  transform: none!important;
 }
 
-.blockish-navigation {
-	// The offcanvas panel inside this wrapper is `position: fixed`. Blockish's
-	// global identity `transform` on this wrapper would otherwise make it the
-	// containing block for that fixed panel (pinning it to this box instead of
-	// the viewport), so neutralize it here too — same reason as in the
-	// offcanvas block's own stylesheet.
-	&,
-	&:hover {
-		transform: none !important;
-	}
+.blockish-navigation .blockish-navigation-inner {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
 
-	.blockish-navigation-inner {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
+.blockish-navigation.is-collapsed .blockish-navmenu,
+.blockish-navigation:not(.is-collapsed) .blockish-offcanvas-hamburger {
+  display: none;
+}
 
-	// Desktop: the offcanvas is present but its trigger is hidden (only the
-	// desktop nav shows). The 3-class selector beats the offcanvas block's
-	// own `.blockish-offcanvas .blockish-offcanvas-hamburger { display: flex }`
-	// default, so the offcanvas still works standalone outside this wrapper.
-	&:not( .is-collapsed ) .blockish-offcanvas-hamburger {
-		display: none;
-	}
+.blockish-navigation.is-collapsed .blockish-offcanvas {
+  flex: 1;
+}
 
-	// Collapsed (mobile) — applied by view.js (matchMedia) so it also covers
-	// the dynamic "custom" breakpoint.
-	&.is-collapsed {
-		@include blockish-navigation-collapsed;
-	}
+.blockish-navigation.is-collapsed .blockish-offcanvas-hamburger {
+  display: inline-flex;
+}
 
-	// Pre-JS fallback for the fixed breakpoints so there's no flash of the
-	// desktop menu before view.js runs. "Custom" has no static width, so it
-	// still relies on the JS is-collapsed toggle above. These come after the
-	// :not(.is-collapsed) rule so they win on source order at equal specificity.
-	@media ( max-width: 1024px ) {
-		&[data-menu-breakpoint='tablet'] {
-			@include blockish-navigation-collapsed;
-		}
-	}
+@media(max-width:1024px) {
+  .blockish-navigation[data-menu-breakpoint=tablet] .blockish-navmenu {
+    display: none;
+  }
+  .blockish-navigation[data-menu-breakpoint=tablet] .blockish-offcanvas {
+    flex: 1;
+  }
+  .blockish-navigation[data-menu-breakpoint=tablet] .blockish-offcanvas-hamburger {
+    display: inline-flex;
+  }
+  ;
+}
 
-	@media ( max-width: 768px ) {
-		&[data-menu-breakpoint='mobile'] {
-			@include blockish-navigation-collapsed;
-		}
-	}
+@media(max-width:768px) {
+  .blockish-navigation[data-menu-breakpoint=mobile] .blockish-navmenu {
+    display: none;
+  }
+  .blockish-navigation[data-menu-breakpoint=mobile] .blockish-offcanvas {
+    flex: 1;
+  }
+  .blockish-navigation[data-menu-breakpoint=mobile] .blockish-offcanvas-hamburger {
+    display: inline-flex;
+  }
+  ;
 }
 ```
 
+#### Minimal schema
 
-
+```json
+{
+  "name": "blockish/navigation",
+  "attributes": {},
+  "innerBlocks": [
+    {
+      "name": "blockish/navmenu",
+      "attributes": {},
+      "innerBlocks": [
+        {
+          "name": "blockish/navmenu-item",
+          "attributes": { "label": "Home", "url": "/" }
+        },
+        {
+          "name": "blockish/navmenu-item",
+          "attributes": { "label": "Pricing", "url": "/pricing" }
+        }
+      ]
+    },
+    {
+      "name": "blockish/offcanvas",
+      "attributes": { "syncWithMenu": true },
+      "innerBlocks": []
+    }
+  ]
+}
+```
