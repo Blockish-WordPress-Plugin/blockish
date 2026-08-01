@@ -6,6 +6,7 @@ import { getEntityTitle } from './utils';
 
 const POST_TYPE = 'blockish-classes';
 const META_KEY = 'blockishClassManagerStyles';
+const STYLE_TYPE = 'blockish-classes-styles';
 
 const getStyleValue = (content) => {
 	if (!content) {
@@ -140,48 +141,37 @@ const RenderClassManagerStyles = () => {
 	};
 
 	const classStylesRef = useRef({});
-	const injectedCssRef = useRef('');
 	const hasClassStylesInitialized = useRef(false);
-	const styleLength = editorSettings?.styles?.length || 0;
+	const editorStyles = editorSettings?.styles;
 
 	useEffect(() => {
-		if (!editorSettings?.styles) return;
+		if (!editorStyles) return;
 		if (!generateStyles) return;
 
-		if (injectedCssRef.current !== generateStyles) {
-			const stylesArray = editorSettings?.styles || [];
-			const styleIndex = stylesArray.findIndex(
-				(style) => style?.__unstableType === 'blockish-classes-styles'
-			);
+		const styleIndex = editorStyles.findIndex(
+			(style) => style?.__unstableType === STYLE_TYPE
+		);
 
-			if (styleIndex === -1) {
-				updateEditorSettings({
-					...editorSettings,
-					styles: [
-						...stylesArray,
-						{
-							isGlobalStyles: true,
-							__unstableType: 'blockish-classes-styles',
-							css: generateStyles || '',
-						},
-					],
-				});
-			} else {
-				updateEditorSettings({
-					...editorSettings,
-					styles: stylesArray.map((style, index) => {
-						if (index === styleIndex) {
-							return {
-								...style,
-								css: generateStyles || '',
-							};
-						}
-						return style;
-					}),
-				});
-			}
-
-			injectedCssRef.current = generateStyles;
+		// The site editor and the global styles renderer rebuild settings.styles
+		// from scratch, dropping this entry — so re-add it whenever it is missing
+		// rather than trusting a one-time injection. Never flag it as
+		// isGlobalStyles: both rebuilds strip those entries by design.
+		if (styleIndex === -1) {
+			updateEditorSettings({
+				styles: [
+					...editorStyles,
+					{
+						__unstableType: STYLE_TYPE,
+						css: generateStyles,
+					},
+				],
+			});
+		} else if (editorStyles[styleIndex]?.css !== generateStyles) {
+			updateEditorSettings({
+				styles: editorStyles.map((style, index) =>
+					index === styleIndex ? { ...style, css: generateStyles } : style
+				),
+			});
 		}
 
 		const nextMap = JSON.stringify(cssByClassId);
@@ -208,7 +198,7 @@ const RenderClassManagerStyles = () => {
 			persistMetaCss(cssByClassId, editedClassIds);
 			classStylesRef.current = cssByClassId;
 		}
-	}, [generateStyles, cssByClassId, classStyles, editedClassIds, styleLength]);
+	}, [generateStyles, cssByClassId, classStyles, editedClassIds, editorStyles]);
 
 	return <></>;
 };

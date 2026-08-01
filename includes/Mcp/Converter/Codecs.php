@@ -241,6 +241,19 @@ class Codecs {
 	}
 
 	/**
+	 * A literal *-gradient() function, or a custom property whose name marks it as
+	 * one (e.g. var(--wp--preset--gradient--brand)) — the value cannot be resolved
+	 * server-side, so the naming convention is the only signal available.
+	 */
+	private static function is_gradient_value( string $value ): bool {
+		if ( preg_match( '/gradient\s*\(/i', $value ) ) {
+			return true;
+		}
+
+		return (bool) preg_match( '/var\(\s*--[^),]*gradient/i', $value );
+	}
+
+	/**
 	 * Classic color / gradient / image (+ size/position/repeat/attachment) → Background JSON.
 	 *
 	 * @param array<string, string> $declarations CSS props for one device
@@ -259,10 +272,10 @@ class Codecs {
 		$attachment = $declarations['background-attachment'] ?? null;
 		$blend     = $declarations['background-blend-mode'] ?? null;
 
-		if ( $shorthand && preg_match( '/gradient\s*\(/i', $shorthand ) ) {
+		if ( $shorthand && self::is_gradient_value( $shorthand ) ) {
 			$payload['backgroundType'] = 'gradient';
 			$payload['gradient']       = trim( $shorthand );
-		} elseif ( $image && preg_match( '/gradient\s*\(/i', $image ) ) {
+		} elseif ( $image && self::is_gradient_value( $image ) ) {
 			$payload['backgroundType'] = 'gradient';
 			$payload['gradient']       = trim( $image );
 		} else {

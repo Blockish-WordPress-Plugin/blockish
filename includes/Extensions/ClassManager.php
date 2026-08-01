@@ -40,6 +40,9 @@ class ClassManager {
 	 * render-style.js injects the same entry (keyed by __unstableType) only after
 	 * it recomputes styles — until then the canvas is unstyled. This baseline is
 	 * replaced in place once the JS pass runs.
+	 *
+	 * The entry must not be flagged isGlobalStyles: the site editor canvas and the
+	 * global styles renderer both drop those entries and substitute their own.
 	 */
 	public function add_editor_class_styles( $settings ) {
 		$css = $this->get_all_class_styles();
@@ -52,7 +55,6 @@ class ClassManager {
 		}
 
 		$settings['styles'][] = array(
-			'isGlobalStyles' => true,
 			'__unstableType' => 'blockish-classes-styles',
 			'css'            => $css,
 		);

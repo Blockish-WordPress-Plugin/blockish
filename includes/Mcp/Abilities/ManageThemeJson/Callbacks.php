@@ -160,7 +160,9 @@ class Callbacks
         if (isset($theme_json['styles'])) {
             $check_style_primitives = function($styles, $path = 'styles', $is_container = false) use (&$check_style_primitives) {
                 foreach ($styles as $k => $v) {
-                    $is_section = in_array($k, ['elements', 'blocks', 'color', 'typography', 'spacing', 'border'], true);
+                    // Pseudo-selector keys (:hover, :focus, …) nest a full style object.
+                    $is_pseudo  = is_string($k) && 0 === strpos($k, ':');
+                    $is_section = $is_pseudo || in_array($k, ['elements', 'blocks', 'color', 'typography', 'spacing', 'border', 'outline', 'dimensions', 'filter'], true);
                     if ($is_section || $is_container) {
                         if (!is_array($v)) return "$path.$k must be an object.";
                         // Elements and blocks contain arbitrary block/element names which act as containers
