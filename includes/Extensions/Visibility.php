@@ -2,6 +2,7 @@
 namespace Blockish\Extensions;
 
 use Blockish\Config\ExtensionList;
+use Blockish\Core\PostPrime;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -21,6 +22,8 @@ class Visibility {
 		if ( ! $this->is_extension_enabled() ) {
 			return;
 		}
+
+		PostPrime::register_hooks();
 
 		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles_if_used' ), 20 );
@@ -62,7 +65,9 @@ class Visibility {
 			}
 
 			$seen_post_ids[ (int) $post->ID ] = true;
-			if ( $this->blocks_use_visibility( parse_blocks( $post->post_content ), $seen_post_ids ) ) {
+			$blocks = parse_blocks( $post->post_content );
+			PostPrime::prime_pattern_refs_from_blocks( $blocks );
+			if ( $this->blocks_use_visibility( $blocks, $seen_post_ids ) ) {
 				$this->enqueue_styles();
 				return;
 			}
@@ -154,7 +159,7 @@ class Visibility {
 				$ref = absint( $attrs['ref'] ?? 0 );
 				if ( $ref > 0 && empty( $seen_post_ids[ $ref ] ) ) {
 					$seen_post_ids[ $ref ] = true;
-					$pattern              = get_post( $ref );
+					$pattern              = PostPrime::get_post( $ref );
 					if (
 						$pattern &&
 						is_string( $pattern->post_content ) &&

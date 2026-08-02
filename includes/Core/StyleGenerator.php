@@ -12,6 +12,8 @@ class StyleGenerator
     private $collected_block_css = ''; // Store CSS for all blocks
     private $block_count = 0;
     private $current_url = '';
+    private $cached_data = null;
+    private $needs_cache_update = false;
 
     private function __construct()
     {
@@ -23,6 +25,7 @@ class StyleGenerator
             }else {
                 add_action('wp_footer', [$this, 'enqueue_block_styles']);
             }
+            add_action('shutdown', [$this, 'save_cache']);
         }
         add_action('template_redirect', [$this, 'set_cache_related_data']);
         add_action('save_post', [$this, 'delete_cache_on_save']); // Fires on insert & update  
@@ -60,7 +63,10 @@ class StyleGenerator
 
     private function set_current_url()
     {
-        $this->current_url = isset($_SERVER['REQUEST_URI']) ? home_url(esc_url_raw(wp_unslash($_SERVER['REQUEST_URI']))) : home_url('/');
+        $url = isset($_SERVER['REQUEST_URI']) ? esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'])) : '/';
+        $parsed_url = parse_url($url);
+        $path = $parsed_url['path'] ?? '/';
+        $this->current_url = home_url($path);
     }
 
     private function get_cache_key()
@@ -70,7 +76,18 @@ class StyleGenerator
 
     private function get_cached_css_data($cache_key)
     {
-        return get_transient($cache_key) ?: [];
+        if ($this->cached_data === null) {
+            $this->cached_data = get_transient($cache_key) ?: [];
+        }
+        return $this->cached_data;
+    }
+
+    public function save_cache()
+    {
+        if ($this->needs_cache_update && $this->cached_data !== null) {
+            set_transient($this->get_cache_key(), $this->cached_data, 60 * 60 * 24); // Cache for 24 hours
+            $this->needs_cache_update = false;
+        }
     }
 
     public function add_unique_class_to_block($block_content, $block)
@@ -330,7 +347,8 @@ class StyleGenerator
 
         $merged_cached_data = $this->get_cached_css_data($cache_key);
         $merged_cached_data[] = $cached_css_data;
-        set_transient($cache_key, $merged_cached_data, 60 * 60 * 24); // Cache for 24 hours
+        $this->cached_data = $merged_cached_data;
+        $this->needs_cache_update = true;
         $this->block_count += 1;
         $this->collected_block_css .= $final_css;
         return $block_data;

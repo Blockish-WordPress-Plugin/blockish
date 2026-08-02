@@ -4,6 +4,7 @@ namespace Blockish\Extensions;
 
 use Blockish\Config\ExtensionList;
 use Blockish\Core\Utilities;
+use Blockish\Core\PostPrime;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -21,6 +22,8 @@ class ClassManager {
 	private const CSS_ORPHAN_TTL = WEEK_IN_SECONDS;
 	private $used_post_ids = array();
 	private $styles_enqueued = false;
+	private $loaded_classes = array();
+	private $all_classes_loaded = false;
 
 	private function __construct() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
@@ -32,6 +35,8 @@ class ClassManager {
 		if ( ! $this->is_extension_enabled() ) {
 			return;
 		}
+
+		PostPrime::register_hooks();
 
 		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_used_class_styles' ), 9 );
@@ -76,19 +81,13 @@ class ClassManager {
 	}
 
 	private function get_all_class_styles() {
-		$class_posts = get_posts(
-			array(
-				'post_type'        => 'blockish-classes',
-				'post_status'      => 'publish',
-				'posts_per_page'   => -1,
-				'orderby'          => 'ID',
-				'order'            => 'ASC',
-				'suppress_filters' => false,
-			)
-		);
+		$this->ensure_classes_loaded();
 
 		$css = '';
-		foreach ( $class_posts as $class_post ) {
+		foreach ( $this->loaded_classes as $class_post ) {
+			if ( ! $class_post instanceof \WP_Post ) {
+				continue;
+			}
 			$meta_css = trim( (string) get_post_meta( $class_post->ID, self::CSS_META_KEY, true ) );
 			if ( '' !== $meta_css ) {
 				$css .= $meta_css;
@@ -96,6 +95,40 @@ class ClassManager {
 		}
 
 		return $css;
+	}
+
+	/**
+	 * Load every published Class Manager post once per request.
+	 *
+	 * render_block used to query by ID as blocks appeared; one bulk fetch is
+	 * cheaper and also primes post meta so CSS lookups do not N+1.
+	 */
+	private function ensure_classes_loaded() {
+		if ( $this->all_classes_loaded ) {
+			return;
+		}
+
+		$this->all_classes_loaded = true;
+
+		$posts = get_posts(
+			array(
+				'post_type'              => 'blockish-classes',
+				'post_status'            => 'publish',
+				'posts_per_page'         => -1,
+				'orderby'                => 'ID',
+				'order'                  => 'ASC',
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => true,
+				'update_post_term_cache' => false,
+				'suppress_filters'       => false,
+			)
+		);
+
+		foreach ( $posts as $post ) {
+			if ( $post instanceof \WP_Post ) {
+				$this->loaded_classes[ (int) $post->ID ] = $post;
+			}
+		}
 	}
 
 	private function is_extension_enabled() {
@@ -207,21 +240,17 @@ class ClassManager {
 			return $block_content;
 		}
 
-		$existing_posts = get_posts(
-			array(
-				'post_type'      => 'blockish-classes',
-				'post_status'    => 'publish',
-				'post__in'       => $requested_ids,
-				'posts_per_page' => -1,
-			)
-		);
-		if ( empty( $existing_posts ) ) {
-			return $block_content;
-		}
+		$this->ensure_classes_loaded();
 
 		$existing_by_id = array();
-		foreach ( $existing_posts as $existing_post ) {
-			$existing_by_id[ (int) $existing_post->ID ] = $existing_post;
+		foreach ( $requested_ids as $req_id ) {
+			if ( ! empty( $this->loaded_classes[ $req_id ] ) ) {
+				$existing_by_id[ $req_id ] = $this->loaded_classes[ $req_id ];
+			}
+		}
+
+		if ( empty( $existing_by_id ) ) {
+			return $block_content;
 		}
 
 		$selected_parent_ids = array();
@@ -296,8 +325,10 @@ class ClassManager {
 		if ( $post_id ) {
 			$post = get_post( $post_id );
 			if ( $post && is_string( $post->post_content ) && '' !== $post->post_content ) {
+				$blocks = parse_blocks( $post->post_content );
+				PostPrime::prime_pattern_refs_from_blocks( $blocks );
 				$seen_content_ids[ (int) $post_id ] = true;
-				$this->collect_used_post_ids_from_blocks( parse_blocks( $post->post_content ), $seen_content_ids );
+				$this->collect_used_post_ids_from_blocks( $blocks, $seen_content_ids );
 			}
 		}
 
@@ -326,7 +357,9 @@ class ClassManager {
 				continue;
 			}
 			$seen_content_ids[ (int) $part->ID ] = true;
-			$this->collect_used_post_ids_from_blocks( parse_blocks( $part->post_content ), $seen_content_ids );
+			$blocks = parse_blocks( $part->post_content );
+			PostPrime::prime_pattern_refs_from_blocks( $blocks );
+			$this->collect_used_post_ids_from_blocks( $blocks, $seen_content_ids );
 		}
 	}
 
@@ -380,7 +413,7 @@ class ClassManager {
 				$ref = absint( $attrs['ref'] ?? 0 );
 				if ( $ref > 0 && empty( $seen_content_ids[ $ref ] ) ) {
 					$seen_content_ids[ $ref ] = true;
-					$pattern                  = get_post( $ref );
+					$pattern                  = PostPrime::get_post( $ref );
 					if ( $pattern && is_string( $pattern->post_content ) && '' !== $pattern->post_content ) {
 						$this->collect_used_post_ids_from_blocks( parse_blocks( $pattern->post_content ), $seen_content_ids );
 					}
@@ -446,7 +479,8 @@ class ClassManager {
 
 		if ( file_exists( $path ) ) {
 			$this->touch_css_hash( $version );
-			$this->prune_orphan_css_files( $version );
+			// We DO NOT run prune_orphan_css_files here because scanning the filesystem (glob) 
+			// on every single page load is terrible for performance.
 			return array(
 				'url'     => $upload['baseurl'] . '/' . self::CSS_DIR . '/' . $filename,
 				'version' => $version,
@@ -525,8 +559,13 @@ class ClassManager {
 			$index = array();
 		}
 
-		$index[ (string) $hash ] = time();
-		update_option( self::CSS_INDEX_KEY, $index, false );
+		$last_touched = isset( $index[ (string) $hash ] ) ? (int) $index[ (string) $hash ] : 0;
+		
+		// Only update the database once every 12 hours to prevent constant UPDATE queries on the frontend.
+		if ( time() - $last_touched > 12 * HOUR_IN_SECONDS ) {
+			$index[ (string) $hash ] = time();
+			update_option( self::CSS_INDEX_KEY, $index, false );
+		}
 	}
 
 	/**
@@ -631,6 +670,7 @@ class ClassManager {
 			return '';
 		}
 
+		$this->ensure_classes_loaded();
 		sort( $post_ids, SORT_NUMERIC );
 
 		$css = '';

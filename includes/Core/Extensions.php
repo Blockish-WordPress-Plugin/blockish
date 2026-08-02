@@ -63,7 +63,49 @@ class Extensions
             }
 
             $this->active_extensions[$slug] = $metadata;
-            $this->persist_extension_schema($slug, $metadata, $extension['name'] ?? $slug);
+        }
+
+        // Only persist schema registry in the backend to save frontend queries/processing
+        if (is_admin()) {
+            $this->persist_all_extension_schemas();
+        }
+    }
+
+    /**
+     * Persist all extension schemas at once to avoid multiple DB writes.
+     *
+     * @return void
+     */
+    private function persist_all_extension_schemas()
+    {
+        $registry = $this->get_saved_extension_schemas();
+        $changed  = false;
+        $active   = ExtensionList::get_instance()->get_list( 'active' );
+
+        foreach ( $this->active_extensions as $slug => $metadata ) {
+            $display_name = isset( $active[ $slug ]['name'] ) && is_string( $active[ $slug ]['name'] )
+                ? $active[ $slug ]['name']
+                : $slug;
+
+            $next_payload = [
+                'name'            => $display_name,
+                'include'         => isset( $metadata['include'] ) && is_array( $metadata['include'] ) ? $metadata['include'] : [],
+                // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+                'exclude'         => isset( $metadata['exclude'] ) && is_array( $metadata['exclude'] ) ? $metadata['exclude'] : [],
+                'attributes'      => isset( $metadata['attributes'] ) && is_array( $metadata['attributes'] ) ? $metadata['attributes'] : [],
+                'usesContext'     => isset( $metadata['usesContext'] ) && is_array( $metadata['usesContext'] ) ? $metadata['usesContext'] : [],
+                'providesContext' => isset( $metadata['providesContext'] ) && is_array( $metadata['providesContext'] ) ? $metadata['providesContext'] : [],
+            ];
+
+            $current_payload = isset( $registry[ $slug ] ) && is_array( $registry[ $slug ] ) ? $registry[ $slug ] : null;
+            if ( $current_payload !== $next_payload ) {
+                $registry[ $slug ] = $next_payload;
+                $changed           = true;
+            }
+        }
+
+        if ( $changed ) {
+            update_option( self::SCHEMA_REGISTRY_OPTION, $registry, false );
         }
     }
 
@@ -121,39 +163,7 @@ class Extensions
         return $merged;
     }
 
-    /**
-     * Persist extension schema so attributes survive when extension is disabled.
-     *
-     * @param string $slug
-     * @param array  $metadata
-     * @param string $display_name
-     * @return void
-     */
-    private function persist_extension_schema($slug, $metadata, $display_name)
-    {
-        if (empty($slug) || !is_array($metadata)) {
-            return;
-        }
-
-        $registry = $this->get_saved_extension_schemas();
-        $next_payload = [
-            'name' => $display_name,
-            'include' => isset($metadata['include']) && is_array($metadata['include']) ? $metadata['include'] : [],
-            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
-            'exclude' => isset($metadata['exclude']) && is_array($metadata['exclude']) ? $metadata['exclude'] : [],
-            'attributes' => isset($metadata['attributes']) && is_array($metadata['attributes']) ? $metadata['attributes'] : [],
-            'usesContext' => isset($metadata['usesContext']) && is_array($metadata['usesContext']) ? $metadata['usesContext'] : [],
-            'providesContext' => isset($metadata['providesContext']) && is_array($metadata['providesContext']) ? $metadata['providesContext'] : [],
-        ];
-
-        $current_payload = isset($registry[$slug]) && is_array($registry[$slug]) ? $registry[$slug] : null;
-        if ($current_payload === $next_payload) {
-            return;
-        }
-
-        $registry[$slug] = $next_payload;
-        update_option(self::SCHEMA_REGISTRY_OPTION, $registry, false);
-    }
+    // persist_extension_schema removed in favor of persist_all_extension_schemas
 
     /**
      * Return saved extension schemas keyed by extension slug.
