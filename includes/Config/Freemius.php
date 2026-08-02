@@ -161,6 +161,19 @@ class Freemius {
 			return false;
 		}
 
+		// Prevent Freemius from bloating the front-end with database queries.
+		// We only load the SDK where it's actually needed (admin, ajax, cron, REST, CLI, or webhooks).
+		$is_admin   = is_admin();
+		$is_ajax    = wp_doing_ajax();
+		$is_cron    = wp_doing_cron();
+		$is_cli     = defined( 'WP_CLI' ) && WP_CLI;
+		$is_rest    = defined( 'REST_REQUEST' ) && REST_REQUEST;
+		$is_webhook = isset( $_REQUEST['fs_action'] ) || isset( $_REQUEST['freemius'] );
+
+		if ( ! $is_admin && ! $is_ajax && ! $is_cron && ! $is_cli && ! $is_rest && ! $is_webhook ) {
+			return false;
+		}
+
 		$sdk_start = BLOCKISH_DIR . 'vendor/freemius/start.php';
 
 		if ( ! file_exists( $sdk_start ) ) {
