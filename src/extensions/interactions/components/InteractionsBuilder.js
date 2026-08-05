@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from '@wordpress/element';
 import { Modal, Button, TabPanel, Spinner } from '@wordpress/components';
+import BlockishSelect from '../../../components/select';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
@@ -88,6 +89,7 @@ export default function InteractionsBuilder({
 	onClose,
 	attributes,
 	setAttributes,
+	isEmbedded,
 }) {
 	const [blockItems, setBlockItems] = useState(() =>
 		(attributes?.interactionData || [])
@@ -102,6 +104,9 @@ export default function InteractionsBuilder({
 	const [globalItems, setGlobalItems] = useState([]);
 	const [globalLoading, setGlobalLoading] = useState(true);
 	const [globalSaving, setGlobalSaving] = useState(false);
+	const [selectedPageOption, setSelectedPageOption] = useState(null);
+	const [pageLoading, setPageLoading] = useState(false);
+	const [pageSaving, setPageSaving] = useState(false);
 
 	const blockItemsRef = useRef(blockItems);
 	const pageItemsRef = useRef(pageItems);
@@ -125,13 +130,36 @@ export default function InteractionsBuilder({
 	const [meta, setMeta] = useEntityProp('postType', postType, 'meta');
 
 	useEffect(() => {
-		if (!pageHydrated && meta) {
-			const parsed = parsePageMeta(meta?.[PAGE_META_KEY]).map(ensureId);
-			setPageItems(parsed);
-			pageItemsRef.current = parsed;
-			setPageHydrated(true);
+		if (selectedPageOption) {
+			let cancelled = false;
+			(async () => {
+				setPageLoading(true);
+				try {
+					const response = await apiFetch({ path: `/blockish/v1/dashboard-tools/page-interactions/${selectedPageOption.value}`, method: 'GET' });
+					const items = response?.items || [];
+					if (!cancelled) {
+						const parsed = parsePageMeta(items).map(ensureId);
+						setPageItems(parsed);
+						pageItemsRef.current = parsed;
+					}
+				} catch (e) {
+					if (!cancelled) {
+						setPageItems([]);
+						pageItemsRef.current = [];
+					}
+				} finally {
+					if (!cancelled) setPageLoading(false);
+				}
+			})();
+			return () => { cancelled = true; };
+		} else {
+			if (meta) {
+				const parsed = parsePageMeta(meta?.[PAGE_META_KEY]).map(ensureId);
+				setPageItems(parsed);
+				pageItemsRef.current = parsed;
+			}
 		}
-	}, [meta, pageHydrated]);
+	}, [meta, selectedPageOption]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -184,26 +212,46 @@ export default function InteractionsBuilder({
 			const withIds = next.map(ensureId);
 			blockItemsRef.current = withIds;
 			setBlockItems(withIds);
-			setAttributes({
-				interactionData: compileList(withIds, 'block'),
-			});
+			if (setAttributes) {
+				setAttributes({
+					interactionData: compileList(withIds, 'block'),
+				});
+			}
 		},
 		[setAttributes]
 	);
 
 	const persistPageItems = useCallback(
-		(next) => {
+		async (next) => {
 			const withIds = next.map(ensureId);
 			pageItemsRef.current = withIds;
 			setPageItems(withIds);
-			if (postId && typeof setMeta === 'function') {
-				setMeta({
-					...(meta || {}),
-					[PAGE_META_KEY]: compileList(withIds, 'page'),
-				});
+			const compiled = compileList(withIds, 'page');
+			
+			if (selectedPageOption) {
+				setPageSaving(true);
+				try {
+					const response = await apiFetch({
+						path: `/blockish/v1/dashboard-tools/page-interactions/${selectedPageOption.value}`,
+						method: 'POST',
+						data: { interactions: compiled }
+					});
+					const items = response?.items || [];
+					const parsed = parsePageMeta(items).map(ensureId);
+					setPageItems(parsed);
+					pageItemsRef.current = parsed;
+				} catch(e) {}
+				setPageSaving(false);
+			} else {
+				if (postId && typeof setMeta === 'function') {
+					setMeta({
+						...(meta || {}),
+						[PAGE_META_KEY]: compiled,
+					});
+				}
 			}
 		},
-		[meta, postId, setMeta]
+		[meta, postId, setMeta, selectedPageOption]
 	);
 
 	const saveDraft = useCallback(
@@ -226,7 +274,7 @@ export default function InteractionsBuilder({
 				persistBlockItems(next);
 			} else if (editingScope === 'page') {
 				const next = upsertInList(pageItemsRef.current, normalized);
-				persistPageItems(next);
+				await persistPageItems(next);
 			} else if (editingScope === 'global') {
 				setGlobalSaving(true);
 				try {
@@ -301,11 +349,11 @@ export default function InteractionsBuilder({
 		onClose();
 	}, [persistBlockItems, persistPageItems, postId, onClose]);
 
-	const [activeTab, setActiveTab] = useState('block');
+	const [activeTab, setActiveTab] = useState(isEmbedded ? 'page' : 'block');
 
 	const tabs = [
-		{ name: 'block', title: __('This block', 'blockish') },
-		{ name: 'page', title: __('This page', 'blockish') },
+		...(!isEmbedded ? [{ name: 'block', title: __('This block', 'blockish') }] : []),
+		{ name: 'page', title: __('Pages', 'blockish') },
 		{ name: 'global', title: __('Whole site', 'blockish') },
 	];
 
@@ -318,19 +366,99 @@ export default function InteractionsBuilder({
 		(draft?.when?.source === 'listen' && !draft?.when?.eventName?.trim()) ||
 		(draft?.action?.type === 'emit' && !draft?.action?.eventName?.trim());
 
-	if (!isOpen) return null;
+	if (!isOpen && !isEmbedded) return null;
 
-	return (
-		<Modal
-			title={__('Interactions', 'blockish')}
-			onRequestClose={() => {
-				cancelDraft();
-				handleApply();
-			}}
-			className="blockish-interactions-modal"
-			size="large"
-		>
-			<div className="blockish-interactions-modal__layout">
+	const layoutContent = (
+		<div className="blockish-interactions-modal__layout">
+			<div className="blockish-cm-panel-header">
+				<div className="blockish-cm-panel-brand">
+					<div className="blockish-cm-panel-mark">IX</div>
+					<div>
+						<h2>{__('Interactions', 'blockish')}</h2>
+						<p>
+							{__(
+								'Manage interactions and dynamic events across your site.',
+								'blockish'
+							)}
+						</p>
+					</div>
+				</div>
+				{!editingScope && (
+					<div className="blockish-cm-panel-header-actions">
+						<Button
+							variant="secondary"
+							onClick={() => {
+								const input = document.createElement('input');
+								input.type = 'file';
+								input.accept = '.json';
+								input.onchange = (e) => {
+									const file = e.target.files[0];
+									if (file) {
+										const reader = new FileReader();
+										reader.onload = async (event) => {
+											try {
+												const data = JSON.parse(event.target.result);
+												if (!Array.isArray(data)) throw new Error('Invalid format');
+
+												if (activeTab === 'page') {
+													persistPageItems(data);
+												} else if (activeTab === 'block') {
+													persistBlockItems(data);
+												} else if (activeTab === 'global') {
+													setGlobalSaving(true);
+													try {
+														const compiledData = compileList(data, 'global');
+														const response = await apiFetch({
+															path: GLOBAL_API,
+															method: 'POST',
+															data: { interactions: compiledData },
+														});
+														const items = response?.items || compiledData;
+														setGlobalItems(
+															items
+																.map((i) => normalizeInteraction(i, 'global'))
+																.filter(Boolean)
+																.map(ensureId)
+														);
+													} catch (err) {
+														console.error(err);
+													}
+													setGlobalSaving(false);
+												}
+											} catch (err) {
+												console.error(err);
+												alert(__('Failed to import interactions. Please ensure the file is a valid JSON export.', 'blockish'));
+											}
+										};
+										reader.readAsText(file);
+									}
+								};
+								input.click();
+							}}
+						>
+							{__('Import', 'blockish')}
+						</Button>
+						<Button
+							variant="secondary"
+							onClick={() => {
+								let dataToExport = [];
+								if (activeTab === 'page') dataToExport = pageItems;
+								else if (activeTab === 'global') dataToExport = globalItems;
+								else dataToExport = blockItems;
+								const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dataToExport));
+								const downloadAnchorNode = document.createElement('a');
+								downloadAnchorNode.setAttribute('href', dataStr);
+								downloadAnchorNode.setAttribute('download', `blockish-interactions-${activeTab}.json`);
+								document.body.appendChild(downloadAnchorNode);
+								downloadAnchorNode.click();
+								downloadAnchorNode.remove();
+							}}
+						>
+							{__('Export', 'blockish')}
+						</Button>
+					</div>
+				)}
+			</div>
 				<div className="blockish-interactions-modal__body">
 					<TabPanel
 						className="blockish-interactions-tabs"
@@ -379,24 +507,57 @@ export default function InteractionsBuilder({
 									);
 								}
 								return (
-									<ScopeTab
-										scope="page"
-										items={pageItems}
-										description={__(
-											'Reusable on this page. Use signals so several blocks can work together.',
-											'blockish'
+									<div className="blockish-interactions-page-scope-wrapper">
+										{!editingScope && (
+											<div style={{ marginBottom: '16px' }}>
+												<BlockishSelect.Async
+													value={selectedPageOption}
+													placeholder={__('Current page', 'blockish')}
+													loadOptions={async (inputValue) => {
+														try {
+															const endpoint = inputValue
+																? `/blockish/v1/dashboard-tools/search-posts?search=${inputValue}`
+																: `/blockish/v1/dashboard-tools/search-posts`;
+															const results = await apiFetch({ path: endpoint });
+															return results.map(p => ({
+																label: p.title || __('Untitled', 'blockish'),
+																value: p.id
+															}));
+														} catch (e) {
+															return [];
+														}
+													}}
+													onChange={(selected) => {
+														setSelectedPageOption(selected);
+													}}
+													menuPortalTarget={document.body}
+													styles={{ menuPortal: base => ({ ...base, zIndex: 999999 }) }}
+													isClearable
+												/>
+												<div style={{ fontSize: '12px', color: '#646970', marginTop: '4px' }}>
+													{__('Empty means current page', 'blockish')}
+												</div>
+											</div>
 										)}
-										emptyText={__(
-											'Create page-wide rules you can reuse while editing this page.',
-											'blockish'
-										)}
-										onEdit={(item) => startEdit('page', item)}
-										onDelete={(id) => deleteItem('page', id)}
-										editing={editingScope === 'page'}
-										draft={draft}
-										setDraft={setDraft}
-										knownEventNames={knownEventNames}
-									/>
+										<ScopeTab
+											scope="page"
+											items={pageItems}
+											description={__(
+												'Reusable on this page. Use signals so several blocks can work together.',
+												'blockish'
+											)}
+											emptyText={__(
+												'Create page-wide rules you can reuse while editing this page.',
+												'blockish'
+											)}
+											onEdit={(item) => startEdit('page', item)}
+											onDelete={(id) => deleteItem('page', id)}
+											editing={editingScope === 'page'}
+											draft={draft}
+											setDraft={setDraft}
+											knownEventNames={knownEventNames}
+										/>
+									</div>
 								);
 							}
 
@@ -431,13 +592,14 @@ export default function InteractionsBuilder({
 					</TabPanel>
 				</div>
 
-				<div className="blockish-interactions-modal__footer">
+				<footer className="blockish-cm-panel-footer" style={{ borderTop: '1px solid #dcdcde', margin: 0, bottom: '90px' }}>
+					<div className="blockish-cm-panel-footer-stats"></div>
+					<div className="blockish-cm-panel-footer-actions">
 					{editingScope ? (
 						<>
 							<Button variant="secondary" onClick={cancelDraft}>
 								{__('Back', 'blockish')}
 							</Button>
-							<div className="blockish-interactions-modal__footer-spacer" />
 							<Button
 								variant="primary"
 								className="is-blockish-primary"
@@ -457,10 +619,11 @@ export default function InteractionsBuilder({
 							>
 								{__('Add interaction', 'blockish')}
 							</Button>
-							<div className="blockish-interactions-modal__footer-spacer" />
-							<Button variant="secondary" onClick={onClose}>
-								{__('Close', 'blockish')}
-							</Button>
+							{isEmbedded ? null : (
+								<Button variant="secondary" onClick={onClose}>
+									{__('Close', 'blockish')}
+								</Button>
+							)}
 							<Button
 								variant="primary"
 								className="is-blockish-primary"
@@ -470,8 +633,26 @@ export default function InteractionsBuilder({
 							</Button>
 						</>
 					)}
-				</div>
+					</div>
+				</footer>
 			</div>
+	);
+
+	if (isEmbedded) {
+		return <div className="blockish-interactions-embedded" style={{height: '100%'}}>{layoutContent}</div>;
+	}
+
+	return (
+		<Modal
+			title={__('Interactions', 'blockish')}
+			onRequestClose={() => {
+				cancelDraft();
+				handleApply();
+			}}
+			className="blockish-interactions-modal"
+			size="large"
+		>
+			{layoutContent}
 		</Modal>
 	);
 }

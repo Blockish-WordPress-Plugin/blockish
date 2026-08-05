@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.0
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -167,6 +167,16 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.2.1 =
+
+* Fixed: Freemius REST early boot — companion add-ons register CPT/REST routes correctly (no more missing-route editor save failures); Freemius SDK still skipped on normal front-end views for performance
+* Added: PostPrime — early synced-pattern (`core/block` ref) cache priming before block theme template render
+* Improved: Class Manager loads published classes once per request (bulk fetch + meta prime) and uses PostPrime for pattern walks
+* Improved: Visibility extension uses PostPrime when scanning patterns for styles
+* Improved: Extension schema registry persists in one batched admin write instead of per-extension option updates on every load
+* Improved: StyleGenerator defers CSS cache writes to `shutdown` and keys cache by request path
+* Improved: MCP `get-posts` / `manage-post` always return a usable `edit_url` (admin fallback) and safer empty permalink handling
 
 = 1.2.0 =
 

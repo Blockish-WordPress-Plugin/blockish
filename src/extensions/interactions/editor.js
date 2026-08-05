@@ -5,6 +5,7 @@ import { useState } from '@wordpress/element';
 import InteractionsBuilder from './components/InteractionsBuilder';
 import withInteractionsToolbar from './toolbar';
 import './editor.scss';
+import './settings-tab';
 
 const InteractionsPanel = ({ clientId }) => {
 	const { useExtensionsAttributes } = window?.blockish?.helpers || {};

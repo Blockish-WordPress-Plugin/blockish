@@ -49,7 +49,7 @@ class Config
             'permission_callback' => fn() => current_user_can('manage_options'),
             'meta'                => [
                 'mcp'         => ['public' => true],
-                'usage_notes' => 'Do not update siteurl or home — they are blocked. Prefer blogname, blogdescription, reading settings, and blockish_* keys.',
+                'usage_notes' => 'Do not update siteurl or home — they are blocked. Prefer blogname, blogdescription, reading settings, and blockish_* keys. When Blockish Forms is active, documented Forms options include blockish_forms_recaptcha ({site_key, secret_key, score_threshold}) and blockish_forms_email ({from_name, from_email, reply_to_mode, reply_to_email}) — full shapes are in get-block-docs under blockish-forms. Per-form toggles (e.g. recaptcha enable) are form meta via manage-post, not options. Do not echo secret_key to the user.',
             ],
         ];
     }
