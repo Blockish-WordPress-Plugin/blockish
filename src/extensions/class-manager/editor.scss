@@ -693,26 +693,12 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     }
 }
 
-.blockish-cm-manager-modal.is-full-screen {
-    width: 100vw;
-    height: 100vh;
-    max-width: none;
-    max-height: none;
-    margin: 0;
-    border-radius: 0;
-
-    .components-modal__content {
-        display: block;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }
+.blockish-settings-tab-content {
 
     .blockish-cm-panel {
         display: grid;
         height: 100%;
-        grid-template-rows: 72px minmax(0, 1fr) 64px;
+        grid-template-rows: 72px minmax(0, 1fr);
         padding: 0;
         position: relative;
         background: #f6f7f7;
@@ -722,17 +708,16 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         display: flex;
         position: sticky;
         top: 0;
-        z-index: 20;
+        z-index: 100;
         grid-row: 1;
         align-items: center;
         justify-content: space-between;
         gap: 24px;
         padding: 0 24px;
+        height: 72px;
+        flex-shrink: 0;
         border-bottom: 1px solid $blockish-border;
         background: $blockish-surface;
-        position: sticky;
-        top: 0;
-        z-index: 100;
 
         h2 {
             margin: 0 0 4px;
@@ -875,7 +860,7 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     }
 
     .blockish-cm-panel-list {
-        max-height: calc(100dvh - 356px);
+        max-height: calc(100dvh - 405px);
         gap: 4px;
         padding: 8px;
         border: 0;
@@ -941,7 +926,7 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 
     .blockish-cm-panel-create {
         position: sticky;
-        bottom: 5px;
+        bottom: 60px;
         z-index: 10;
         flex-shrink: 0;
         padding: 10px 16px;
@@ -969,7 +954,7 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         gap: 7px;
 
         .components-button {
-            height: 36px;
+            height: 40px;
             justify-content: center;
         }
     }
@@ -987,12 +972,14 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 
     .blockish-cm-panel-detail {
         display: grid;
+        height: 100%;
         min-width: 0;
         grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
         gap: 12px;
         padding: 18px 20px;
         border: 0;
         background: #f6f7f7;
+        align-self: stretch;
     }
 
     .blockish-cm-panel-detail-header {
@@ -1173,17 +1160,19 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     .blockish-cm-panel-footer {
         display: flex;
         position: sticky;
-        bottom: 0;
+        bottom: 60px;
         z-index: 20;
-        grid-row: 3;
+        grid-column: 1 / -1;
         align-items: center;
         justify-content: space-between;
         gap: 20px;
-        padding: 0 24px;
+        padding: 16px 20px;
+        margin: 18px -20px -18px; /* Offset parent padding */
         border-top: 1px solid $blockish-border;
         background: $blockish-surface;
         color: #646970;
         font-size: 12px;
+        height: 60px;
     }
 
     .blockish-cm-panel-footer-actions {

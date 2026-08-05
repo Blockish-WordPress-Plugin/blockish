@@ -26,7 +26,7 @@
 		display: flex;
 		flex-direction: column;
 		width: min(760px, 94vw);
-		max-height: min(86vh, 900px);
+		max-height: 100vh;
 		padding: 0;
 		overflow: hidden;
 	}
@@ -43,7 +43,7 @@
 		flex-direction: column;
 		flex: 1;
 		min-height: 0;
-		height: min(68vh, 620px);
+		height: 100vh;
 	}
 
 	&__body {
@@ -63,11 +63,31 @@
 		padding: 14px 24px;
 		border-top: 1px solid #e8eaed;
 		background: #fff;
+		position: sticky;
+		bottom: 0;
+		z-index: 10;
 	}
 
 	&__footer-spacer {
 		flex: 1;
 	}
+}
+
+.blockish-interactions-page-scope-wrapper {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+}
+
+.blockish-interaction-form {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 16px;
 }
 
 .blockish-interactions-tabs {

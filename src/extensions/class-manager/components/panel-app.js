@@ -369,12 +369,35 @@ export default function ClassManagerPanelApp({ onClose }) {
 						</span>
 					</div>
 					<Button
-						variant="tertiary"
-						onClick={onClose}
-						className="blockish-cm-panel-close"
-						aria-label={__('Close Class Manager', 'blockish')}
+						variant="secondary"
+						onClick={() => {
+							const input = document.createElement('input');
+							input.type = 'file';
+							input.accept = '.json';
+							input.onchange = (e) => {
+								const file = e.target.files[0];
+								if (file) {
+									alert('Import will be processed. Hook up your API here!');
+								}
+							};
+							input.click();
+						}}
 					>
-						<span aria-hidden="true">×</span>
+						{__('Import', 'blockish')}
+					</Button>
+					<Button
+						variant="secondary"
+						onClick={() => {
+							const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(panel.classes));
+							const downloadAnchorNode = document.createElement('a');
+							downloadAnchorNode.setAttribute('href', dataStr);
+							downloadAnchorNode.setAttribute('download', 'class-manager-export.json');
+							document.body.appendChild(downloadAnchorNode);
+							downloadAnchorNode.click();
+							downloadAnchorNode.remove();
+						}}
+					>
+						{__('Export', 'blockish')}
 					</Button>
 				</div>
 			</div>
@@ -691,49 +714,46 @@ export default function ClassManagerPanelApp({ onClose }) {
 								<p>{__('Select or create a class to inspect it.', 'blockish')}</p>
 							</div>
 						)}
+
+						<footer className="blockish-cm-panel-footer">
+							<div>
+								{checkedClasses.length > 0 ? (
+									<strong>
+										{sprintf(
+											/* translators: %d: number of selected classes */
+											__('%d selected', 'blockish'),
+											checkedClasses.length
+										)}
+									</strong>
+								) : (
+									<span>{__('Select classes to perform bulk actions.', 'blockish')}</span>
+								)}
+							</div>
+							<div className="blockish-cm-panel-footer-actions">
+								{checkedClasses.length > 0 ? (
+									<>
+										<Button
+											variant="tertiary"
+											onClick={() => setCheckedIds([])}
+											disabled={isSaving}
+										>
+											{__('Clear selection', 'blockish')}
+										</Button>
+										<Button
+											variant="secondary"
+											isDestructive
+											onClick={() => setDeleteTargets(checkedClasses)}
+											disabled={isSaving}
+										>
+											{__('Delete selected', 'blockish')}
+										</Button>
+									</>
+								) : null}
+							</div>
+						</footer>
 					</main>
 				</div>
 			)}
-
-			<footer className="blockish-cm-panel-footer">
-				<div>
-					{checkedClasses.length > 0 ? (
-						<strong>
-							{sprintf(
-								/* translators: %d: number of selected classes */
-								__('%d selected', 'blockish'),
-								checkedClasses.length
-							)}
-						</strong>
-					) : (
-						<span>{__('Select classes to perform bulk actions.', 'blockish')}</span>
-					)}
-				</div>
-				<div className="blockish-cm-panel-footer-actions">
-					{checkedClasses.length > 0 ? (
-						<>
-							<Button
-								variant="tertiary"
-								onClick={() => setCheckedIds([])}
-								disabled={isSaving}
-							>
-								{__('Clear selection', 'blockish')}
-							</Button>
-							<Button
-								variant="secondary"
-								isDestructive
-								onClick={() => setDeleteTargets(checkedClasses)}
-								disabled={isSaving}
-							>
-								{__('Delete selected', 'blockish')}
-							</Button>
-						</>
-					) : null}
-					<Button variant="primary" onClick={onClose}>
-						{__('Done', 'blockish')}
-					</Button>
-				</div>
-			</footer>
 
 			{deleteTargets.length ? (
 				<Modal

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useSyncExternalStore } from '@wordpress/el
 import { createRoot } from 'react-dom/client';
 import { __ } from '@wordpress/i18n';
 import { subscribe } from '@wordpress/data';
+import { settings } from '@wordpress/icons';
 import Modal from './components/Modal';
 import './style.scss';
 
@@ -73,7 +74,12 @@ const AddRoot = () => {
 			rootElement.style.display = 'flex';
 			rootElement.style.alignItems = 'center';
 			rootElement.style.marginLeft = '8px';
-			toolbarElement.appendChild(rootElement);
+			let settingsButton = document.getElementById('blockish-editor-settings-toolbar-button');
+			if (settingsButton) {
+				toolbarElement.insertBefore(rootElement, settingsButton);
+			} else {
+				toolbarElement.appendChild(rootElement);
+			}
 		}
 
 		if (!rootRef.current && rootElement) {

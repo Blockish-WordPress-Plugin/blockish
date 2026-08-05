@@ -204,11 +204,16 @@ class Callbacks
             $featured_media_set = (bool) set_post_thumbnail( $post_id, $attachment_id );
         }
 
+        $edit_url = get_edit_post_link( $post_id, 'raw' );
+        if ( ! is_string( $edit_url ) || $edit_url === '' ) {
+            $edit_url = admin_url( 'post.php?post=' . (int) $post_id . '&action=edit' );
+        }
+
         $result = [
             'post_id'            => $post_id,
             'post_status'        => get_post_status( $post_id ),
-            'post_url'           => get_permalink( $post_id ),
-            'edit_url'           => get_edit_post_link( $post_id, 'raw' ),
+            'post_url'           => get_permalink( $post_id ) ?: '',
+            'edit_url'           => $edit_url,
             'post_parent'        => (int) get_post_field( 'post_parent', $post_id ),
             'schema_staged'      => $schema_staged,
             'featured_media_set' => $featured_media_set,

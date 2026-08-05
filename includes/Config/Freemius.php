@@ -148,6 +148,41 @@ class Freemius {
 	}
 
 	/**
+	 * Whether this request is (or will be) a REST API request.
+	 *
+	 * `REST_REQUEST` is only defined after routing; detect early via URI so
+	 * Freemius (and license-gated add-ons) boot in time to register routes.
+	 *
+	 * @return bool
+	 */
+	private function is_rest_request_early() {
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return true;
+		}
+
+		// Plain permalinks: index.php?rest_route=/wp/v2/...
+		if ( isset( $_GET['rest_route'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return true;
+		}
+
+		if ( empty( $_SERVER['REQUEST_URI'] ) ) {
+			return false;
+		}
+
+		$request_uri = (string) wp_unslash( $_SERVER['REQUEST_URI'] );
+		$prefix      = function_exists( 'rest_get_url_prefix' ) ? rest_get_url_prefix() : 'wp-json';
+		$prefix      = '/' . trim( (string) $prefix, '/' );
+
+		if ( false !== strpos( $request_uri, $prefix . '/' ) || false !== strpos( $request_uri, $prefix . '?' ) ) {
+			return true;
+		}
+
+		// Exact /wp-json or /wp-json/
+		$path = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
+		return $path === $prefix || $path === $prefix . '/';
+	}
+
+	/**
 	 * Load and initialize the shared Freemius SDK.
 	 *
 	 * Menu slug matches the Blockish dashboard so Freemius does not create a
@@ -163,11 +198,16 @@ class Freemius {
 
 		// Prevent Freemius from bloating the front-end with database queries.
 		// We only load the SDK where it's actually needed (admin, ajax, cron, REST, CLI, or webhooks).
+		//
+		// CRITICAL: REST_REQUEST is defined late (after parse_request). Plugin bootstrap
+		// runs earlier, so URI / rest_route detection is required — otherwise add-ons that
+		// gate on Freemius never register CPT REST routes and editor saves fail with
+		// "No route was found matching the URL and request method."
 		$is_admin   = is_admin();
 		$is_ajax    = wp_doing_ajax();
 		$is_cron    = wp_doing_cron();
 		$is_cli     = defined( 'WP_CLI' ) && WP_CLI;
-		$is_rest    = defined( 'REST_REQUEST' ) && REST_REQUEST;
+		$is_rest    = $this->is_rest_request_early();
 		$is_webhook = isset( $_REQUEST['fs_action'] ) || isset( $_REQUEST['freemius'] );
 
 		if ( ! $is_admin && ! $is_ajax && ! $is_cron && ! $is_cli && ! $is_rest && ! $is_webhook ) {

@@ -202,6 +202,35 @@ class DashboardToolsV1 extends WP_REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/search-posts',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'search_posts' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/page-interactions/(?P<id>\d+)',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'get_page_interactions' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'update_page_interactions' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
+			)
+		);
 	}
 
 	public function permissions_check() {
@@ -975,5 +1004,59 @@ class DashboardToolsV1 extends WP_REST_Controller {
 				'password' => $password,
 			)
 		);
+	}
+
+	public function search_posts( WP_REST_Request $request ) {
+		$search = $request->get_param( 'search' );
+		
+		$args = array(
+			'post_type'      => array( 'post', 'page' ),
+			'post_status'    => array( 'publish', 'draft', 'private' ),
+			'posts_per_page' => 20,
+		);
+
+		if ( ! empty( $search ) ) {
+			$args['s'] = $search;
+		}
+
+		$query = new \WP_Query( $args );
+		$posts = array();
+
+		if ( $query->have_posts() ) {
+			foreach ( $query->posts as $post ) {
+				$posts[] = array(
+					'id'    => $post->ID,
+					'title' => get_the_title( $post->ID ),
+				);
+			}
+		}
+
+		return rest_ensure_response( $posts );
+	}
+
+	public function get_page_interactions( WP_REST_Request $request ) {
+		$id   = (int) $request->get_param( 'id' );
+		$meta = get_post_meta( $id, 'blockish_page_interactions', true );
+		if ( empty( $meta ) ) {
+			$meta = array();
+		}
+		return rest_ensure_response( array(
+			'status' => 'success',
+			'items'  => $meta,
+		) );
+	}
+
+	public function update_page_interactions( WP_REST_Request $request ) {
+		$id           = (int) $request->get_param( 'id' );
+		$interactions = $request->get_param( 'interactions' );
+		
+		if ( is_array( $interactions ) || is_string( $interactions ) ) {
+			update_post_meta( $id, 'blockish_page_interactions', $interactions );
+		}
+
+		return rest_ensure_response( array(
+			'status' => 'success',
+			'items'  => $interactions,
+		) );
 	}
 }

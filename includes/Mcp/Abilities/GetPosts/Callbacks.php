@@ -59,13 +59,18 @@ class Callbacks
 
     private static function format_post( $post, bool $with_content = false ): array
     {
+        $edit_url = get_edit_post_link( $post->ID, 'raw' );
+        if ( ! is_string( $edit_url ) || $edit_url === '' ) {
+            $edit_url = admin_url( 'post.php?post=' . (int) $post->ID . '&action=edit' );
+        }
+
         $data = [
             'id'             => $post->ID,
             'title'          => get_the_title( $post ),
             'status'         => $post->post_status,
             'type'           => $post->post_type,
-            'url'            => get_permalink( $post ),
-            'edit_url'       => get_edit_post_link( $post->ID, 'raw' ),
+            'url'            => get_permalink( $post ) ?: '',
+            'edit_url'       => $edit_url,
             'excerpt'        => wp_strip_all_tags( get_the_excerpt( $post ) ),
             'modified'       => $post->post_modified,
             'featured_media' => (int) get_post_thumbnail_id( $post ),

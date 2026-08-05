@@ -66,6 +66,12 @@ class Enqueue {
             BLOCKISH_DIR . 'build/global/index.asset.php'
         );
 
+        $this->register_and_enqueue_style(
+            'blockish-global',
+            BLOCKISH_URL . 'build/global/index.css',
+            BLOCKISH_VERSION
+        );
+
         wp_localize_script(
             'blockish-global',
             'blockishGlobalData',
