@@ -5,6 +5,9 @@ Primary layout block — flexbox, CSS grid, or plain block. **Accepts children: 
 > [!WARNING]
 > **Hard rule — flex alignment:** Top-level containers ship centered (`justify-content` / `align-items: center` in Already-there CSS). Nested containers reset to no alignment default. Only convert alignment CSS when intentional (`flex-start` for copy columns, `stretch` for equal-height cards). Button placement is converted on the button itself — parent align does not move buttons.
 
+> [!WARNING]
+> **Hard rule — do not force `width: 100%` on section / outer wrappers:** `alignfull` / flex layout already stretches the bar. Extra `width: 100%` in Class Manager often squeezes content to one side in the editor. Prefer `max-width` + horizontal padding + `margin-left/right: auto` on the **inner** shell. Never re-declare `display: flex|grid|block` in Class Manager when the block’s `display` / `layout-type-*` class already sets it — change the `display` attribute instead (Class Manager loses to the stylesheet `layout-type-*` rules).
+
 #### Content / structure
 
 | Attribute | Type | Notes |

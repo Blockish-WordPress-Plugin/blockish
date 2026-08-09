@@ -335,6 +335,7 @@ class BlockSchemaMeta
 
         if ('pattern' === $context) {
             // One section can nest; only reject extreme trees.
+            // Also used for library CPTs (blockish-pattern / blockish-page) via ManagePost.
             if ($m['node_count'] > 250 || $m['max_depth'] > 12) {
                 return sprintf(
                     'Pattern schema is too heavy (nodes=%d, depth=%d). Split this section into smaller patterns, or simplify nested containers. Prefer schema_file for large payloads. See blockish/get-designer-workflow step 7.',
@@ -346,11 +347,12 @@ class BlockSchemaMeta
         }
 
         // Page / template assembly: allow ref-based layouts; reject monolithic trees.
+        // Depth allowance matches patterns (≤12). Node/byte caps still push pattern-first assembly.
         if ($m['ref_heavy']) {
             return null;
         }
 
-        if ($m['max_depth'] >= 6 || $m['node_count'] >= 80 || $m['json_bytes'] >= 100000) {
+        if ($m['max_depth'] > 12 || $m['node_count'] >= 100 || $m['json_bytes'] >= 100000) {
             return sprintf(
                 'Schema too large or too deeply nested for a full page/template (nodes=%d, depth=%d, bytes=%d). Do NOT send a monolithic layout. Build each section with blockish/manage-pattern, then assemble a lightweight schema of {"name":"core/block","attributes":{"ref":<pattern_id>,"align":"full"}}. On block themes, omit header/footer template-parts from page content (the template already provides them); use core/template-part only when editing wp_template layouts. See blockish/get-designer-workflow step 7–8.',
                 $m['node_count'],

@@ -39,12 +39,15 @@ With image set:
 | `captionType: "custom"` | Caption text from `customCaption`. |
 | `captionType: "attachment"` | Caption text from `image.caption`. |
 
-Style with convert-css:
+Style with convert-css / Class Manager:
 - wrapper align → `{{ROOT}} { text-align: …; }`
 - image box → `{{ROOT}} .blockish-image { width: …; height: …; border-radius: …; }`
-- **object-fit only emits when height is set** — convert both: `{{ROOT}} .blockish-image { height: 320px; object-fit: cover; }`
+- **object-fit only works when height is set** — always pair them: `{{ROOT}} .blockish-image { height: 320px; object-fit: cover; }`
 - caption → `{{ROOT}} .blockish-image-caption { … }`
 Do not invent markup. Do not style `.blockish-lightbox*` chrome unless intentionally customizing the global lightbox.
+
+> [!WARNING]
+> **Hard rule — editor image height:** Do **not** size filled/cropped images with `height: 100%` (or `%` height) inside a flex parent. Defaults already set `.blockish-image { width: 100%; height: auto; }`. Percentage height often collapses to `0` in the block editor even when the frontend looks fine. Use an **explicit length** (`px` / `rem` / `clamp(...)`) plus `object-fit: cover`, or give the wrapper a real size via `aspect-ratio` + explicit image height. Prefer `display: "block"` on a positioning wrapper when the image sits with absolute decorative children (glows) so flex siblings do not compete for height.
 
 #### Already-there CSS
 

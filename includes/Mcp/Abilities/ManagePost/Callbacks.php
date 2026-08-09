@@ -37,11 +37,12 @@ class Callbacks
         }
 
         $schema_context = 'page';
-        if ( ! empty( $input['post_type'] ) && in_array( $input['post_type'], array( 'wp_block', 'blockish_form' ), true ) ) {
+        $pattern_like_types = array( 'wp_block', 'blockish_form', 'blockish-pattern', 'blockish-page' );
+        if ( ! empty( $input['post_type'] ) && in_array( $input['post_type'], $pattern_like_types, true ) ) {
             $schema_context = 'pattern';
         } elseif ( ! empty( $input['post_id'] ) ) {
             $existing_type = get_post_type( (int) $input['post_id'] );
-            if ( in_array( $existing_type, array( 'wp_block', 'blockish_form' ), true ) ) {
+            if ( in_array( $existing_type, $pattern_like_types, true ) ) {
                 $schema_context = 'pattern';
             }
         }

@@ -20,6 +20,25 @@ You **never** write style-object JSON, and you **never** create child posts your
 
 ---
 
+## 2a. Do not re-declare Already-there CSS
+
+Before writing Class Manager CSS, read each block’s **Already-there CSS** in `get-block-docs`. Omit anything the block already ships. Re-declaring it bloats classes, fights defaults, and often looks like “duplicate CSS” in Class Manager.
+
+**Common do-not-repeat (unless intentionally overriding):**
+
+| Already shipped | Typical offender |
+|---|---|
+| Container `layout-type-flex/grid/block` → `display` | Class Manager `display: flex` |
+| Image `.blockish-image { width: 100%; height: auto; … }` | Class Manager `width: 100%` / `height: 100%` |
+| Button link `transition`, default padding chrome | Re-stating the same transition / defaults |
+| Heading / paragraph `margin: 0; padding: 0` | Zeroing margin again without a real spacing change |
+
+Only write **deltas** (colors, type scale, custom padding, shadows, decorative selectors). Changing `display` belongs on the container `display` attribute, not Class Manager — stylesheet `layout-type-*` rules beat a lone `.my-class { display: … }`.
+
+**Note:** After save, Class Manager may split one rule into several (e.g. `gap` on its own line). That converter behavior is normal — still do not hand-duplicate Already-there properties.
+
+---
+
 ## 3. Write one stylesheet (root + hover + descendants)
 
 ```css

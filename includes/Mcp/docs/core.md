@@ -56,7 +56,7 @@ Build the whole section, then convert once:
 
 1. **Content / structure** — attrs you set by hand (`text`, `url`, `display`, …).
 2. **Markup** — default HTML + table of which attribute changes which class/element. Use these selectors when writing CSS.
-3. **Already-there CSS** — what the block already ships. Do not re-declare it; convert only overrides.
+3. **Already-there CSS** — what the block already ships. Do **not** re-declare it in Class Manager or convert-css (no redundant `display:flex`, image `width:100%`, default button `transition`, zero margins already set). Write only overrides / deltas — see `get-class-manager-docs` §2a.
 4. **Minimal schema** — content-only starter.
 
 **Naming:** Top-level layout blocks should set `metadata.name` (e.g. `"Hero Section"`).

@@ -366,276 +366,285 @@ export default function InteractionsBuilder({
 		(draft?.when?.source === 'listen' && !draft?.when?.eventName?.trim()) ||
 		(draft?.action?.type === 'emit' && !draft?.action?.eventName?.trim());
 
+	const handleImport = useCallback(() => {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.json';
+		input.onchange = (e) => {
+			const file = e.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = async (event) => {
+					try {
+						const data = JSON.parse(event.target.result);
+						if (!Array.isArray(data)) throw new Error('Invalid format');
+
+						if (activeTab === 'page') {
+							persistPageItems(data);
+						} else if (activeTab === 'block') {
+							persistBlockItems(data);
+						} else if (activeTab === 'global') {
+							setGlobalSaving(true);
+							try {
+								const compiledData = compileList(data, 'global');
+								const response = await apiFetch({
+									path: GLOBAL_API,
+									method: 'POST',
+									data: { interactions: compiledData },
+								});
+								const items = response?.items || compiledData;
+								setGlobalItems(
+									items
+										.map((i) => normalizeInteraction(i, 'global'))
+										.filter(Boolean)
+										.map(ensureId)
+								);
+							} catch (err) {
+								console.error(err);
+							}
+							setGlobalSaving(false);
+						}
+					} catch (err) {
+						console.error(err);
+						alert(
+							__(
+								'Failed to import interactions. Please ensure the file is a valid JSON export.',
+								'blockish'
+							)
+						);
+					}
+				};
+				reader.readAsText(file);
+			}
+		};
+		input.click();
+	}, [activeTab, persistPageItems, persistBlockItems]);
+
+	const handleExport = useCallback(() => {
+		let dataToExport = [];
+		if (activeTab === 'page') dataToExport = pageItems;
+		else if (activeTab === 'global') dataToExport = globalItems;
+		else dataToExport = blockItems;
+		const dataStr =
+			'data:text/json;charset=utf-8,' +
+			encodeURIComponent(JSON.stringify(dataToExport));
+		const downloadAnchorNode = document.createElement('a');
+		downloadAnchorNode.setAttribute('href', dataStr);
+		downloadAnchorNode.setAttribute(
+			'download',
+			`blockish-interactions-${activeTab}.json`
+		);
+		document.body.appendChild(downloadAnchorNode);
+		downloadAnchorNode.click();
+		downloadAnchorNode.remove();
+	}, [activeTab, pageItems, globalItems, blockItems]);
+
 	if (!isOpen && !isEmbedded) return null;
 
 	const layoutContent = (
 		<div className="blockish-interactions-modal__layout">
-			<div className="blockish-cm-panel-header">
-				<div className="blockish-cm-panel-brand">
-					<div className="blockish-cm-panel-mark">IX</div>
-					<div>
-						<h2>{__('Interactions', 'blockish')}</h2>
-						<p>
-							{__(
-								'Manage interactions and dynamic events across your site.',
-								'blockish'
-							)}
-						</p>
-					</div>
-				</div>
-				{!editingScope && (
-					<div className="blockish-cm-panel-header-actions">
-						<Button
-							variant="secondary"
-							onClick={() => {
-								const input = document.createElement('input');
-								input.type = 'file';
-								input.accept = '.json';
-								input.onchange = (e) => {
-									const file = e.target.files[0];
-									if (file) {
-										const reader = new FileReader();
-										reader.onload = async (event) => {
-											try {
-												const data = JSON.parse(event.target.result);
-												if (!Array.isArray(data)) throw new Error('Invalid format');
-
-												if (activeTab === 'page') {
-													persistPageItems(data);
-												} else if (activeTab === 'block') {
-													persistBlockItems(data);
-												} else if (activeTab === 'global') {
-													setGlobalSaving(true);
-													try {
-														const compiledData = compileList(data, 'global');
-														const response = await apiFetch({
-															path: GLOBAL_API,
-															method: 'POST',
-															data: { interactions: compiledData },
-														});
-														const items = response?.items || compiledData;
-														setGlobalItems(
-															items
-																.map((i) => normalizeInteraction(i, 'global'))
-																.filter(Boolean)
-																.map(ensureId)
-														);
-													} catch (err) {
-														console.error(err);
-													}
-													setGlobalSaving(false);
-												}
-											} catch (err) {
-												console.error(err);
-												alert(__('Failed to import interactions. Please ensure the file is a valid JSON export.', 'blockish'));
-											}
-										};
-										reader.readAsText(file);
-									}
-								};
-								input.click();
-							}}
-						>
+			{!editingScope && (
+				<div className="blockish-interactions-modal__toolbar">
+					<p className="blockish-interactions-modal__intro">
+						{__(
+							'Manage interactions and dynamic events across your site.',
+							'blockish'
+						)}
+					</p>
+					<div className="blockish-interactions-modal__toolbar-actions">
+						<Button variant="secondary" onClick={handleImport}>
 							{__('Import', 'blockish')}
 						</Button>
-						<Button
-							variant="secondary"
-							onClick={() => {
-								let dataToExport = [];
-								if (activeTab === 'page') dataToExport = pageItems;
-								else if (activeTab === 'global') dataToExport = globalItems;
-								else dataToExport = blockItems;
-								const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dataToExport));
-								const downloadAnchorNode = document.createElement('a');
-								downloadAnchorNode.setAttribute('href', dataStr);
-								downloadAnchorNode.setAttribute('download', `blockish-interactions-${activeTab}.json`);
-								document.body.appendChild(downloadAnchorNode);
-								downloadAnchorNode.click();
-								downloadAnchorNode.remove();
-							}}
-						>
+						<Button variant="secondary" onClick={handleExport}>
 							{__('Export', 'blockish')}
 						</Button>
 					</div>
-				)}
-			</div>
-				<div className="blockish-interactions-modal__body">
-					<TabPanel
-						className="blockish-interactions-tabs"
-						activeClass="is-active"
-						tabs={tabs}
-						initialTabName={activeTab}
-						onSelect={(name) => {
-							if (!editingScope) {
-								setActiveTab(name);
-							}
-						}}
-					>
-						{({ name }) => {
-							if (name === 'block') {
-								return (
-									<ScopeTab
-										scope="block"
-										items={blockItems}
-										description={__(
-											'Only for the block you selected. You can add as many as you need.',
-											'blockish'
-										)}
-										emptyText={__(
-											'Add an animation, send a signal to other blocks, or run custom code.',
-											'blockish'
-										)}
-										onEdit={(item) => startEdit('block', item)}
-										onDelete={(id) => deleteItem('block', id)}
-										editing={editingScope === 'block'}
-										draft={draft}
-										setDraft={setDraft}
-										knownEventNames={knownEventNames}
-									/>
-								);
-							}
-
-							if (name === 'page') {
-								if (!postId) {
-									return (
-										<p>
-											{__(
-												'Open a post or page to manage page-level interactions.',
-												'blockish'
-											)}
-										</p>
-									);
-								}
-								return (
-									<div className="blockish-interactions-page-scope-wrapper">
-										{!editingScope && (
-											<div style={{ marginBottom: '16px' }}>
-												<BlockishSelect.Async
-													value={selectedPageOption}
-													placeholder={__('Current page', 'blockish')}
-													loadOptions={async (inputValue) => {
-														try {
-															const endpoint = inputValue
-																? `/blockish/v1/dashboard-tools/search-posts?search=${inputValue}`
-																: `/blockish/v1/dashboard-tools/search-posts`;
-															const results = await apiFetch({ path: endpoint });
-															return results.map(p => ({
-																label: p.title || __('Untitled', 'blockish'),
-																value: p.id
-															}));
-														} catch (e) {
-															return [];
-														}
-													}}
-													onChange={(selected) => {
-														setSelectedPageOption(selected);
-													}}
-													menuPortalTarget={document.body}
-													styles={{ menuPortal: base => ({ ...base, zIndex: 999999 }) }}
-													isClearable
-												/>
-												<div style={{ fontSize: '12px', color: '#646970', marginTop: '4px' }}>
-													{__('Empty means current page', 'blockish')}
-												</div>
-											</div>
-										)}
-										<ScopeTab
-											scope="page"
-											items={pageItems}
-											description={__(
-												'Reusable on this page. Use signals so several blocks can work together.',
-												'blockish'
-											)}
-											emptyText={__(
-												'Create page-wide rules you can reuse while editing this page.',
-												'blockish'
-											)}
-											onEdit={(item) => startEdit('page', item)}
-											onDelete={(id) => deleteItem('page', id)}
-											editing={editingScope === 'page'}
-											draft={draft}
-											setDraft={setDraft}
-											knownEventNames={knownEventNames}
-										/>
-									</div>
-								);
-							}
-
+				</div>
+			)}
+			<div className="blockish-interactions-modal__body">
+				<TabPanel
+					className="blockish-interactions-tabs"
+					activeClass="is-active"
+					tabs={tabs}
+					initialTabName={activeTab}
+					onSelect={(name) => {
+						if (!editingScope) {
+							setActiveTab(name);
+						}
+					}}
+				>
+					{({ name }) => {
+						if (name === 'block') {
 							return (
-								<>
-									{(globalLoading || globalSaving) && (
-										<div className="blockish-interactions-loading">
-											<Spinner />
+								<ScopeTab
+									scope="block"
+									items={blockItems}
+									description={__(
+										'Only for the block you selected. You can add as many as you need.',
+										'blockish'
+									)}
+									emptyText={__(
+										'Add an animation, send a signal to other blocks, or run custom code.',
+										'blockish'
+									)}
+									onEdit={(item) => startEdit('block', item)}
+									onDelete={(id) => deleteItem('block', id)}
+									editing={editingScope === 'block'}
+									draft={draft}
+									setDraft={setDraft}
+									knownEventNames={knownEventNames}
+								/>
+							);
+						}
+
+						if (name === 'page') {
+							if (!postId) {
+								return (
+									<p>
+										{__(
+											'Open a post or page to manage page-level interactions.',
+											'blockish'
+										)}
+									</p>
+								);
+							}
+							return (
+								<div className="blockish-interactions-page-scope-wrapper">
+									{!editingScope && (
+										<div className="blockish-interactions-page-picker">
+											<BlockishSelect.Async
+												value={selectedPageOption}
+												placeholder={__('Current page', 'blockish')}
+												loadOptions={async (inputValue) => {
+													try {
+														const endpoint = inputValue
+															? `/blockish/v1/dashboard-tools/search-posts?search=${inputValue}`
+															: `/blockish/v1/dashboard-tools/search-posts`;
+														const results = await apiFetch({
+															path: endpoint,
+														});
+														return results.map((p) => ({
+															label:
+																p.title ||
+																__('Untitled', 'blockish'),
+															value: p.id,
+														}));
+													} catch (e) {
+														return [];
+													}
+												}}
+												onChange={(selected) => {
+													setSelectedPageOption(selected);
+												}}
+												menuPortalTarget={document.body}
+												styles={{
+													menuPortal: (base) => ({
+														...base,
+														zIndex: 999999,
+													}),
+												}}
+												isClearable
+											/>
+											<div className="blockish-interactions-page-picker__hint">
+												{__('Empty means current page', 'blockish')}
+											</div>
 										</div>
 									)}
 									<ScopeTab
-										scope="global"
-										items={globalItems}
+										scope="page"
+										items={pageItems}
 										description={__(
-											'Reusable everywhere on your site. Handy for shared click or load behavior.',
+											'Reusable on this page. Use signals so several blocks can work together.',
 											'blockish'
 										)}
 										emptyText={__(
-											'Create site-wide rules once, then use them on any page.',
+											'Create page-wide rules you can reuse while editing this page.',
 											'blockish'
 										)}
-										onEdit={(item) => startEdit('global', item)}
-										onDelete={(id) => deleteItem('global', id)}
-										editing={editingScope === 'global'}
+										onEdit={(item) => startEdit('page', item)}
+										onDelete={(id) => deleteItem('page', id)}
+										editing={editingScope === 'page'}
 										draft={draft}
 										setDraft={setDraft}
 										knownEventNames={knownEventNames}
 									/>
-								</>
+								</div>
 							);
-						}}
-					</TabPanel>
-				</div>
+						}
 
-				<footer className="blockish-cm-panel-footer" style={{ borderTop: '1px solid #dcdcde', margin: 0, bottom: '90px' }}>
-					<div className="blockish-cm-panel-footer-stats"></div>
-					<div className="blockish-cm-panel-footer-actions">
-					{editingScope ? (
-						<>
-							<Button variant="secondary" onClick={cancelDraft}>
-								{__('Back', 'blockish')}
-							</Button>
-							<Button
-								variant="primary"
-								className="is-blockish-primary"
-								onClick={() => saveDraft(draft)}
-								disabled={formSaveDisabled}
-							>
-								{__('Save', 'blockish')}
-							</Button>
-						</>
-					) : (
-						<>
-							<Button
-								variant="primary"
-								className="is-blockish-primary"
-								onClick={() => startAdd(activeTab)}
-								disabled={!canAddOnTab}
-							>
-								{__('Add interaction', 'blockish')}
-							</Button>
-							{isEmbedded ? null : (
-								<Button variant="secondary" onClick={onClose}>
-									{__('Close', 'blockish')}
-								</Button>
-							)}
-							<Button
-								variant="primary"
-								className="is-blockish-primary"
-								onClick={handleApply}
-							>
-								{__('Done', 'blockish')}
-							</Button>
-						</>
-					)}
-					</div>
-				</footer>
+						return (
+							<>
+								{(globalLoading || globalSaving) && (
+									<div className="blockish-interactions-loading">
+										<Spinner />
+									</div>
+								)}
+								<ScopeTab
+									scope="global"
+									items={globalItems}
+									description={__(
+										'Reusable everywhere on your site. Handy for shared click or load behavior.',
+										'blockish'
+									)}
+									emptyText={__(
+										'Create site-wide rules once, then use them on any page.',
+										'blockish'
+									)}
+									onEdit={(item) => startEdit('global', item)}
+									onDelete={(id) => deleteItem('global', id)}
+									editing={editingScope === 'global'}
+									draft={draft}
+									setDraft={setDraft}
+									knownEventNames={knownEventNames}
+								/>
+							</>
+						);
+					}}
+				</TabPanel>
 			</div>
+
+			<footer className="blockish-interactions-modal__footer">
+				<div className="blockish-interactions-modal__footer-spacer" />
+				{editingScope ? (
+					<>
+						<Button variant="secondary" onClick={cancelDraft}>
+							{__('Back', 'blockish')}
+						</Button>
+						<Button
+							variant="primary"
+							className="is-blockish-primary"
+							onClick={() => saveDraft(draft)}
+							disabled={formSaveDisabled}
+						>
+							{__('Save', 'blockish')}
+						</Button>
+					</>
+				) : (
+					<>
+						<Button
+							variant="primary"
+							className="is-blockish-primary"
+							onClick={() => startAdd(activeTab)}
+							disabled={!canAddOnTab}
+						>
+							{__('Add interaction', 'blockish')}
+						</Button>
+						{isEmbedded ? null : (
+							<Button variant="secondary" onClick={onClose}>
+								{__('Close', 'blockish')}
+							</Button>
+						)}
+						<Button
+							variant="primary"
+							className="is-blockish-primary"
+							onClick={handleApply}
+						>
+							{__('Done', 'blockish')}
+						</Button>
+					</>
+				)}
+			</footer>
+		</div>
 	);
 
 	if (isEmbedded) {
