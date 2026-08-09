@@ -65,7 +65,10 @@ export default function GlobalInteractionsSettings({
 				>
 					<VStack className="blockish-modal-controls blockish-schemas-modal-content" spacing={4}>
 						<Text className="blockish-schemas-modal-description">
-							{__('Review and delete site-wide interactions. Create and edit them from any block’s Interactions modal (Global tab).', 'blockish')}
+							{__(
+								'Review and delete site-wide interactions. Create and edit them from Blockish editor Settings → Interactions.',
+								'blockish'
+							)}
 						</Text>
 						<Flex className="blockish-schemas-modal-toolbar" justify="space-between" align="center">
 							<div className="blockish-schemas-modal-search">
