@@ -2,6 +2,7 @@
 
 namespace Blockish\Routes;
 
+use Blockish\Core\Utilities;
 use WP_REST_Controller;
 use WP_REST_Request;
 
@@ -209,7 +210,7 @@ class SVGUploaderV1 extends WP_REST_Controller
     }
 
     /**
-     * SVG Sanitization using restricted wp_kses
+     * SVG sanitization — shared allowlist with Utilities::sanitize_inline_svg.
      */
     private function sanitize_svg_file($file)
     {
@@ -222,27 +223,11 @@ class SVGUploaderV1 extends WP_REST_Controller
             return new \WP_Error('read_error', 'Unable to read uploaded SVG.', ['status' => 400]);
         }
 
-        // Strip comments
-        $svg_content = preg_replace('/<!--.*?-->/s', '', $svg_content);
+        $clean = Utilities::sanitize_inline_svg($svg_content);
+        if ($clean === '') {
+            return new \WP_Error('invalid_svg', 'SVG content was empty after sanitization.', ['status' => 400]);
+        }
 
-        // Allowed SVG elements
-        $allowed_tags = [
-            'svg'     => ['xmlns' => true, 'width' => true, 'height' => true, 'viewBox' => true, 'viewbox' => true, 'fill' => true, 'class' => true, 'aria-hidden' => true, 'aria-labelledby' => true, 'role' => true, 'preserveaspectratio' => true, 'version' => true, 'id' => true],
-            'defs'    => [],
-            'style'   => [],
-            'linearGradient' => ['id' => true, 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'gradientUnits' => true, 'gradientTransform' => true, 'spreadMethod' => true, 'offset' => true],
-            'radialGradient' => ['id' => true, 'cx' => true, 'cy' => true, 'r' => true, 'fx' => true, 'fy' => true, 'gradientUnits' => true, 'gradientTransform' => true, 'spreadMethod' => true, 'offset' => true],
-            'lineargradient' => ['id' => true, 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'gradientUnits' => true, 'gradientTransform' => true, 'spreadMethod' => true, 'offset' => true],
-            'radialgradient' => ['id' => true, 'cx' => true, 'cy' => true, 'r' => true, 'fx' => true, 'fy' => true, 'gradientUnits' => true, 'gradientTransform' => true, 'spreadMethod' => true, 'offset' => true],
-            'stop'    => ['offset' => true, 'stop-color' => true, 'stop-opacity' => true],
-            'path'    => ['d' => true, 'fill' => true, 'class' => true, 'id' => true, 'stroke' => true, 'stroke-width' => true],
-            'g'       => ['fill' => true],
-            'rect'    => ['x' => true, 'y' => true, 'width' => true, 'height' => true],
-            'circle'  => ['cx' => true, 'cy' => true, 'r' => true],
-            'polygon' => ['points' => true],
-            'line'    => ['x1' => true, 'y1' => true, 'x2' => true, 'y2' => true],
-        ];
-
-        return wp_kses($svg_content, $allowed_tags);
+        return $clean;
     }
 }

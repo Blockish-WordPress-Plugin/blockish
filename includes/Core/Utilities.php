@@ -600,25 +600,149 @@ class Utilities
     }
 
     /**
-     * Restricted wp_kses for inline SVG markup — same allowlist shape used by
-     * the SVG uploader route.
+     * Shared SVG allowlist for uploads + inline custom icons (wp_kses).
+     * Keys are lowercase — wp_kses normalizes attribute names.
+     *
+     * @return array<string, array<string, bool>>
+     */
+    public static function get_allowed_inline_svg_tags()
+    {
+        // Presentation attrs shared by most shape / group elements.
+        $paint_attrs = [
+            'stroke'              => true,
+            'stroke-width'        => true,
+            'stroke-linecap'      => true,
+            'stroke-linejoin'     => true,
+            'stroke-dasharray'    => true,
+            'stroke-dashoffset'   => true,
+            'stroke-opacity'      => true,
+            'stroke-miterlimit'   => true,
+            'fill'                => true,
+            'fill-opacity'        => true,
+            'fill-rule'           => true,
+            'opacity'             => true,
+            'transform'           => true,
+            'clip-path'           => true,
+            'clip-rule'           => true,
+            'mask'                => true,
+            'vector-effect'       => true,
+            'paint-order'         => true,
+            'style'               => true,
+            'class'               => true,
+            'id'                  => true,
+        ];
+
+        return [
+            'svg' => array_merge(
+                [
+                    'xmlns'               => true,
+                    'xmlns:xlink'         => true,
+                    'width'               => true,
+                    'height'              => true,
+                    'x'                   => true,
+                    'y'                   => true,
+                    'viewbox'             => true,
+                    'preserveaspectratio' => true,
+                    'aria-hidden'         => true,
+                    'aria-labelledby'     => true,
+                    'role'                => true,
+                    'focusable'           => true,
+                    'version'             => true,
+                    'overflow'            => true,
+                ],
+                $paint_attrs
+            ),
+            'g'        => $paint_attrs,
+            'path'     => array_merge(['d' => true], $paint_attrs),
+            'rect'     => array_merge(
+                ['x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true],
+                $paint_attrs
+            ),
+            'circle'   => array_merge(['cx' => true, 'cy' => true, 'r' => true], $paint_attrs),
+            'ellipse'  => array_merge(['cx' => true, 'cy' => true, 'rx' => true, 'ry' => true], $paint_attrs),
+            'polygon'  => array_merge(['points' => true], $paint_attrs),
+            'polyline' => array_merge(['points' => true], $paint_attrs),
+            'line'     => array_merge(
+                ['x1' => true, 'y1' => true, 'x2' => true, 'y2' => true],
+                $paint_attrs
+            ),
+            'defs'   => ['id' => true, 'class' => true],
+            'style'  => ['type' => true],
+            'title'  => [],
+            'desc'   => [],
+            'symbol' => array_merge(
+                [
+                    'viewbox'             => true,
+                    'preserveaspectratio' => true,
+                    'overflow'            => true,
+                ],
+                $paint_attrs
+            ),
+            // Internal fragment refs only — href that points at "#id". External URLs stripped by kses if not allowed as URLs;
+            // keep href/xlink:href for sprite-style <use href="#icon">.
+            'use' => array_merge(
+                [
+                    'href'       => true,
+                    'xlink:href' => true,
+                    'x'          => true,
+                    'y'          => true,
+                    'width'      => true,
+                    'height'     => true,
+                ],
+                $paint_attrs
+            ),
+            'clippath' => [
+                'id'            => true,
+                'class'         => true,
+                'clippathunits' => true,
+                'transform'     => true,
+            ],
+            'mask' => [
+                'id'           => true,
+                'class'        => true,
+                'x'            => true,
+                'y'            => true,
+                'width'        => true,
+                'height'       => true,
+                'maskunits'    => true,
+                'maskcontentunits' => true,
+                'mask-type'    => true,
+            ],
+            'lineargradient' => [
+                'id'                => true,
+                'x1'                => true,
+                'y1'                => true,
+                'x2'                => true,
+                'y2'                => true,
+                'gradientunits'     => true,
+                'gradienttransform' => true,
+                'spreadmethod'      => true,
+            ],
+            'radialgradient' => [
+                'id'                => true,
+                'cx'                => true,
+                'cy'                => true,
+                'r'                 => true,
+                'fx'                => true,
+                'fy'                => true,
+                'gradientunits'     => true,
+                'gradienttransform' => true,
+                'spreadmethod'      => true,
+            ],
+            'stop' => [
+                'offset'       => true,
+                'stop-color'   => true,
+                'stop-opacity' => true,
+                'style'        => true,
+            ],
+        ];
+    }
+
+    /**
+     * Restricted wp_kses for inline SVG markup — same allowlist as the SVG uploader.
      */
     public static function sanitize_inline_svg($svg)
     {
-        $allowed_tags = [
-            'svg'            => ['xmlns' => true, 'width' => true, 'height' => true, 'viewbox' => true, 'fill' => true, 'class' => true, 'aria-hidden' => true, 'role' => true, 'preserveaspectratio' => true, 'focusable' => true],
-            'g'              => ['fill' => true, 'transform' => true],
-            'path'           => ['d' => true, 'fill' => true, 'class' => true, 'stroke' => true, 'stroke-width' => true],
-            'rect'           => ['x' => true, 'y' => true, 'width' => true, 'height' => true, 'fill' => true, 'rx' => true],
-            'circle'         => ['cx' => true, 'cy' => true, 'r' => true, 'fill' => true],
-            'polygon'        => ['points' => true, 'fill' => true],
-            'line'           => ['x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true],
-            'defs'           => [],
-            'linearGradient' => ['id' => true, 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'gradientunits' => true],
-            'radialGradient' => ['id' => true, 'cx' => true, 'cy' => true, 'r' => true],
-            'stop'           => ['offset' => true, 'stop-color' => true, 'stop-opacity' => true],
-        ];
-
-        return wp_kses(preg_replace('/<!--.*?-->/s', '', $svg), $allowed_tags);
+        return wp_kses(preg_replace('/<!--.*?-->/s', '', $svg), self::get_allowed_inline_svg_tags());
     }
 }
