@@ -1,3 +1,22 @@
+/**
+ * RangeUnit / option bags → CSS length string.
+ * @param {unknown} raw
+ * @returns {string}
+ */
+const toCssLength = (raw) => {
+    if (raw == null || raw === '') {
+        return '';
+    }
+    if (typeof raw === 'string' || typeof raw === 'number') {
+        return String(raw);
+    }
+    if (typeof raw === 'object' && raw.value != null) {
+        const unit = raw.unit != null ? String(raw.unit) : '';
+        return `${raw.value}${unit}`;
+    }
+    return '';
+};
+
 const generateBackgroundControlStyles = (background, device) => {
     if (!background || (typeof background !== 'string' && typeof background !== 'object')) return '';
 
@@ -17,8 +36,15 @@ const generateBackgroundControlStyles = (background, device) => {
             styles += `background-image: url(${backgroundImage.url});`;
         }
 
-        if (jsonBackground?.backgroundImagePosition?.[device]) {
-            styles += `background-position: ${jsonBackground?.backgroundImagePosition?.[device]?.value};`;
+        const position = jsonBackground?.backgroundImagePosition?.[device];
+        if (position?.value === 'custom') {
+            const x = toCssLength(jsonBackground?.backgroundImagePositionHorizontal?.[device]);
+            const y = toCssLength(jsonBackground?.backgroundImagePositionVertical?.[device]);
+            if (x && y) {
+                styles += `background-position: ${x} ${y};`;
+            }
+        } else if (position?.value) {
+            styles += `background-position: ${position.value};`;
         }
 
         if (jsonBackground?.backgroundImageAttachment && device === 'Desktop') {
@@ -29,8 +55,15 @@ const generateBackgroundControlStyles = (background, device) => {
             styles += `background-repeat: ${jsonBackground?.backgroundImageRepeat?.[device]?.value};`;
         }
 
-        if (jsonBackground?.backgroundImageSize?.[device]) {
-            styles += `background-size: ${jsonBackground?.backgroundImageSize?.[device]?.value};`;
+        // Never emit the sentinel "custom" — resolve Width when Size.value is custom.
+        const size = jsonBackground?.backgroundImageSize?.[device];
+        if (size?.value === 'custom') {
+            const width = toCssLength(jsonBackground?.backgroundImageSizeWidth?.[device]);
+            if (width) {
+                styles += `background-size: ${width};`;
+            }
+        } else if (size?.value) {
+            styles += `background-size: ${size.value};`;
         }
 
         if (jsonBackground?.backgroundImageBlendMode && device === 'Desktop') {
