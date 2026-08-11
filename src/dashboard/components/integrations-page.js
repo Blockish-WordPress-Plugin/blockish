@@ -1,218 +1,390 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	Button,
 	Flex,
+	FlexBlock,
+	SearchControl,
+	Spinner,
+	Notice,
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import apiFetch from '@wordpress/api-fetch';
+import IntegrationSetupModal from './integration-setup-modal';
 
-const INTEGRATION_FILTERS = [
-	{ key: 'all', label: __('All', 'blockish') },
-	{ key: 'marketing', label: __('Marketing', 'blockish') },
-	{ key: 'analytics', label: __('Analytics', 'blockish') },
-	{ key: 'automation', label: __('Automation', 'blockish') },
-	{ key: 'communication', label: __('Communication', 'blockish') },
-	{ key: 'payments', label: __('Payments', 'blockish') },
-	{ key: 'crm', label: __('CRM', 'blockish') },
-	{ key: 'productivity', label: __('Productivity', 'blockish') },
-	{ key: 'developer', label: __('Developer', 'blockish') },
+const FILTERS = [
+	{ key: 'all', label: __( 'All', 'blockish' ) },
+	{ key: 'marketing', label: __( 'Marketing', 'blockish' ) },
+	{ key: 'crm', label: __( 'CRM', 'blockish' ) },
+	{ key: 'payments', label: __( 'Payments', 'blockish' ) },
+	{ key: 'communication', label: __( 'Communication', 'blockish' ) },
+	{ key: 'automation', label: __( 'Automation', 'blockish' ) },
+	{ key: 'productivity', label: __( 'Productivity', 'blockish' ) },
+	{ key: 'analytics', label: __( 'Analytics', 'blockish' ) },
+	{ key: 'developer', label: __( 'Developer', 'blockish' ) },
 ];
 
-const INTEGRATIONS = [
-	{
-		key: 'mailchimp',
-		name: 'Mailchimp',
-		icon: '📧',
-		category: 'marketing',
-		description: __('Sync form submissions to your Mailchimp audience', 'blockish'),
-		status: 'connected',
-	},
-	{
-		key: 'google-analytics',
-		name: 'Google Analytics',
-		icon: '📊',
-		category: 'analytics',
-		description: __('Track block interactions and user engagement', 'blockish'),
-		status: 'connected',
-	},
-	{
-		key: 'zapier',
-		name: 'Zapier',
-		icon: '⚡',
-		category: 'automation',
-		description: __('Connect to 5000+ apps with automated workflows', 'blockish'),
-		status: 'available',
-		premium: true,
-	},
-	{
-		key: 'slack',
-		name: 'Slack',
-		icon: '💬',
-		category: 'communication',
-		description: __('Get notifications for form submissions and events', 'blockish'),
-		status: 'available',
-	},
-	{
-		key: 'stripe',
-		name: 'Stripe',
-		icon: '💳',
-		category: 'payments',
-		description: __('Accept payments directly through your blocks', 'blockish'),
-		status: 'available',
-		premium: true,
-	},
-	{
-		key: 'hubspot',
-		name: 'HubSpot',
-		icon: '🎯',
-		category: 'crm',
-		description: __('Capture leads and sync with your CRM', 'blockish'),
-		status: 'available',
-		premium: true,
-	},
-	{
-		key: 'convertkit',
-		name: 'ConvertKit',
-		icon: '✉️',
-		category: 'marketing',
-		description: __('Add subscribers to your email sequences', 'blockish'),
-		status: 'available',
-	},
-	{
-		key: 'google-sheets',
-		name: 'Google Sheets',
-		icon: '📄',
-		category: 'productivity',
-		description: __('Export form data to Google Sheets automatically', 'blockish'),
-		status: 'connected',
-	},
-	{
-		key: 'webhooks',
-		name: 'Webhooks',
-		icon: '🔗',
-		category: 'developer',
-		description: __('Send data to custom endpoints', 'blockish'),
-		status: 'available',
-	},
-];
+function categoryLabel( key ) {
+	return FILTERS.find( ( f ) => f.key === key )?.label || key;
+}
+
+function formatRelativeUpdated( iso ) {
+	if ( ! iso ) {
+		return '';
+	}
+	const then = Date.parse( iso );
+	if ( Number.isNaN( then ) ) {
+		return '';
+	}
+	const diffSec = Math.round( ( Date.now() - then ) / 1000 );
+	if ( diffSec < 60 ) {
+		return __( 'Updated just now', 'blockish' );
+	}
+	if ( diffSec < 3600 ) {
+		return sprintf(
+			/* translators: %d: minutes */
+			__( 'Updated %d min ago', 'blockish' ),
+			Math.floor( diffSec / 60 )
+		);
+	}
+	if ( diffSec < 86400 ) {
+		return sprintf(
+			/* translators: %d: hours */
+			__( 'Updated %d h ago', 'blockish' ),
+			Math.floor( diffSec / 3600 )
+		);
+	}
+	return sprintf(
+		/* translators: %d: days */
+		__( 'Updated %d d ago', 'blockish' ),
+		Math.floor( diffSec / 86400 )
+	);
+}
 
 export default function IntegrationsPage() {
-	const [activeFilter, setActiveFilter] = useState('all');
+	const [ items, setItems ] = useState( [] );
+	const [ connectedCount, setConnectedCount ] = useState( 0 );
+	const [ activeFilter, setActiveFilter ] = useState( 'all' );
+	const [ search, setSearch ] = useState( '' );
+	const [ isLoading, setIsLoading ] = useState( true );
+	const [ loadError, setLoadError ] = useState( null );
+	const [ activeItem, setActiveItem ] = useState( null );
 
-	const filteredItems = useMemo(() => {
-		if (activeFilter === 'all') {
-			return INTEGRATIONS;
-		}
+	const apiPath =
+		window.blockishDashboardData?.integrationsApiPath ||
+		'/blockish/v1/integrations';
+	const docsUrl =
+		window.blockishDashboardData?.plugin?.links?.documentation || '';
+	const supportUrl =
+		window.blockishDashboardData?.plugin?.links?.support || '';
 
-		return INTEGRATIONS.filter((item) => item.category === activeFilter);
-	}, [activeFilter]);
+	const load = useCallback( () => {
+		setIsLoading( true );
+		setLoadError( null );
+		apiFetch( { path: apiPath } )
+			.then( ( response ) => {
+				setItems( Array.isArray( response?.items ) ? response.items : [] );
+				setConnectedCount(
+					Number( response?.connected_count ) || 0
+				);
+			} )
+			.catch( () => {
+				setLoadError(
+					__(
+						'Could not load integrations. Refresh and try again.',
+						'blockish'
+					)
+				);
+			} )
+			.finally( () => setIsLoading( false ) );
+	}, [ apiPath ] );
 
-	const connectedCount = useMemo(
-		() => INTEGRATIONS.filter((item) => item.status === 'connected').length,
-		[]
+	useEffect( () => {
+		load();
+	}, [ load ] );
+
+	const filterCounts = useMemo( () => {
+		const counts = { all: items.length };
+		items.forEach( ( item ) => {
+			counts[ item.category ] = ( counts[ item.category ] || 0 ) + 1;
+		} );
+		return counts;
+	}, [ items ] );
+
+	const visibleFilters = useMemo(
+		() =>
+			FILTERS.filter(
+				( filter ) =>
+					filter.key === 'all' || ( filterCounts[ filter.key ] || 0 ) > 0
+			),
+		[ filterCounts ]
 	);
 
+	const filteredItems = useMemo( () => {
+		const q = search.trim().toLowerCase();
+		return items.filter( ( item ) => {
+			if ( activeFilter !== 'all' && item.category !== activeFilter ) {
+				return false;
+			}
+			if ( ! q ) {
+				return true;
+			}
+			return (
+				item.name.toLowerCase().includes( q ) ||
+				String( item.description || '' )
+					.toLowerCase()
+					.includes( q ) ||
+				String( item.category || '' )
+					.toLowerCase()
+					.includes( q )
+			);
+		} );
+	}, [ items, activeFilter, search ] );
+
+	const applyItem = ( nextItem ) => {
+		setItems( ( prev ) => {
+			const mapped = prev.map( ( item ) =>
+				item.key === nextItem.key ? nextItem : item
+			);
+			setConnectedCount(
+				mapped.filter( ( i ) => i.status === 'connected' ).length
+			);
+			return mapped;
+		} );
+		setActiveItem( nextItem );
+	};
+
+	const handleSaved = ( nextItem ) => {
+		applyItem( nextItem );
+	};
+
+	const handleDisconnected = ( nextItem ) => {
+		setItems( ( prev ) => {
+			const mapped = prev.map( ( item ) =>
+				item.key === nextItem.key ? nextItem : item
+			);
+			setConnectedCount(
+				mapped.filter( ( i ) => i.status === 'connected' ).length
+			);
+			return mapped;
+		} );
+		setActiveItem( null );
+	};
+
 	return (
-		<VStack className="blockish-integrations-page" spacing={5}>
-			<header className="blockish-page-header">
-				<Heading className="blockish-heading-primary" level={1}>
-					{__('Integrations', 'blockish')}
-				</Heading>
-				<Text className="blockish-text-muted">
-					{sprintf(
-						__('Connect Blockish with your favorite tools and services. %d active connections.', 'blockish'),
-						connectedCount
-					)}
-				</Text>
+		<VStack className="blockish-integrations-page" spacing={ 5 }>
+			<header className="blockish-page-header blockish-integrations-header">
+				<div>
+					<Heading className="blockish-heading-primary" level={ 1 }>
+						{ __( 'Integrations', 'blockish' ) }
+					</Heading>
+					<Text className="blockish-text-muted">
+						{ __(
+							'Connect CRM, email, payments, and automation once — Forms and future addons reuse these connections.',
+							'blockish'
+						) }
+					</Text>
+				</div>
+				{ connectedCount > 0 ? (
+					<div
+						className="blockish-integrations-stat"
+						aria-live="polite"
+					>
+						<span className="blockish-integrations-stat__value">
+							{ connectedCount }
+						</span>
+						<span className="blockish-integrations-stat__label">
+							{ connectedCount === 1
+								? __( 'connected', 'blockish' )
+								: __( 'connected', 'blockish' ) }
+						</span>
+					</div>
+				) : null }
 			</header>
 
-			<section className="blockish-panel blockish-integrations-filter-wrap">
-				<HStack className="blockish-integrations-filters" justify="flex-start">
-					{INTEGRATION_FILTERS.map((filter) => (
+			<section className="blockish-panel blockish-block-controls">
+				<Flex
+					className="blockish-block-controls-top"
+					justify="space-between"
+					align="center"
+				>
+					<FlexBlock className="blockish-block-search-wrap">
+						<SearchControl
+							placeholder={ __(
+								'Search integrations…',
+								'blockish'
+							) }
+							value={ search }
+							onChange={ setSearch }
+						/>
+					</FlexBlock>
+				</Flex>
+
+				<HStack
+					className="blockish-category-filter"
+					justify="flex-start"
+				>
+					{ visibleFilters.map( ( filter ) => (
 						<Button
-							key={filter.key}
-							className={`blockish-filter-button blockish-button-base ${activeFilter === filter.key ? 'is-active' : ''}`}
+							key={ filter.key }
+							className={ `blockish-filter-button blockish-button-base ${
+								activeFilter === filter.key ? 'is-active' : ''
+							}` }
 							variant="tertiary"
-							onClick={() => setActiveFilter(filter.key)}
+							onClick={ () => setActiveFilter( filter.key ) }
 						>
-							{filter.label}
+							{ filter.label }
 						</Button>
-					))}
+					) ) }
 				</HStack>
 			</section>
 
-			<div className="blockish-integrations-grid">
-				{filteredItems.map((item) => {
-					const isConnected = item.status === 'connected';
-					return (
-						<section
-							key={item.key}
-							className={`blockish-integration-card ${isConnected ? 'is-connected' : ''}`}
-						>
-							<Flex justify="space-between" align="flex-start" className="blockish-integration-head">
-								<Flex gap={3} justify="flex-start" align="center">
-									<span className="blockish-integration-icon" aria-hidden="true">
-										{item.icon}
+			{ loadError ? (
+				<Notice status="error" isDismissible={ false }>
+					{ loadError }{ ' ' }
+					<Button variant="link" onClick={ load }>
+						{ __( 'Retry', 'blockish' ) }
+					</Button>
+				</Notice>
+			) : null }
+
+			{ isLoading ? (
+				<div className="blockish-integrations-loading">
+					<Spinner />
+					<Text>{ __( 'Loading integrations…', 'blockish' ) }</Text>
+				</div>
+			) : filteredItems.length === 0 ? (
+				<section className="blockish-integrations-empty">
+					<Heading level={ 3 }>
+						{ __( 'No integrations match', 'blockish' ) }
+					</Heading>
+					<Text className="blockish-text-muted">
+						{ __(
+							'Try another filter or clear your search.',
+							'blockish'
+						) }
+					</Text>
+					<Button
+						variant="secondary"
+						onClick={ () => {
+							setSearch( '' );
+							setActiveFilter( 'all' );
+						} }
+					>
+						{ __( 'Reset filters', 'blockish' ) }
+					</Button>
+				</section>
+			) : (
+				<div className="blockish-integrations-grid">
+					{ filteredItems.map( ( item ) => {
+						const isConnected = item.status === 'connected';
+						const updated = formatRelativeUpdated(
+							item.updated_at || item.connected_at
+						);
+						return (
+							<section
+								key={ item.key }
+								className={ `blockish-integration-card ${
+									isConnected ? 'is-connected' : ''
+								}` }
+							>
+								<div className="blockish-integration-head">
+									<span
+										className="blockish-integration-icon"
+										aria-hidden="true"
+									>
+										{ item.icon || item.initials || '🔌' }
 									</span>
-									<div>
-										<Heading className="blockish-heading-secondary blockish-integration-title" level={3}>
-											{item.name}
+									<div className="blockish-integration-head__copy">
+										<Heading
+											className="blockish-heading-secondary blockish-integration-title"
+											level={ 3 }
+										>
+											{ item.name }
 										</Heading>
 										<Text className="blockish-text-muted blockish-integration-category">
-											{INTEGRATION_FILTERS.find((filter) => filter.key === item.category)?.label}
+											{ categoryLabel( item.category ) }
 										</Text>
 									</div>
-								</Flex>
-								{isConnected && <span className="blockish-integration-badge">{__('Connected', 'blockish')}</span>}
-							</Flex>
+									{ isConnected ? (
+										<span className="blockish-integration-badge">
+											{ __( 'Connected', 'blockish' ) }
+										</span>
+									) : null }
+								</div>
 
-							<Text className="blockish-text-muted blockish-integration-description">
-								{item.description}
-							</Text>
+								<Text className="blockish-text-muted blockish-integration-description">
+									{ item.description }
+								</Text>
 
-							<div className="blockish-integration-actions">
-								{item.premium && <span className="blockish-integration-premium">{__('Premium', 'blockish')}</span>}
-								<Flex justify="space-between" align="center" className="blockish-integration-actions-row">
+								{ updated ? (
+									<Text className="blockish-integration-meta">
+										{ updated }
+									</Text>
+								) : null }
+
+								<div className="blockish-integration-actions">
 									<Button
-										className={`blockish-action-button blockish-button-base ${
-											isConnected ? 'is-secondary blockish-button-secondary' : 'is-primary blockish-button-primary'
-										}`}
-										variant={isConnected ? 'secondary' : 'primary'}
+										className={ `blockish-action-button blockish-button-base ${
+											isConnected
+												? 'is-secondary blockish-button-secondary'
+												: 'is-primary blockish-button-primary'
+										}` }
+										variant={
+											isConnected
+												? 'secondary'
+												: 'primary'
+										}
+										onClick={ () => setActiveItem( item ) }
 									>
-										{isConnected ? __('Configure', 'blockish') : __('Connect', 'blockish')}
+										{ isConnected
+											? __( 'Configure', 'blockish' )
+											: __( 'Connect', 'blockish' ) }
 									</Button>
-									{isConnected && (
-										<button type="button" className="blockish-integration-disconnect" aria-label={__('Disconnect', 'blockish')}>
-											×
-										</button>
-									)}
-								</Flex>
-							</div>
-						</section>
-					);
-				})}
-			</div>
+								</div>
+							</section>
+						);
+					} ) }
+				</div>
+			) }
 
 			<section className="blockish-integrations-help">
-				<Heading className="blockish-heading-secondary" level={3}>
-					{__('Need help with integrations?', 'blockish')}
+				<Heading className="blockish-heading-secondary" level={ 3 }>
+					{ __( 'How this works', 'blockish' ) }
 				</Heading>
 				<Text className="blockish-text-muted">
-					{__('Each integration has detailed setup instructions in our documentation. Our support team can also help you get connected.', 'blockish')}
+					{ __(
+						'Save provider keys here once. Enable each service per form from Form settings when you are ready to sync submissions.',
+						'blockish'
+					) }
 				</Text>
-				<Flex className="blockish-integrations-help-links" gap={2} justify="flex-start">
-					<Text as="a" href="#" className="blockish-integrations-help-link">
-						{__('View Integration Guides', 'blockish')}
-					</Text>
-					<Text className="blockish-text-muted">·</Text>
-					<Text as="a" href="#" className="blockish-integrations-help-link">
-						{__('Contact Support', 'blockish')}
-					</Text>
-				</Flex>
+				{ docsUrl || supportUrl ? (
+					<div className="blockish-integrations-help-links">
+						{ docsUrl ? (
+							<a
+								href={ docsUrl }
+								className="blockish-integrations-help-link"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{ __( 'Documentation', 'blockish' ) }
+							</a>
+						) : null }
+					</div>
+				) : null }
 			</section>
+
+			{ activeItem ? (
+				<IntegrationSetupModal
+					item={ activeItem }
+					onClose={ () => setActiveItem( null ) }
+					onSaved={ handleSaved }
+					onDisconnected={ handleDisconnected }
+				/>
+			) : null }
 		</VStack>
 	);
 }

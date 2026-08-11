@@ -248,6 +248,6 @@ Prefer structured presets. Legacy `{ event, selector, callbacks }` still works a
 
 **Animation target:** defaults to the outer wrapper. For buttons animate `.blockish-button-link` via `when.selector`. Prefer Class Manager classes as stable selectors.
 
-Global libraries: `blockish/manage-global-interactions` when available.
+Global / page libraries: `blockish/manage-interactions` with `scope:"global"` or `scope:"page"` + `post_id` (replaces manage-global-interactions).
 
 ---

@@ -34,6 +34,7 @@ class Freemius {
 		if ( $this->sdk ) {
 			$this->configure_parent_redirects( $this->sdk );
 			$this->configure_local_icon( $this->sdk );
+			$this->configure_parent_notices( $this->sdk );
 
 			// Strip Freemius Plugins-row links before add-ons boot (they fire on this action).
 			$this->hide_plugins_row_links( $this->sdk );
@@ -42,6 +43,51 @@ class Freemius {
 
 			do_action( 'blockish/freemius/loaded', $this->sdk );
 		}
+	}
+
+	/**
+	 * Silence Freemius WP-admin nags for Core (opt-in email confirmation, etc.).
+	 * Licensing / account UX lives in Blockish → Addons.
+	 *
+	 * @param \Freemius $sdk Freemius instance.
+	 * @return void
+	 */
+	private function configure_parent_notices( $sdk ) {
+		if ( ! is_object( $sdk ) || ! method_exists( $sdk, 'add_filter' ) ) {
+			return;
+		}
+
+		$sdk->add_filter( 'show_admin_notice', array( $this, 'filter_show_admin_notice' ), 10, 2 );
+	}
+
+	/**
+	 * Hide Freemius connect / pending-opt-in sticky notices on wp-admin.
+	 *
+	 * @param bool  $show Whether to show the notice.
+	 * @param array $msg  Notice payload from Freemius.
+	 * @return bool
+	 */
+	public function filter_show_admin_notice( $show, $msg ) {
+		if ( ! is_array( $msg ) ) {
+			return $show;
+		}
+
+		$id = isset( $msg['id'] ) ? (string) $msg['id'] : '';
+		if ( in_array( $id, array( 'activation_pending', 'connect_account' ), true ) ) {
+			return false;
+		}
+
+		$message = isset( $msg['message'] ) ? wp_strip_all_tags( (string) $msg['message'] ) : '';
+		if (
+			false !== stripos( $message, 'one step away' ) ||
+			false !== stripos( $message, 'Activation Now' ) ||
+			false !== stripos( $message, 'confirmation email' ) ||
+			false !== stripos( $message, 'complete the opt-in' )
+		) {
+			return false;
+		}
+
+		return $show;
 	}
 
 	/**

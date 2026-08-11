@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { useTemplateLibrary } from '../context';
 import { fetchDesignWithDependencies, installDependenciesAndRemap } from '../resolve-design';
+
+const PAGE_META_KEY = 'blockish_page_interactions';
 
 /**
  * Resolve package gate for a design.
@@ -66,7 +68,39 @@ function goToAddons() {
 	}
 }
 
-const insertDesign = async (design, insertBlocks, onClose, setBusyId, setError) => {
+/**
+ * Apply page-scoped interactions onto the current editor document (REPLACE).
+ * Block-level interactionData is already inside remapped content.
+ *
+ * @param {object} full Cloud design payload
+ * @param {Function} editPost
+ */
+function applyPageInteractions(full, editPost) {
+	if (!editPost || typeof editPost !== 'function') {
+		return;
+	}
+	// Only page templates carry page meta for replace.
+	if (full?.type !== 'pages') {
+		return;
+	}
+	const interactions = Array.isArray(full.page_interactions)
+		? full.page_interactions
+		: [];
+	editPost({
+		meta: {
+			[PAGE_META_KEY]: interactions,
+		},
+	});
+}
+
+const insertDesign = async (
+	design,
+	insertBlocks,
+	onClose,
+	setBusyId,
+	setError,
+	editPost
+) => {
 	const gate = getPackageGate(design);
 	if (gate.locked) {
 		goToAddons();
@@ -84,11 +118,13 @@ const insertDesign = async (design, insertBlocks, onClose, setBusyId, setError) 
 	setError(null);
 
 	try {
+		// List payload has no content — insert always resolves from single-design fetch.
 		const full = await fetchDesignWithDependencies(design.id);
 		const remappedContent = await installDependenciesAndRemap(full, { apiFetch });
 		const blocks = parse(remappedContent);
 		if (blocks && blocks.length > 0) {
 			insertBlocks(blocks);
+			applyPageInteractions(full, editPost);
 			if (onClose) {
 				onClose();
 			}
@@ -108,7 +144,15 @@ const insertDesign = async (design, insertBlocks, onClose, setBusyId, setError) 
 	}
 };
 
-const PatternCard = ({ design, insertBlocks, onClose, busyId, setBusyId, setError }) => {
+const PatternCard = ({
+	design,
+	insertBlocks,
+	onClose,
+	busyId,
+	setBusyId,
+	setError,
+	editPost,
+}) => {
 	const gate = getPackageGate(design);
 	const isBusy = busyId === design.id;
 
@@ -119,7 +163,16 @@ const PatternCard = ({ design, insertBlocks, onClose, busyId, setBusyId, setErro
 					<button
 						className="insert-button"
 						disabled={Boolean(busyId)}
-						onClick={() => insertDesign(design, insertBlocks, onClose, setBusyId, setError)}
+						onClick={() =>
+							insertDesign(
+								design,
+								insertBlocks,
+								onClose,
+								setBusyId,
+								setError,
+								editPost
+							)
+						}
 					>
 						{isBusy
 							? __('Inserting…', 'blockish')
@@ -143,7 +196,15 @@ const PatternCard = ({ design, insertBlocks, onClose, busyId, setBusyId, setErro
 	);
 };
 
-const PageCard = ({ design, insertBlocks, onClose, busyId, setBusyId, setError }) => {
+const PageCard = ({
+	design,
+	insertBlocks,
+	onClose,
+	busyId,
+	setBusyId,
+	setError,
+	editPost,
+}) => {
 	const gate = getPackageGate(design);
 	const isBusy = busyId === design.id;
 
@@ -172,7 +233,16 @@ const PageCard = ({ design, insertBlocks, onClose, busyId, setBusyId, setError }
 				<button
 					className="insert-button inline"
 					disabled={Boolean(busyId)}
-					onClick={() => insertDesign(design, insertBlocks, onClose, setBusyId, setError)}
+					onClick={() =>
+						insertDesign(
+							design,
+							insertBlocks,
+							onClose,
+							setBusyId,
+							setError,
+							editPost
+						)
+					}
 				>
 					{isBusy
 						? __('Inserting…', 'blockish')
@@ -204,9 +274,13 @@ const SkeletonCard = () => (
 const DesignGrid = ({ onClose }) => {
 	const { designs, isLoading, hasMore, loadMore, activeTab } = useTemplateLibrary();
 	const { insertBlocks } = useDispatch('core/block-editor');
+	const { editPost } = useDispatch('core/editor');
 	const loaderRef = useRef(null);
 	const [busyId, setBusyId] = useState(null);
 	const [error, setError] = useState(null);
+
+	// Keep editor store subscribed so editPost is valid in FSE + post editors.
+	useSelect((select) => select('core/editor')?.getCurrentPostId?.(), []);
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -255,6 +329,7 @@ const DesignGrid = ({ onClose }) => {
 							busyId={busyId}
 							setBusyId={setBusyId}
 							setError={setError}
+							editPost={editPost}
 						/>
 					))}
 					{isLoading && (

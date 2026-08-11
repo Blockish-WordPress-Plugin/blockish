@@ -103,7 +103,9 @@ const RenderClassManagerStyles = () => {
 				}
 			});
 
-			byId[item.id] = css;
+			// Freshly imported classes may already have compiled meta CSS before
+			// the content→CSS path has a chance to re-run.
+			byId[item.id] = css || item.metaCss || '';
 		});
 
 		return byId;

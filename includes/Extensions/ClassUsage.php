@@ -327,6 +327,7 @@ class ClassUsage {
 			$children = array();
 			foreach ( $children_posts as $child ) {
 				$children[] = array(
+					'id'      => (int) $child->ID,
 					'title'   => (string) $child->post_title,
 					'content' => (string) $child->post_content,
 				);
@@ -424,10 +425,31 @@ class ClassUsage {
 			return array( 'error' => (string) $result['error'] );
 		}
 
+		$parent_id = (int) $result['post_id'];
+		$child_posts = get_posts(
+			array(
+				'post_type'      => 'blockish-classes',
+				'post_status'    => array( 'publish', 'private' ),
+				'posts_per_page' => -1,
+				'post_parent'    => $parent_id,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+			)
+		);
+
+		$children_out = array();
+		foreach ( $child_posts as $child ) {
+			$children_out[] = array(
+				'id'    => (int) $child->ID,
+				'title' => (string) $child->post_title,
+			);
+		}
+
 		return array(
-			'post_id' => (int) $result['post_id'],
-			'name'    => (string) $result['name'],
-			'created' => ! $existing_id,
+			'post_id'  => $parent_id,
+			'name'     => (string) $result['name'],
+			'created'  => ! $existing_id,
+			'children' => $children_out,
 		);
 	}
 
