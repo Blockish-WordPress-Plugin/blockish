@@ -80,11 +80,16 @@ function getInitialAddons() {
 export default function AddonsPage() {
 	const [addons, setAddons] = useState(getInitialAddons);
 	const [licenseKey, setLicenseKey] = useState('');
+	const [recoverEmail, setRecoverEmail] = useState(
+		() => window.blockishDashboardData?.userEmail || ''
+	);
 	const [busySlug, setBusySlug] = useState(null);
 	const [busyAction, setBusyAction] = useState(null);
 	const [feedback, setFeedback] = useState(null);
 	const [modalAddon, setModalAddon] = useState(null);
 	const [modalFeedback, setModalFeedback] = useState(null);
+	const [recoverOpen, setRecoverOpen] = useState(false);
+	const [recoverFeedback, setRecoverFeedback] = useState(null);
 	const [selectedPlans, setSelectedPlans] = useState(() => {
 		const initial = {};
 		getInitialAddons().forEach((addon) => {
@@ -152,12 +157,81 @@ export default function AddonsPage() {
 		setModalAddon(null);
 		setLicenseKey('');
 		setModalFeedback(null);
+		setRecoverOpen(false);
+		setRecoverFeedback(null);
+	};
+
+	const openRecoverModal = (event) => {
+		if (event) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+		setModalFeedback(null);
+		setRecoverFeedback(null);
+		setRecoverEmail((prev) => prev || window.blockishDashboardData?.userEmail || '');
+		setRecoverOpen(true);
+	};
+
+	const closeRecoverModal = () => {
+		if (busyAction === 'resend') {
+			return;
+		}
+		setRecoverOpen(false);
+		setRecoverFeedback(null);
+	};
+
+	const resendLicenseKey = async () => {
+		if (!modalAddon) {
+			return;
+		}
+
+		const email = recoverEmail.trim();
+		if (!email) {
+			setRecoverFeedback({
+				status: 'error',
+				message: __('Please enter the email you used at purchase.', 'blockish'),
+			});
+			return;
+		}
+
+		startBusy(modalAddon.slug, 'resend');
+		setRecoverFeedback(null);
+
+		try {
+			const response = await apiFetch({
+				path: `${addonsApiPath}/license/resend`,
+				method: 'POST',
+				data: {
+					slug: modalAddon.slug,
+					email,
+				},
+			});
+
+			setRecoverFeedback({
+				status: 'success',
+				message:
+					response?.message ||
+					__(
+						'If we find a purchase for that email, we will send the license key shortly. Check your inbox and spam folder.',
+						'blockish'
+					),
+			});
+			clearBusy();
+		} catch (error) {
+			setRecoverFeedback({
+				status: 'error',
+				message: error?.message || __('Could not send the license key. Please try again.', 'blockish'),
+			});
+			clearBusy();
+		}
 	};
 
 	const openLicenseModal = async (addon) => {
 		setFeedback(null);
 		setModalFeedback(null);
 		setLicenseKey('');
+		setRecoverOpen(false);
+		setRecoverFeedback(null);
 		setModalAddon(addon);
 		startBusy(addon.slug, 'refresh');
 
@@ -421,6 +495,8 @@ export default function AddonsPage() {
 				return __('Loading license status…', 'blockish');
 			case 'checkout':
 				return __('Opening checkout…', 'blockish');
+			case 'resend':
+				return __('Sending license key…', 'blockish');
 			default:
 				return __('Please wait…', 'blockish');
 		}
@@ -661,9 +737,11 @@ export default function AddonsPage() {
 			{modalAddon && (
 				<Modal
 					title={
-						isModalLicensed
-							? sprintf(__('Manage %s License', 'blockish'), modalAddon.name)
-							: sprintf(__('Activate %s License', 'blockish'), modalAddon.name)
+						recoverOpen
+							? __('Email my license key', 'blockish')
+							: isModalLicensed
+								? sprintf(__('Manage %s License', 'blockish'), modalAddon.name)
+								: sprintf(__('Activate %s License', 'blockish'), modalAddon.name)
 					}
 					onRequestClose={closeLicenseModal}
 					shouldCloseOnClickOutside={!isModalBusy}
@@ -671,6 +749,72 @@ export default function AddonsPage() {
 					isDismissible={!isModalBusy}
 					className="blockish-configure-modal blockish-license-modal"
 				>
+					{recoverOpen ? (
+						<VStack spacing={4} className="blockish-license-modal-content">
+							<Text className="blockish-schemas-modal-description">
+								{__(
+									'Enter the email address you used at checkout. We’ll send your license key if we find a matching purchase.',
+									'blockish'
+								)}
+							</Text>
+
+							{isModalBusy && busyAction === 'resend' && (
+								<div className="blockish-license-processing" role="status" aria-live="polite">
+									<Spinner />
+									<span>{processingLabel}</span>
+								</div>
+							)}
+
+							{recoverFeedback && (
+								<Notice
+									status={recoverFeedback.status === 'error' ? 'error' : 'success'}
+									isDismissible={busyAction !== 'resend'}
+									onRemove={() => setRecoverFeedback(null)}
+								>
+									{recoverFeedback.message}
+								</Notice>
+							)}
+
+							<div className="blockish-license-key-field">
+								<label className="blockish-license-key-label" htmlFor="blockish-license-recover-email">
+									{__('Purchase email', 'blockish')}
+								</label>
+								<input
+									id="blockish-license-recover-email"
+									className="blockish-license-key-input"
+									type="email"
+									autoComplete="email"
+									placeholder={__('you@example.com', 'blockish')}
+									value={recoverEmail}
+									onChange={(event) => setRecoverEmail(event.target.value)}
+									disabled={busyAction === 'resend'}
+									autoFocus
+								/>
+							</div>
+
+							<Flex className="blockish-license-modal-actions" justify="flex-end" gap={2}>
+								<Button
+									variant="secondary"
+									className="blockish-action-button is-secondary"
+									onClick={closeRecoverModal}
+									disabled={busyAction === 'resend'}
+								>
+									{__('Back', 'blockish')}
+								</Button>
+								<Button
+									variant="primary"
+									className="blockish-action-button is-primary"
+									onClick={resendLicenseKey}
+									isBusy={busyAction === 'resend'}
+									disabled={busyAction === 'resend' || !recoverEmail.trim()}
+								>
+									{busyAction === 'resend'
+										? __('Sending…', 'blockish')
+										: __('Email my key', 'blockish')}
+								</Button>
+							</Flex>
+						</VStack>
+					) : (
 					<VStack spacing={4} className="blockish-license-modal-content">
 						<Text className="blockish-schemas-modal-description">
 							{isModalLicensed
@@ -679,7 +823,7 @@ export default function AddonsPage() {
 										'blockish'
 								  )
 								: __(
-										'Paste the license key from your purchase email or Freemius account to unlock this add-on.',
+										'Paste the license key from your purchase email to unlock this add-on on this site.',
 										'blockish'
 								  )}
 						</Text>
@@ -755,7 +899,7 @@ export default function AddonsPage() {
 
 								{modalAddon.is_installed && !modalLicense.fs_ready && (
 									<Notice status="warning" isDismissible={false}>
-										{__('Freemius is not ready for this add-on yet. Finish product keys first.', 'blockish')}
+										{__('License service is not ready for this add-on yet. Try again in a moment.', 'blockish')}
 									</Notice>
 								)}
 
@@ -775,6 +919,14 @@ export default function AddonsPage() {
 										disabled={isModalBusy}
 										autoFocus
 									/>
+									<button
+										type="button"
+										className="blockish-license-recover-link"
+										onClick={openRecoverModal}
+										disabled={isModalBusy}
+									>
+										{__('Lost your license key?', 'blockish')}
+									</button>
 								</div>
 
 								<Flex className="blockish-license-modal-actions" justify="flex-end" gap={2}>
@@ -803,6 +955,7 @@ export default function AddonsPage() {
 							</>
 						)}
 					</VStack>
+					)}
 				</Modal>
 			)}
 		</VStack>

@@ -116,7 +116,7 @@ class Loader
         Abilities\ManageFonts\Config::class,
         Abilities\ManageOptions\Config::class,
         Abilities\ManageComments\Config::class,
-        Abilities\ManageGlobalInteractions\Config::class,
+        Abilities\ManageInteractions\Config::class,
         Abilities\TriggerRefresh\Config::class,
         Abilities\JsonHelper\Config::class,
         Abilities\ConvertCss\Config::class,

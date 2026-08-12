@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.0
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -167,6 +167,19 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.2.2 =
+
+* Added: Global Integrations hub — connect Mailchimp, Kit, HubSpot, Brevo, ActiveCampaign, Zapier, Make, Webhooks, Slack, Discord (and related destinations) from the Blockish dashboard
+* Added: Integration setup modal with credential fields and deep links to provider key pages
+* Added: REST API for integrations (`IntegrationsV1`) and shared connection helpers used by companion Forms destinations
+* Added: License notice surface for companion add-ons / Freemius status in the dashboard
+* Added: Containerize — wrap the selected blocks in a Blockish Container from the block settings menu (Ungroup via existing container transform)
+* Improved: Interactions editor — separate builders/panels for block, page, and global scopes; clearer footer controls and UI polish
+* Improved: MCP interactions abilities (`ManageInteractions`); media manage/upload docs and callbacks
+* Improved: SVG upload system and background control style generation
+* Improved: Template Library / pattern insert flow when adding designs
+* Improved: Add-ons marketing page and integrations dashboard UI
 
 = 1.2.1 =
 

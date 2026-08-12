@@ -2,13 +2,49 @@
 	width: 100%;
 }
 
-.blockish-integrations-filter-wrap {
-	padding: 14px;
+.blockish-integrations-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
 }
 
-.blockish-integrations-filters {
-	gap: 8px !important;
-	flex-wrap: wrap;
+.blockish-integrations-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	padding: 10px 14px;
+	border-radius: 12px;
+	background: #ecfdf3;
+	border: 1px solid #bbf7d0;
+	min-width: 88px;
+}
+
+.blockish-integrations-stat__value {
+	font-size: 1.5rem;
+	font-weight: 700;
+	line-height: 1.1;
+	color: #15803d;
+}
+
+.blockish-integrations-stat__label {
+	font-size: 12px;
+	color: #166534;
+	text-transform: lowercase;
+}
+
+.blockish-integrations-loading,
+.blockish-integrations-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 48px 20px;
+	border: 1px dashed var(--color-gray-200);
+	border-radius: 12px;
+	background: #fafafa;
+	text-align: center;
 }
 
 .blockish-integrations-grid {
@@ -18,32 +54,57 @@
 }
 
 .blockish-integration-card {
+	display: flex;
+	flex-direction: column;
 	background: var(--color-white);
 	border: 1px solid var(--color-gray-200);
 	border-radius: 12px;
 	padding: 18px;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.blockish-integration-card:hover {
+	border-color: #cbd5e1;
+	box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
 
 .blockish-integration-card.is-connected {
-	border-color: #baeac8;
+	border-color: #86efac;
+	background: linear-gradient(180deg, #f0fdf4 0%, #fff 48%);
 }
 
 .blockish-integration-head {
-	gap: 10px;
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+}
+
+.blockish-integration-head__copy {
+	flex: 1;
+	min-width: 0;
 }
 
 .blockish-integration-icon {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 30px;
-	height: 30px;
-	font-size: 21px;
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
+	background: #f8fafc;
+	border: 1px solid var(--color-gray-200);
+	font-size: 22px;
 	line-height: 1;
+}
+
+.blockish-integration-icon-tile {
+	display: none;
 }
 
 .blockish-integration-title.components-heading {
 	margin: 0;
+	font-size: 1rem;
 }
 
 .blockish-integration-category.components-text {
@@ -62,6 +123,7 @@
 	font-size: 13px;
 	font-weight: var(--font-weight-medium);
 	white-space: nowrap;
+	flex-shrink: 0;
 }
 
 .blockish-integration-badge::before {
@@ -69,48 +131,41 @@
 	margin-right: 6px;
 }
 
+.blockish-integration-badge.is-idle {
+	display: none;
+}
+
+.blockish-integration-badge.is-inline {
+	margin-top: 8px;
+}
+
 .blockish-integration-description.components-text {
 	margin-top: 14px;
 	line-height: 1.5;
-	min-height: 48px;
+	flex: 1;
+}
+
+.blockish-integration-meta {
+	display: block;
+	margin-top: 8px;
+	font-size: 12px;
+	color: #94a3b8;
 }
 
 .blockish-integration-actions {
-	margin-top: 12px;
+	margin-top: 14px;
 	border-top: 1px solid var(--color-gray-200);
 	padding-top: 12px;
 }
 
-.blockish-integration-premium {
-	display: inline-flex;
-	align-items: center;
-	height: 22px;
-	padding: 0 8px;
-	border-radius: 6px;
-	background: #fcebc2;
-	color: #9c6d00;
-	font-size: 13px;
-	margin-bottom: 10px;
-}
-
-.blockish-integration-actions-row .components-button {
-	flex: 1;
-}
-
-.blockish-integration-disconnect {
-	border: none;
-	background: transparent;
-	color: #e1192d;
-	font-size: 30px;
-	line-height: 1;
-	width: 28px;
-	height: 28px;
-	cursor: pointer;
+.blockish-integration-actions .components-button {
+	width: 100%;
+	justify-content: center;
 }
 
 .blockish-integrations-help {
-	border: 1px solid #bed7ff;
-	background: #edf4ff;
+	border: 1px solid #bfdbfe;
+	background: #eff6ff;
 	border-radius: 12px;
 	padding: 22px 20px;
 }
@@ -124,14 +179,74 @@
 }
 
 .blockish-integrations-help-links {
-	margin-top: 6px;
+	margin-top: 10px;
 }
 
 .blockish-integrations-help-link {
 	color: var(--color-blue-600) !important;
 	text-decoration: none;
+	font-weight: 600;
 }
 
 .blockish-integrations-help-link:hover {
 	text-decoration: underline;
+}
+
+/* Setup modal */
+.blockish-integration-modal .components-modal__content {
+	padding-bottom: 20px;
+}
+
+.blockish-integration-modal__intro {
+	display: flex;
+	gap: 14px;
+	align-items: flex-start;
+}
+
+.blockish-integration-modal__lead {
+	display: block;
+	line-height: 1.5;
+	color: #475569;
+}
+
+.blockish-integration-modal__fields {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.blockish-integration-field-error {
+	margin: 6px 0 0;
+	color: #b91c1c;
+	font-size: 12px;
+}
+
+.blockish-integration-modal__docs {
+	margin: 0;
+	font-size: 13px;
+}
+
+.blockish-integration-modal__docs a {
+	color: var(--color-blue-600);
+	text-decoration: none;
+	font-weight: 600;
+}
+
+.blockish-integration-modal__docs a:hover {
+	text-decoration: underline;
+}
+
+.blockish-integration-modal__footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding-top: 8px;
+	border-top: 1px solid var(--color-gray-200);
+}
+
+.blockish-integration-modal__footer-right {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }

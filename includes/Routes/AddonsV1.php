@@ -108,6 +108,30 @@ class AddonsV1 extends WP_REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/license/resend',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'resend_license' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => array(
+						'slug'  => array(
+							'type'              => 'string',
+							'required'          => true,
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'email' => array(
+							'type'              => 'string',
+							'required'          => true,
+							'sanitize_callback' => 'sanitize_email',
+						),
+					),
+				),
+			)
+		);
 	}
 
 	public function permissions_check() {
@@ -206,6 +230,95 @@ class AddonsV1 extends WP_REST_Controller {
 				'message' => __( 'License deactivated.', 'blockish' ),
 				'addons'  => \Blockish\Config\AddonsList::get_instance()->refresh_list(),
 				'reload'  => true,
+			)
+		);
+	}
+
+	/**
+	 * Email the license key to the purchase address via Freemius (branded as Blockish in UI).
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|WP_Error
+	 */
+	public function resend_license( WP_REST_Request $request ) {
+		$slug  = $request->get_param( 'slug' );
+		$email = sanitize_email( (string) $request->get_param( 'email' ) );
+
+		if ( ! is_email( $email ) ) {
+			return new WP_Error(
+				'blockish_invalid_email',
+				__( 'Please enter a valid email address.', 'blockish' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$rate_key = 'blockish_lic_resend_' . md5( strtolower( $email ) . '|' . $slug );
+		$attempts = (int) get_transient( $rate_key );
+		if ( $attempts >= 3 ) {
+			return new WP_Error(
+				'blockish_resend_rate_limited',
+				__( 'Too many requests. Please wait a while and try again.', 'blockish' ),
+				array( 'status' => 429 )
+			);
+		}
+		set_transient( $rate_key, $attempts + 1, HOUR_IN_SECONDS );
+
+		$sdk = $this->resolve_sdk( $slug );
+		if ( is_wp_error( $sdk ) ) {
+			return $sdk;
+		}
+
+		if ( ! method_exists( $sdk, 'get_api_plugin_scope' ) ) {
+			return new WP_Error(
+				'blockish_freemius_unavailable',
+				__( 'License recovery is unavailable right now.', 'blockish' ),
+				array( 'status' => 503 )
+			);
+		}
+
+		$api    = $sdk->get_api_plugin_scope();
+		$result = $api->call(
+			'/licenses/resend.json',
+			'post',
+			array(
+				'email' => $email,
+				'url'   => home_url(),
+			)
+		);
+
+		$generic_ok = __(
+			'If we find a purchase for that email, we will send the license key shortly. Check your inbox and spam folder.',
+			'blockish'
+		);
+
+		if ( is_object( $result ) && isset( $result->error ) ) {
+			$code = isset( $result->error->code ) ? (string) $result->error->code : '';
+
+			// Avoid leaking whether an email exists in our system.
+			if ( in_array( $code, array( 'invalid_email', 'no_user', 'no_license' ), true ) ) {
+				return rest_ensure_response(
+					array(
+						'status'  => 'success',
+						'message' => $generic_ok,
+					)
+				);
+			}
+
+			$message = ! empty( $result->error->message )
+				? (string) $result->error->message
+				: __( 'Could not send the license key. Please try again.', 'blockish' );
+
+			return new WP_Error(
+				'blockish_resend_failed',
+				$message,
+				array( 'status' => 400 )
+			);
+		}
+
+		return rest_ensure_response(
+			array(
+				'status'  => 'success',
+				'message' => $generic_ok,
 			)
 		);
 	}

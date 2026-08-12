@@ -5,6 +5,7 @@ import Save from './save';
 import metadata from './block.json';
 import transforms from './transforms';
 import './filters';
+import './containerize-menu';
 
 registerBlockType( metadata.name, {
 	edit: Edit,

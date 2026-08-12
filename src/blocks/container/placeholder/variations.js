@@ -79,9 +79,9 @@ const variations = [
 			},
 		},
 		innerBlocks: [
-			['blockish/container', { ...childContainer }],
-			['blockish/container', { ...childContainer }],
-			['blockish/container', { ...childContainer }],
+			['blockish/container', { ...childContainer, containerWidth: 'align-custom-width', customWidthContainer: { Desktop: '50%', Tablet: '49%', Mobile: '100%' } }],
+			['blockish/container', { ...childContainer, containerWidth: 'align-custom-width', customWidthContainer: { Desktop: '25%', Tablet: '49%', Mobile: '100%' } }],
+			['blockish/container', { ...childContainer, containerWidth: 'align-custom-width', customWidthContainer: { Desktop: '25%', Tablet: '50%', Mobile: '100%' } }],
 		],
 		scope: ['block'],
 	},

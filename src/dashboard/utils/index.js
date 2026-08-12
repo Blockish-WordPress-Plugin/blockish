@@ -15,6 +15,8 @@ export const SIDEBAR_MENUS = [
 	{ key: 'extensions', label: 'Extensions', icon: plugIcon },
 	{ key: 'mcp-config', label: 'MCP Server', icon: zap },
 	{ key: 'settings', label: 'Settings', icon: settingsIcon },
+	// Pinned just above Forms (and before Addons) via orderSidebarMenus.
+	{ key: 'integrations', label: 'Integrations', icon: plugIcon },
 	// Always last — buy add-ons + activate licenses live here (not Plugins row).
 	{
 		key: 'addons',
@@ -22,20 +24,32 @@ export const SIDEBAR_MENUS = [
 		hint: 'Buy add-ons · Activate keys',
 		icon: packageIcon,
 	},
-	// { key: 'integrations', label: 'Integrations', icon: plugIcon },
 ];
 
 /**
- * Keep Addons pinned under every other sidebar item (including filter-injected ones).
+ * Pin Integrations → Forms → Addons at the bottom of the sidebar.
+ * Filter-injected menus (e.g. Forms) stay just under Integrations.
  *
  * @param {Array} menus Sidebar menu definitions.
  * @return {Array}
  */
 export function orderSidebarMenus(menus = []) {
 	const list = Array.isArray(menus) ? [ ...menus ] : [];
-	const addons = list.find( ( menu ) => menu?.key === 'addons' );
-	const rest = list.filter( ( menu ) => menu?.key !== 'addons' );
-	return addons ? [ ...rest, addons ] : rest;
+	const take = ( key ) => list.find( ( menu ) => menu?.key === key );
+	const integrations = take( 'integrations' );
+	const forms = take( 'forms' );
+	const addons = take( 'addons' );
+	const rest = list.filter(
+		( menu ) =>
+			! [ 'integrations', 'forms', 'addons' ].includes( menu?.key )
+	);
+
+	return [
+		...rest,
+		...( integrations ? [ integrations ] : [] ),
+		...( forms ? [ forms ] : [] ),
+		...( addons ? [ addons ] : [] ),
+	];
 }
 
 export const BLOCK_FILTERS = [

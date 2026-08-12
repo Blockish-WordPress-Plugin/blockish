@@ -5,7 +5,7 @@
  * Description:       Build sites with AI via MCP (Cursor, Claude). 30+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
  * Requires at least: 6.2
  * Requires PHP:      7.4
- * Version:           1.2.1
+ * Version:           1.2.2
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/
@@ -22,6 +22,7 @@ use Blockish\Config\Freemius as FreemiusConfig;
 use Blockish\Core\Blocks;
 use Blockish\Core\Dashboard;
 use Blockish\Core\Enqueue;
+use Blockish\Core\LicenseNotice;
 use Blockish\Core\SEO;
 use Blockish\Core\StyleGenerator;
 use Blockish\Extensions\ExtensionsLoader;
@@ -31,6 +32,7 @@ use Blockish\Routes\BlocksV1;
 use Blockish\Routes\DashboardToolsV1;
 use Blockish\Routes\EditorSyncV1;
 use Blockish\Routes\ExtensionsV1;
+use Blockish\Routes\IntegrationsV1;
 use Blockish\Routes\SVGUploaderV1;
 
 // Exit if accessed directly.
@@ -50,7 +52,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.2.1';
+    const VERSION = '1.2.2';
 
     /**
      * Holds the instance of this class.
@@ -153,11 +155,13 @@ final class Blockish
         Dashboard::get_instance();
         Enqueue::get_instance();
         StyleGenerator::get_instance();
+        LicenseNotice::get_instance();
         BlocksV1::get_instance();
         ExtensionsV1::get_instance();
         EditorSyncV1::get_instance();
         DashboardToolsV1::get_instance();
         AddonsV1::get_instance();
+        IntegrationsV1::get_instance();
         SVGUploaderV1::get_instance();
         Blocks::get_instance();
         ExtensionsLoader::get_instance();

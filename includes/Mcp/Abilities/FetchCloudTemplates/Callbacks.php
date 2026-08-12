@@ -102,8 +102,11 @@ class Callbacks
             }
 
             if ($is_installed) {
-                // Enrich with dependencies from single-design endpoint when missing.
-                if (empty($design['dependencies']) && !empty($design['id'])) {
+                // List payload has no content/deps — always load single-design for insert schema.
+                if (
+                    ( empty( $design['content'] ) || empty( $design['dependencies'] ) )
+                    && ! empty( $design['id'] )
+                ) {
                     $design = self::fetch_design_with_dependencies((int) $design['id']) ?: $design;
                 }
 

@@ -297,6 +297,40 @@
 	cursor: not-allowed;
 }
 
+.blockish-license-key-field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.blockish-license-recover-link {
+	align-self: flex-start;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--color-blue-600, #2563eb);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.blockish-license-recover-link:hover,
+.blockish-license-recover-link:focus {
+	color: var(--color-blue-700, #1d4ed8);
+}
+
+.blockish-license-recover-link:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.blockish-addons-license-banner {
+	margin: 0;
+}
+
 .blockish-license-processing {
 	display: flex;
 	align-items: center;

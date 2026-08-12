@@ -630,7 +630,7 @@ class DashboardToolsV1 extends WP_REST_Controller {
 			$out['actionType'] = sanitize_key( (string) $item['actionType'] );
 		}
 		if ( isset( $item['preset'] ) ) {
-			$out['preset'] = sanitize_key( (string) $item['preset'] );
+			$out['preset'] = $this->sanitize_interaction_preset_id( (string) $item['preset'] );
 		}
 		if ( isset( $item['listenEventName'] ) ) {
 			$out['listenEventName'] = sanitize_text_field( (string) $item['listenEventName'] );
@@ -676,7 +676,7 @@ class DashboardToolsV1 extends WP_REST_Controller {
 			$action = $item['action'];
 			$out['action'] = array(
 				'type'          => isset( $action['type'] ) ? sanitize_key( (string) $action['type'] ) : 'custom',
-				'preset'        => isset( $action['preset'] ) ? sanitize_key( (string) $action['preset'] ) : 'fadeUp',
+				'preset'        => isset( $action['preset'] ) ? $this->sanitize_interaction_preset_id( (string) $action['preset'] ) : 'fadeUp',
 				'eventName'     => isset( $action['eventName'] ) ? sanitize_text_field( (string) $action['eventName'] ) : '',
 				'phase'         => isset( $action['phase'] ) ? sanitize_key( (string) $action['phase'] ) : 'start',
 				'presetOptions' => isset( $action['presetOptions'] ) && is_array( $action['presetOptions'] )
@@ -706,6 +706,18 @@ class DashboardToolsV1 extends WP_REST_Controller {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Preset ids stay camelCase for CSS classes (fadeUp). sanitize_key would break them.
+	 *
+	 * @param string $preset Raw preset id.
+	 * @return string
+	 */
+	private function sanitize_interaction_preset_id( $preset ) {
+		$preset  = sanitize_text_field( (string) $preset );
+		$allowed = array( 'fadeIn', 'fadeUp', 'fadeDown', 'fadeLeft', 'fadeRight', 'zoomIn' );
+		return in_array( $preset, $allowed, true ) ? $preset : 'fadeUp';
 	}
 
 	public function update_class_manager_item( WP_REST_Request $request ) {
@@ -883,10 +895,13 @@ class DashboardToolsV1 extends WP_REST_Controller {
 
 		return rest_ensure_response(
 			array(
-				'status'  => 'success',
-				'id'      => (int) $result['post_id'],
-				'name'    => (string) $result['name'],
-				'created' => ! empty( $result['created'] ),
+				'status'   => 'success',
+				'id'       => (int) $result['post_id'],
+				'name'     => (string) $result['name'],
+				'created'  => ! empty( $result['created'] ),
+				'children' => isset( $result['children'] ) && is_array( $result['children'] )
+					? array_values( $result['children'] )
+					: array(),
 			)
 		);
 	}
