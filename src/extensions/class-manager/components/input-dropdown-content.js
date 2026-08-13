@@ -1,4 +1,5 @@
 import { useState, useMemo } from '@wordpress/element';
+import { usePopupFocus } from '../focus-popup';
 import { SearchControl, MenuItem, MenuGroup, Button, __experimentalText as Text } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 import { plus, trash } from '@wordpress/icons';
@@ -10,6 +11,7 @@ import { addClassItem, getEntityTitle, isValidCssClass, removeClassById, useClas
 const CLASS_POST_TYPE = 'blockish-classes';
 
 const InputDropdownContent = ({ attributes, setAttributes }) => {
+    const [ popupRef, focusPopup ] = usePopupFocus();
     const [ searchInput, setSearchInput ] = useState('');
     const selectedClasses = attributes?.classManager || [];
     const normalizedSearchInput = searchInput.trim();
@@ -46,6 +48,7 @@ const InputDropdownContent = ({ attributes, setAttributes }) => {
                 classManager: nextClasses,
                 classManagerSubselector: nextSubSelectors,
             });
+            focusPopup();
         } else {
             const nextClasses = addClassItem(selectedClasses, item);
             let nextSubSelectors = attributes?.classManagerSubselector || [];
@@ -69,11 +72,12 @@ const InputDropdownContent = ({ attributes, setAttributes }) => {
                 classManager: nextClasses,
                 classManagerSubselector: nextSubSelectors,
             });
+            focusPopup();
         }
     };
 
     return (
-        <div className="blockish-input-dropdown-content">
+        <div ref={popupRef} tabIndex={-1} className="blockish-input-dropdown-content">
             <SearchControl
                 className='blockish-class-manager-search'
                 __nextHasNoMarginBottom
@@ -107,6 +111,7 @@ const InputDropdownContent = ({ attributes, setAttributes }) => {
                                                 classManagerSubselector: nextSubSelectors,
                                             });
                                             await deleteEntityRecord('postType', CLASS_POST_TYPE, item?.id, { force: true });
+                                            focusPopup();
                                         }}
                                     >
                                         {trash}
@@ -137,6 +142,7 @@ const InputDropdownContent = ({ attributes, setAttributes }) => {
                             }
 
                             setSearchInput('');
+                            focusPopup();
                         }}
                     >
                         {__('Add Class', 'blockish')}

@@ -243,7 +243,7 @@ const ControlsDropdownContent = ({
                     <FlexItem className="controls-dropdown-content-header-controls">
                         <Dropdown
                             contentClassName="controls-dropdown-content-header-edit-dropdown-content"
-                            popoverProps={{ placement: 'left-start' }}
+                            popoverProps={{ placement: 'left-start', focusOnMount: 'container' }}
                             renderToggle={({ isOpen, onToggle }) => (
                                 <Button
                                     className="controls-dropdown-content-header-controls-button"
@@ -362,7 +362,7 @@ const ControlsDropdownContent = ({
                     <Dropdown
                         className="blockish-class-manager-subselector-input-dropdown"
                         contentClassName="blockish-class-manager-input-dropdown-content"
-                        popoverProps={{ placement: 'bottom-end' }}
+                        popoverProps={{ placement: 'bottom-end', focusOnMount: 'container' }}
                         renderToggle={({ isOpen, onToggle }) => (
                             <Button
                                 className="controls-dropdown-content-subselector"
