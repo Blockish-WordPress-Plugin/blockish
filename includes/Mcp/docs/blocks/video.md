@@ -14,7 +14,8 @@ Embed YouTube, Vimeo, or self-hosted video. **Accepts children: no.**
 | `vimeoUrl` | Scalar (URL) | Demo placeholder default — always override. |
 | `selfHostedVideo` | Image (video file) | Media object with `url`. |
 | `selfHostedUrl` | Scalar (URL) | Fallback if no media object. |
-| `poster` | Scalar (URL) | Self-hosted poster. |
+| `posterImage` | Image | Self-hosted poster media object (`id`, `url`, `type`). |
+| `poster` | Scalar (URL) | **Deprecated.** Use `posterImage`. Still read as fallback. |
 | `autoplay` | Scalar (bool) | Default `false`. |
 | `loop` | Scalar (bool) | Default `false`. |
 | `muted` | Scalar (bool) | Default `false`. |
@@ -47,6 +48,7 @@ Default (YouTube source + demo URL):
 | When | What changes |
 |---|---|
 | `sourceType: "selfHosted"` + URL | Child `<video class="blockish-video" …>` instead of iframe. |
+| `posterImage` (or deprecated `poster`) | `<video poster="…">`. Prefers `posterImage.url`, then string `poster`, then `overlayImage.url`. |
 | `lazyLoad` + self-hosted | No `src`; `data-blockish-video-src` + `data-blockish-video-preload`; `preload="none"`. |
 | `lazyLoad` + embed | `loading="lazy"` on iframe. |
 | `privacyMode` | No-cookie embed URL + `referrerPolicy` on iframe. |

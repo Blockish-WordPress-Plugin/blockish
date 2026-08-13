@@ -5,6 +5,7 @@ import {
 	sourceOptions,
 	suggestedVideosOptions,
 	normalizeSuggestedVideosOption,
+	getPosterMediaValue,
 } from './utils';
 
 const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
@@ -87,17 +88,14 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 												'blockish'
 											) }
 											allowedTypes={ [ 'image' ] }
-											value={
-												attributes?.poster
-													? {
-															url: attributes.poster,
-															type: 'image',
-													  }
-													: null
-											}
+											value={ getPosterMediaValue(
+												attributes
+											) }
 											onChange={ ( media ) => {
 												setAttributes( {
-													poster: media?.url || '',
+													posterImage:
+														media || undefined,
+													poster: undefined,
 												} );
 											} }
 										/>
