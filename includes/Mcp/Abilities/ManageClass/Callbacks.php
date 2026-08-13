@@ -3,6 +3,7 @@
 namespace Blockish\Mcp\Abilities\ManageClass;
 
 use Blockish\Mcp\Abilities\GetClasses\Callbacks as GetClassesCallbacks;
+use Blockish\Extensions\ClassPrevious;
 use Blockish\Extensions\ClassUsage;
 use Blockish\Mcp\Converter\ClassStyleConverter;
 
@@ -205,9 +206,14 @@ class Callbacks
             if ( ! $post_id ) {
                 return [ 'error' => 'post_id is required for update.' ];
             }
+            ClassPrevious::seed_if_empty( ClassPrevious::resolve_parent_id( $post_id ), false );
             $args['ID'] = $post_id;
             $result     = wp_update_post( $args, true );
         } else {
+            $parent_id = absint( $args['post_parent'] ?? 0 );
+            if ( $parent_id > 0 ) {
+                ClassPrevious::seed_if_empty( $parent_id, false );
+            }
             $result = wp_insert_post( $args, true );
         }
 
@@ -216,6 +222,9 @@ class Callbacks
         }
 
         $id = (int) $result;
+        if ( 'update' !== $action && (int) get_post_field( 'post_parent', $id ) < 1 ) {
+            ClassPrevious::seed_if_empty( $id, true );
+        }
         self::refresh_class_meta( $id );
 
         $post = get_post( $id );
@@ -256,6 +265,7 @@ class Callbacks
             if ( ! current_user_can( 'edit_post', $existing_id ) ) {
                 return [ 'error' => 'You do not have access to edit class "' . $slug . '".' ];
             }
+            ClassPrevious::seed_if_empty( $existing_id, false );
             $args['ID'] = $existing_id;
             $result     = wp_update_post( $args, true );
         } else {
@@ -267,6 +277,9 @@ class Callbacks
         }
 
         $id = (int) $result;
+        if ( empty( $existing_id ) ) {
+            ClassPrevious::seed_if_empty( $id, true );
+        }
         self::sync_children( $id, $children );
 
         /*

@@ -72,6 +72,7 @@ class ComposerStaticInit5a0f551b1813cddc2ea500c265a7dbf0
         'Blockish\\Core\\StyleGenerator' => __DIR__ . '/../..' . '/includes/Core/StyleGenerator.php',
         'Blockish\\Core\\Utilities' => __DIR__ . '/../..' . '/includes/Core/Utilities.php',
         'Blockish\\Extensions\\ClassManager' => __DIR__ . '/../..' . '/includes/Extensions/ClassManager.php',
+        'Blockish\\Extensions\\ClassPrevious' => __DIR__ . '/../..' . '/includes/Extensions/ClassPrevious.php',
         'Blockish\\Extensions\\ClassUsage' => __DIR__ . '/../..' . '/includes/Extensions/ClassUsage.php',
         'Blockish\\Extensions\\ExtensionsLoader' => __DIR__ . '/../..' . '/includes/Extensions/ExtensionsLoader.php',
         'Blockish\\Extensions\\Interaction' => __DIR__ . '/../..' . '/includes/Extensions/Interaction.php',

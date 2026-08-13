@@ -125,6 +125,7 @@ Name normalization: lowercase, spaces → hyphens, only `a-z 0-9 - _`, must star
 3. **Attach by name** (§6).
 4. **Usage tracker:** `blockish/get-class-usage` — where each class is attached (`used_in`, `usage_count`, `unused`).
 5. **Sweep unused:** `{ "action": "sweep" }` dry-run; `{ "action": "sweep", "confirm": true }` deletes unused parents (optional `post_ids` whitelist).
+6. **Accept / Discard (AI only):** `manage-class` still writes `{ "css" }` only. Blockish snapshots the previous class tree internally. After `trigger-refresh`, if that class is used on the open editor canvas, the page wraps in `blockish/ai-preview`. Accept commits the CSS; Discard restores the snapshot (new classes are deleted). Manual Class Manager edits in the editor do **not** wrap. Do not read or write `previousContent` yourself.
 
 ---
 

@@ -28,6 +28,7 @@ return array(
     'Blockish\\Core\\StyleGenerator' => $baseDir . '/includes/Core/StyleGenerator.php',
     'Blockish\\Core\\Utilities' => $baseDir . '/includes/Core/Utilities.php',
     'Blockish\\Extensions\\ClassManager' => $baseDir . '/includes/Extensions/ClassManager.php',
+    'Blockish\\Extensions\\ClassPrevious' => $baseDir . '/includes/Extensions/ClassPrevious.php',
     'Blockish\\Extensions\\ClassUsage' => $baseDir . '/includes/Extensions/ClassUsage.php',
     'Blockish\\Extensions\\ExtensionsLoader' => $baseDir . '/includes/Extensions/ExtensionsLoader.php',
     'Blockish\\Extensions\\Interaction' => $baseDir . '/includes/Extensions/Interaction.php',

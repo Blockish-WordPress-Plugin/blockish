@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
+import { refreshClassEntities, resolveClassPrevious } from '../class-manager/wrap-ai-preview';
 
 const schemaNodeToBlock = ( node ) => {
 	if ( ! node || typeof node !== 'object' || ! node.name ) {
@@ -209,8 +210,10 @@ registerBlockType( 'blockish/ai-preview', {
 			);
 		}, [ pendingSchema ] );
 
-		/** Accept: remove wrapper only — keep template/inner blocks. */
-		const handleApprove = useCallback( () => {
+		/** Accept: unwrap + commit Class Manager previousContent. */
+		const handleApprove = useCallback( async () => {
+			await resolveClassPrevious( 'accept' );
+			await refreshClassEntities();
 			const block = window.wp.data
 				.select( 'core/block-editor' )
 				.getBlock( clientId );
@@ -219,8 +222,21 @@ registerBlockType( 'blockish/ai-preview', {
 			resetEditorBlocks( nextBlocks );
 		}, [ clientId, resetEditorBlocks ] );
 
-		/** Discard: replace everything with previousSchema. */
-		const handleReject = useCallback( () => {
+		/** Discard: restore page schema + Class Manager previousContent. */
+		const handleReject = useCallback( async () => {
+			const result = await resolveClassPrevious( 'discard' );
+			const restoredIds = Array.isArray( result?.restored )
+				? result.restored.flatMap( ( row ) => {
+					const ids = [ row?.id ];
+					( row?.records || [] ).forEach( ( record ) => {
+						if ( record?.id ) {
+							ids.push( record.id );
+						}
+					} );
+					return ids.filter( Boolean );
+				} )
+				: [];
+			await refreshClassEntities( restoredIds );
 			const nextBlocks = parseSchemaAttr( previousSchema )
 				.map( schemaNodeToBlock )
 				.filter( Boolean );

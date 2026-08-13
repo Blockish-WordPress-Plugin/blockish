@@ -148,7 +148,6 @@ const RenderClassManagerStyles = () => {
 
 	useEffect(() => {
 		if (!editorStyles) return;
-		if (!generateStyles) return;
 
 		const styleIndex = editorStyles.findIndex(
 			(style) => style?.__unstableType === STYLE_TYPE

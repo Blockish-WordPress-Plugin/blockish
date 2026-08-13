@@ -37,6 +37,7 @@ class ClassManager {
 		}
 
 		PostPrime::register_hooks();
+		ClassPrevious::register_hooks();
 
 		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_used_class_styles' ), 9 );
@@ -184,6 +185,8 @@ class ClassManager {
 				'sanitize_callback' => 'wp_strip_all_tags',
 			)
 		);
+
+		ClassPrevious::register_meta();
 	}
 
 	public function render_block( $block_content, $block ) {

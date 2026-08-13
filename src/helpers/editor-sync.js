@@ -95,6 +95,11 @@
         const postId = editorSelect ? editorSelect.getCurrentPostId() : null;
 
         const dirty = getDirtyEntityRecords().filter((record) => {
+            // AI class writes already hit the DB. Saving in-memory Class Manager
+            // edits here overwrites them and can abort the reload entirely.
+            if (record.kind === 'postType' && record.name === 'blockish-classes') {
+                return false;
+            }
             if (!postType || postId === null || postId === undefined) {
                 return true;
             }

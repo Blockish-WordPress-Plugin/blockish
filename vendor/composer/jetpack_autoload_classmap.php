@@ -106,6 +106,10 @@ return array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Extensions/ClassManager.php'
 	),
+	'Blockish\\Extensions\\ClassPrevious' => array(
+		'version' => 'dev-main',
+		'path'    => $baseDir . '/includes/Extensions/ClassPrevious.php'
+	),
 	'Blockish\\Extensions\\ClassUsage' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Extensions/ClassUsage.php'
