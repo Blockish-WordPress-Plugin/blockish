@@ -43,6 +43,70 @@ const schemaToBlocks = (nodes) => {
 
 const schemaToContent = (nodes) => serialize(schemaToBlocks(nodes));
 
+const collectNestedEntityIds = (nodes, ids = new Set()) => {
+	if (!Array.isArray(nodes)) {
+		return ids;
+	}
+	nodes.forEach((node) => {
+		if (!node || typeof node !== 'object') {
+			return;
+		}
+		if (node.name === 'core/block' && node.attributes?.ref) {
+			ids.add(absint(node.attributes.ref));
+		}
+		if (node.name === 'blockish-forms/form' && node.attributes?.formId) {
+			ids.add(absint(node.attributes.formId));
+		}
+		if (Array.isArray(node.innerBlocks)) {
+			collectNestedEntityIds(node.innerBlocks, ids);
+		}
+	});
+	return ids;
+};
+
+const absint = (value) => {
+	const id = parseInt(value, 10);
+	return Number.isFinite(id) && id > 0 ? id : 0;
+};
+
+const fetchQueueItem = async (id) => {
+	try {
+		return await apiFetch({ path: `/blockish/v1/ai-preview-queue/${id}` });
+	} catch (e) {
+		return null;
+	}
+};
+
+const prepareAcceptContents = async (rootIds) => {
+	const contents = {};
+	const orderedIds = [];
+	const seen = new Set();
+
+	const prepare = async (id) => {
+		if (!id || seen.has(id)) {
+			return;
+		}
+		seen.add(id);
+		const item = await fetchQueueItem(id);
+		if (!item) {
+			return;
+		}
+		const schema = item.pendingSchema || [];
+		const nested = [...collectNestedEntityIds(schema)].filter((nestedId) => nestedId !== id);
+		for (const nestedId of nested) {
+			await prepare(nestedId);
+		}
+		contents[id] = schemaToContent(schema);
+		orderedIds.push(id);
+	};
+
+	for (const id of rootIds) {
+		await prepare(id);
+	}
+
+	return { ids: orderedIds, contents };
+};
+
 function PendingPreview({ itemId }) {
 	const [schema, setSchema] = useState(null);
 	const [error, setError] = useState('');
@@ -205,23 +269,24 @@ export default function AiPreviewPendingList() {
 		setBusyIds(nextIds);
 		setError('');
 		try {
-			const contents = {};
-			await Promise.all(
-				nextIds.map(async (id) => {
-					const item = await apiFetch({
-						path: `/blockish/v1/ai-preview-queue/${id}`,
-					});
-					const schema =
-						action === 'discard'
-							? item?.previousSchema
-							: item?.pendingSchema;
-					contents[id] = schemaToContent(schema || []);
-				})
-			);
+			let payloadIds = nextIds;
+			let contents = {};
+			if (action === 'accept') {
+				const prepared = await prepareAcceptContents(nextIds);
+				payloadIds = prepared.ids.length ? prepared.ids : nextIds;
+				contents = prepared.contents;
+			} else {
+				await Promise.all(
+					nextIds.map(async (id) => {
+						const item = await fetchQueueItem(id);
+						contents[id] = schemaToContent(item?.previousSchema || []);
+					})
+				);
+			}
 			await apiFetch({
 				path: '/blockish/v1/ai-preview-queue',
 				method: 'POST',
-				data: { action, ids: nextIds, contents },
+				data: { action, ids: payloadIds, contents },
 			});
 			setSelected((current) => current.filter((id) => !nextIds.includes(id)));
 			await loadInventory(true);
