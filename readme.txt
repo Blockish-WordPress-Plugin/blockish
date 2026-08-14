@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.0
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -167,6 +167,17 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.2.3 =
+
+* Added: Settings → AI Preview queue — list pending staged layouts (pages, patterns, templates, template parts) with Gutenberg BlockPreview, search, type filters, and pagination
+* Added: Accept / Discard from the Settings list, including multi-select and bulk actions
+* Added: Accepting a page from Settings also unwraps nested staged patterns and forms
+* Added: Class Manager previous-content snapshots so Accept keeps live CSS and Discard restores the pre-AI stylesheet (or removes a class created in that cycle)
+* Improved: Queue matching uses the real `<!-- wp:blockish/ai-preview` block comment so body text cannot fake a pending item
+* Improved: Settings Accept serializes with Gutenberg `createBlock` (no PHP fake markup / block recovery)
+* Improved: Class Manager popups stay focused without stealing the editor canvas
+* Improved: Video block poster handling
 
 = 1.2.2 =
 
