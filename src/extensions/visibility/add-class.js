@@ -1,38 +1,38 @@
 import clsx from 'clsx';
 
+const DEVICE_CLASS = {
+	Desktop: 'blockish-visibility-preview-desktop',
+	Tablet: 'blockish-visibility-preview-tablet',
+	Mobile: 'blockish-visibility-preview-mobile',
+};
+
 /**
- * Editor preview classes — dim hidden blocks instead of removing them.
+ * Editor preview classes — dim only on the device preview that is hidden.
  *
  * @param {Object} wrapperProps
  * @param {Object} attributes
+ * @param {Object} extra
  * @return {Object}
  */
 export default function withVisibilityWrapperProp(
 	wrapperProps = {},
-	attributes = {}
+	attributes = {},
+	extra = {}
 ) {
 	const hideOn =
 		attributes?.hideOn && typeof attributes.hideOn === 'object'
 			? attributes.hideOn
 			: {};
 
-	const classes = [];
-	if ( hideOn.Desktop ) {
-		classes.push( 'blockish-visibility-preview-desktop' );
-	}
-	if ( hideOn.Tablet ) {
-		classes.push( 'blockish-visibility-preview-tablet' );
-	}
-	if ( hideOn.Mobile ) {
-		classes.push( 'blockish-visibility-preview-mobile' );
-	}
+	const deviceType = extra.deviceType || 'Desktop';
+	const previewClass = DEVICE_CLASS[ deviceType ];
 
-	if ( ! classes.length ) {
+	if ( ! previewClass || ! hideOn[ deviceType ] ) {
 		return wrapperProps;
 	}
 
 	return {
 		...wrapperProps,
-		className: clsx( wrapperProps.className, classes ),
+		className: clsx( wrapperProps.className, previewClass ),
 	};
 }

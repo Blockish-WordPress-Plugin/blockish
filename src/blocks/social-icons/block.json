@@ -21,10 +21,16 @@
       "type": "string",
       "default": "circle"
     },
-    "columns": {
+    "flexDirection": {
       "type": "object",
       "selectors": {
-        ".{{WRAPPER}}": "--blockish-social-icons-columns: {{VALUE}};"
+        ".{{WRAPPER}}": "flex-direction: {{VALUE}};"
+      }
+    },
+    "flexWrap": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}": "flex-wrap: {{VALUE}};"
       }
     },
     "alignment": {

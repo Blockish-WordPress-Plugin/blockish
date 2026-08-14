@@ -10,6 +10,10 @@ You build a **schema**: a JSON tree of `{ name, attributes, innerBlocks }`.
 
 **Never** write block HTML, hand-built markup, or layout CSS into `post_content`. Always stage via `block_schema` (`blockish/ai-preview` → user Accept/Discard). Share `edit_url`, not live preview URLs.
 
+### Docs mismatch or plugin bug (escape hatch)
+
+If `get-block-docs` / convert-css looks wrong vs the inspector: do **not** invent CSS or attributes. Re-read the per-block doc. Then open **only** the matching files on the public repo at the **installed plugin version** (see `blockish/get-designer-workflow` → `stuck_recovery`): `includes/Mcp/docs/blocks/{slug}.md` and `src/blocks/{slug}/block.json`. Retry once from those files. Still stuck: stop, report to the user, offer a GitHub issue **draft** — do not open the issue yourself. Support: [wordpress.org/support/plugin/blockish](https://wordpress.org/support/plugin/blockish/). Repo: [Blockish-WordPress-Plugin/blockish](https://github.com/Blockish-WordPress-Plugin/blockish).
+
 ### Styles vs content (critical)
 
 | Concern | How |

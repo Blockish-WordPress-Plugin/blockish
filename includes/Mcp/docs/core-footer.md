@@ -137,7 +137,7 @@ Hard rule: convert `justify-content:center` on the button root; parent alignment
 
 1. **`manage-post` (page):** never include `core/template-part` header/footer — the theme template already provides chrome. Pattern refs only; full-bleed needs `"align":"full"`.
 2. **`manage-template` (`wp_template`):** may include `core/template-part` with `slug` + `theme`.
-3. **Designing a header template part:** leave container `tagName` as default `div` — WordPress already wraps the part in `<header>`.
+3. **Designing a header or footer template part:** leave container `tagName` as default `div`. WordPress already wraps the header part in `<header>` and the footer part in `<footer>`. Never set `tagName` to `header` or `footer` here — that doubles the landmark.
 
 ```json
 {

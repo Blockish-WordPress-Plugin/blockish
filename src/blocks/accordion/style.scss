@@ -62,6 +62,7 @@
 
 	.blockish-accordion-item-title-text {
 		display: block;
+		text-align: start;
 	}
 
 	.blockish-accordion-item-trigger::-webkit-details-marker {
@@ -72,18 +73,8 @@
 		content: "";
 	}
 
-	.blockish-accordion-item-title-text {
-		color: #111827;
-		text-align: start;
-	}
-
-	.blockish-accordion-item-details[open] .blockish-accordion-item-title-text {
-		color: #111827;
-	}
-
 	.blockish-accordion-item-icon {
 		align-items: center;
-		color: #111827;
 		display: inline-flex;
 		justify-content: center;
 		line-height: 1;
@@ -93,10 +84,6 @@
 		fill: currentColor;
 		height: var(--blockish-accordion-icon-size);
 		width: var(--blockish-accordion-icon-size);
-	}
-
-	.blockish-accordion-item-details[open] .blockish-accordion-item-icon {
-		color: #111827;
 	}
 
 	.blockish-accordion-item-icon[data-icon-state="open"] {

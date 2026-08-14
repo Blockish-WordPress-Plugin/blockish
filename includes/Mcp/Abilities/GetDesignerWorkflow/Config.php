@@ -25,6 +25,10 @@ class Config
                         'type' => 'array',
                         'items' => ['type' => 'string']
                     ],
+                    'stuck_recovery' => [
+                        'type'        => 'object',
+                        'description' => 'Versioned GitHub escape hatch when MCP docs look wrong or a plugin bug is likely. Not a license to browse the whole repo.',
+                    ],
                 ],
             ],
             'execute_callback'    => [Callbacks::class, 'get_workflow'],

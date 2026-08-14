@@ -23,6 +23,8 @@ $blockish-primary: #001feb;
 
 .blockish-editor-settings-modal {
     &.is-full-screen {
+        display: flex;
+        flex-direction: column;
         width: 100vw;
         height: 100vh;
         max-width: none;
@@ -36,7 +38,9 @@ $blockish-primary: #001feb;
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        height: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+        height: auto;
     }
 }
 
@@ -132,6 +136,14 @@ $blockish-primary: #001feb;
         background: #f0f0f1;
         overflow: hidden;
         padding: 16px;
+
+        > * {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+        }
     }
 }
 

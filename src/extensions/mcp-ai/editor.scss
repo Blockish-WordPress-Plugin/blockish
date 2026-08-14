@@ -43,12 +43,16 @@
 }
 
 .blockish-ai-preview-actions {
-	position: absolute;
-	top: 12px;
-	right: 16px;
+	position: sticky;
+	top: 16px;
 	z-index: 100000;
+	display: flex;
+	justify-content: flex-end;
+	padding: 0 16px;
+	pointer-events: none;
 	
 	.blockish-ai-button-group {
+		pointer-events: auto;
 		background: rgba(255, 255, 255, 0.85);
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);

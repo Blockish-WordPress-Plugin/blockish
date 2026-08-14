@@ -13,7 +13,7 @@ Primary layout block — flexbox, CSS grid, or plain block. **Accepts children: 
 | Attribute | Type | Notes |
 |---|---|---|
 | `display` | Scalar | `"flex"` (default) `"grid"` `"block"`. Also produced by convert-css `display:` — either path works; markup class `layout-type-*` follows the attr. |
-| `tagName` | Option | Default `{"label":"Div","value":"div"}` — send the object, never a bare string. Values: `div` `section` `article` `main` `a` `nav` `aside` `header` `footer` `ul` `ol` `li` `figure` (labels are the capitalised name, e.g. `{"label":"Section","value":"section"}`). Avoid `header`/`footer` inside template parts (double tags). When `a`, also set `url`. No nested links/buttons inside a linked container. |
+| `tagName` | Option | Default `{"label":"Div","value":"div"}` — send the object, never a bare string. Values: `div` `section` `article` `main` `a` `nav` `aside` `header` `footer` `ul` `ol` `li` `figure` (labels are the capitalised name, e.g. `{"label":"Section","value":"section"}`). **Never** set `header` or `footer` inside `wp_template_part` header/footer — the theme already wraps those parts. When `a`, also set `url`. No nested links/buttons inside a linked container. |
 | `url` | Link | Only when `tagName.value` is `"a"`. |
 | `containerWidth` | Scalar | `"alignfull"` (default) `"alignwide"` `"align-custom-width"` (literal — not `"custom"`). Nested containers use `align-custom-width`; max-width via convert-css. |
 | `gridLayoutType` | Scalar | `"auto"` (default, auto-fit) or `"fixed"` (exact column count). Only matters when `display` is `"grid"`. |

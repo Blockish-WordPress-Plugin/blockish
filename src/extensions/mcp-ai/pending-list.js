@@ -9,7 +9,12 @@ import {
 } from '@wordpress/components';
 import { BlockPreview } from '@wordpress/block-editor';
 import { createBlock, serialize } from '@wordpress/blocks';
+import { dispatch, select } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
+import {
+	collectClassIdsFromBlocks,
+	resolveClassPrevious,
+} from '../class-manager/wrap-ai-preview';
 import './pending-list.scss';
 
 const PAGE_SIZE = 8;
@@ -40,8 +45,6 @@ const schemaToBlocks = (nodes) => {
 		})
 		.filter(Boolean);
 };
-
-const schemaToContent = (nodes) => serialize(schemaToBlocks(nodes));
 
 const collectNestedEntityIds = (nodes, ids = new Set()) => {
 	if (!Array.isArray(nodes)) {
@@ -77,8 +80,48 @@ const fetchQueueItem = async (id) => {
 	}
 };
 
-const prepareAcceptContents = async (rootIds) => {
-	const contents = {};
+const unwrapCurrentEditor = (nextBlocks) => {
+	const preview = (select('core/block-editor').getBlocks?.() || []).find(
+		(block) => block.name === 'blockish/ai-preview'
+	);
+	if (preview?.clientId) {
+		dispatch('core/block-editor').replaceBlocks(preview.clientId, nextBlocks);
+		return;
+	}
+	dispatch('core/block-editor').resetBlocks(nextBlocks);
+};
+
+const isCurrentEditorPost = (queueItem) => {
+	const currentId = select('core/editor')?.getCurrentPostId?.();
+	if (currentId == null) {
+		return false;
+	}
+	return (
+		currentId === queueItem.id ||
+		String(currentId) === String(queueItem.id) ||
+		String(currentId) === String(queueItem.rest_id || '')
+	);
+};
+
+const savePostContent = async (item, content) => {
+	const route = item?.rest_route;
+	if (!route) {
+		throw new Error(
+			sprintf(
+				/* translators: %d: post ID */
+				__('No REST route for preview %d.', 'blockish'),
+				item?.id || 0
+			)
+		);
+	}
+	await apiFetch({
+		path: route,
+		method: 'POST',
+		data: { content },
+	});
+};
+
+const prepareAcceptOrder = async (rootIds) => {
 	const orderedIds = [];
 	const seen = new Set();
 
@@ -92,11 +135,12 @@ const prepareAcceptContents = async (rootIds) => {
 			return;
 		}
 		const schema = item.pendingSchema || [];
-		const nested = [...collectNestedEntityIds(schema)].filter((nestedId) => nestedId !== id);
+		const nested = [...collectNestedEntityIds(schema)].filter(
+			(nestedId) => nestedId !== id
+		);
 		for (const nestedId of nested) {
 			await prepare(nestedId);
 		}
-		contents[id] = schemaToContent(schema);
 		orderedIds.push(id);
 	};
 
@@ -104,7 +148,7 @@ const prepareAcceptContents = async (rootIds) => {
 		await prepare(id);
 	}
 
-	return { ids: orderedIds, contents };
+	return orderedIds;
 };
 
 function PendingPreview({ itemId }) {
@@ -269,25 +313,32 @@ export default function AiPreviewPendingList() {
 		setBusyIds(nextIds);
 		setError('');
 		try {
-			let payloadIds = nextIds;
-			let contents = {};
-			if (action === 'accept') {
-				const prepared = await prepareAcceptContents(nextIds);
-				payloadIds = prepared.ids.length ? prepared.ids : nextIds;
-				contents = prepared.contents;
-			} else {
-				await Promise.all(
-					nextIds.map(async (id) => {
-						const item = await fetchQueueItem(id);
-						contents[id] = schemaToContent(item?.previousSchema || []);
-					})
-				);
+			const orderedIds =
+				action === 'accept'
+					? await prepareAcceptOrder(nextIds)
+					: nextIds;
+			const ids = orderedIds.length ? orderedIds : nextIds;
+
+			for (const id of ids) {
+				const queueItem = await fetchQueueItem(id);
+				if (!queueItem) {
+					continue;
+				}
+				const schema =
+					action === 'accept'
+						? queueItem.pendingSchema || []
+						: queueItem.previousSchema || [];
+				const blocks = schemaToBlocks(schema);
+				const content = serialize(blocks);
+				await savePostContent(queueItem, content);
+				const classIds = collectClassIdsFromBlocks(schema);
+				if (classIds.length) {
+					await resolveClassPrevious(action, { class_ids: classIds });
+				}
+				if (isCurrentEditorPost(queueItem)) {
+					unwrapCurrentEditor(blocks);
+				}
 			}
-			await apiFetch({
-				path: '/blockish/v1/ai-preview-queue',
-				method: 'POST',
-				data: { action, ids: payloadIds, contents },
-			});
 			setSelected((current) => current.filter((id) => !nextIds.includes(id)));
 			await loadInventory(true);
 		} catch (err) {

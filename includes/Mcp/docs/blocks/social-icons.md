@@ -2,15 +2,21 @@
 
 Social profile icon list. **Accepts children: yes** — only `blockish/social-icon-item`.
 
+> [!WARNING]
+> **Hard rule — layout is flex, not columns.** Default direction is row, wrap on. For a single footer/header row, convert unwrap: `{{ROOT}} { flex-wrap: nowrap; }`. Vertical stack: `{{ROOT}} { flex-direction: column; }`. Do **not** set `--blockish-social-icons-columns` or `display: grid` in Class Manager.
+
 #### Content / structure
 
 | Attribute | Type | Notes |
 |---|---|---|
 | `shape` | Scalar | `"circle"` (default) \| `"square"` \| `"rounded"` → root class `shape-*`. |
-| `iconColorMode` | Scalar | `"official"` (default) \| `"custom"` → root class `is-color-*`. Official uses each item’s `officialColor`; custom uses parent color vars. |
+| `flexDirection` | Responsive-Option | Inspector: Row / Column. Values: `"row"` `"column"`. Prefer convert-css: `{{ROOT}} { flex-direction: column; }`. Default Already-there is row. |
+| `flexWrap` | Responsive-Option | Inspector: Wrap / Unwrap. Values: `"wrap"` `"nowrap"`. Prefer convert-css: `{{ROOT}} { flex-wrap: nowrap; }`. Default Already-there is wrap. |
+| `alignment` | Responsive-Option | Inspector: Left / Center / Right. Values: `"flex-start"` `"center"` `"flex-end"`. Prefer convert-css: `{{ROOT}} { justify-content: flex-start; }`. Default Already-there is center. |
+| `iconColorMode` | Scalar | `"official"` (default) \| `"custom"` → root class `is-color-*`. Official uses each item’s `officialColor`; custom uses parent color vars. On dark backgrounds prefer `"custom"` — official X/GitHub black disappears. |
 | `anchor` / `align` | Scalar | `"align"`: `"wide"` \| `"full"`. |
 
-Children must be `blockish/social-icon-item` only.
+Children must be `blockish/social-icon-item` only. Put this block **inside** a flex column container (`flex-direction: column` on the parent).
 
 #### Markup
 
@@ -26,14 +32,26 @@ Default:
 |---|---|
 | `shape: "square"` / `"rounded"` | Class `shape-square` / `shape-rounded` (border-radius on links). |
 | `iconColorMode: "custom"` | Class `is-color-custom` (uses `--blockish-social-icons-primary-color`). |
+| `flexDirection` set | `flex-direction` on the root (inspector Direction). |
+| `flexWrap` set | `flex-wrap` on the root (inspector Wrap). |
+| `alignment` set | `justify-content` on the root (inspector Alignment). |
+
+Style with convert-css:
+- direction → `{{ROOT}} { flex-direction: row; }` or `column`
+- wrap / unwrap → `{{ROOT}} { flex-wrap: wrap; }` or `nowrap`
+- alignment → `{{ROOT}} { justify-content: flex-start; }`
+- icon chrome (size, padding, custom colors) → Markup selectors on `.blockish-social-icon-item__link` / svg
+
+Do not invent markup.
 
 #### Already-there CSS
 
 ```css
-/* Defaults from attributes */
+/* Defaults from attributes — row / wrap / center until you set `flexDirection` + `flexWrap` + `alignment` */
 .blockish-social-icons {
-  --blockish-social-icons-columns: auto-fit;
   --blockish-social-icons-secondary-color: #FFFFFF;
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   column-gap: 12px;
   row-gap: 12px;
@@ -42,13 +60,10 @@ Default:
 /* Stylesheet */
 .blockish-social-icons {
   align-items: center;
-  column-gap: 12px;
-  display: grid;
-  grid-template-columns: repeat(var(--blockish-social-icons-columns,auto-fit),minmax(0,max-content));
+  display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
-  row-gap: 12px;
 }
 
 .blockish-social-icons.is-color-official .blockish-social-icon-item__link {
@@ -72,6 +87,7 @@ Default:
 }
 
 .blockish-social-icons .blockish-social-icon-item {
+  flex-shrink: 0;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -108,7 +124,15 @@ Default:
 ```json
 {
   "name": "blockish/social-icons",
-  "attributes": {},
+  "attributes": {
+    "shape": "circle",
+    "flexWrap": {
+      "Desktop": { "label": "Unwrap", "value": "nowrap" }
+    },
+    "alignment": {
+      "Desktop": { "label": "Left", "value": "flex-start" }
+    }
+  },
   "innerBlocks": [
     {
       "name": "blockish/social-icon-item",

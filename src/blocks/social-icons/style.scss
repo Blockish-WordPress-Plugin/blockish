@@ -1,13 +1,16 @@
 .blockish-social-icons {
-	display: grid;
-	grid-template-columns: repeat(
-		var(--blockish-social-icons-columns, auto-fit),
-		minmax(0, max-content)
-	);
+	display: flex;
 	align-items: center;
 	list-style: none;
 	margin: 0;
 	padding: 0;
+
+	.blockish-social-icon-item {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		flex-shrink: 0;
+	}
 
 	&.is-color-official {
 		.blockish-social-icon-item__link {
@@ -39,12 +42,6 @@
 		}
 	}
 
-	.blockish-social-icon-item {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
 	.blockish-social-icon-item__link {
 		display: inline-flex;
 		align-items: center;
@@ -70,8 +67,8 @@
 }
 
 :where(.blockish-social-icons){
-	width: 100%;
-	--blockish-social-icons-columns: auto-fit;
+	flex-direction: row;
+	flex-wrap: wrap;
 	justify-content: center;
 	column-gap: 12px;
 	row-gap: 12px;

@@ -58,21 +58,35 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									] }
 								/>
 								<BlockishResponsiveControl
-									type="BlockishSelect"
-									label={ __( 'Columns', 'blockish' ) }
-									slug="columns"
+									type="BlockishToggleGroup"
+									label={ __( 'Direction', 'blockish' ) }
+									slug="flexDirection"
+									left="8ch"
+									options={ [
+										{
+											label: __( 'Row', 'blockish' ),
+											value: 'row',
+										},
+										{
+											label: __( 'Column', 'blockish' ),
+											value: 'column',
+										},
+									] }
+								/>
+								<BlockishResponsiveControl
+									type="BlockishToggleGroup"
+									label={ __( 'Wrap', 'blockish' ) }
+									slug="flexWrap"
 									left="7ch"
 									options={ [
 										{
-											label: __( 'Auto', 'blockish' ),
-											value: 'auto-fit',
+											label: __( 'Wrap', 'blockish' ),
+											value: 'wrap',
 										},
-										{ label: '1', value: '1' },
-										{ label: '2', value: '2' },
-										{ label: '3', value: '3' },
-										{ label: '4', value: '4' },
-										{ label: '5', value: '5' },
-										{ label: '6', value: '6' },
+										{
+											label: __( 'Unwrap', 'blockish' ),
+											value: 'nowrap',
+										},
 									] }
 								/>
 								<BlockishResponsiveControl

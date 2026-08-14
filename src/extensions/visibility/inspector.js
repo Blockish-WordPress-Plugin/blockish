@@ -48,7 +48,7 @@ function VisibilityPanel( { clientId } ) {
 		>
 			<p className="blockish-visibility-help">
 				{ __(
-					'Hide this block on selected devices. In the editor it stays dimmed so you can still select it.',
+					'Hide this block on selected devices. In the editor it dims only while that device preview is active, so you can still select it.',
 					'blockish'
 				) }
 			</p>

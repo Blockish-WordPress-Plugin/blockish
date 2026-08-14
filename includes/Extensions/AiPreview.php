@@ -70,13 +70,15 @@ class AiPreview {
 			}
 
 			$items[] = array(
-				'id'        => $id,
-				'type'      => $type,
-				'typeLabel' => self::type_label( $type ),
-				'title'     => $title,
-				'status'    => (string) ( $row['post_status'] ?? '' ),
-				'modified'  => (string) ( $row['post_modified'] ?? '' ),
-				'edit_url'  => self::edit_url( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
+				'id'         => $id,
+				'type'       => $type,
+				'typeLabel'  => self::type_label( $type ),
+				'title'      => $title,
+				'status'     => (string) ( $row['post_status'] ?? '' ),
+				'modified'   => (string) ( $row['post_modified'] ?? '' ),
+				'edit_url'   => self::edit_url( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
+				'rest_id'    => self::rest_id( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
+				'rest_route' => self::rest_route( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
 			);
 		}
 
@@ -97,12 +99,17 @@ class AiPreview {
 			? \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['pendingSchema'] ?? '' )
 			: array();
 
+		$post_type = $post->post_type;
+		$post_name = (string) $post->post_name;
+
 		return array(
 			'id'             => $post_id,
 			'pendingSchema'  => $pending,
 			'previousSchema' => $preview
 				? \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' )
 				: array(),
+			'rest_id'        => self::rest_id( $post_id, $post_type, $post_name ),
+			'rest_route'     => self::rest_route( $post_id, $post_type, $post_name ),
 		);
 	}
 
@@ -222,21 +229,45 @@ class AiPreview {
 		return null !== \Blockish\Mcp\SchemaUtils::find_ai_preview_block( $content );
 	}
 
+	private static function template_theme_slug( int $post_id, string $post_name = '' ): array {
+		if ( '' === $post_name ) {
+			$post      = get_post( $post_id );
+			$post_name = $post ? (string) $post->post_name : '';
+		}
+
+		$theme = get_stylesheet();
+		$terms = get_the_terms( $post_id, 'wp_theme' );
+		if ( $terms && ! is_wp_error( $terms ) && ! empty( $terms[0]->slug ) ) {
+			$theme = (string) $terms[0]->slug;
+		}
+
+		return array( $theme, $post_name );
+	}
+
+	private static function rest_id( int $post_id, string $post_type, string $post_name = '' ): string {
+		if ( in_array( $post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
+			list( $theme, $slug ) = self::template_theme_slug( $post_id, $post_name );
+			return $theme . '//' . $slug;
+		}
+
+		return (string) $post_id;
+	}
+
+	private static function rest_route( int $post_id, string $post_type, string $post_name = '' ): string {
+		if ( in_array( $post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
+			$rest_base = 'wp_template' === $post_type ? 'templates' : 'template-parts';
+			return '/wp/v2/' . $rest_base . '/' . rawurlencode( self::rest_id( $post_id, $post_type, $post_name ) );
+		}
+
+		return rest_get_route_for_post( $post_id );
+	}
+
 	private static function edit_url( int $post_id, string $post_type, string $post_name = '' ): string {
 		if ( in_array( $post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
-			if ( '' === $post_name ) {
-				$post      = get_post( $post_id );
-				$post_name = $post ? (string) $post->post_name : '';
-			}
-
-			$theme = get_stylesheet();
-			$terms = get_the_terms( $post_id, 'wp_theme' );
-			if ( $terms && ! is_wp_error( $terms ) && ! empty( $terms[0]->slug ) ) {
-				$theme = (string) $terms[0]->slug;
-			}
+			list( $theme, $slug ) = self::template_theme_slug( $post_id, $post_name );
 
 			return admin_url(
-				'site-editor.php?p=/' . $post_type . '/' . rawurlencode( $theme . '//' . $post_name ) . '&canvas=edit'
+				'site-editor.php?p=/' . $post_type . '/' . rawurlencode( $theme . '//' . $slug ) . '&canvas=edit'
 			);
 		}
 

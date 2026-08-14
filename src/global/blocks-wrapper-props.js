@@ -2,10 +2,12 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
 import clsx from 'clsx';
 import { useMemo } from '@wordpress/element';
+import useDeviceType from '../helpers/use-device-type';
 
 const BlockishBlocksWrapperProps = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { attributes, name, clientId } = props;
+		const deviceType = useDeviceType();
 
 		// Synced pattern: apply alignfull/alignwide only when align is set.
 		if ( name === 'core/block' ) {
@@ -38,7 +40,8 @@ const BlockishBlocksWrapperProps = createHigherOrderComponent(
 			const wrapperProps = applyFilters(
 				'blockish.blockWrapper.attributes',
 				globalWrapperProps,
-				attributes
+				attributes,
+				{ deviceType }
 			);
 			return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
 		}
