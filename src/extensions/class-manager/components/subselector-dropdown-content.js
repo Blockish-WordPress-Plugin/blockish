@@ -1,4 +1,5 @@
 import { useMemo, useState } from '@wordpress/element';
+import { focusMainClassPopover, usePopupFocus } from '../focus-popup';
 import { SearchControl, MenuItem, MenuGroup, Button, __experimentalText as Text } from '@wordpress/components';
 import { plus, trash } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
@@ -9,6 +10,7 @@ import { getEntityTitle, removeClassById } from '../utils';
 const CLASS_POST_TYPE = 'blockish-classes';
 
 const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, setAttributes, onClose }) => {
+    const [popupRef, focusPopup] = usePopupFocus();
     const [searchInput, setSearchInput] = useState('');
     const { saveEntityRecord, deleteEntityRecord } = useDispatch('core');
     const normalizedSearchInput = searchInput.trim();
@@ -60,6 +62,7 @@ const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, set
             setAttributes({
                 classManagerSubselector: removeClassById(current, item?.id),
             });
+            focusPopup();
             return;
         }
 
@@ -80,6 +83,7 @@ const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, set
             ];
 
         setAttributes({ classManagerSubselector: next });
+        focusPopup();
     };
 
     const addSubSelector = async () => {
@@ -118,10 +122,11 @@ const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, set
         if (onClose) {
             onClose();
         }
+        focusMainClassPopover();
     };
 
     return (
-        <div className="blockish-input-dropdown-content">
+        <div ref={popupRef} tabIndex={-1} className="blockish-input-dropdown-content">
             <SearchControl
                 __nextHasNoMarginBottom
                 className="blockish-class-manager-search"
@@ -157,6 +162,7 @@ const SubselectorDropdownContent = ({ subSelectors = [], parent, attributes, set
                                     classManagerSubselector: removeClassById(current, item?.id),
                                 });
                                 await deleteEntityRecord('postType', CLASS_POST_TYPE, item?.id, { force: true });
+                                focusPopup();
                             }}
                         >
                             {trash}

@@ -239,6 +239,13 @@ $blockish-control-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     }
 }
 
+.blockish-class-manager-popover-focus,
+.blockish-input-dropdown-content {
+    &:focus {
+        outline: none;
+    }
+}
+
 .blockish-class-manager-popover {
     min-width: 340px !important;
     max-width: 350px;
