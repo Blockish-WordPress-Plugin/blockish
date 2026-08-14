@@ -29,6 +29,7 @@ use Blockish\Extensions\ExtensionsLoader;
 use Blockish\Mcp\Loader;
 use Blockish\Routes\AddonsV1;
 use Blockish\Routes\BlocksV1;
+use Blockish\Routes\AiPreviewQueueV1;
 use Blockish\Routes\ClassPreviousV1;
 use Blockish\Routes\DashboardToolsV1;
 use Blockish\Routes\EditorSyncV1;
@@ -161,6 +162,7 @@ final class Blockish
         ExtensionsV1::get_instance();
         EditorSyncV1::get_instance();
         ClassPreviousV1::get_instance();
+        AiPreviewQueueV1::get_instance();
         DashboardToolsV1::get_instance();
         AddonsV1::get_instance();
         IntegrationsV1::get_instance();
