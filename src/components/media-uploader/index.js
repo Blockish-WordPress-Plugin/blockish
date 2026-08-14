@@ -23,6 +23,7 @@ const ALLOWED_MEDIA_TYPES = ['image'];
 
 const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = __('Upload Image', 'blockish'), value, onChange, allowedTypes = ALLOWED_MEDIA_TYPES, isInheritedValue = false }) => {
     const toggleRef = useRef();
+    const hasMedia = !!(value?.id || value?.url);
     const backgroundImageStyleProps = {};
     if (value?.url) {
         backgroundImageStyleProps.backgroundImage = `url(${value?.url})`;
@@ -60,12 +61,12 @@ const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = 
                                 <Button
                                     ref={toggleRef}
                                     className={
-                                        !value?.id ? 'blockish-media-uploader-toggle' : 'blockish-media-uploader-preview'
+                                        !hasMedia ? 'blockish-media-uploader-toggle' : 'blockish-media-uploader-preview'
                                     }
                                     
                                     onClick={open}
                                     aria-label={
-                                        !value?.id
+                                        !hasMedia
                                             ? null
                                             : __('Edit or replace the media')
                                     }
@@ -90,9 +91,9 @@ const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = 
                                             <source src={`${value?.url}?muted=1&controls=0&autoplay=0&t=0`} />
                                         </video>
                                     )}
-                                    {!value?.id && placeholder}
+                                    {!hasMedia && placeholder}
                                 </Button>
-                                {!!value?.id && (
+                                {hasMedia && (
                                     <HStack className="blockish-media-uploader-actions">
                                         <Button
                                             className="blockish-media-uploader-image-action"

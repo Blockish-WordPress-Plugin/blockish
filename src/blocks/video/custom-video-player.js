@@ -1,9 +1,11 @@
 import { __ } from '@wordpress/i18n';
+import { getPosterUrl } from './utils';
 
 const CustomVideoPlayer = ( { attributes, videoRef } ) => {
 	const media = attributes?.selfHostedVideo;
 	const src = media?.url || attributes?.selfHostedUrl;
 	const playOnMobile = attributes?.playOnMobile !== false;
+	const posterUrl = getPosterUrl( attributes );
 
 	if ( ! src ) {
 		return null;
@@ -11,6 +13,7 @@ const CustomVideoPlayer = ( { attributes, videoRef } ) => {
 
 	return (
 		<video
+			key={ `${ src }|${ posterUrl || '' }` }
 			ref={ videoRef }
 			className="blockish-video"
 			src={ src }
@@ -20,9 +23,7 @@ const CustomVideoPlayer = ( { attributes, videoRef } ) => {
 			muted={ !! attributes?.muted }
 			preload={ attributes?.preload || 'metadata' }
 			playsInline={ playOnMobile }
-			poster={
-				attributes?.poster || attributes?.overlayImage?.url || undefined
-			}
+			poster={ posterUrl }
 		>
 			{ __( 'Your browser does not support the video tag.', 'blockish' ) }
 		</video>

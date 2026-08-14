@@ -1,5 +1,9 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { getVideoEmbedUrl, isAnyVideoSuggestion } from './utils';
+import {
+	getVideoEmbedUrl,
+	isAnyVideoSuggestion,
+	getPosterUrl,
+} from './utils';
 
 export default function Save( { attributes } ) {
 	const blockProps = useBlockProps.save( {
@@ -39,6 +43,7 @@ export default function Save( { attributes } ) {
 	// data attribute and view.js swaps it in once the player nears the viewport.
 	const lazySelfHosted = isSelfHosted && !! attributes?.lazyLoad;
 	const overlayImageUrl = attributes?.overlayImage?.url;
+	const posterUrl = getPosterUrl( attributes );
 	const shouldShowOverlay =
 		!! attributes?.showOverlay &&
 		!! overlayImageUrl &&
@@ -101,11 +106,7 @@ export default function Save( { attributes } ) {
 										: attributes?.preload || 'metadata'
 								}
 								playsInline={ playOnMobile }
-								poster={
-									attributes?.poster ||
-									overlayImageUrl ||
-									undefined
-								}
+								poster={ posterUrl }
 							/>
 					  )
 					: embedUrl && (

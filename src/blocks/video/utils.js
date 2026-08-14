@@ -40,6 +40,33 @@ const normalizeSuggestedVideosOption = ( value ) => {
 const isAnyVideoSuggestion = ( value ) =>
 	normalizeSuggestedVideosOption( value )?.value === 'anyVideo';
 
+/** @deprecated string `poster` — prefer `posterImage.url`. */
+const getPosterUrl = ( attributes ) => {
+	if ( attributes?.posterImage?.url ) {
+		return attributes.posterImage.url;
+	}
+	if ( typeof attributes?.poster === 'string' && attributes.poster ) {
+		return attributes.poster;
+	}
+	return attributes?.overlayImage?.url || undefined;
+};
+
+const getPosterMediaValue = ( attributes ) => {
+	if ( attributes?.posterImage?.url ) {
+		return {
+			...attributes.posterImage,
+			type: attributes.posterImage.type || 'image',
+		};
+	}
+	if ( typeof attributes?.poster === 'string' && attributes.poster ) {
+		return {
+			url: attributes.poster,
+			type: 'image',
+		};
+	}
+	return null;
+};
+
 const escapeAttribute = ( value = '' ) => {
 	return String( value )
 		.replaceAll( '&', '&amp;' )
@@ -167,4 +194,6 @@ export {
 	isAnyVideoSuggestion,
 	escapeAttribute,
 	getVideoEmbedUrl,
+	getPosterUrl,
+	getPosterMediaValue,
 };

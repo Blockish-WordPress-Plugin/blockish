@@ -11,6 +11,7 @@ import './editor.scss';
 import Inspector from './inspector';
 import EmbededVideo from './embed-video';
 import CustomVideoPlayer from './custom-video-player';
+import { getPosterUrl } from './utils';
 
 export default function Edit( {
 	attributes,
@@ -38,7 +39,14 @@ export default function Edit( {
 		setAttributes( {
 			selfHostedVideo: media,
 			selfHostedUrl: media.url,
-			poster: attributes?.poster || media?.image?.src || '',
+			...( getPosterUrl( attributes ) || ! media?.image?.src
+				? {}
+				: {
+						posterImage: {
+							url: media.image.src,
+							type: 'image',
+						},
+				  } ),
 		} );
 	}
 
@@ -66,6 +74,7 @@ export default function Edit( {
 		attributes?.youtubeUrl,
 		attributes?.vimeoUrl,
 		attributes?.overlayImage?.url,
+		attributes?.posterImage?.url,
 	] );
 
 	const shouldShowOverlay =

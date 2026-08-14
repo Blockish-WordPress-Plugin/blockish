@@ -38,6 +38,9 @@
     "selfHostedUrl": {
       "type": "string"
     },
+    "posterImage": {
+      "type": "object"
+    },
     "poster": {
       "type": "string"
     },

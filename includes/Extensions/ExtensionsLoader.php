@@ -2,8 +2,6 @@
 
 namespace Blockish\Extensions;
 
-use Blockish\Core\Extensions;
-
 defined('ABSPATH') || exit;
 
 class ExtensionsLoader
@@ -12,7 +10,7 @@ class ExtensionsLoader
 
     private function __construct()
     {
-        Extensions::get_instance();
+        \Blockish\Core\Extensions::get_instance();
         $this->load_active_extensions();
     }
 
