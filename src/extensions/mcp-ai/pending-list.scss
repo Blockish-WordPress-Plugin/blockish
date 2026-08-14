@@ -1,0 +1,272 @@
+.blockish-ai-preview-pending {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	height: 100%;
+	max-height: 100%;
+	overflow: hidden;
+	background: #fff;
+
+	&__toolbar {
+		flex-shrink: 0;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
+		padding: 12px 16px;
+		border-bottom: 1px solid #ddd;
+	}
+
+	&__search {
+		flex: 1 1 220px;
+		min-width: 140px;
+		max-width: 280px;
+		margin: 0;
+	}
+
+	&__filters {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		overflow-x: auto;
+	}
+
+	&__bulk {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		margin-left: auto;
+	}
+
+	&__error {
+		padding: 8px 16px 0;
+		color: #b32d2e;
+	}
+
+	&__body {
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow-x: hidden;
+		overflow-y: auto;
+		padding: 16px 16px 55px;
+	}
+
+	&__empty,
+	&__loading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 120px;
+		color: #757575;
+	}
+
+	&__grid {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 12px;
+		align-content: start;
+	}
+
+	&__card {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		min-height: 0;
+		overflow: hidden;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		background: #fff;
+
+		&.is-selected {
+			border-color: #3858e9;
+			box-shadow: 0 0 0 1px #3858e9;
+		}
+
+		&:hover &__check,
+		&.is-selected &__check,
+		&__check:focus-within {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
+
+	&__card-preview-wrap {
+		position: relative;
+		width: 100%;
+		overflow: hidden;
+	}
+
+	&__check {
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 24px;
+		height: 24px;
+		margin: 0;
+		border-radius: 4px;
+		background: rgba(255, 255, 255, 0.95);
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.12s ease;
+
+		.components-base-control,
+		.components-checkbox-control,
+		.components-base-control__field {
+			margin: 0;
+		}
+
+		.components-checkbox-control__input-container {
+			margin: 0;
+		}
+
+		.components-checkbox-control__label {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+		}
+	}
+
+	&__card-preview {
+		display: block;
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		max-height: 128px;
+		overflow: hidden;
+		background: #f6f7f7;
+		color: inherit;
+		text-decoration: none;
+
+		.block-editor-block-preview__container {
+			position: absolute;
+			inset: 0;
+			height: 100% !important;
+			width: 100%;
+		}
+
+		.block-editor-block-preview__content {
+			margin: 0;
+		}
+	}
+
+	&__preview-empty {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		min-height: 80px;
+		color: #c3c4c7;
+		font-size: 13px;
+	}
+
+	&__card-footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		padding: 8px 10px;
+		border-top: 1px solid #f0f0f0;
+	}
+
+	&__card-title {
+		min-width: 0;
+		font-size: 14px;
+		font-weight: 600;
+		color: #1e1e1e;
+		text-decoration: none;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		&:hover {
+			color: #3858e9;
+		}
+	}
+
+	&__type {
+		flex-shrink: 0;
+		padding: 2px 8px;
+		border-radius: 12px;
+		background: #e4e6eb;
+		font-size: 11px;
+		font-weight: 500;
+		color: #3c4043;
+	}
+
+	&__card-actions {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+		padding: 0 10px 10px;
+
+		.components-button {
+			justify-content: center;
+			height: 32px;
+		}
+
+		.components-button.is-destructive {
+			color: #b32d2e;
+			box-shadow: inset 0 0 0 1px #b32d2e;
+
+			&:hover:not(:disabled) {
+				color: #8a2424;
+				background: #fef7f7;
+			}
+		}
+	}
+
+	&__bulk .components-button.is-destructive {
+		color: #b32d2e;
+		box-shadow: inset 0 0 0 1px #b32d2e;
+
+		&:hover:not(:disabled) {
+			color: #8a2424;
+			background: #fef7f7;
+		}
+	}
+
+	&__footer {
+		position: sticky;
+		bottom: 55px;
+		z-index: 2;
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 8px 16px;
+		border-top: 1px solid #ddd;
+		background: #fff;
+	}
+
+	&__select-page {
+		margin: 0 auto 0 0;
+
+		.components-base-control,
+		.components-base-control__field {
+			margin-bottom: 0;
+		}
+
+		.components-checkbox-control__label {
+			font-size: 13px;
+		}
+	}
+
+	&__pages {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+}

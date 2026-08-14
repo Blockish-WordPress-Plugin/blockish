@@ -102,6 +102,10 @@ return array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Core/Utilities.php'
 	),
+	'Blockish\\Extensions\\AiPreview' => array(
+		'version' => 'dev-main',
+		'path'    => $baseDir . '/includes/Extensions/AiPreview.php'
+	),
 	'Blockish\\Extensions\\ClassManager' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Extensions/ClassManager.php'
@@ -485,6 +489,10 @@ return array(
 	'Blockish\\Routes\\AddonsV1' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Routes/AddonsV1.php'
+	),
+	'Blockish\\Routes\\AiPreviewQueueV1' => array(
+		'version' => 'dev-main',
+		'path'    => $baseDir . '/includes/Routes/AiPreviewQueueV1.php'
 	),
 	'Blockish\\Routes\\BlocksV1' => array(
 		'version' => 'dev-main',
