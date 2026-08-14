@@ -18,7 +18,7 @@ class Callbacks
             '3. Globals: Set palette / typography / spacing with `blockish/manage-theme-json` before pages. Prefer theme CSS variables in Class Manager CSS.',
 
             '4. Styles: Class Manager first (full rules in get-class-manager-docs). Order: `get-classes` → `manage-class` `{css}` only → attach `"classManager": "name1, name2"`. convert-css `css_to_schema` only for true one-offs. Do not pack the Class Manager reference into this workflow.',
-            
+
             '5. Assets: `get-media` for existing images. New remote image → temp HTTPS URL → `manage-media` `url` (never client path / base64). Cloud: call `fetch-cloud-templates` when you need layout/structure inspiration (hero, pricing, footer). Treat it as a starting schema — change copy, color, and sections to match the user. Recreate `dependencies` locally and remap pattern/form/class IDs. Never stage cloud IDs as-is. Skip the library if the user already supplied a full layout.',
         ];
 
@@ -46,18 +46,17 @@ class Callbacks
             '14. Stuck: do not invent CSS. Re-read get-block-docs + get-class-manager-docs. Then only the versioned GitHub files in `stuck_recovery`. Retry once. Still stuck → report + issue draft (do not open the issue).',
         ] );
 
-        $version = defined( 'BLOCKISH_VERSION' ) ? BLOCKISH_VERSION : '1.2.3';
         $repo    = 'https://github.com/Blockish-WordPress-Plugin/blockish';
-        $tag     = 'v' . $version;
+        $tag     = 'v' . BLOCKISH_VERSION;
         $blob    = $repo . '/blob/' . $tag . '/';
 
         return [
             'workflow'       => $workflow,
             'stuck_recovery' => [
-                'plugin_version' => $version,
+                'plugin_version' => BLOCKISH_VERSION,
                 'repo'           => $repo,
                 'prefer_tag'     => $tag,
-                'fallback_tag'   => $version,
+                'fallback_tag'   => BLOCKISH_VERSION,
                 'blob_base'      => $blob,
                 'paths'          => [
                     'block_docs' => 'includes/Mcp/docs/blocks/{slug}.md',

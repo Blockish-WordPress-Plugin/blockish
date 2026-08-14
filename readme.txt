@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.0
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -167,6 +167,15 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.2.4 =
+
+* Improved: Settings AI Preview Accept/Discard writes via the WordPress REST route from JS (templates/parts use `theme//slug`, not numeric IDs)
+* Improved: Accepting the currently open post from Settings unwraps `blockish/ai-preview` with `replaceBlocks`
+* Improved: Settings queue layout — scrollable card grid, sticky pagination footer, taller previews, hover/selected checkboxes
+* Improved: MCP designer workflow — discover blocks with `get-blocks-info` first; pick the right Blockish block for logos, nav, buttons, social icons, FAQs
+* Improved: Social Icons is always flex (row/column + wrap); Visibility hide applies in the current editor device preview
+* Improved: Docs for container header/footer landmarks, social-icons, and a versioned GitHub stuck-recovery path
 
 = 1.2.3 =
 
