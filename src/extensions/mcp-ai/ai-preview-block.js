@@ -5,6 +5,12 @@ import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
+import {
+	collectClassIdsFromBlocks,
+	refreshClassEntities,
+	requestClassCssRegenerate,
+	resolveClassPrevious,
+} from '../class-manager/wrap-ai-preview';
 
 const schemaNodeToBlock = ( node ) => {
 	if ( ! node || typeof node !== 'object' || ! node.name ) {
@@ -209,23 +215,56 @@ registerBlockType( 'blockish/ai-preview', {
 			);
 		}, [ pendingSchema ] );
 
-		/** Accept: remove wrapper only — keep template/inner blocks. */
-		const handleApprove = useCallback( () => {
+		/** Accept: unwrap + commit Class Manager previousContent on used classes. */
+		const handleApprove = useCallback( async () => {
 			const block = window.wp.data
 				.select( 'core/block-editor' )
 				.getBlock( clientId );
+			const classIds = collectClassIdsFromBlocks(
+				block?.innerBlocks?.length ? block.innerBlocks : []
+			);
+			await resolveClassPrevious(
+				'accept',
+				classIds.length ? { class_ids: classIds } : {}
+			);
+			await refreshClassEntities( classIds );
+			requestClassCssRegenerate( classIds, { quiet: true } );
 			const nextBlocks =
 				block && block.innerBlocks.length > 0 ? block.innerBlocks : [];
 			resetEditorBlocks( nextBlocks );
 		}, [ clientId, resetEditorBlocks ] );
 
-		/** Discard: replace everything with previousSchema. */
-		const handleReject = useCallback( () => {
+		/** Discard: restore page schema + Class Manager previousContent on used classes. */
+		const handleReject = useCallback( async () => {
+			const block = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlock( clientId );
+			const classIds = collectClassIdsFromBlocks(
+				block?.innerBlocks?.length
+					? block.innerBlocks
+					: parseSchemaAttr( pendingSchema )
+			);
+			const result = await resolveClassPrevious(
+				'discard',
+				classIds.length ? { class_ids: classIds } : {}
+			);
+			const restoredIds = Array.isArray( result?.restored )
+				? result.restored.flatMap( ( row ) => {
+					const ids = [ row?.id ];
+					( row?.records || [] ).forEach( ( record ) => {
+						if ( record?.id ) {
+							ids.push( record.id );
+						}
+					} );
+					return ids.filter( Boolean );
+				} )
+				: [];
+			await refreshClassEntities( restoredIds.length ? restoredIds : classIds );
 			const nextBlocks = parseSchemaAttr( previousSchema )
 				.map( schemaNodeToBlock )
 				.filter( Boolean );
 			resetEditorBlocks( nextBlocks );
-		}, [ previousSchema, resetEditorBlocks ] );
+		}, [ clientId, pendingSchema, previousSchema, resetEditorBlocks ] );
 
 		const innerBlockProps = useInnerBlocksProps(
 			{

@@ -106,6 +106,10 @@ return array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Extensions/ClassManager.php'
 	),
+	'Blockish\\Extensions\\ClassPrevious' => array(
+		'version' => 'dev-main',
+		'path'    => $baseDir . '/includes/Extensions/ClassPrevious.php'
+	),
 	'Blockish\\Extensions\\ClassUsage' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Extensions/ClassUsage.php'
@@ -485,6 +489,10 @@ return array(
 	'Blockish\\Routes\\BlocksV1' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Routes/BlocksV1.php'
+	),
+	'Blockish\\Routes\\ClassPreviousV1' => array(
+		'version' => 'dev-main',
+		'path'    => $baseDir . '/includes/Routes/ClassPreviousV1.php'
 	),
 	'Blockish\\Routes\\DashboardToolsV1' => array(
 		'version' => 'dev-main',

@@ -95,6 +95,11 @@
         const postId = editorSelect ? editorSelect.getCurrentPostId() : null;
 
         const dirty = getDirtyEntityRecords().filter((record) => {
+            // MCP class writes already hit the DB. Saving in-memory Class Manager
+            // edits here would overwrite them.
+            if (record.kind === 'postType' && record.name === 'blockish-classes') {
+                return false;
+            }
             if (!postType || postId === null || postId === undefined) {
                 return true;
             }

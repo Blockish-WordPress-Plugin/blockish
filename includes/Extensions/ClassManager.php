@@ -184,6 +184,8 @@ class ClassManager {
 				'sanitize_callback' => 'wp_strip_all_tags',
 			)
 		);
+
+		ClassPrevious::register_meta();
 	}
 
 	public function render_block( $block_content, $block ) {
