@@ -115,6 +115,7 @@ class Loader
         Abilities\FetchGoogleFonts\Config::class,
         Abilities\ManageFonts\Config::class,
         Abilities\ManageOptions\Config::class,
+        Abilities\ManagePluginsThemes\Config::class,
         Abilities\ManageComments\Config::class,
         Abilities\ManageInteractions\Config::class,
         Abilities\TriggerRefresh\Config::class,

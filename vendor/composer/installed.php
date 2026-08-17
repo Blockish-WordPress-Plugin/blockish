@@ -3,7 +3,7 @@
         'name' => 'blockish/blockish',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'd88442c265d5764904e842b62af8ae3f1060dee4',
+        'reference' => 'ee3f82247e7fe155e3a63405c9535a80150413a8',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'blockish/blockish' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'd88442c265d5764904e842b62af8ae3f1060dee4',
+            'reference' => 'ee3f82247e7fe155e3a63405c9535a80150413a8',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

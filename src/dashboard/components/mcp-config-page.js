@@ -8,7 +8,7 @@ export default function McpConfigPage() {
 	const [step, setStep] = useState(0);
 	const [os, setOs] = useState('mac');
 	const [hasNode, setHasNode] = useState('yes');
-	const [aiClient, setAiClient] = useState('cursor');
+	const [aiClient, setAiClient] = useState('claude-desktop');
 	const [appPassword, setAppPassword] = useState('');
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [isCopied, setIsCopied] = useState(false);
@@ -155,20 +155,17 @@ export default function McpConfigPage() {
 				label={__('Select your AI Client', 'blockish')}
 				value={aiClient}
 				options={[
-					{ label: 'Cursor (IDE)', value: 'cursor' },
-					{ label: 'Windsurf (IDE)', value: 'windsurf' },
-					{ label: 'Zed Editor', value: 'zed' },
-					{ label: 'Cline (VS Code)', value: 'cline' },
-					{ label: 'Continue.dev', value: 'continue' },
-					{ label: 'Sourcegraph Cody', value: 'cody' },
-					{ label: 'Goose', value: 'goose' },
 					{ label: 'Claude Desktop', value: 'claude-desktop' },
-					{ label: 'Claude Code (CLI)', value: 'claude-code' },
-					{ label: 'Antigravity IDE', value: 'antigravity-ide' },
-					{ label: 'Antigravity Chat', value: 'antigravity-chat' },
-					{ label: 'Antigravity CLI', value: 'antigravity-cli' },
+					{ label: 'Claude Code', value: 'claude-code' },
+					{ label: 'Cursor', value: 'cursor' },
 					{ label: 'Codex', value: 'codex' },
-					{ label: 'ChatGPT Desktop', value: 'chatgpt' },
+					{ label: 'Cline (VS Code)', value: 'cline' },
+					{ label: 'Devin (Windsurf)', value: 'devin' },
+					{ label: 'Antigravity', value: 'antigravity' },
+					{ label: 'Antigravity Chat', value: 'antigravity-chat' },
+					{ label: 'Trae', value: 'trae' },
+					{ label: 'Qwen Code', value: 'qwen-code' },
+					{ label: 'Kimi Code', value: 'kimi-code' },
 				]}
 				onChange={(val) => setAiClient(val)}
 			/>
@@ -291,7 +288,7 @@ export default function McpConfigPage() {
 					{__('MCP Server Config', 'blockish')}
 				</Heading>
 				<Text className="blockish-text-muted">
-					{__('Connect Blockish to your favorite AI assistant (Claude Desktop, Cursor, Windsurf, etc.) using the Model Context Protocol (MCP).', 'blockish')}
+					{__('Connect Blockish to your AI client (Cursor, Claude, Codex, Windsurf, and others) using the Model Context Protocol (MCP).', 'blockish')}
 				</Text>
 			</VStack>
 

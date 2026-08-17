@@ -20,19 +20,21 @@ class Callbacks
             '4. Styles: Class Manager first (full rules in get-class-manager-docs). Order: `get-classes` → `manage-class` `{css}` only → attach `"classManager": "name1, name2"`. convert-css `css_to_schema` only for true one-offs. Do not pack the Class Manager reference into this workflow.',
 
             '5. Assets: `get-media` for existing images. New remote image → temp HTTPS URL → `manage-media` `url` (never client path / base64). Cloud: call `fetch-cloud-templates` when you need layout/structure inspiration (hero, pricing, footer). Treat it as a starting schema — change copy, color, and sections to match the user. Recreate `dependencies` locally and remap pattern/form/class IDs. Never stage cloud IDs as-is. Skip the library if the user already supplied a full layout.',
+
+            '5a. Plugins/themes: Never WP-CLI, zip, GitHub, or filesystem. Only `blockish/manage-plugins-themes`. Exact wordpress.org slug. Ask in chat, then `confirm:true`. Promoted: ACF `advanced-custom-fields` (install+activate), WooCommerce `woocommerce` (install+activate), Blockish Forms `blockish-forms` (Pro — activate only if installed), Blockish Dynamicity `blockish-dynamicity` (Pro — activate only). No delete/uninstall. No deactivate of Blockish core (`blockish`). No theme deactivate — switch. Update only when the user explicitly asks. After ACF / Woo / Forms / Dynamicity install or activate: tell the user to fully restart the AI software they are using, or new abilities will not appear.',
         ];
 
         if ( defined('BLOCKISH_DYNAMICITY_VERSION') ) {
             $workflow[] = '6. Dynamicity is ACTIVE: Use `blockish-dynamicity/query-builder` + `loop` (not `core/query`). Prefer Blockish post blocks inside loops. Docs: include those names (or `"blockish-dynamicity"`) in get-block-docs. Display Conditions = `displayConditions`.';
-            $workflow[] = '6a. ACF: Do not invent Blockish CPT/field tools. If ACF is missing and the user allows install, `blockish-dynamicity/install-acf` confirm:true, then reconnect. If ACF is active, use `acf/register-custom-post-type`, `acf/register-custom-taxonomy`, `acf/register-field-group` (and the acf list tools). Skip Options pages. Bind with Dynamicity `post_acf` / `term_acf` / `user_acf` + metaKey from `blockish-dynamicity/get-meta-list`.';
+            $workflow[] = '6a. ACF: Do not invent Blockish CPT/field tools. If ACF is missing and the user allows install, `blockish/manage-plugins-themes` action=install type=plugin slug=advanced-custom-fields confirm:true. Then tell the user to fully restart their AI app — acf/* tools will not appear in this session. If ACF is active, use `acf/register-custom-post-type`, `acf/register-custom-taxonomy`, `acf/register-field-group` (and the acf list tools). Skip Options pages. Bind with Dynamicity `post_acf` / `term_acf` / `user_acf` + metaKey from `blockish-dynamicity/get-meta-list`.';
         } else {
-            $workflow[] = '6. Dynamicity is NOT active: Use `core/query`. Tell the user Dynamicity exists for a real query builder. Site chrome can still use `blockish/site-logo`, `site-title`, `site-tagline`.';
+            $workflow[] = '6. Dynamicity is NOT active: Use `core/query`. Do not invent Dynamicity blocks. If the user wants the query builder, ask to activate Blockish Dynamicity (`blockish/manage-plugins-themes` action=activate type=plugin slug=blockish-dynamicity confirm:true — Pro, not installable from .org). Then tell them to fully restart their AI app so new abilities appear. Site chrome can still use `blockish/site-logo`, `site-title`, `site-tagline`.';
         }
 
         if ( defined( 'BLOCKISH_FORMS_VERSION' ) ) {
             $workflow[] = '6b. Forms is ACTIVE: Never put field blocks on a page. `manage-post` `post_type:"blockish_form"` for the form CPT, embed with `blockish-forms/form` + numeric `formId`. Option/meta keys live in get-block-docs (`blockish-forms`).';
         } else {
-            $workflow[] = '6b. Forms is NOT active: Do not invent `blockish-forms/*`. Tell the user the Forms add-on exists.';
+            $workflow[] = '6b. Forms is NOT active: Do not invent `blockish-forms/*`. If the user wants forms, ask to activate Blockish Forms (`blockish/manage-plugins-themes` action=activate type=plugin slug=blockish-forms confirm:true — Pro, not installable from .org). Then tell them to fully restart their AI app.';
         }
 
         $workflow = array_merge( $workflow, [

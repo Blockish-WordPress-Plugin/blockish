@@ -6,9 +6,16 @@ export const focusPopupNode = ( node ) => {
 	}
 
 	requestAnimationFrame( () => {
-		if ( node.isConnected ) {
-			node.focus( { preventScroll: true } );
+		if ( ! node.isConnected ) {
+			return;
 		}
+
+		const active = document.activeElement;
+		if ( active && node.contains( active ) && active !== node ) {
+			return;
+		}
+
+		node.focus( { preventScroll: true } );
 	} );
 };
 
