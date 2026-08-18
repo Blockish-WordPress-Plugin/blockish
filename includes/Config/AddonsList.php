@@ -23,6 +23,19 @@ class AddonsList extends ConfigList {
         return $this->list;
     }
 
+    /**
+     * Real Freemius seat (no local/dev bypass). Used by fetch-cloud-templates.
+     *
+     * @param string $slug Addon option key (`blockish-forms` / `blockish-dynamicity`).
+     */
+    public function has_active_freemius_license( $slug ) {
+        $list = $this->list;
+        if ( empty( $list ) ) {
+            $list = $this->refresh_list();
+        }
+        return ! empty( $list[ $slug ]['license']['is_active'] );
+    }
+
     protected function set_list() {
         $forms_installed      = class_exists( 'Blockish_Forms' );
         $dynamicity_installed = class_exists( 'Blockish_Dynamicity' );

@@ -501,8 +501,16 @@ class ClassStyleConverter {
 			'flexWrap'         => 'flex-wrap',
 			'justifyContent'   => 'justify-content',
 			'alignItems'       => 'align-items',
+			'alignSelf'        => 'align-self',
+			'justifySelf'      => 'justify-self',
 			'columnGap'        => 'column-gap',
 			'rowGap'           => 'row-gap',
+			'flexGrow'         => 'flex-grow',
+			'flexShrink'       => 'flex-shrink',
+			'gridColumnStart'  => 'grid-column-start',
+			'gridColumnEnd'    => 'grid-column-end',
+			'gridRowStart'     => 'grid-row-start',
+			'gridRowEnd'       => 'grid-row-end',
 			'width'            => 'width',
 			'height'           => 'height',
 			'minWidth'         => 'min-width',
@@ -538,6 +546,17 @@ class ClassStyleConverter {
 			'perspective'      => 'perspective',
 		);
 
+		$unitless_keys = array(
+			'flexGrow'        => true,
+			'flexShrink'      => true,
+			'gridColumnStart' => true,
+			'gridColumnEnd'   => true,
+			'gridRowStart'    => true,
+			'gridRowEnd'      => true,
+			'zIndex'          => true,
+			'columnCount'     => true,
+		);
+
 		foreach ( $map as $key => $property ) {
 			$exists = false;
 			$value  = self::device_value( $styles[ $key ] ?? null, $device, $exists );
@@ -545,10 +564,32 @@ class ClassStyleConverter {
 				continue;
 			}
 			$css = self::css_value( $value );
+			if ( isset( $unitless_keys[ $key ] ) ) {
+				$num = self::unitless_number( $css );
+				if ( ! is_numeric( $num ) ) {
+					continue;
+				}
+				$css = (string) $num;
+			}
 			if ( '' !== $css ) {
 				$out[ $property ] = $css;
 			}
 		}
+
+		$order_exists = false;
+		$flex_order   = self::css_value( self::device_value( $styles['flexOrder'] ?? null, $device, $order_exists ) );
+		if ( $order_exists && 'custom' === $flex_order ) {
+			$custom_exists = false;
+			$custom        = self::css_value( self::device_value( $styles['flexCustomOrder'] ?? null, $device, $custom_exists ) );
+			if ( $custom_exists && '' !== $custom ) {
+				$out['order'] = (string) (int) $custom;
+			}
+		} elseif ( $order_exists && '' !== $flex_order ) {
+			$out['order'] = $flex_order;
+		}
+
+		self::compile_grid_span( $out, $styles, $device, 'gridColumn', 'grid-column' );
+		self::compile_grid_span( $out, $styles, $device, 'gridRow', 'grid-row' );
 
 		foreach ( array( 'padding', 'margin' ) as $key ) {
 			$exists = false;
@@ -788,8 +829,8 @@ class ClassStyleConverter {
 			foreach ( array( 'gridColumns' => 'grid-template-columns', 'gridRows' => 'grid-template-rows' ) as $key => $property ) {
 				$has   = false;
 				$count = self::device_value( $styles[ $key ] ?? null, $device, $has );
-				$count = self::css_value( $count );
-				if ( $has && '' !== $count ) {
+				$count = self::unitless_number( self::css_value( $count ) );
+				if ( $has && is_numeric( $count ) && '' !== (string) $count ) {
 					$out[ $property ] = 'repeat(' . $count . ', minmax(0, 1fr))';
 				}
 			}
@@ -1188,15 +1229,38 @@ class ClassStyleConverter {
 			case 'z-index':
 			case 'opacity':
 			case 'column-count':
+			case 'flex-grow':
+			case 'flex-shrink':
+			case 'grid-column-start':
+			case 'grid-column-end':
+			case 'grid-row-start':
+			case 'grid-row-end':
+				if ( self::apply_grid_span_token( $content, $property, $value, $device ) ) {
+					return true;
+				}
 				$attr = self::camel( $property );
-				Codecs::set_responsive( $content, $attr, $device, is_numeric( $value ) ? 0 + $value : $value );
+				if ( 'flex-grow' === $property ) {
+					$attr = 'flexGrow';
+				} elseif ( 'flex-shrink' === $property ) {
+					$attr = 'flexShrink';
+				}
+				Codecs::set_responsive( $content, $attr, $device, self::unitless_number( $value ) );
 				return true;
+
+			case 'order':
+				return self::apply_flex_order( $content, $value, $device );
+
+			case 'grid-column':
+			case 'grid-row':
+				return self::apply_grid_line_shorthand( $content, $property, $value, $device );
 
 			case 'display':
 			case 'flex-direction':
 			case 'flex-wrap':
 			case 'justify-content':
 			case 'align-items':
+			case 'align-self':
+			case 'justify-self':
 			case 'overflow':
 			case 'position':
 			case 'object-fit':
@@ -1419,6 +1483,8 @@ class ClassStyleConverter {
 			'flex-wrap'        => 'flexWrap',
 			'justify-content'  => 'justifyContent',
 			'align-items'      => 'alignItems',
+			'align-self'       => 'alignSelf',
+			'justify-self'     => 'justifySelf',
 			'overflow'         => 'overflow',
 			'position'         => 'position',
 			'object-fit'       => 'objectFit',
@@ -1433,6 +1499,124 @@ class ClassStyleConverter {
 			'background-clip'  => 'backgroundClip',
 		);
 		return $map[ $property ] ?? null;
+	}
+
+	private static function unitless_number( string $value ) {
+		$trimmed = trim( $value );
+		if ( is_numeric( $trimmed ) ) {
+			return 0 + $trimmed;
+		}
+		if ( preg_match( '/^-?[\d.]+/', $trimmed, $match ) ) {
+			return 0 + $match[0];
+		}
+		return $trimmed;
+	}
+
+	/**
+	 * @param array<string, mixed> $content
+	 */
+	private static function apply_flex_order( array &$content, string $value, string $device ): bool {
+		$number = self::unitless_number( $value );
+		if ( -99999 === (int) $number || '-99999' === (string) $number ) {
+			Codecs::set_responsive(
+				$content,
+				'flexOrder',
+				$device,
+				array(
+					'label' => 'Start',
+					'value' => '-99999',
+				)
+			);
+			return true;
+		}
+		if ( 99999 === (int) $number || '99999' === (string) $number ) {
+			Codecs::set_responsive(
+				$content,
+				'flexOrder',
+				$device,
+				array(
+					'label' => 'End',
+					'value' => '99999',
+				)
+			);
+			return true;
+		}
+
+		Codecs::set_responsive(
+			$content,
+			'flexOrder',
+			$device,
+			array(
+				'label' => 'Custom',
+				'value' => 'custom',
+			)
+		);
+		Codecs::set_responsive( $content, 'flexCustomOrder', $device, $number );
+		return true;
+	}
+
+	private static function apply_grid_span_token( array &$content, string $property, string $value, string $device ): bool {
+		if ( ! preg_match( '/^span\s+(\d+)/i', trim( $value ), $match ) ) {
+			return false;
+		}
+		$prefix = str_starts_with( $property, 'grid-column' ) ? 'gridColumn' : 'gridRow';
+		if ( ! str_starts_with( $property, 'grid-' ) ) {
+			return false;
+		}
+		Codecs::set_responsive( $content, $prefix . 'Span', $device, (int) $match[1] );
+		return true;
+	}
+
+	/**
+	 * @param array<string, mixed> $content
+	 */
+	private static function apply_grid_line_shorthand( array &$content, string $property, string $value, string $device ): bool {
+		$parts  = preg_split( '/\s*\/\s*/', trim( $value ) );
+		$start  = isset( $parts[0] ) ? trim( $parts[0] ) : '';
+		$end    = isset( $parts[1] ) ? trim( $parts[1] ) : '';
+		$prefix = 'grid-column' === $property ? 'gridColumn' : 'gridRow';
+		$ok     = false;
+
+		if ( self::apply_grid_span_token( $content, $property, $start, $device ) ) {
+			$ok = true;
+		} elseif ( '' !== $start && 'auto' !== strtolower( $start ) ) {
+			Codecs::set_responsive( $content, $prefix . 'Start', $device, self::unitless_number( $start ) );
+			$ok = true;
+		}
+
+		if ( '' !== $end && self::apply_grid_span_token( $content, $property, $end, $device ) ) {
+			$ok = true;
+		} elseif ( '' !== $end && 'auto' !== strtolower( $end ) ) {
+			Codecs::set_responsive( $content, $prefix . 'End', $device, self::unitless_number( $end ) );
+			$ok = true;
+		}
+
+		return $ok;
+	}
+
+	/**
+	 * @param array<string, string> $out
+	 * @param array<string, mixed>  $styles
+	 */
+	private static function compile_grid_span( array &$out, array $styles, string $device, string $prefix, string $property ): void {
+		$span_exists = false;
+		$span        = self::css_value( self::device_value( $styles[ $prefix . 'Span' ] ?? null, $device, $span_exists ) );
+		if ( ! $span_exists || '' === $span ) {
+			return;
+		}
+		$span = (string) (int) self::unitless_number( $span );
+		if ( '0' === $span ) {
+			return;
+		}
+
+		$start_exists = false;
+		$start        = self::css_value( self::device_value( $styles[ $prefix . 'Start' ] ?? null, $device, $start_exists ) );
+		$start_num    = self::unitless_number( $start );
+		$start        = is_numeric( $start_num ) ? (string) $start_num : '';
+		unset( $out[ $property . '-start' ], $out[ $property . '-end' ] );
+		$out[ $property ] = ( $start_exists && '' !== $start )
+			? $start . ' / span ' . $span
+			: 'span ' . $span;
 	}
 
 	private static function camel( string $property ): string {
@@ -1456,6 +1640,14 @@ class ClassStyleConverter {
 			),
 			'flex-wrap'       => array( 'nowrap' => 'No Wrap', 'wrap' => 'Wrap', 'wrap-reverse' => 'Wrap Reverse' ),
 			'align-items'     => array( 'baseline' => 'Baseline', 'stretch' => 'Stretch' ),
+			'align-self'      => array(
+				'start' => 'Start', 'center' => 'Center', 'end' => 'End', 'stretch' => 'Stretch',
+				'flex-start' => 'Start', 'flex-end' => 'End',
+			),
+			'justify-self'    => array(
+				'start' => 'Start', 'center' => 'Center', 'end' => 'End', 'stretch' => 'Stretch',
+				'flex-start' => 'Start', 'flex-end' => 'End',
+			),
 			'text-align'      => array(
 				'left' => 'Left', 'center' => 'Center', 'right' => 'Right',
 				'justify' => 'Justify', 'start' => 'Start', 'end' => 'End',
@@ -1490,6 +1682,14 @@ class ClassStyleConverter {
 		);
 
 		$key = strtolower( $value );
+		if ( in_array( $property, array( 'align-self', 'justify-self' ), true ) ) {
+			if ( 'flex-start' === $key ) {
+				$key = 'start';
+			} elseif ( 'flex-end' === $key ) {
+				$key = 'end';
+			}
+		}
+
 		if ( 'font-weight' === $property && isset( $labels['font-weight'][ $key ] ) ) {
 			$mapped = $labels['font-weight'][ $key ];
 			return array( 'label' => (string) $mapped, 'value' => (string) $mapped );

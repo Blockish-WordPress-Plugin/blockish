@@ -12,6 +12,9 @@ export const TemplateLibraryProvider = ({ children }) => {
 	const [selectedCategory, setSelectedCategory] = useState('');
 	const [selectedPackage, setSelectedPackage] = useState(() => {
 		const fromData = window.blockishTemplateLibraryData?.defaultPackage;
+		if (window.blockishTemplateLibraryData) {
+			delete window.blockishTemplateLibraryData.defaultPackage;
+		}
 		return fromData || 'All';
 	});
 	

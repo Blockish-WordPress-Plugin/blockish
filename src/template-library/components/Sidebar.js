@@ -44,12 +44,17 @@ const SidebarPatterns = () => {
 			{packages.length > 0 && (
 				<div className="sidebar-section">
 					<div className="sidebar-package-list">
+						<PackageItem
+							label={__('All', 'blockish')}
+							isSelected={selectedPackage === 'All' || !selectedPackage}
+							onClick={() => setSelectedPackage('All')}
+						/>
 						{packages.map(pkg => (
 							<PackageItem 
 								key={pkg.package_name}
 								label={formatSlugToTitle(pkg.package_name)} 
 								isSelected={selectedPackage === pkg.package_name} 
-								onClick={() => setSelectedPackage(selectedPackage === pkg.package_name ? 'All' : pkg.package_name)} 
+								onClick={() => setSelectedPackage(pkg.package_name)} 
 							/>
 						))}
 					</div>
@@ -94,12 +99,17 @@ const SidebarPages = () => {
 			{packages.length > 0 && (
 				<div className="sidebar-section">
 					<div className="sidebar-package-list">
+						<PackageItem
+							label={__('All', 'blockish')}
+							isSelected={selectedPackage === 'All' || !selectedPackage}
+							onClick={() => setSelectedPackage('All')}
+						/>
 						{packages.map(pkg => (
 							<PackageItem 
 								key={pkg.package_name}
 								label={formatSlugToTitle(pkg.package_name)} 
 								isSelected={selectedPackage === pkg.package_name} 
-								onClick={() => setSelectedPackage(selectedPackage === pkg.package_name ? 'All' : pkg.package_name)} 
+								onClick={() => setSelectedPackage(pkg.package_name)} 
 							/>
 						))}
 					</div>

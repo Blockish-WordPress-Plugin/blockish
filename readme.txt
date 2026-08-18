@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.0
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -167,6 +167,17 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.2.5 =
+
+* Added: Container inner content width — constrain inner content independently of a full-bleed section
+* Added: MCP `manage-plugins-themes` to install/activate plugins and themes
+* Improved: MCP connect wizard client list matches `blockish-mcp-cli` (Claude Desktop/Code, Cursor, Codex, Cline, Windsurf, Antigravity, Trae, Qwen Code, Kimi Code)
+* Improved: Manage Theme JSON — restore global-styles revisions
+* Improved: Class Manager — Flex, Grid, and Position controls; unitless number fields
+* Improved: `convert-css` maps grid layout for Container and Loop
+* Improved: Template Library — All filter by default; Dynamicity/Forms designs need an active license (Get add-on CTA); library hidden in the form editor
+* Improved: MCP `fetch-cloud-templates` omits unlicensed Dynamicity/Forms cloud designs
 
 = 1.2.4 =
 

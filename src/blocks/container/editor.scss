@@ -93,3 +93,17 @@
     margin-left: auto !important;
     margin-right: auto !important;
 }
+
+:where(.wp-block-blockish-container.has-inner-content-width > .block-editor-inner-blocks > .block-editor-block-list__layout > :not(.alignfull):not(.alignwide)) {
+    max-width: var(--wp--style--global--content-size, 1200px);
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+:where(.wp-block-blockish-container.has-inner-content-width > .block-editor-inner-blocks > .block-editor-block-list__layout > .alignwide) {
+    max-width: var(--wp--style--global--wide-size, 1200px);
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}

@@ -2,7 +2,7 @@ import { registerPlugin } from '@wordpress/plugins';
 import { useState, useEffect, useRef, useSyncExternalStore } from '@wordpress/element';
 import { createRoot } from 'react-dom/client';
 import { __ } from '@wordpress/i18n';
-import { subscribe } from '@wordpress/data';
+import { subscribe, useSelect } from '@wordpress/data';
 import { settings } from '@wordpress/icons';
 import Modal from './components/Modal';
 import './style.scss';
@@ -61,11 +61,18 @@ const TemplateLibraryApp = () => {
 };
 
 const AddRoot = () => {
+	const postType = useSelect(
+		(select) => select('core/editor')?.getCurrentPostType?.() || '',
+		[]
+	);
 	const rootRef = useRef(null);
 	const toolbarElement = useToolbarElement();
 
 	useEffect(() => {
-		if (!toolbarElement) return;
+		if (postType === 'blockish_form') {
+			return undefined;
+		}
+		if (!toolbarElement) return undefined;
 
 		let rootElement = document.getElementById('blockish-template-library-root');
 		if (!rootElement) {
@@ -96,7 +103,11 @@ const AddRoot = () => {
 				rootRef.current = null;
 			}
 		};
-	}, [toolbarElement]);
+	}, [toolbarElement, postType]);
+
+	if (postType === 'blockish_form') {
+		return null;
+	}
 
 	return null;
 };

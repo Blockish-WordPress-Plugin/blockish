@@ -33,11 +33,17 @@ const Inspector = createHigherOrderComponent((WrappedComponent) => {
 
             if (!classes.some((item) => item?.id === selectedClass.id)) {
                 closePopover();
+            }
+        }, [classIdsKey, selectedClass?.id, classes, closePopover]);
+
+        // Refocus only when the class list changes (add/delete), not on style edits.
+        useEffect(() => {
+            if (!selectedClass?.id) {
                 return;
             }
 
             focusPopupNode(popoverRef.current);
-        }, [classIdsKey, selectedClass?.id, classes, closePopover]);
+        }, [classIdsKey, selectedClass?.id]);
 
         const closeIfFocusOutside = (event) => {
             const nextTarget = event?.relatedTarget || event?.target;

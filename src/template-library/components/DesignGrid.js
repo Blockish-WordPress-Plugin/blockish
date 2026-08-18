@@ -68,6 +68,26 @@ function goToAddons() {
 	}
 }
 
+function getInsertLabel(gate, isBusy) {
+	if (isBusy) {
+		return __('Inserting…', 'blockish');
+	}
+	if (!gate.locked) {
+		return __('Insert', 'blockish');
+	}
+	if (gate.packageKey === 'dynamicity') {
+		return __('Get Dynamicity', 'blockish');
+	}
+	if (gate.packageKey === 'forms') {
+		return __('Get Forms', 'blockish');
+	}
+	return sprintf(
+		/* translators: %s: addon name */
+		__('Get %s', 'blockish'),
+		gate.label || __('Addon', 'blockish')
+	);
+}
+
 /**
  * Apply page-scoped interactions onto the current editor document (REPLACE).
  * Block-level interactionData is already inside remapped content.
@@ -104,13 +124,6 @@ const insertDesign = async (
 	const gate = getPackageGate(design);
 	if (gate.locked) {
 		goToAddons();
-		setError(
-			sprintf(
-				/* translators: %s: addon name */
-				__('Activate %s from the Addons page to use this template.', 'blockish'),
-				gate.label || gate.packageKey
-			)
-		);
 		return;
 	}
 
@@ -163,7 +176,11 @@ const PatternCard = ({
 					<button
 						className="insert-button"
 						disabled={Boolean(busyId)}
-						onClick={() =>
+						onClick={() => {
+							if (gate.locked) {
+								goToAddons();
+								return;
+							}
 							insertDesign(
 								design,
 								insertBlocks,
@@ -171,14 +188,10 @@ const PatternCard = ({
 								setBusyId,
 								setError,
 								editPost
-							)
-						}
+							);
+						}}
 					>
-						{isBusy
-							? __('Inserting…', 'blockish')
-							: gate.locked
-								? __('Get Addon', 'blockish')
-								: __('Insert', 'blockish')}
+						{getInsertLabel(gate, isBusy)}
 					</button>
 				</div>
 				{design.featured_image ? (
@@ -233,7 +246,11 @@ const PageCard = ({
 				<button
 					className="insert-button inline"
 					disabled={Boolean(busyId)}
-					onClick={() =>
+					onClick={() => {
+						if (gate.locked) {
+							goToAddons();
+							return;
+						}
 						insertDesign(
 							design,
 							insertBlocks,
@@ -241,14 +258,10 @@ const PageCard = ({
 							setBusyId,
 							setError,
 							editPost
-						)
-					}
+						);
+					}}
 				>
-					{isBusy
-						? __('Inserting…', 'blockish')
-						: gate.locked
-							? __('Get Addon', 'blockish')
-							: __('Insert', 'blockish')}
+					{getInsertLabel(gate, isBusy)}
 				</button>
 			</div>
 		</div>

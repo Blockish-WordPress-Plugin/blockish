@@ -335,6 +335,17 @@ class MetadataConverter {
 
 			foreach ( $rule['declarations'] as $property => $value ) {
 				$property = strtolower( (string) $property );
+
+				if (
+					'blockish-dynamicity/loop' === $block_name
+					&& 'grid-template-columns' === $property
+					&& self::is_loop_wrapper_selector( $rule_selector, $root )
+					&& self::apply_loop_grid_template_columns( $attributes, (string) $value, $device )
+				) {
+					$mapped[] = 'grid-template-columns@' . $device;
+					continue;
+				}
+
 				$entry    = self::find_entry( $entries, $rule_selector, $root, $property );
 
 				if ( ! $entry && 'gap' === $property && self::apply_gap_shorthand( $attributes, $entries, $rule_selector, $root, (string) $value, $device ) ) {
@@ -485,6 +496,91 @@ class MetadataConverter {
 	private static function is_root_selector( string $selector, string $root ): bool {
 		$selector = trim( (string) preg_replace( '/:hover\b/i', '', $selector ) );
 		return self::normalize_selector( $selector ) === self::normalize_selector( $root );
+	}
+
+	/**
+	 * Loop grid CSS may land on {{ROOT}} or {{ROOT}}.is-layout-grid… — not on __item.
+	 */
+	private static function is_loop_wrapper_selector( string $selector, string $root ): bool {
+		$selector = trim( (string) preg_replace( '/:hover\b/i', '', $selector ) );
+		$actual   = self::normalize_selector( $selector );
+		$base     = self::normalize_selector( $root );
+		if ( $actual === $base ) {
+			return true;
+		}
+		if ( '' === $base ) {
+			return false;
+		}
+		if ( str_contains( $actual, ' ' ) || str_contains( $actual, '>' ) ) {
+			return false;
+		}
+		return str_starts_with( $actual, $base . '.' );
+	}
+
+	/**
+	 * Infer loop gridType auto|manual from grid-template-columns (container-style, loop names).
+	 */
+	private static function apply_loop_grid_template_columns( array &$attributes, string $value, string $device ): bool {
+		$value = trim( $value );
+
+		if ( preg_match( '/^repeat\(\s*(\d+)\s*,/i', $value, $match ) ) {
+			if ( ! self::claim_loop_grid_type( $attributes, 'manual', $device ) ) {
+				return false;
+			}
+			self::ensure_loop_layout_grid( $attributes );
+			Codecs::set_responsive( $attributes, 'columns', $device, (int) $match[1] );
+			return true;
+		}
+
+		if ( preg_match( '/^repeat\(\s*auto-(?:fill|fit)\s*,\s*minmax\(\s*(?:min\(\s*)?([^,\s)]+)/i', $value, $match ) ) {
+			if ( ! self::claim_loop_grid_type( $attributes, 'auto', $device ) ) {
+				return false;
+			}
+			self::ensure_loop_layout_grid( $attributes );
+			Codecs::set_responsive( $attributes, 'minColumnWidth', $device, trim( $match[1] ) );
+			return true;
+		}
+
+		return false;
+	}
+
+	private static function claim_loop_grid_type( array &$attributes, string $type, string $device ): bool {
+		$existing = is_array( $attributes['gridType'] ?? null )
+			? ( $attributes['gridType']['value'] ?? null )
+			: null;
+		$label    = 'auto' === $type ? 'Auto' : 'Manual';
+
+		if ( null === $existing || '' === $existing ) {
+			$attributes['gridType'] = array(
+				'label' => $label,
+				'value' => $type,
+			);
+			return true;
+		}
+		if ( $existing === $type ) {
+			return true;
+		}
+		if ( 'Desktop' === $device ) {
+			$attributes['gridType'] = array(
+				'label' => $label,
+				'value' => $type,
+			);
+			return true;
+		}
+		return false;
+	}
+
+	private static function ensure_loop_layout_grid( array &$attributes ): void {
+		$current = is_array( $attributes['layoutType'] ?? null )
+			? ( $attributes['layoutType']['value'] ?? null )
+			: null;
+		if ( 'metro' === $current ) {
+			return;
+		}
+		$attributes['layoutType'] = array(
+			'label' => 'Grid',
+			'value' => 'grid',
+		);
 	}
 
 	/**

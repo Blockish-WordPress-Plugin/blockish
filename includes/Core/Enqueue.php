@@ -81,6 +81,30 @@ class Enqueue {
             )
         );
 
+        if ( ! $this->is_form_editor() ) {
+            $this->enqueue_template_library();
+        }
+    }
+
+    /**
+     * Template library is for pages/posts/site editor — not the Forms CPT canvas.
+     */
+    private function is_form_editor() {
+        $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+        if ( $screen && ! empty( $screen->post_type ) && 'blockish_form' === $screen->post_type ) {
+            return true;
+        }
+        if ( isset( $_GET['post_type'] ) && 'blockish_form' === sanitize_key( wp_unslash( $_GET['post_type'] ) ) ) {
+            return true;
+        }
+        $post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+        if ( $post_id && 'blockish_form' === get_post_type( $post_id ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    private function enqueue_template_library() {
         $this->register_and_enqueue_script(
             'blockish-template-library',
             BLOCKISH_URL . 'build/template-library/index.js',
@@ -100,14 +124,9 @@ class Enqueue {
         $dynamicity_installed = class_exists( 'Blockish_Dynamicity' );
         $addons               = \Blockish\Config\AddonsList::get_instance()->refresh_list();
 
-        $forms_licensed = ! empty( $addons['blockish-forms']['license']['is_active'] );
+        // Template library insert uses real Freemius state (not local feature bypass).
+        $forms_licensed      = ! empty( $addons['blockish-forms']['license']['is_active'] );
         $dynamicity_licensed = ! empty( $addons['blockish-dynamicity']['license']['is_active'] );
-
-        // Local bypass mirrors AddonsList feature bypass for local/dev testing.
-        if ( function_exists( 'wp_get_environment_type' ) && in_array( wp_get_environment_type(), array( 'local', 'development' ), true ) ) {
-            $forms_licensed      = $forms_installed ? true : $forms_licensed;
-            $dynamicity_licensed = $dynamicity_installed ? true : $dynamicity_licensed;
-        }
 
         wp_localize_script(
             'blockish-template-library',
