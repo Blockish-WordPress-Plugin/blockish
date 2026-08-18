@@ -68,6 +68,22 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                                                 />
                                             )
                                         }
+                                        <BlockishControl
+                                            type="ToggleControl"
+                                            label={__('Inner blocks use content width', 'blockish')}
+                                            slug="innerContentWidth"
+                                            help={__('Constrain children to a content width. Alignfull children stay full bleed.', 'blockish')}
+                                        />
+                                        {
+                                            attributes?.innerContentWidth && (
+                                                <BlockishResponsiveControl
+                                                    type="BlockishRangeUnit"
+                                                    label={__('Content Width', 'blockish')}
+                                                    slug="innerContentMaxWidth"
+                                                    left="95px"
+                                                />
+                                            )
+                                        }
                                         <BlockishResponsiveControl
                                             type="BlockishRangeUnit"
                                             label={__('Min Height', 'blockish')}

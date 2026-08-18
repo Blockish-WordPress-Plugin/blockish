@@ -15,7 +15,9 @@ Primary layout block — flexbox, CSS grid, or plain block. **Accepts children: 
 | `display` | Scalar | `"flex"` (default) `"grid"` `"block"`. Also produced by convert-css `display:` — either path works; markup class `layout-type-*` follows the attr. |
 | `tagName` | Option | Default `{"label":"Div","value":"div"}` — send the object, never a bare string. Values: `div` `section` `article` `main` `a` `nav` `aside` `header` `footer` `ul` `ol` `li` `figure` (labels are the capitalised name, e.g. `{"label":"Section","value":"section"}`). **Never** set `header` or `footer` inside `wp_template_part` header/footer — the theme already wraps those parts. When `a`, also set `url`. No nested links/buttons inside a linked container. |
 | `url` | Link | Only when `tagName.value` is `"a"`. |
-| `containerWidth` | Scalar | `"alignfull"` (default) `"alignwide"` `"align-custom-width"` (literal — not `"custom"`). Nested containers use `align-custom-width`; max-width via convert-css. |
+| `containerWidth` | Scalar | `"alignfull"` (default) `"alignwide"` `"align-custom-width"` (literal — not `"custom"`). Nested containers use `align-custom-width`; max-width via convert-css. This is the **container’s own** width, not its children. |
+| `innerContentWidth` | Boolean | Default `false`. When `true`, InnerBlocks are constrained to a content width (replaces `core/group` `layout.type: constrained`). Children with `align:"full"` stay full bleed; `align:"wide"` uses theme wide size. |
+| `innerContentMaxWidth` | Scalar (responsive) | Only when `innerContentWidth` is true. Custom child max-width. Omit to use `var(--wp--style--global--content-size)` (fallback 1200px). convert-css `max-width` on the container itself is still `customWidthContainer` — do not use convert-css for inner content width; set this attr. |
 | `gridLayoutType` | Scalar | `"auto"` (default, auto-fit) or `"fixed"` (exact column count). Only matters when `display` is `"grid"`. |
 | `anchor` / `align` | Scalar | See §7.1. `"align"`: `"wide"` \| `"full"`. |
 | `containerBackground` (video only) | Stringified-JSON | **Only** way to get a background `<video>`. convert-css color/image/gradient backgrounds do **not** create the element. Set by hand before `css_to_schema`, then style via Markup selectors. Shape: `{"backgroundType":"video","backgroundVideo":{"id":123,"url":"https://…/file.mp4"}}` — use `blockish/get-media` / `upload-media` for a real `id`+`url`. Autoplay/muted/loop/playsInline are hardcoded in save. |
@@ -47,6 +49,7 @@ shows the variation placeholder in the editor.
 | Overlay CSS converted (or overlay enabled) | Class `has-background-overlay` (styles land on `::before`). |
 | `containerWidth: "alignwide"` | Class `alignwide` instead of `alignfull`. |
 | `containerWidth: "align-custom-width"` | Class `align-custom-width` (max-width from attrs / convert-css). |
+| `innerContentWidth: true` | Class `has-inner-content-width`. Direct children (except `alignfull` / background video) get content-size max-width + horizontal auto margin. |
 
 Style with convert-css:
 - wrapper / flex / color-image-gradient bg → `{{ROOT}} { … }`
@@ -75,6 +78,8 @@ Stylesheet + defaults (omit = these already apply). Write only what differs.
 .wp-block-blockish-container .blockish-container-background-video { height: 100%; inset: 0; object-fit: cover; pointer-events: none; position: absolute; width: 100%; z-index: -1; }
 :where(.wp-block-blockish-container.align-custom-width) { margin-left: auto; margin-right: auto; max-width: 100%; }
 :where(.wp-block-blockish-container .wp-block-blockish-container.align-custom-width) { margin-left: unset; margin-right: unset; }
+:where(.wp-block-blockish-container.has-inner-content-width > :not(.alignfull):not(.alignwide):not(.blockish-container-background-video):not(.block-list-appender):not(.block-editor-inner-blocks)) { max-width: var(--wp--style--global--content-size, 1200px); margin-left: auto; margin-right: auto; width: 100%; }
+:where(.wp-block-blockish-container.has-inner-content-width > .alignwide) { max-width: var(--wp--style--global--wide-size, 1200px); margin-left: auto; margin-right: auto; width: 100%; }
 /* Flex defaults at :where (spec 0) so Class Manager / attrs can override; nested flex resets align/justify only */
 :where(.wp-block-blockish-container.blockish-container.layout-type-flex) { flex-direction: row; align-items: center; justify-content: center; }
 :where(.wp-block-blockish-container .wp-block-blockish-container.blockish-container.layout-type-flex) { align-items: normal; justify-content: normal; }

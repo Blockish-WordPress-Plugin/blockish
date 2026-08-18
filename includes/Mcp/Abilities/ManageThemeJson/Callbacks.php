@@ -14,28 +14,15 @@ class Callbacks
 
         $delete     = $input['delete'] ?? false;
         $theme_json = $input['theme_json'] ?? null;
+        $post       = self::get_styles_post();
 
-        $args      = [
-            'post_type'              => 'wp_global_styles',
-            'posts_per_page'         => 1,
-            'post_status'            => 'publish',
-            'ignore_sticky_posts'    => true,
-            'no_found_rows'          => true,
-            'order'                  => 'DESC',
-            'orderby'                => 'date',
-            'update_post_term_cache' => false,
-            'update_post_meta_cache' => false,
-            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-            'tax_query'              => [
-                [
-                    'taxonomy' => 'wp_theme',
-                    'field'    => 'name',
-                    'terms'    => wp_get_theme()->get_stylesheet(),
-                ],
-            ],
-        ];
-        $query = new \WP_Query($args);
-        $post  = !empty($query->posts) ? $query->posts[0] : null;
+        if (!empty($input['list_revisions'])) {
+            return self::list_revisions($post, $input);
+        }
+
+        if (!empty($input['restore_revision_id'])) {
+            return self::restore_revision($post, $input);
+        }
 
         if ($delete) {
             if ($post && ! current_user_can( 'edit_theme_options' ) ) {
@@ -43,12 +30,7 @@ class Callbacks
             }
             if ($post) {
                 wp_delete_post($post->ID, true);
-                if (function_exists('wp_clean_theme_json_cache')) {
-                    wp_clean_theme_json_cache();
-                }
-                if (class_exists('\WP_Theme_JSON_Resolver')) {
-                    \WP_Theme_JSON_Resolver::clean_cached_data();
-                }
+                self::clean_styles_cache();
             }
             return [
                 'action' => 'deleted',
@@ -99,15 +81,16 @@ class Callbacks
             $final_data['version'] = 3;
         }
 
+        $post_id = $post ? (int) $post->ID : 0;
         $post_content = wp_slash(wp_json_encode($final_data));
 
         if ($post) {
             wp_update_post([
-                'ID'           => $post->ID,
+                'ID'           => $post_id,
                 'post_content' => $post_content,
             ]);
         } else {
-            $post_id = wp_insert_post([
+            $post_id = (int) wp_insert_post([
                 'post_type'    => 'wp_global_styles',
                 'post_name'    => 'wp-global-styles-' . urlencode(wp_get_theme()->get_stylesheet()),
                 'post_title'   => 'Custom Styles',
@@ -117,17 +100,185 @@ class Callbacks
             wp_set_post_terms($post_id, wp_get_theme()->get_stylesheet(), 'wp_theme');
         }
 
+        self::clean_styles_cache();
+
+        return [
+            'action'   => 'updated',
+            'post_id'  => $post_id,
+            'edit_url' => admin_url('site-editor.php?canvas=edit'),
+        ];
+    }
+
+    /**
+     * @return \WP_Post|null
+     */
+    private static function get_styles_post()
+    {
+        $args = [
+            'post_type'              => 'wp_global_styles',
+            'posts_per_page'         => 1,
+            'post_status'            => 'publish',
+            'ignore_sticky_posts'    => true,
+            'no_found_rows'          => true,
+            'order'                  => 'DESC',
+            'orderby'                => 'date',
+            'update_post_term_cache' => false,
+            'update_post_meta_cache' => false,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+            'tax_query'              => [
+                [
+                    'taxonomy' => 'wp_theme',
+                    'field'    => 'name',
+                    'terms'    => wp_get_theme()->get_stylesheet(),
+                ],
+            ],
+        ];
+        $query = new \WP_Query($args);
+        return !empty($query->posts) ? $query->posts[0] : null;
+    }
+
+    private static function clean_styles_cache(): void
+    {
         if (function_exists('wp_clean_theme_json_cache')) {
             wp_clean_theme_json_cache();
         }
         if (class_exists('\WP_Theme_JSON_Resolver')) {
             \WP_Theme_JSON_Resolver::clean_cached_data();
         }
+    }
+
+    /**
+     * @param \WP_Post|null $post
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    private static function list_revisions($post, array $input): array
+    {
+        if (!$post) {
+            return [
+                'action'     => 'listed',
+                'revisions'  => [],
+                'message'    => 'No custom global styles post yet — nothing to restore.',
+            ];
+        }
+
+        $limit = isset($input['limit']) ? absint($input['limit']) : 10;
+        if ($limit < 1) {
+            $limit = 10;
+        }
+        if ($limit > 50) {
+            $limit = 50;
+        }
+
+        $revisions = wp_get_post_revisions($post->ID, [
+            'numberposts' => $limit,
+            'orderby'     => 'date',
+            'order'       => 'DESC',
+        ]);
+
+        $items = [];
+        foreach ($revisions as $revision) {
+            $author = get_userdata((int) $revision->post_author);
+            $items[] = [
+                'id'      => (int) $revision->ID,
+                'date'    => $revision->post_modified_gmt,
+                'author'  => $author ? $author->display_name : '',
+                'summary' => self::revision_summary((string) $revision->post_content),
+            ];
+        }
 
         return [
-            'action'   => 'updated',
-            'edit_url' => admin_url('site-editor.php?canvas=edit'),
+            'action'     => 'listed',
+            'post_id'    => (int) $post->ID,
+            'revisions'  => $items,
+            'edit_url'   => admin_url('site-editor.php?canvas=edit'),
         ];
+    }
+
+    /**
+     * @param \WP_Post|null $post
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    private static function restore_revision($post, array $input): array
+    {
+        if (empty($input['confirm'])) {
+            return ['error' => 'confirm must be true to restore a global styles revision. Ask the user first.'];
+        }
+
+        if (!$post) {
+            return ['error' => 'No custom global styles post for this theme — nothing to restore.'];
+        }
+
+        if (!current_user_can('edit_theme_options')) {
+            return ['error' => 'You do not have access to edit theme options.'];
+        }
+
+        $revision_id = absint($input['restore_revision_id']);
+        $revision    = wp_get_post_revision($revision_id);
+        if (!$revision) {
+            return ['error' => 'Revision not found.'];
+        }
+        if ((int) $revision->post_parent !== (int) $post->ID) {
+            return ['error' => 'That revision is not for this theme\'s global styles.'];
+        }
+
+        $result = wp_restore_post_revision($revision_id);
+        if (!$result || is_wp_error($result)) {
+            $msg = is_wp_error($result) ? $result->get_error_message() : 'Failed to restore global styles revision.';
+            return ['error' => $msg];
+        }
+
+        self::clean_styles_cache();
+
+        return [
+            'action'      => 'restored',
+            'post_id'     => (int) $post->ID,
+            'revision_id' => $revision_id,
+            'edit_url'    => admin_url('site-editor.php?canvas=edit'),
+        ];
+    }
+
+    private static function revision_summary(string $content): string
+    {
+        $decoded = json_decode($content, true);
+        if (!is_array($decoded)) {
+            return '';
+        }
+
+        $bits = [];
+        $palette = $decoded['settings']['color']['palette']['theme']
+            ?? $decoded['settings']['color']['palette']['custom']
+            ?? $decoded['settings']['color']['palette']
+            ?? null;
+        if (is_array($palette) && !isset($palette['theme']) && !isset($palette['custom'])) {
+            $bits[] = count($palette) . ' palette colors';
+        } elseif (is_array($palette)) {
+            $n = 0;
+            foreach (['theme', 'custom'] as $origin) {
+                if (!empty($palette[$origin]) && is_array($palette[$origin])) {
+                    $n += count($palette[$origin]);
+                }
+            }
+            if ($n) {
+                $bits[] = $n . ' palette colors';
+            }
+        }
+
+        $fonts = $decoded['settings']['typography']['fontFamilies']['custom']
+            ?? $decoded['settings']['typography']['fontFamilies']
+            ?? null;
+        if (is_array($fonts) && isset($fonts[0])) {
+            $bits[] = count($fonts) . ' font families';
+        } elseif (is_array($fonts) && !empty($fonts['custom']) && is_array($fonts['custom'])) {
+            $bits[] = count($fonts['custom']) . ' custom font families';
+        }
+
+        if (isset($decoded['styles']) && is_array($decoded['styles'])) {
+            $bits[] = 'has styles';
+        }
+
+        return implode(', ', $bits);
     }
 
     /**

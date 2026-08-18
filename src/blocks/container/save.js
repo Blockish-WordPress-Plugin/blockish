@@ -11,6 +11,7 @@ export default function Save({ attributes }) {
 			'has-background-video': backgroundVideo?.url,
 			'has-background-overlay': backgroundOverlay?.enabled,
 			[`${attributes?.containerWidth}`]: attributes?.containerWidth && attributes?.isVariationPicked,
+			'has-inner-content-width': attributes?.innerContentWidth,
 			[`layout-type-${attributes?.display}`]: attributes?.display,
 			[`grid-layout-type-${attributes?.gridLayoutType}`]: attributes?.display === 'grid' && attributes?.gridLayoutType,
 		}),

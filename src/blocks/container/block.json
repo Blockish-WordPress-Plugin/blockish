@@ -42,6 +42,17 @@
         ".{{WRAPPER}}.align-custom-width": "max-width: {{VALUE}};"
       }
     },
+    "innerContentWidth": {
+      "type": "boolean",
+      "default": false
+    },
+    "innerContentMaxWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}.has-inner-content-width > :not(.alignfull):not(.alignwide):not(.blockish-container-background-video):not(.block-list-appender):not(.block-editor-inner-blocks)": "max-width: {{VALUE}};",
+        ".{{WRAPPER}}.has-inner-content-width > .block-editor-inner-blocks > .block-editor-block-list__layout > :not(.alignfull):not(.alignwide)": "max-width: {{VALUE}};"
+      }
+    },
     "containerMinHeight": {
       "type": "object",
       "selectors": {
