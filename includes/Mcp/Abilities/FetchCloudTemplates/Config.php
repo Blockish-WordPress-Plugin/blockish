@@ -63,7 +63,7 @@ class Config
             'permission_callback' => fn() => true,
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'NOTE TO AI: Designs include content + optional dependencies (patterns/forms/classes with cloud ids). 1) Create local entities from dependencies (classes via manage-class css or template-library import). 2) Remap ref/formId/classManager id from cloud IDs to new local IDs in content/schema. 3) Modify colors/copy/layout for the user. 4) Stage via manage-pattern / manage-post block_schema and share edit_url — never paste unresolved cloud refs.',
+                'usage_notes' => 'NOTE TO AI: Designs include content + optional dependencies (patterns/forms/classes with cloud ids). 1) Create local entities from dependencies (classes via manage-class css or template-library import). 2) Remap ref/formId/classManager id from cloud IDs to new local IDs in content/schema. 3) Modify colors/copy/layout for the user. 4) Stage via manage-pattern / manage-post block_schema and share edit_url — never paste unresolved cloud refs. Unlicensed Dynamicity/Forms cloud packages are omitted — if `note` says PRO REQUIRED, tell the user using designer-workflow step 6 / 6b (do not invent those templates).',
             ],
         ];
     }

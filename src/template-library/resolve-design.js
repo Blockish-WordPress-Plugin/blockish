@@ -490,7 +490,8 @@ async function ensureForm(cloudId, catalog, idMap, apiFetch, stack, classMeta = 
 		throw new Error(`Circular form dependency detected (id ${id}).`);
 	}
 
-	if (!window.blockishTemplateLibraryData?.packages?.forms?.installed) {
+	const formsPkg = window.blockishTemplateLibraryData?.packages?.forms;
+	if (!formsPkg?.installed || (formsPkg.requires_license && !formsPkg.licensed)) {
 		const err = new Error('FORMS_REQUIRED');
 		err.code = 'FORMS_REQUIRED';
 		throw err;

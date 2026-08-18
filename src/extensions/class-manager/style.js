@@ -50,6 +50,11 @@ const toLength = (value) => {
     return '';
 };
 
+const toUnitlessNumber = (value) => {
+    const n = parseFloat(toLength(value));
+    return Number.isFinite(n) ? n : '';
+};
+
 const buildSpacingCss = (property, value) => {
     if (value === undefined || value === null || value === '') return '';
     if (typeof value === 'string' || typeof value === 'number') {
@@ -212,8 +217,8 @@ const generateRuleSet = (styles, device) => {
     const color = normalizeColor(styles?.color);
 
     const layoutType = generateCSS({ attributes: styles, key: 'gridLayoutType', device });
-    const gridCols = generateCSS({ attributes: styles, key: 'gridColumns', device });
-    const gridRows = generateCSS({ attributes: styles, key: 'gridRows', device });
+    const gridCols = generateCSS({ attributes: styles, key: 'gridColumns', device, getValue: toUnitlessNumber });
+    const gridRows = generateCSS({ attributes: styles, key: 'gridRows', device, getValue: toUnitlessNumber });
     const autoGridWidth = generateCSS({ attributes: styles, key: 'autoGridWidth', device, getValue: toLength });
     const autoGridHeight = generateCSS({ attributes: styles, key: 'autoGridHeight', device, getValue: toLength });
 
@@ -224,6 +229,45 @@ const generateRuleSet = (styles, device) => {
     addRule('alignItems', generateCSS({ attributes: styles, key: 'alignItems', device, getValue: (v) => `align-items: ${v};` }));
     addRule('columnGap', generateCSS({ attributes: styles, key: 'columnGap', device, getValue: (v) => `column-gap: ${toLength(v)};` }));
     addRule('rowGap', generateCSS({ attributes: styles, key: 'rowGap', device, getValue: (v) => `row-gap: ${toLength(v)};` }));
+    addRule('alignSelf', generateCSS({ attributes: styles, key: 'alignSelf', device, getValue: (v) => `align-self: ${v};` }));
+    addRule('justifySelf', generateCSS({ attributes: styles, key: 'justifySelf', device, getValue: (v) => `justify-self: ${v};` }));
+    addRule('flexGrow', generateCSS({ attributes: styles, key: 'flexGrow', device, getValue: (v) => {
+        const n = toUnitlessNumber(v);
+        return n === '' ? '' : `flex-grow: ${n};`;
+    } }));
+    addRule('flexShrink', generateCSS({ attributes: styles, key: 'flexShrink', device, getValue: (v) => {
+        const n = toUnitlessNumber(v);
+        return n === '' ? '' : `flex-shrink: ${n};`;
+    } }));
+
+    const gridAxisNumber = (key) => generateCSS({ attributes: styles, key, device, getValue: toUnitlessNumber });
+    const emitGridAxis = (spanKey, startKey, endKey, property) => {
+        const span = gridAxisNumber(spanKey);
+        const start = gridAxisNumber(startKey);
+        const end = gridAxisNumber(endKey);
+        if (span && start) {
+            addRule(spanKey, `${property}: ${start} / span ${span};`);
+            return;
+        }
+        if (span) {
+            addRule(spanKey, `${property}: span ${span};`);
+            return;
+        }
+        if (start) addRule(startKey, `${property}-start: ${start};`);
+        if (end) addRule(endKey, `${property}-end: ${end};`);
+    };
+    emitGridAxis('gridColumnSpan', 'gridColumnStart', 'gridColumnEnd', 'grid-column');
+    emitGridAxis('gridRowSpan', 'gridRowStart', 'gridRowEnd', 'grid-row');
+
+    const flexOrder = generateCSS({ attributes: styles, key: 'flexOrder', device });
+    if (flexOrder === 'custom') {
+        addRule('flexCustomOrder', generateCSS({ attributes: styles, key: 'flexCustomOrder', device, getValue: (v) => {
+            const n = toUnitlessNumber(v);
+            return n === '' ? '' : `order: ${n};`;
+        } }));
+    } else if (flexOrder) {
+        addRule('flexOrder', `order: ${flexOrder};`);
+    }
 
     if (layoutType === 'fixed' && gridCols) pushRule(`grid-template-columns: repeat(${gridCols}, minmax(0, 1fr));`, true);
     if (layoutType === 'fixed' && gridRows) pushRule(`grid-template-rows: repeat(${gridRows}, minmax(0, 1fr));`, true);
@@ -249,7 +293,10 @@ const generateRuleSet = (styles, device) => {
     addRule('right', generateCSS({ attributes: styles, key: 'right', device, getValue: (v) => `right: ${toLength(v)};` }));
     addRule('bottom', generateCSS({ attributes: styles, key: 'bottom', device, getValue: (v) => `bottom: ${toLength(v)};` }));
     addRule('left', generateCSS({ attributes: styles, key: 'left', device, getValue: (v) => `left: ${toLength(v)};` }));
-    addRule('zIndex', generateCSS({ attributes: styles, key: 'zIndex', device, getValue: (v) => `z-index: ${v};` }));
+    addRule('zIndex', generateCSS({ attributes: styles, key: 'zIndex', device, getValue: (v) => {
+        const n = toUnitlessNumber(v);
+        return n === '' ? '' : `z-index: ${n};`;
+    } }));
     addRule('anchorOffset', generateCSS({ attributes: styles, key: 'anchorOffset', device, getValue: (v) => `scroll-margin-top: ${toLength(v)};` }));
 
     pushRule(styles?.fontFamily?.value ? `font-family: ${styles.fontFamily.value};` : '', false);
@@ -259,7 +306,10 @@ const generateRuleSet = (styles, device) => {
     addRule('lineHeight', generateCSS({ attributes: styles, key: 'lineHeight', device, getValue: (v) => `line-height: ${toLength(v)};` }));
     addRule('letterSpacing', generateCSS({ attributes: styles, key: 'letterSpacing', device, getValue: (v) => `letter-spacing: ${toLength(v)};` }));
     addRule('wordSpacing', generateCSS({ attributes: styles, key: 'wordSpacing', device, getValue: (v) => `word-spacing: ${toLength(v)};` }));
-    addRule('columnCount', generateCSS({ attributes: styles, key: 'columnCount', device, getValue: (v) => `column-count: ${v};` }));
+    addRule('columnCount', generateCSS({ attributes: styles, key: 'columnCount', device, getValue: (v) => {
+        const n = toUnitlessNumber(v);
+        return n === '' ? '' : `column-count: ${n};`;
+    } }));
     addRule('textDecoration', generateCSS({ attributes: styles, key: 'textDecoration', device, getValue: (v) => `text-decoration: ${v};` }));
     addRule('textTransform', generateCSS({ attributes: styles, key: 'textTransform', device, getValue: (v) => `text-transform: ${v};` }));
     addRule('direction', generateCSS({ attributes: styles, key: 'direction', device, getValue: (v) => `direction: ${v};` }));

@@ -50,6 +50,26 @@ export const GRID_LAYOUT_OPTIONS = [
     { label: 'Fixed', value: 'fixed' },
 ];
 
+export const ALIGN_SELF_OPTIONS = [
+    { label: 'Start', value: 'start' },
+    { label: 'Center', value: 'center' },
+    { label: 'End', value: 'end' },
+    { label: 'Stretch', value: 'stretch' },
+];
+
+export const JUSTIFY_SELF_OPTIONS = [
+    { label: 'Start', value: 'start' },
+    { label: 'Center', value: 'center' },
+    { label: 'End', value: 'end' },
+    { label: 'Stretch', value: 'stretch' },
+];
+
+export const FLEX_ORDER_OPTIONS = [
+    { label: 'Start', value: '-99999' },
+    { label: 'End', value: '99999' },
+    { label: 'Custom', value: 'custom' },
+];
+
 export const POSITION_OPTIONS = [
     { label: 'Static', value: 'static' },
     { label: 'Relative', value: 'relative' },

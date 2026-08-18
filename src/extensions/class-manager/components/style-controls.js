@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { rotateRight } from '@wordpress/icons';
 import {
     ALIGN_ITEMS_OPTIONS,
+    ALIGN_SELF_OPTIONS,
     ASPECT_RATIO_OPTIONS,
     BLEND_MODE_OPTIONS,
     BACKGROUND_CLIP_OPTIONS,
@@ -10,9 +11,11 @@ import {
     FONT_STYLE_OPTIONS,
     FONT_WEIGHT_OPTIONS,
     FLEX_DIRECTION_OPTIONS,
+    FLEX_ORDER_OPTIONS,
     FLEX_WRAP_OPTIONS,
     GRID_LAYOUT_OPTIONS,
     JUSTIFY_CONTENT_OPTIONS,
+    JUSTIFY_SELF_OPTIONS,
     OBJECT_FIT_OPTIONS,
     OVERFLOW_OPTIONS,
     POSITION_OPTIONS,
@@ -24,6 +27,39 @@ import {
     TRANSITION_TIMING_OPTIONS,
 } from '../utils';
 
+const toStoredNumber = (next) => {
+    if (next === '' || next === undefined || next === null) {
+        return undefined;
+    }
+    const n = typeof next === 'number' ? next : parseFloat(next);
+    return Number.isFinite(n) ? n : undefined;
+};
+
+const numberFromStyle = (raw) => {
+    if (raw === undefined || raw === null || raw === '') {
+        return undefined;
+    }
+    if (typeof raw === 'object' && !Array.isArray(raw) && raw.value !== undefined && raw.value !== null && raw.value !== '') {
+        const n = parseFloat(raw.value);
+        return Number.isFinite(n) ? n : undefined;
+    }
+    const n = typeof raw === 'number' ? raw : parseFloat(raw);
+    return Number.isFinite(n) ? n : undefined;
+};
+
+/**
+ * TODO: Class Manager controls worth adding (reusable CSS on any selector).
+ * High — Flex/Grid: align-content, justify-items, place-items, place-content,
+ * flex-basis, gap shorthand, grid-auto-flow (row / column / dense).
+ * High — Box: box-sizing, visibility, overflow-x / overflow-y, object-position,
+ * cursor, pointer-events, user-select.
+ * High — Type: white-space, word-break, text-wrap, line-clamp, list-style-type.
+ * Medium — outline + outline-offset; inset / inset-inline / inset-block;
+ * clip-path presets, mask-image.
+ * Skip here: animation (Interactions owns keyframes); display contents / flow-root;
+ * grid-template-areas; float/clear; extra hover panel (:hover subselector exists).
+ */
+
 const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
     const {
         BlockishPanelBody,
@@ -31,6 +67,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
         BlockishSpacingSizes,
         BlockishSelect,
         BlockishRangeUnit,
+        BlockishNumber,
         BlockishDropdown,
         BlockishFontFamily,
         BlockishBorder,
@@ -50,9 +87,6 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
     const { useDeviceType } = window.blockish.helpers;
 
     const device = useDeviceType();
-    const displayValue = value?.display?.[device]?.value;
-    const isFlexDisplay = displayValue === 'flex' || displayValue === 'inline-flex';
-    const isGridDisplay = displayValue === 'grid' || displayValue === 'inline-grid';
     const onChangeResponsiveValue = (key, nextValue) => {
         onChange({
             ...value,
@@ -101,125 +135,6 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 />
             </BlockishResponsive>
 
-            {isFlexDisplay && (
-                <>
-                    <BlockishResponsive left="92px">
-                        <BlockishSelect
-                            label={__('Flex Direction', 'blockish')}
-                            options={FLEX_DIRECTION_OPTIONS}
-                            value={value?.flexDirection?.[device]}
-                            onChange={(next) => onChangeResponsiveValue('flexDirection', next)}
-                        />
-                    </BlockishResponsive>
-
-                    <BlockishResponsive left="66px">
-                        <BlockishSelect
-                            label={__('Flex Wrap', 'blockish')}
-                            options={FLEX_WRAP_OPTIONS}
-                            value={value?.flexWrap?.[device]}
-                            onChange={(next) => onChangeResponsiveValue('flexWrap', next)}
-                        />
-                    </BlockishResponsive>
-
-                    <BlockishResponsive left="105px">
-                        <BlockishSelect
-                            label={__('Justify Content', 'blockish')}
-                            options={JUSTIFY_CONTENT_OPTIONS}
-                            value={value?.justifyContent?.[device]}
-                            onChange={(next) => onChangeResponsiveValue('justifyContent', next)}
-                        />
-                    </BlockishResponsive>
-
-                    <BlockishResponsive left="75px">
-                        <BlockishSelect
-                            label={__('Align Items', 'blockish')}
-                            options={ALIGN_ITEMS_OPTIONS}
-                            value={value?.alignItems?.[device]}
-                            onChange={(next) => onChangeResponsiveValue('alignItems', next)}
-                        />
-                    </BlockishResponsive>
-
-                </>
-            )}
-
-            {isGridDisplay && (
-                <>
-                    <BlockishResponsive left="75px">
-                        <BlockishSelect
-                            label={__('Grid Layout', 'blockish')}
-                            options={GRID_LAYOUT_OPTIONS}
-                            value={value?.gridLayoutType?.[device]}
-                            onChange={(next) => onChangeResponsiveValue('gridLayoutType', next)}
-                        />
-                    </BlockishResponsive>
-
-                    {value?.gridLayoutType?.[device] === 'fixed' && (
-                        <>
-                            <BlockishResponsive left="92px">
-                                <BlockishRangeUnit
-                                    label={__('Columns', 'blockish')}
-                                    value={value?.gridColumns?.[device]}
-                                    onChange={(next) => onChangeResponsiveValue('gridColumns', next)}
-                                    units={{
-                                        px: { min: 1, max: 12, step: 1 },
-                                    }}
-                                />
-                            </BlockishResponsive>
-                            <BlockishResponsive left="75px">
-                                <BlockishRangeUnit
-                                    label={__('Rows', 'blockish')}
-                                    value={value?.gridRows?.[device]}
-                                    onChange={(next) => onChangeResponsiveValue('gridRows', next)}
-                                    units={{
-                                        px: { min: 1, max: 12, step: 1 },
-                                    }}
-                                />
-                            </BlockishResponsive>
-                        </>
-                    )}
-
-                    {value?.gridLayoutType?.[device] === 'auto' && (
-                        <>
-                            <BlockishResponsive left="70px">
-                                <BlockishRangeUnit
-                                    label={__('Grid Width', 'blockish')}
-                                    value={value?.autoGridWidth?.[device]}
-                                    onChange={(next) => onChangeResponsiveValue('autoGridWidth', next)}
-                                />
-                            </BlockishResponsive>
-                            <BlockishResponsive left="72px">
-                                <BlockishRangeUnit
-                                    label={__('Grid Height', 'blockish')}
-                                    value={value?.autoGridHeight?.[device]}
-                                    onChange={(next) => onChangeResponsiveValue('autoGridHeight', next)}
-                                />
-                            </BlockishResponsive>
-                        </>
-                    )}
-                </>
-            )}
-
-            {(isFlexDisplay || isGridDisplay) && (
-                <>
-                    <BlockishResponsive left="77px">
-                        <BlockishRangeUnit
-                            label={__('Column Gap', 'blockish')}
-                            value={value?.columnGap?.[device]}
-                            onChange={(next) => onChangeResponsiveValue('columnGap', next)}
-                        />
-                    </BlockishResponsive>
-                    <BlockishResponsive left="54px">
-                        <BlockishRangeUnit
-                            label={__('Row Gap', 'blockish')}
-                            value={value?.rowGap?.[device]}
-                            onChange={(next) => onChangeResponsiveValue('rowGap', next)}
-                        />
-                    </BlockishResponsive>
-                </>
-            )}
-        </BlockishPanelBody>
-
-        <BlockishPanelBody title={__('Spacing', 'blockish')} initialOpen={false}>
             <BlockishResponsive left="52px">
                 <BlockishSpacingSizes
                     label={__('Padding', 'blockish')}
@@ -233,6 +148,238 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                     label={__('Margin', 'blockish')}
                     value={value?.margin?.[device]}
                     onChange={(next) => onChangeResponsiveValue('margin', next)}
+                />
+            </BlockishResponsive>
+        </BlockishPanelBody>
+
+        <BlockishPanelBody title={__('Flex', 'blockish')} initialOpen={false}>
+            <BlockishResponsive left="92px">
+                <BlockishSelect
+                    label={__('Flex Direction', 'blockish')}
+                    options={FLEX_DIRECTION_OPTIONS}
+                    value={value?.flexDirection?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('flexDirection', next)}
+                />
+            </BlockishResponsive>
+
+            <BlockishResponsive left="66px">
+                <BlockishSelect
+                    label={__('Flex Wrap', 'blockish')}
+                    options={FLEX_WRAP_OPTIONS}
+                    value={value?.flexWrap?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('flexWrap', next)}
+                />
+            </BlockishResponsive>
+
+            <BlockishResponsive left="105px">
+                <BlockishSelect
+                    label={__('Justify Content', 'blockish')}
+                    options={JUSTIFY_CONTENT_OPTIONS}
+                    value={value?.justifyContent?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('justifyContent', next)}
+                />
+            </BlockishResponsive>
+
+            <BlockishResponsive left="75px">
+                <BlockishSelect
+                    label={__('Align Items', 'blockish')}
+                    options={ALIGN_ITEMS_OPTIONS}
+                    value={value?.alignItems?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('alignItems', next)}
+                />
+            </BlockishResponsive>
+
+            <BlockishResponsive left="77px">
+                <BlockishRangeUnit
+                    label={__('Column Gap', 'blockish')}
+                    value={value?.columnGap?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('columnGap', next)}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="54px">
+                <BlockishRangeUnit
+                    label={__('Row Gap', 'blockish')}
+                    value={value?.rowGap?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('rowGap', next)}
+                />
+            </BlockishResponsive>
+
+            <BlockishResponsive left="64px">
+                <BlockishSelect
+                    label={__('Align Self', 'blockish')}
+                    options={ALIGN_SELF_OPTIONS}
+                    value={value?.alignSelf?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('alignSelf', next)}
+                />
+            </BlockishResponsive>
+
+            <BlockishResponsive left="40px">
+                <BlockishSelect
+                    label={__('Order', 'blockish')}
+                    options={FLEX_ORDER_OPTIONS}
+                    value={value?.flexOrder?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('flexOrder', next)}
+                />
+            </BlockishResponsive>
+
+            {value?.flexOrder?.[device]?.value === 'custom' && (
+                <BlockishResponsive left="89px">
+                    <BlockishNumber
+                        label={__('Custom Order', 'blockish')}
+                        value={numberFromStyle(value?.flexCustomOrder?.[device])}
+                        onChange={(next) => onChangeResponsiveValue('flexCustomOrder', toStoredNumber(next))}
+                        min={-99999}
+                        max={99999}
+                    />
+                </BlockishResponsive>
+            )}
+
+            <BlockishResponsive left="36px">
+                <BlockishNumber
+                    label={__('Grow', 'blockish')}
+                    value={numberFromStyle(value?.flexGrow?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('flexGrow', toStoredNumber(next))}
+                    min={0}
+                    max={99}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="42px">
+                <BlockishNumber
+                    label={__('Shrink', 'blockish')}
+                    value={numberFromStyle(value?.flexShrink?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('flexShrink', toStoredNumber(next))}
+                    min={0}
+                    max={99}
+                />
+            </BlockishResponsive>
+        </BlockishPanelBody>
+
+        <BlockishPanelBody title={__('Grid', 'blockish')} initialOpen={false}>
+            <BlockishResponsive left="75px">
+                <BlockishSelect
+                    label={__('Grid Layout', 'blockish')}
+                    options={GRID_LAYOUT_OPTIONS}
+                    value={value?.gridLayoutType?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('gridLayoutType', next)}
+                />
+            </BlockishResponsive>
+
+            <BlockishResponsive left="92px">
+                <BlockishNumber
+                    label={__('Columns', 'blockish')}
+                    value={numberFromStyle(value?.gridColumns?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('gridColumns', toStoredNumber(next))}
+                    min={1}
+                    max={12}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="75px">
+                <BlockishNumber
+                    label={__('Rows', 'blockish')}
+                    value={numberFromStyle(value?.gridRows?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('gridRows', toStoredNumber(next))}
+                    min={1}
+                    max={12}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="70px">
+                <BlockishRangeUnit
+                    label={__('Grid Width', 'blockish')}
+                    value={value?.autoGridWidth?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('autoGridWidth', next)}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="72px">
+                <BlockishRangeUnit
+                    label={__('Grid Height', 'blockish')}
+                    value={value?.autoGridHeight?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('autoGridHeight', next)}
+                />
+            </BlockishResponsive>
+
+            <BlockishResponsive left="77px">
+                <BlockishRangeUnit
+                    label={__('Column Gap', 'blockish')}
+                    value={value?.columnGap?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('columnGap', next)}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="54px">
+                <BlockishRangeUnit
+                    label={__('Row Gap', 'blockish')}
+                    value={value?.rowGap?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('rowGap', next)}
+                />
+            </BlockishResponsive>
+
+            <BlockishResponsive left="64px">
+                <BlockishSelect
+                    label={__('Align Self', 'blockish')}
+                    options={ALIGN_SELF_OPTIONS}
+                    value={value?.alignSelf?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('alignSelf', next)}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="77px">
+                <BlockishSelect
+                    label={__('Justify Self', 'blockish')}
+                    options={JUSTIFY_SELF_OPTIONS}
+                    value={value?.justifySelf?.[device]}
+                    onChange={(next) => onChangeResponsiveValue('justifySelf', next)}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="80px">
+                <BlockishNumber
+                    label={__('Column Span', 'blockish')}
+                    value={numberFromStyle(value?.gridColumnSpan?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('gridColumnSpan', toStoredNumber(next))}
+                    min={1}
+                    max={12}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="62px">
+                <BlockishNumber
+                    label={__('Row Span', 'blockish')}
+                    value={numberFromStyle(value?.gridRowSpan?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('gridRowSpan', toStoredNumber(next))}
+                    min={1}
+                    max={12}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="88px">
+                <BlockishNumber
+                    label={__('Column Start', 'blockish')}
+                    value={numberFromStyle(value?.gridColumnStart?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('gridColumnStart', toStoredNumber(next))}
+                    min={1}
+                    max={13}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="75px">
+                <BlockishNumber
+                    label={__('Column End', 'blockish')}
+                    value={numberFromStyle(value?.gridColumnEnd?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('gridColumnEnd', toStoredNumber(next))}
+                    min={1}
+                    max={13}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="64px">
+                <BlockishNumber
+                    label={__('Row Start', 'blockish')}
+                    value={numberFromStyle(value?.gridRowStart?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('gridRowStart', toStoredNumber(next))}
+                    min={1}
+                    max={13}
+                />
+            </BlockishResponsive>
+            <BlockishResponsive left="52px">
+                <BlockishNumber
+                    label={__('Row End', 'blockish')}
+                    value={numberFromStyle(value?.gridRowEnd?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('gridRowEnd', toStoredNumber(next))}
+                    min={1}
+                    max={13}
                 />
             </BlockishResponsive>
         </BlockishPanelBody>
@@ -324,9 +471,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 />
             </BlockishResponsive>
 
-            {value?.position?.[device] && value?.position?.[device] !== 'static' && (
-                <>
-                    <BlockishResponsive left="25px">
+            <BlockishResponsive left="25px">
                         <BlockishRangeUnit
                             label={__('Top', 'blockish')}
                             value={value?.top?.[device]}
@@ -386,17 +531,14 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                             }}
                         />
                     </BlockishResponsive>
-                </>
-            )}
 
             <BlockishResponsive left="48px">
-                <BlockishRangeUnit
+                <BlockishNumber
                     label={__('Z-Index', 'blockish')}
-                    value={value?.zIndex?.[device]}
-                    onChange={(next) => onChangeResponsiveValue('zIndex', next)}
-                    units={{
-                        px: { min: -999, max: 999, step: 1 },
-                    }}
+                    value={numberFromStyle(value?.zIndex?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('zIndex', toStoredNumber(next))}
+                    min={-999}
+                    max={999}
                 />
             </BlockishResponsive>
 
@@ -514,13 +656,12 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
             </BlockishResponsive>
 
             <BlockishResponsive left="50px">
-                <BlockishRangeUnit
+                <BlockishNumber
                     label={__('Column', 'blockish')}
-                    value={value?.columnCount?.[device]}
-                    onChange={(next) => onChangeResponsiveValue('columnCount', next)}
-                    units={{
-                        px: { min: 1, max: 12, step: 1 },
-                    }}
+                    value={numberFromStyle(value?.columnCount?.[device])}
+                    onChange={(next) => onChangeResponsiveValue('columnCount', toStoredNumber(next))}
+                    min={1}
+                    max={12}
                 />
             </BlockishResponsive>
 
