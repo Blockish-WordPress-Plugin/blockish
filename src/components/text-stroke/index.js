@@ -26,6 +26,7 @@ const BlockishTextStroke = ( {
 	label = __( 'Text Stroke', 'blockish' ),
 	value,
 	onChange,
+	showReset = true,
 } ) => {
 	const { BlockishDropdown, BlockishRangeUnit, BlockishResponsive, BlockishColor } =
 		window.blockish.components;
@@ -71,17 +72,19 @@ const BlockishTextStroke = ( {
 								</HStack>
 							</Button>
 						</FlexBlock>
-						<FlexItem>
-							<Button
-								className="blockish-text-stroke-button blockish-text-stroke-reset"
-								variant="secondary"
-								icon={ rotateRight }
-								onClick={ () => onChange( '' ) }
-								disabled={ ! hasValue( usableValue ) }
-								label={ __( 'Reset Text Stroke', 'blockish' ) }
-								showTooltip
-							/>
-						</FlexItem>
+						{ showReset && (
+							<FlexItem>
+								<Button
+									className="blockish-text-stroke-button blockish-text-stroke-reset"
+									variant="secondary"
+									icon={ rotateRight }
+									onClick={ () => onChange( '' ) }
+									disabled={ ! hasValue( usableValue ) }
+									label={ __( 'Reset Text Stroke', 'blockish' ) }
+									showTooltip
+								/>
+							</FlexItem>
+						) }
 					</Flex>
 				) }
 			>
@@ -91,12 +94,14 @@ const BlockishTextStroke = ( {
 							label={ __( 'Stroke Width', 'blockish' ) }
 							value={ usableValue?.width?.[ device ] }
 							onChange={ handleWidthChange }
+							showReset={ false }
 						/>
 					</BlockishResponsive>
 					<BlockishColor
 						label={ __( 'Stroke Color', 'blockish' ) }
 						value={ usableValue?.color }
 						onChange={ handleColorChange }
+						showReset={ false }
 					/>
 				</div>
 			</BlockishDropdown>

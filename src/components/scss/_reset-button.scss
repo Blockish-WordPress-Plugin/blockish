@@ -1,0 +1,38 @@
+.blockish-control-label {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 8px;
+	width: 100%;
+
+	.components-base-control__label,
+	.components-base-control__associated-help-text,
+	legend {
+		margin-bottom: 0 !important;
+	}
+}
+
+.blockish-reset-button {
+	flex-shrink: 0;
+	min-width: 24px;
+	height: 24px;
+	padding: 0 !important;
+	color: #1e1e1e !important;
+	box-shadow: none !important;
+
+	&:hover:not(:disabled) {
+		color: #3858e9 !important;
+	}
+
+	&:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
+	}
+}
+
+.blockish-range-unit {
+	.blockish-reset-button {
+		margin-left: 4px;
+	}
+}

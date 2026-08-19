@@ -46,6 +46,7 @@ const BlockishBoxShadow = ( {
 	onChange,
 	label = __( 'Drop Shadow', 'blockish' ),
 	exclude = [],
+	showReset = true,
 } ) => {
 	// Safely parse the value - handle empty strings and undefined
 	let usableBoxShadow;
@@ -68,17 +69,19 @@ const BlockishBoxShadow = ( {
 				<div className="blockish-box-shadow-header">
 					<h5 className="blockish-box-shadow-title">{ label }</h5>
 					<div className="blockish-box-shadow-actions">
-						<div className="blockish-box-shadow-reset-button-wrapper">
-							<Button
-								className="blockish-box-shadow-reset-button"
-								onClick={ () => onChange( '' ) }
-								size="small"
-								icon={ rotateRight }
-								label={ __( 'Reset Shadow', 'blockish' ) }
-								showTooltip
-								disabled={ ! hasValue( value ) }
-							/>
-						</div>
+						{ showReset && (
+							<div className="blockish-box-shadow-reset-button-wrapper">
+								<Button
+									className="blockish-box-shadow-reset-button"
+									onClick={ () => onChange( '' ) }
+									size="small"
+									icon={ rotateRight }
+									label={ __( 'Reset Shadow', 'blockish' ) }
+									showTooltip
+									disabled={ ! hasValue( value ) }
+								/>
+							</div>
+						) }
 						<div className="blockish-box-shadow-add-button-wrapper">
 							<Button
 								className="blockish-box-shadow-add-button"

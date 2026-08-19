@@ -7,13 +7,14 @@ import {
 	Button, 
 	BaseControl, 
 	__experimentalHStack as HStack, 	
-	__experimentalVStack as VStack
+    __experimentalVStack as VStack
  } from '@wordpress/components';
 import { 
 	LineHeightControl,
 	__experimentalUnitControl as UnitControl
 } from '@wordpress/block-editor';
 import fontWeights from './font-weights';
+import BlockishResetButton from '../reset-button';
 
 const UNITS = {
 	fontSize: {
@@ -29,6 +30,7 @@ const BlockishTypography = ({
 	onChange,
 	excludeControls = [],
 	units: userUnits,
+	showReset = true,
 }) => {
 	const {
 		BlockishFontFamily,
@@ -75,25 +77,48 @@ const BlockishTypography = ({
 		letterSpacing: typographyValue?.letterSpacing?.[device],
 	};
 
+	const hasTypographyValue = !!typographyValue && Object.values(typographyValue).some((item) => {
+		if (item === undefined || item === null || item === '') {
+			return false;
+		}
+		if (typeof item === 'object') {
+			return Object.values(item).some(Boolean);
+		}
+		return true;
+	});
+
 	return (
 		<div className="blockish-group-control blockish-control blockish-typography-control">
 			<BlockishDropdown
 				label={label}
 				renderToggle={({ isOpen, onToggle }) => {
 					return (
-						<div className="blockish-typography-toggle" aria-expanded={isOpen} onClick={onToggle}>
-							<BaseControl label={label}>
-								<Button
-									className="blockish-typography-toggle-button"
-									variant="secondary"
-									onClick={onToggle}
-									aria-expanded={isOpen}
-								>
-									<div className="blockish-typography-preview" style={previewStyle}>
-										{__('Aa', 'blockish')}
-									</div>
-								</Button>
-							</BaseControl>
+						<div className="blockish-typography-toggle">
+							<div className="blockish-typography-label-row">
+								<BaseControl.VisualLabel as="legend" __nextHasNoMarginBottom={true}>
+									{label}
+								</BaseControl.VisualLabel>
+								{showReset && (
+									<BlockishResetButton
+										onClick={(event) => {
+											event.stopPropagation();
+											onChange('');
+										}}
+										disabled={!hasTypographyValue}
+										label={__('Reset typography', 'blockish')}
+									/>
+								)}
+							</div>
+							<Button
+								className="blockish-typography-toggle-button"
+								variant="secondary"
+								onClick={onToggle}
+								aria-expanded={isOpen}
+							>
+								<div className="blockish-typography-preview" style={previewStyle}>
+									{__('Aa', 'blockish')}
+								</div>
+							</Button>
 						</div>
 					)
 				}}
@@ -107,6 +132,7 @@ const BlockishTypography = ({
 										label={__('Font Family', 'blockish')}
 										value={typographyValue?.fontFamily}
 										onChange={(newValue) => handleChange('fontFamily', newValue)}
+										showReset={false}
 									/>
 								</div>
 							)}
@@ -146,6 +172,7 @@ const BlockishTypography = ({
 											[device]: value
 										})}
 										units={units?.fontSize}
+										showReset={false}
 									/>
 								</BlockishResponsive>
 							</div>

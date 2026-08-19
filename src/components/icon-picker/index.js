@@ -11,7 +11,7 @@ import { useCustomSVGIcons } from './use-custom-svg-icons';
 import parse from "html-react-parser";
 import cleanMarkup from './clean-markup';
 
-const BlockishIconPicker = ({ label, value, onChange }) => {
+const BlockishIconPicker = ({ label, value, onChange, showReset = true }) => {
     const [openLibrary, setOpenLibrary] = useState(false);
     const [category, setCategory] = useState('all');
     const [search, setSearch] = useState('');
@@ -130,7 +130,7 @@ const BlockishIconPicker = ({ label, value, onChange }) => {
                     >
                         {__('Icon selection controls', 'blockish')}
                     </span>
-                    {!!value && (
+                    {!!value && showReset && (
                         <Button
                             className="blockish-icon-picker-preview-remove"
                             aria-label={__('Remove selected icon', 'blockish')}

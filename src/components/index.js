@@ -35,6 +35,7 @@ import BlockishDivider from "./divider";
 import BlockishTextStroke from "./text-stroke";
 import BlockishCodeEditor from "./code-editor";
 import BlockishRepeater from "./repeater";
+import BlockishResetButton from "./reset-button";
 
 if (window?.blockish?.screen) {
     window.blockish.components = {
@@ -74,5 +75,6 @@ if (window?.blockish?.screen) {
         BlockishTextStroke,
         BlockishCodeEditor,
         BlockishRepeater,
+        BlockishResetButton,
     }
 }

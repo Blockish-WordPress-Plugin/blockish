@@ -2,7 +2,7 @@ import Select from "react-select";
 import AsyncSelect from "react-select/async";
 import { BaseControl } from "@wordpress/components";
 
-const BlockishSelect = ({ label = 'Select', value, onChange, options = [], ...props }) => {
+const BlockishSelect = ({ label = 'Select', value, onChange, options = [], showReset = true, isClearable, ...props }) => {
 	return (
 		<div className="blockish-control blockish-select-control">
 			<BaseControl.VisualLabel as="legend" children={label} __nextHasNoMarginBottom={true} />
@@ -13,7 +13,7 @@ const BlockishSelect = ({ label = 'Select', value, onChange, options = [], ...pr
 				onChange={onChange}
 				options={options}
 				isSearchable
-				isClearable
+				isClearable={isClearable ?? showReset}
 				theme={(theme) => ({
 					...theme,
 					colors: {
@@ -29,7 +29,7 @@ const BlockishSelect = ({ label = 'Select', value, onChange, options = [], ...pr
 };
 
 // ✅ Async version
-const BlockishAsyncSelect = ({ label = 'Select', value, onChange, loadOptions, ...props }) => {
+const BlockishAsyncSelect = ({ label = 'Select', value, onChange, loadOptions, showReset = true, isClearable, ...props }) => {
 	return (
 		<div className="blockish-control blockish-select-control">
 			<BaseControl.VisualLabel as="legend" children={label} __nextHasNoMarginBottom={true} />
@@ -42,7 +42,7 @@ const BlockishAsyncSelect = ({ label = 'Select', value, onChange, loadOptions, .
 				defaultOptions
 				cacheOptions
 				isSearchable
-				isClearable
+				isClearable={isClearable ?? showReset}
 				theme={(theme) => ({
 					...theme,
 					colors: {

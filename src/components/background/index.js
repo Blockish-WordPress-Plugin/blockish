@@ -6,7 +6,7 @@ import {
 } from '@wordpress/components';
 import { __ } from "@wordpress/i18n";
 
-const BlockishBackground = ({ value, onChange, label = __('Background', 'blockish'), showVideo = false, noLabel = false, ...props }) => {
+const BlockishBackground = ({ value, onChange, label = __('Background', 'blockish'), showVideo = false, noLabel = false, showReset = true, ...props }) => {
     const { BlockishColor, BlockishMediaUploader, BlockishToggleGroup, BlockishSelect, BlockishRangeUnit, BlockishResponsive } = window.blockish.components;
     const { useDeviceType, useInheritResponsiveValue } = window.blockish.helpers;
     const device = useDeviceType();
@@ -64,7 +64,7 @@ const BlockishBackground = ({ value, onChange, label = __('Background', 'blockis
                 ) : (
                     <ToolsPanel
                         label={__('Background Controls', 'blockish')}
-                        resetAll={() => onChange('')}
+                        resetAll={showReset ? () => onChange('') : undefined}
                         __experimentalFirstVisibleItemClass="first"
                         __experimentalLastVisibleItemClass="last"
                         dropdownMenuProps={{
@@ -166,6 +166,7 @@ const BlockishBackground = ({ value, onChange, label = __('Background', 'blockis
                                                                     }
                                                                 }))}
                                                                 placeholder={__('0', 'blockish')}
+                                                                showReset={false}
                                                             />
                                                         </BlockishResponsive>
                                                         <BlockishResponsive left="38px">
@@ -179,6 +180,7 @@ const BlockishBackground = ({ value, onChange, label = __('Background', 'blockis
                                                                     }
                                                                 }))}
                                                                 placeholder={__('0', 'blockish')}
+                                                                showReset={false}
                                                             />
                                                         </BlockishResponsive>
                                                     </>
@@ -235,6 +237,7 @@ const BlockishBackground = ({ value, onChange, label = __('Background', 'blockis
                                                                 }
                                                             }))}
                                                             placeholder={__('0', 'blockish')}
+                                                            showReset={false}
                                                         />
                                                     </BlockishResponsive>
                                                 )

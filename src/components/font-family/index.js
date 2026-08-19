@@ -153,7 +153,7 @@ const BlockishFontFamily = (props) => {
 				loadOptions={loadOptions}
 				cacheOptions
 				defaultOptions
-				isClearable
+				showReset={props.showReset}
 				isSearchable
 			/>
 		</div>

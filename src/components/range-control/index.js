@@ -1,5 +1,6 @@
 import { RangeControl } from '@wordpress/components';
-const BlockishRangeControl = ({ label = 'Range', value, onChange, ...props }) => {
+
+const BlockishRangeControl = ({ label = 'Range', value, onChange, showReset = true, ...props }) => {
     return (
         <div className="blockish-control blockish-range-control">
             <RangeControl
@@ -7,8 +8,8 @@ const BlockishRangeControl = ({ label = 'Range', value, onChange, ...props }) =>
                 label={label}
                 value={value}
                 onChange={onChange}
-               
                 {...props}
+                allowReset={showReset}
             />
         </div>
     )

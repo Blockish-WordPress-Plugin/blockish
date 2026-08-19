@@ -9,7 +9,7 @@ import invert from "./images/invert.png";
 import sepia from "./images/sepia.png";
 
 
-const BlockishCSSFilters = ({ label = __('CSS Filters', 'blockish'), value, onChange, excludes = [] }) => {
+const BlockishCSSFilters = ({ label = __('CSS Filters', 'blockish'), value, onChange, excludes = [], showReset = true }) => {
     const { BlockishDropdown } = window.blockish.components;
     const excludeFilters = new Set(excludes);
     const usableValue = value && typeof value == 'string' ? JSON.parse(value) : value;
@@ -43,6 +43,7 @@ const BlockishCSSFilters = ({ label = __('CSS Filters', 'blockish'), value, onCh
                                 </HStack>
                             </Button>
                         </FlexBlock>
+                        {showReset && (
                         <FlexItem>
                             <Button
                                 className="blockish-css-filters-button blockish-css-filters-reset"
@@ -52,6 +53,7 @@ const BlockishCSSFilters = ({ label = __('CSS Filters', 'blockish'), value, onCh
                                 disabled={!hasValue}
                             />
                         </FlexItem>
+                        )}
                     </Flex>
                 )}
             >
