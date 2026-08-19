@@ -1,5 +1,7 @@
 import { __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 import { rotateRight } from '@wordpress/icons';
+import { getStylePanelTerms, panelMatchesQuery } from './style-panel-search';
 import {
     ALIGN_ITEMS_OPTIONS,
     ALIGN_SELF_OPTIONS,
@@ -60,7 +62,7 @@ const numberFromStyle = (raw) => {
  * grid-template-areas; float/clear; extra hover panel (:hover subselector exists).
  */
 
-const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
+const StyleControls = ({ value = {}, onChange, currentSelector = '', controlSearch = '' }) => {
     const {
         BlockishPanelBody,
         BlockishResponsive,
@@ -87,6 +89,19 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
     const { useDeviceType } = window.blockish.helpers;
 
     const device = useDeviceType();
+    const isSearching = controlSearch.trim() !== '';
+    const panelTerms = useMemo(() => getStylePanelTerms(), []);
+    const visible = useMemo(() => {
+        return Object.fromEntries(
+            Object.entries(panelTerms).map(([id, terms]) => [id, panelMatchesQuery(controlSearch, terms)])
+        );
+    }, [controlSearch, panelTerms]);
+    const hasMatches = Object.values(visible).some(Boolean);
+    const panelKey = (id) => `${id}-${isSearching ? 'search' : 'idle'}`;
+    const getPanelBodyProps = (defaultOpen) => ({
+        initialOpen: isSearching || defaultOpen,
+        ...(isSearching ? { opened: true } : {}),
+    });
     const onChangeResponsiveValue = (key, nextValue) => {
         onChange({
             ...value,
@@ -125,7 +140,13 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
 
     return (
         <>
-        <BlockishPanelBody title={__('Layout', 'blockish')} initialOpen>
+        {isSearching && !hasMatches && (
+            <p className="blockish-cm-style-search-empty">
+                {__('No matching controls.', 'blockish')}
+            </p>
+        )}
+        {visible.layout && (
+        <BlockishPanelBody key={panelKey('layout')} title={__('Layout', 'blockish')} {...getPanelBodyProps(true)}>
             <BlockishResponsive left="46px">
                 <BlockishSelect
                     label={__('Display', 'blockish')}
@@ -151,8 +172,10 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 />
             </BlockishResponsive>
         </BlockishPanelBody>
+        )}
 
-        <BlockishPanelBody title={__('Flex', 'blockish')} initialOpen={false}>
+        {visible.flex && (
+        <BlockishPanelBody key={panelKey('flex')} title={__('Flex', 'blockish')} {...getPanelBodyProps(false)}>
             <BlockishResponsive left="92px">
                 <BlockishSelect
                     label={__('Flex Direction', 'blockish')}
@@ -253,8 +276,10 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 />
             </BlockishResponsive>
         </BlockishPanelBody>
+        )}
 
-        <BlockishPanelBody title={__('Grid', 'blockish')} initialOpen={false}>
+        {visible.grid && (
+        <BlockishPanelBody key={panelKey('grid')} title={__('Grid', 'blockish')} {...getPanelBodyProps(false)}>
             <BlockishResponsive left="75px">
                 <BlockishSelect
                     label={__('Grid Layout', 'blockish')}
@@ -264,7 +289,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 />
             </BlockishResponsive>
 
-            <BlockishResponsive left="92px">
+            <BlockishResponsive left="58px">
                 <BlockishNumber
                     label={__('Columns', 'blockish')}
                     value={numberFromStyle(value?.gridColumns?.[device])}
@@ -273,7 +298,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                     max={12}
                 />
             </BlockishResponsive>
-            <BlockishResponsive left="75px">
+            <BlockishResponsive left="35px">
                 <BlockishNumber
                     label={__('Rows', 'blockish')}
                     value={numberFromStyle(value?.gridRows?.[device])}
@@ -383,8 +408,10 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 />
             </BlockishResponsive>
         </BlockishPanelBody>
+        )}
 
-        <BlockishPanelBody title={__('Size', 'blockish')} initialOpen={false}>
+        {visible.size && (
+        <BlockishPanelBody key={panelKey('size')} title={__('Size', 'blockish')} {...getPanelBodyProps(false)}>
             <BlockishResponsive left="40px">
                 <BlockishRangeUnit
                     label={__('Width', 'blockish')}
@@ -460,8 +487,10 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 />
             </BlockishResponsive>
         </BlockishPanelBody>
+        )}
 
-        <BlockishPanelBody title={__('Position', 'blockish')} initialOpen={false}>
+        {visible.position && (
+        <BlockishPanelBody key={panelKey('position')} title={__('Position', 'blockish')} {...getPanelBodyProps(false)}>
             <BlockishResponsive left="56px">
                 <BlockishSelect
                     label={__('Position', 'blockish')}
@@ -558,8 +587,10 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 />
             </BlockishResponsive>
         </BlockishPanelBody>
+        )}
 
-        <BlockishPanelBody title={__('Typography', 'blockish')} initialOpen={false}>
+        {visible.typography && (
+        <BlockishPanelBody key={panelKey('typography')} title={__('Typography', 'blockish')} {...getPanelBodyProps(false)}>
             <BlockishFontFamily
                 label={__('Font Family', 'blockish')}
                 value={value?.fontFamily}
@@ -678,8 +709,10 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 onChange={(next) => onChange({ ...value, textStroke: next })}
             />
         </BlockishPanelBody>
+        )}
 
-        <BlockishPanelBody title={__('Border', 'blockish')} initialOpen={false}>
+        {visible.border && (
+        <BlockishPanelBody key={panelKey('border')} title={__('Border', 'blockish')} {...getPanelBodyProps(false)}>
             <BlockishBorder
                 label={__('Border', 'blockish')}
                 value={value?.border}
@@ -694,8 +727,10 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 />
             </BlockishResponsive>
         </BlockishPanelBody>
+        )}
 
-        <BlockishPanelBody title={__('Background', 'blockish')} initialOpen={false}>
+        {visible.background && (
+        <BlockishPanelBody key={panelKey('background')} title={__('Background', 'blockish')} {...getPanelBodyProps(false)}>
             <BlockishBackground
                 value={value?.background}
                 onChange={(next) => onChange({ ...value, background: next })}
@@ -722,8 +757,10 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 onChange={(next) => onChange({ ...value, backgroundFilters: next })}
             />
         </BlockishPanelBody>
+        )}
 
-        <BlockishPanelBody title={__('Effect', 'blockish')} initialOpen={false}>
+        {visible.effect && (
+        <BlockishPanelBody key={panelKey('effect')} title={__('Effect', 'blockish')} {...getPanelBodyProps(false)}>
             <div className="blockish-class-manager-effect-panel">
             <BlockishResponsive left="50px">
                 <RangeControl
@@ -994,8 +1031,10 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
             />
             </div>
         </BlockishPanelBody>
+        )}
 
-        <BlockishPanelBody title={__('Custom CSS', 'blockish')} initialOpen={false}>
+        {visible.customCss && (
+        <BlockishPanelBody key={panelKey('customCss')} title={__('Custom CSS', 'blockish')} {...getPanelBodyProps(false)}>
             <BlockishCodeEditor
                 label={__('Custom CSS', 'blockish')}
                 value={value?.customCss || customCssExample}
@@ -1016,6 +1055,7 @@ const StyleControls = ({ value = {}, onChange, currentSelector = '' }) => {
                 {`${__('Current selector:', 'blockish')} ${currentSelector || '{{SELECTOR}}'}`}
             </Text>
         </BlockishPanelBody>
+        )}
         </>
     );
 };
