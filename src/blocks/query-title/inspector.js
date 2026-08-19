@@ -32,7 +32,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Query Title', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['type', 'tag', 'alignment']}>
 								<BlockishControl
 									type="BlockishSelect"
 									label={ __( 'Type', 'blockish' ) }

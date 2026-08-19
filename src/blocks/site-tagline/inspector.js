@@ -29,7 +29,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Site Tagline', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['tag', 'alignment']}>
 								<BlockishControl
 									type="BlockishSelect"
 									label={ __( 'HTML Tag', 'blockish' ) }

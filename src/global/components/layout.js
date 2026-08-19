@@ -9,7 +9,7 @@ const Layout = ({ name }) => {
     if (layoutExcludes.has(name)) return null;
     
     return (
-        <BlockishControl type='BlockishPanelBody' title={__('Layout', 'blockish')} initialOpen={true}>
+        <BlockishControl type='BlockishPanelBody' title={__('Layout', 'blockish')} initialOpen={true} indicatorSlugs={['margin', 'padding']}>
             {
                 !layoutMarginExcludes.has(name) && (
                     <BlockishResponsiveControl

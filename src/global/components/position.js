@@ -7,7 +7,7 @@ const Position = ({ name, attributes }) => {
 
     if (positionExcludes.has(name)) return null;
     return (
-        <BlockishControl type='BlockishPanelBody' title={__('Position', 'blockish')}>
+        <BlockishControl type='BlockishPanelBody' title={__('Position', 'blockish')} indicatorSlugs={['position', 'positionTop', 'positionLeft', 'positionRight', 'positionBottom', 'zIndex']}>
             <BlockishControl
                 type='BlockishSelect'
                 label={__('Position', 'blockish')}

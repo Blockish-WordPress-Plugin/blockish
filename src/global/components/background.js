@@ -7,7 +7,7 @@ const Background = ({ name }) => {
     if (backgroundExcludes.has(name)) return null;
 
     return (
-        <BlockishControl type="BlockishPanelBody" title={__('Background', 'blockish')}>
+        <BlockishControl type="BlockishPanelBody" title={__('Background', 'blockish')} indicatorSlugs={['background', 'backgroundHover', 'backgroundHoverTransition']}>
             <BlockishControl
                 type="BlockishTab"
                 tabs={[

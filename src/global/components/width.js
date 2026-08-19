@@ -13,7 +13,7 @@ const Width = (props) => {
     if (widthExcludes.has(name)) return null;
     
     return (
-        <BlockishControl type='BlockishPanelBody' title={__('Width', 'blockish')} initialOpen={false}>
+        <BlockishControl type='BlockishPanelBody' title={__('Width', 'blockish')} initialOpen={false} indicatorSlugs={['minWidth', 'maxWidth', 'widthType', 'customWidth']} indicatorWhen={{ customWidth: { slug: 'widthType', value: 'custom' } }}>
             {
                 !minWidthExcludes.has(name) && (
                     <BlockishResponsiveControl

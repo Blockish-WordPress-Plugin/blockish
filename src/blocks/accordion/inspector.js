@@ -26,7 +26,7 @@ const Inspector = ( { advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Layout', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['itemPosition', 'iconPosition', 'faqSchema']}>
 									<BlockishResponsiveControl
 										type="BlockishToggleGroup"
 										label={ __(
@@ -57,7 +57,7 @@ const Inspector = ( { advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Interactions', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['maxItemExpanded']}>
 									<BlockishControl
 										type="BlockishToggleGroup"
 										label={ __(
@@ -83,7 +83,7 @@ const Inspector = ( { advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Accordion', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['itemsSpaceBetween', 'distanceBetweenContent', 'accordionBackgroundNormal', 'accordionBorderNormal', 'accordionBackgroundHover', 'accordionBorderHover', 'accordionBackgroundActive', 'accordionBorderActive', 'accordionBorderRadius', 'accordionPadding']}>
 									<BlockishResponsiveControl
 										type="BlockishRangeUnit"
 										label={ __(
@@ -207,7 +207,7 @@ const Inspector = ( { advancedControls } ) => {
 								<BlockishControl
 									type="BlockishPanelBody"
 									title={ __( 'Header', 'blockish' ) }
-								>
+								indicatorSlugs={['headerTypography', 'iconSize', 'headerTextColor', 'iconColor', 'headerTextShadow', 'headerTextStroke', 'headerTextColorHover', 'iconColorHover', 'headerTextShadowHover', 'headerTextStrokeHover', 'headerTextColorActive', 'iconColorActive', 'headerTextShadowActive', 'headerTextStrokeActive']}>
 									<BlockishGroupControl
 										type="BlockishTypography"
 										label={ __( 'Typography', 'blockish' ) }
@@ -365,7 +365,7 @@ const Inspector = ( { advancedControls } ) => {
 								<BlockishControl
 									type="BlockishPanelBody"
 									title={ __( 'Content', 'blockish' ) }
-								>
+								indicatorSlugs={['contentTextColor', 'contentBackground', 'contentBorder', 'contentBorderRadius', 'contentPadding']}>
 									<BlockishControl
 										type="BlockishColor"
 										label={ __( 'Text Color', 'blockish' ) }

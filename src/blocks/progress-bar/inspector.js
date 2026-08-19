@@ -24,7 +24,11 @@ const Inspector = ( { attributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Progress Bar', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['showTitle', 'title', 'titleTag', 'percentage', 'animationDuration', 'displayPercentage', 'innerText']}
+							indicatorWhen={{
+								title: 'showTitle',
+								titleTag: 'showTitle',
+							}}>
 								<BlockishControl
 									type="ToggleControl"
 									label={ __( 'Show Title', 'blockish' ) }
@@ -93,7 +97,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Progress Bar', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['titleTextColor', 'titleTypography', 'titleTextShadow', 'percentageFillColor', 'percentageBackgroundColor', 'percentageHeight', 'percentageBorderRadius', 'innerTextColor', 'innerTextTypography', 'innerTextShadow']}>
 								<p className="blockish-style-section-title">
 									{ __( 'Title', 'blockish' ) }
 								</p>

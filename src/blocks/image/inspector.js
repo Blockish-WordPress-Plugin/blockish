@@ -54,7 +54,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                         {
                             tabName === 'content' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Content', 'blockish')} initialOpen={true}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Content', 'blockish')} initialOpen={true} indicatorSlugs={['image', 'imageSize', 'imageURL', 'altText', 'title', 'captionType', 'customCaption', 'lightbox']}>
                                         {
                                             attributes?.image?.id && (
                                                 <>
@@ -163,7 +163,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                         {
                             tabName === 'style' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Image', 'blockish')} initialOpen={true}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Image', 'blockish')} initialOpen={true} indicatorSlugs={['alignment', 'imageWidth', 'imageMaxWidth', 'imageHeight', 'objectFit', 'imageOpacityNormal', 'imageBorderNormal', 'imageBorderRadiusNormal', 'imageBoxShadowNormal', 'imageCSSFiltersNormal', 'imageOpacityHover', 'imageBorderHover', 'imageBorderRadiusHover', 'imageBoxShadowHover', 'imageCSSFiltersHover']}>
                                         <BlockishResponsiveControl
                                             left='66px'
                                             type="BlockishToggleGroup"
@@ -293,7 +293,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                             )}
                                         </BlockishControl>
                                     </BlockishControl>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Caption', 'blockish')}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Caption', 'blockish')} indicatorSlugs={['captionAlignment', 'captionColor', 'captionBackgroundColor', 'captionTypography', 'captionTextShadow', 'captionSpacing']}>
                                         <BlockishResponsiveControl
                                             left="8ch"
                                             type="BlockishToggleGroup"

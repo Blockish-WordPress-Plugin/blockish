@@ -29,7 +29,8 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Site Logo', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['linkToHome', 'openInNewTab']}
+							indicatorWhen={{ openInNewTab: 'linkToHome' }}>
 								<ToggleControl
 									label={ __( 'Link to home', 'blockish' ) }
 									checked={ attributes.linkToHome }
@@ -57,7 +58,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Layout', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['alignment', 'logoWidth', 'logoMaxWidth']}>
 									<BlockishResponsiveControl
 										type="BlockishToggleGroup"
 										label={ __( 'Alignment', 'blockish' ) }
@@ -104,7 +105,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 										'blockish'
 									) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['border', 'borderRadius', 'boxShadow']}>
 									<BlockishGroupControl
 										type="BlockishBorder"
 										label={ __( 'Border', 'blockish' ) }

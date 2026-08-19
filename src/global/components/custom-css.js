@@ -8,7 +8,7 @@ const CustomCss = ({ name }) => {
     if (customCssExcludes.has(name)) return null;
 
     return (
-        <BlockishControl type="BlockishPanelBody" title={__('Custom CSS', 'blockish')} initialOpen={false}>
+        <BlockishControl type="BlockishPanelBody" title={__('Custom CSS', 'blockish')} initialOpen={false} indicatorSlugs={['customCss']} indicatorDefaults={{ customCss: '{{SELECTOR}}{}' }}>
             <BlockishControl
                 type="BlockishCodeEditor"
                 label={__('Custom CSS', 'blockish')}

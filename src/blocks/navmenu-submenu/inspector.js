@@ -23,7 +23,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Submenu', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['alignment', 'containerWidth', 'itemGap']}>
 								<BlockishResponsiveControl
 									type="BlockishSelect"
 									label={ __( 'Alignment', 'blockish' ) }
@@ -57,7 +57,7 @@ const Inspector = ( { advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Panel', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['panelBg', 'panelBorder', 'panelBorderRadius', 'panelPadding', 'panelBoxShadow']}>
 									<BlockishGroupControl
 										type="BlockishBackground"
 										label={ __( 'Background', 'blockish' ) }
@@ -90,7 +90,7 @@ const Inspector = ( { advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Submenu Item', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['subItemTypography', 'subItemBgNormal', 'subItemColorNormal', 'subItemBorderNormal', 'subItemBgHover', 'subItemColorHover', 'subItemBorderColorHover', 'subItemBgActive', 'subItemColorActive', 'subItemBorderColorActive', 'subItemPadding', 'subItemBorderRadius']}>
 									<BlockishGroupControl
 										type="BlockishTypography"
 										label={ __( 'Typography', 'blockish' ) }

@@ -1,3 +1,22 @@
-.blockish-panel-body-content{
-    padding: 0;
+.blockish-panel-body-content {
+	padding: 0;
+}
+
+.blockish-panel-body-title {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.blockish-panel-body-title-text {
+	min-width: 0;
+}
+
+.blockish-panel-body-dot {
+	flex-shrink: 0;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #001feb;
 }

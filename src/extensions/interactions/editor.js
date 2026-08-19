@@ -24,7 +24,7 @@ const InteractionsPanel = ({ clientId }) => {
 				type="BlockishPanelBody"
 				title={__('Interactions', 'blockish')}
 				initialOpen={false}
-			>
+			indicatorSlugs={['interactionData']}>
 				<div className="blockish-interactions-panel">
 					<p className="blockish-interactions-panel__desc">
 						{__(

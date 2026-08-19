@@ -23,7 +23,8 @@ const Inspector = ( { attributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Navigation', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['menuBreakpoint', 'menuCustomBreakpoint']}
+							indicatorWhen={{ menuCustomBreakpoint: { slug: 'menuBreakpoint', value: 'custom' } }}>
 								<BlockishControl
 									type="BlockishToggleGroup"
 									label={ __( 'Menu Breakpoint', 'blockish' ) }
@@ -56,7 +57,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Layout', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['justifyContent']}>
 								<BlockishResponsiveControl
 									type="BlockishSelect"
 									label={ __( 'Justify Content', 'blockish' ) }

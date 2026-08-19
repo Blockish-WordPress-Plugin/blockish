@@ -34,7 +34,7 @@ const Inspector = ({ advancedControls }) => {
                         {
                             tabName === 'content' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Paragraph', 'blockish')} initialOpen={true}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Paragraph', 'blockish')} initialOpen={true} indicatorSlugs={['url', 'alignment']}>
                                         <BlockishControl
                                             type="BlockishLink"
                                             label={__('Link', 'blockish')}
@@ -58,7 +58,7 @@ const Inspector = ({ advancedControls }) => {
                         {
                             tabName === 'style' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Heading', 'blockish')} initialOpen={true}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Heading', 'blockish')} initialOpen={true} indicatorSlugs={['typography', 'color', 'textShadow', 'hoverColor', 'textShadowHover']}>
                                         <BlockishControl
                                             type="BlockishTypography"
                                             label={__('Typography', 'blockish')}

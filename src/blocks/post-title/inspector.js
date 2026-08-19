@@ -30,7 +30,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Post Title', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['tag', 'alignment']}>
 								<BlockishControl
 									type="BlockishSelect"
 									label={ __( 'HTML Tag', 'blockish' ) }
