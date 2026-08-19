@@ -20,7 +20,7 @@ const Inspector = ({ advancedControls }) => {
 				{({ name: tabName }) => (
 					<>
 						{tabName === 'content' && (
-							<BlockishControl type="BlockishPanelBody" title={__('Tab', 'blockish')} initialOpen={true}>
+							<BlockishControl type="BlockishPanelBody" title={__('Tab', 'blockish')} initialOpen={true} indicatorSlugs={['direction', 'justify', 'alignTitle']}>
 								<BlockishResponsiveControl
 									type="BlockishToggleGroup"
 									label={__('Direction', 'blockish')}
@@ -64,7 +64,7 @@ const Inspector = ({ advancedControls }) => {
 									type="BlockishPanelBody"
 									title={__('Nav Container', 'blockish')}
 									initialOpen={false}
-								>
+								indicatorSlugs={['navAlign', 'navBackground', 'navBorder', 'navBorderRadius', 'navPadding']}>
 									<BlockishResponsiveControl
 										type="BlockishToggleGroup"
 										label={__('Alignment', 'blockish')}
@@ -104,7 +104,7 @@ const Inspector = ({ advancedControls }) => {
 									type="BlockishPanelBody"
 									title={__('Tabs', 'blockish')}
 									initialOpen={true}
-								>
+								indicatorSlugs={['navGap', 'distanceFromContent', 'tabsBackgroundNormal', 'tabsBorderNormal', 'tabsBoxShadowNormal', 'tabsBackgroundHover', 'tabsBorderHover', 'tabsBoxShadowHover', 'tabsBackgroundActive', 'tabsBorderActive', 'tabsBoxShadowActive', 'tabsBorderRadius', 'tabsPadding']}>
 									<BlockishResponsiveControl
 										type="BlockishRangeUnit"
 										label={__('Gap Between Tabs', 'blockish')}
@@ -205,7 +205,7 @@ const Inspector = ({ advancedControls }) => {
 									type="BlockishPanelBody"
 									title={__('Titles', 'blockish')}
 									initialOpen={false}
-								>
+								indicatorSlugs={['titleTypography', 'titleColorNormal', 'titleTextShadowNormal', 'titleTextStrokeNormal', 'titleColorHover', 'titleTextShadowHover', 'titleTextStrokeHover', 'titleColorActive', 'titleTextShadowActive', 'titleTextStrokeActive']}>
 									<BlockishGroupControl
 										type="BlockishTypography"
 										label={__('Typography', 'blockish')}
@@ -289,7 +289,7 @@ const Inspector = ({ advancedControls }) => {
 									type="BlockishPanelBody"
 									title={__('Icon', 'blockish')}
 									initialOpen={false}
-								>
+								indicatorSlugs={['iconPosition', 'iconSize', 'iconSpacing', 'iconColorNormal', 'iconColorHover', 'iconColorActive']}>
 									<BlockishResponsiveControl
 										type="BlockishToggleGroup"
 										label={__('Position', 'blockish')}
@@ -351,7 +351,7 @@ const Inspector = ({ advancedControls }) => {
 									type="BlockishPanelBody"
 									title={__('Content', 'blockish')}
 									initialOpen={false}
-								>
+								indicatorSlugs={['contentColor', 'contentBackground', 'contentBorder', 'contentBorderRadius', 'contentPadding']}>
 									<BlockishControl
 										type="BlockishColor"
 										label={__('Color', 'blockish')}

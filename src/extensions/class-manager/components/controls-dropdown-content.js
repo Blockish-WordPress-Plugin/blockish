@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button, Dropdown, Flex, FlexItem, __experimentalText as Text, __experimentalVStack as VStack, TextControl } from '@wordpress/components';
+import { Button, Dropdown, Flex, FlexItem, SearchControl, __experimentalText as Text, __experimentalVStack as VStack, TextControl } from '@wordpress/components';
 import { closeSmall, pencil, plus, seen, trash, unseen } from '@wordpress/icons';
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
@@ -142,10 +142,15 @@ const ControlsDropdownContent = ({
     const selectedSubSelectorTitle = getEntityTitle(selectedSubSelector?.title);
     const panelTitle = selectedSubSelectorTitle || selectedClassTitle;
     const [editInput, setEditInput] = useState(panelTitle);
+    const [controlSearch, setControlSearch] = useState('');
 
     useEffect(() => {
         setEditInput(panelTitle || '');
     }, [panelTitle]);
+
+    useEffect(() => {
+        setControlSearch('');
+    }, [classId, subSelectorId]);
 
     const currentEntityId = subSelectorId || classId;
     const currentSelector = subSelectorId
@@ -386,12 +391,24 @@ const ControlsDropdownContent = ({
                         )}
                     />
                 </div>
+
+                <div className="blockish-cm-style-search">
+                    <SearchControl
+                        label={__('Search controls', 'blockish')}
+                        placeholder={__('Search…', 'blockish')}
+                        value={controlSearch}
+                        onChange={setControlSearch}
+                        size="compact"
+                        __nextHasNoMarginBottom
+                    />
+                </div>
             </VStack>
 
             <div className="controls-dropdown-content-body">
                 <StyleControls
                     value={currentStyle}
                     currentSelector={currentSelector}
+                    controlSearch={controlSearch}
                     onChange={(value) => {
                         if (!currentEntityId) {
                             return;

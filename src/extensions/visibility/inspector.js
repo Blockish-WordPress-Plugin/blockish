@@ -45,7 +45,7 @@ function VisibilityPanel( { clientId } ) {
 			type="BlockishPanelBody"
 			title={ __( 'Visibility', 'blockish' ) }
 			initialOpen={ false }
-		>
+		indicatorSlugs={['hideOn']}>
 			<p className="blockish-visibility-help">
 				{ __(
 					'Hide this block on selected devices. In the editor it dims only while that device preview is active, so you can still select it.',

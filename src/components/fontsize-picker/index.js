@@ -1,7 +1,7 @@
 import { FontSizePicker } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-const BlockishFontSizePicker = ({ value, onChange, label, ...props }) => {
+const BlockishFontSizePicker = ({ value, onChange, label, showReset = true, ...props }) => {
     return (
         <div className="blockish-fontsize-picker-control blockish-control">
             <FontSizePicker
@@ -9,9 +9,9 @@ const BlockishFontSizePicker = ({ value, onChange, label, ...props }) => {
                 onChange={onChange}
                 label={label || __('Font Size', 'blockish')}
                 withSlider
-                withReset
                 units={['px', 'em', 'rem']}
                 {...props}
+                withReset={showReset}
             />
         </div>
     );

@@ -33,7 +33,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                     <>
                         {tabName === 'content' && (
                             <>
-                                <BlockishControl type="BlockishPanelBody" title={__('Images', 'blockish')} initialOpen={true}>
+                                <BlockishControl type="BlockishPanelBody" title={__('Images', 'blockish')} initialOpen={true} indicatorSlugs={['beforeImage', 'afterImage']}>
                                     <BlockishControl
                                         type="BlockishMediaUploader"
                                         label={__('Before Image', 'blockish')}
@@ -45,7 +45,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                         slug="afterImage"
                                     />
                                 </BlockishControl>
-                                <BlockishControl type="BlockishPanelBody" title={__('Settings', 'blockish')} initialOpen={false}>
+                                <BlockishControl type="BlockishPanelBody" title={__('Settings', 'blockish')} initialOpen={false} indicatorSlugs={['beforeLabel', 'afterLabel', 'sliderPosition']}>
                                     <BlockishControl
                                         type="TextControl"
                                         label={__('Before Label', 'blockish')}
@@ -70,7 +70,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                         )}
                         {tabName === 'style' && (
                             <>
-                                <BlockishControl type="BlockishPanelBody" title={__('Labels', 'blockish')} initialOpen={true}>
+                                <BlockishControl type="BlockishPanelBody" title={__('Labels', 'blockish')} initialOpen={true} indicatorSlugs={['labelColor', 'labelBackgroundColor', 'labelTypography', 'labelPadding', 'labelBorderRadius']}>
                                     <BlockishControl 
                                         type="BlockishColor"
                                         label={__('Color', 'blockish')}
@@ -100,7 +100,7 @@ const Inspector = ({ attributes, setAttributes, advancedControls }) => {
                                     />
                                 </BlockishControl>
 
-                                <BlockishControl type="BlockishPanelBody" title={__('Handle', 'blockish')} initialOpen={false}>
+                                <BlockishControl type="BlockishPanelBody" title={__('Handle', 'blockish')} initialOpen={false} indicatorSlugs={['handleColor', 'handleArrowColor', 'handleArrowBackground', 'handleArrowBoxShadow']}>
                                     <BlockishControl 
                                         type="BlockishColor"
                                         label={__('Line Color', 'blockish')}

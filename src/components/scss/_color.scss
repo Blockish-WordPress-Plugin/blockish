@@ -1,4 +1,22 @@
 .blockish-color-control{
+    .components-base-control__label,
+    legend {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .blockish-color-control__picker {
+        position: relative;
+    }
+
+    .blockish-color-control__reset {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        z-index: 2;
+        transform: translateY(-50%);
+    }
+
     .block-editor-panel-color-gradient-settings{
         padding: 0 !important;
 
@@ -6,5 +24,14 @@
             margin: 0 !important;
             border-top: 0 !important;
         }
+
+        .block-editor-tools-panel-color-gradient-settings__dropdown > button,
+        .block-editor-panel-color-gradient-settings__dropdown {
+            padding-right: 36px;
+        }
+    }
+
+    .block-editor-panel-color-gradient-settings__reset {
+        display: none;
     }
 }

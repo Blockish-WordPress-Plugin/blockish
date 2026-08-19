@@ -30,7 +30,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Carousel settings', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['slidesPerView', 'slidesPerViewTablet', 'slidesPerViewMobile', 'gap', 'transitionSpeed']}>
 									<p className="blockish-carousel-help">
 										{ __(
 											'Add Carousel Slide blocks. Each slide has its own background/layout — only limited content blocks are allowed (no Container).',
@@ -86,7 +86,13 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								<BlockishControl
 									type="BlockishPanelBody"
 									title={ __( 'Navigation', 'blockish' ) }
-								>
+								indicatorSlugs={['showArrows', 'arrowsPosition', 'showDots', 'dotsPosition', 'dotsAlign', 'loop', 'autoplay', 'pauseOnHover']}
+								indicatorWhen={{
+									arrowsPosition: 'showArrows',
+									dotsPosition: 'showDots',
+									dotsAlign: 'showDots',
+									pauseOnHover: 'autoplay',
+								}}>
 									<BlockishControl
 										type="ToggleControl"
 										label={ __( 'Show arrows', 'blockish' ) }
@@ -225,7 +231,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Track & slides', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['slideMinHeight', 'slideBorderRadius', 'trackPadding']}>
 									<BlockishResponsiveControl
 										type="BlockishRangeUnit"
 										label={ __( 'Slide min height', 'blockish' ) }
@@ -249,7 +255,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								<BlockishControl
 									type="BlockishPanelBody"
 									title={ __( 'Arrows', 'blockish' ) }
-								>
+								indicatorSlugs={['arrowSize', 'arrowIconSize', 'arrowOffset', 'arrowBorderRadius', 'arrowColor', 'arrowBackground', 'arrowBorder', 'arrowBoxShadow', 'arrowColorHover', 'arrowBackgroundHover']}>
 									<BlockishResponsiveControl
 										type="BlockishRangeUnit"
 										label={ __( 'Size', 'blockish' ) }
@@ -335,7 +341,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								<BlockishControl
 									type="BlockishPanelBody"
 									title={ __( 'Dots', 'blockish' ) }
-								>
+								indicatorSlugs={['dotSize', 'dotActiveSize', 'dotGap', 'dotsOffset', 'dotBorderRadius', 'dotColor', 'dotActiveColor']}>
 									<BlockishResponsiveControl
 										type="BlockishRangeUnit"
 										label={ __( 'Size', 'blockish' ) }

@@ -10,7 +10,7 @@ const Border = ({ name }) => {
     if (borderExcludes.has(name)) return null;
 
     return (
-        <BlockishControl type="BlockishPanelBody" title={__('Border', 'blockish')}>
+        <BlockishControl type="BlockishPanelBody" title={__('Border', 'blockish')} indicatorSlugs={['border', 'borderRadius', 'boxShadow', 'borderHoverTransition']}>
             <BlockishControl
                 type="BlockishTab"
                 tabs={[

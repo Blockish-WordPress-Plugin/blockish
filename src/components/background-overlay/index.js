@@ -1,4 +1,6 @@
 import { __ } from '@wordpress/i18n';
+import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
+import BlockishResetButton from '../reset-button';
 
 const parseValue = (value) => {
 	if (!value) {
@@ -28,7 +30,8 @@ const BlockishBackgroundOverlay = ({
 	onChange,
 	label = __('Background Overlay', 'blockish'),
 	noLabel = false,
-	excludes = []
+	excludes = [],
+	showReset = true,
 }) => {
 	const { BlockishToggle, BlockishColor, BlockishRangeControl, BlockishToggleGroup, BlockishCSSFilters, BlockishSelect } = window.blockish.components;
 	const overlay = {
@@ -38,14 +41,28 @@ const BlockishBackgroundOverlay = ({
 	};
 	const isEnabled = !!overlay?.enabled;
 	const excludedOptions = new Set(excludes);
+	const hasOverlayValue = !!value && (isEnabled || Object.keys(parseValue(value)).length > 0);
 
 	return (
 		<div className="blockish-control blockish-group-control blockish-background-overlay-control">
-			<BlockishToggle
-				label={label}
-				value={isEnabled}
-				onChange={(nextValue) => onChange(createValue(value, { enabled: nextValue }))}
-			/>
+			<Flex>
+				<FlexBlock>
+					<BlockishToggle
+						label={label}
+						value={isEnabled}
+						onChange={(nextValue) => onChange(createValue(value, { enabled: nextValue }))}
+					/>
+				</FlexBlock>
+				{showReset && (
+					<FlexItem>
+						<BlockishResetButton
+							onClick={() => onChange('')}
+							disabled={!hasOverlayValue}
+							label={__('Reset overlay', 'blockish')}
+						/>
+					</FlexItem>
+				)}
+			</Flex>
 			{isEnabled && (
 				<>
 					<BlockishToggleGroup

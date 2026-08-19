@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.0
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -167,6 +167,13 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.2.6 =
+
+* Added: Inspector reset on Blockish controls (per-control, without colliding with device/responsive UI)
+* Added: Class Manager control search — match panel titles and labels, sticky header, compact scrollable panel
+* Added: Panel change dots on inspector and Class Manager when a section has non-default stored values
+* Improved: Change dots ignore nested values when their controlling condition is off (hidden controls no longer look “dirty”)
 
 = 1.2.5 =
 

@@ -29,7 +29,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Post Excerpt', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['excerptLength', 'moreText', 'alignment']}>
 								<BlockishControl
 									type="BlockishRangeControl"
 									label={ __( 'Excerpt Length', 'blockish' ) }
@@ -82,7 +82,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Excerpt', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['typography', 'color', 'moreColor', 'moreHoverColor']}>
 								<BlockishControl
 									type="BlockishTypography"
 									label={ __( 'Typography', 'blockish' ) }

@@ -4,7 +4,7 @@ const Flex = ({ attributes }) => {
     const { useDeviceType, getResponsiveValue } = window?.blockish?.helpers;
     const device = useDeviceType();
     return (
-        <BlockishControl type='BlockishPanelBody' title={__('Flex', 'blockish')}>
+        <BlockishControl type='BlockishPanelBody' title={__('Flex', 'blockish')} indicatorSlugs={['alignSelf', 'flexOrder', 'flexCustomOrder', 'flexGrow', 'flexShrink']} indicatorWhen={{ flexCustomOrder: { slug: 'flexOrder', value: 'custom' } }}>
             <BlockishResponsiveControl
                 type='BlockishToggleGroup'
                 label={__('Align Self', 'blockish')}

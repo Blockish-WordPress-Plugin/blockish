@@ -38,7 +38,7 @@ const Inspector = ( {
 								type="BlockishPanelBody"
 								title={ __( 'Settings', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['icon', 'iconPosition']}>
 								<TextControl
 									label={ __( 'Text', 'blockish' ) }
 									value={ label }
@@ -141,7 +141,7 @@ const Inspector = ( {
 									'Override this single item — handy for turning the last item into a button (combine with the Advanced tab for background, border and padding).',
 									'blockish'
 								) }
-							>
+							indicatorSlugs={['itemTextColor', 'itemTextColorHover', 'itemTypography', 'iconSize']}>
 								<BlockishControl
 									type="BlockishTab"
 									tabs={ [

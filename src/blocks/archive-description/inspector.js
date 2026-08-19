@@ -32,7 +32,7 @@ const Inspector = ( { advancedControls } ) => {
 									'blockish'
 								) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['tag', 'alignment']}>
 								<BlockishControl
 									type="BlockishSelect"
 									label={ __( 'HTML Tag', 'blockish' ) }

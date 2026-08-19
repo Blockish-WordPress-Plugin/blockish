@@ -4,7 +4,7 @@ const Grid = () => {
 	const { BlockishControl, BlockishResponsiveControl } = window?.blockish?.controls;
 
 	return (
-		<BlockishControl type="BlockishPanelBody" title={ __( 'Grid', 'blockish' ) }>
+		<BlockishControl type="BlockishPanelBody" title={ __( 'Grid', 'blockish' ) } indicatorSlugs={ [ 'alignSelf', 'justifySelf', 'gridColumnStart', 'gridColumnEnd', 'gridRowStart', 'gridRowEnd' ] }>
 			<BlockishResponsiveControl
 				type="BlockishToggleGroup"
 				label={ __( 'Align Self', 'blockish' ) }

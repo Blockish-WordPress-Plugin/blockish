@@ -33,7 +33,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Icon List', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['layout']}>
 								<BlockishControl
 									type="BlockishToggleGroup"
 									label={ __( 'Layout', 'blockish' ) }
@@ -61,7 +61,7 @@ const Inspector = ( { advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'List', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['rowGap', 'columnGap', 'itemPadding', 'itemContentSpacing']}>
 									<BlockishResponsiveControl
 										type="BlockishRangeUnit"
 										label={ __( 'Row Gap', 'blockish' ) }
@@ -98,7 +98,7 @@ const Inspector = ( { advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Icon', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['itemIconSize', 'itemIconColor', 'itemIconHoverColor', 'itemIconHoverTransition']}>
 									<BlockishResponsiveControl
 										type="BlockishRangeUnit"
 										label={ __( 'Size', 'blockish' ) }
@@ -163,7 +163,7 @@ const Inspector = ( { advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Text', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['itemTextTypography', 'itemTextColor', 'itemTextHoverColor', 'itemTextHoverTransition']}>
 									<BlockishGroupControl
 										type="BlockishTypography"
 										label={ __( 'Typography', 'blockish' ) }

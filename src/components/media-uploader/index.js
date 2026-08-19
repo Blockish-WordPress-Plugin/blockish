@@ -21,7 +21,7 @@ const instructions = (
 
 const ALLOWED_MEDIA_TYPES = ['image'];
 
-const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = __('Upload Image', 'blockish'), value, onChange, allowedTypes = ALLOWED_MEDIA_TYPES, isInheritedValue = false }) => {
+const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = __('Upload Image', 'blockish'), value, onChange, allowedTypes = ALLOWED_MEDIA_TYPES, isInheritedValue = false, showReset = true }) => {
     const toggleRef = useRef();
     const hasMedia = !!(value?.id || value?.url);
     const backgroundImageStyleProps = {};
@@ -102,15 +102,17 @@ const BlockishMediaUploader = ({ label = __('Image', 'blockish'), placeholder = 
                                         >
                                             {__('Replace')}
                                         </Button>
-                                        <Button
-                                            className="blockish-media-uploader-image-action"
-                                            onClick={() => {
-                                                onChange(null);
-                                                toggleRef.current.focus();
-                                            }}
-                                        >
-                                            {__('Remove')}
-                                        </Button>
+                                        {showReset && (
+                                            <Button
+                                                className="blockish-media-uploader-image-action"
+                                                onClick={() => {
+                                                    onChange(null);
+                                                    toggleRef.current.focus();
+                                                }}
+                                            >
+                                                {__('Remove')}
+                                            </Button>
+                                        )}
                                     </HStack>
                                 )}
                             </div>

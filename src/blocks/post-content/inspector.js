@@ -28,7 +28,7 @@ const Inspector = ({ advancedControls }) => {
 								type="BlockishPanelBody"
 								title={__('Post Content', 'blockish')}
 								initialOpen={true}
-							>
+							indicatorSlugs={['tag', 'alignment']}>
 								<BlockishControl
 									type="BlockishSelect"
 									label={__('HTML Tag', 'blockish')}
@@ -79,7 +79,7 @@ const Inspector = ({ advancedControls }) => {
 								type="BlockishPanelBody"
 								title={__('Content', 'blockish')}
 								initialOpen={true}
-							>
+							indicatorSlugs={['typography', 'color', 'linkColor', 'linkHoverColor']}>
 								<BlockishControl
 									type="BlockishTypography"
 									label={__('Typography', 'blockish')}

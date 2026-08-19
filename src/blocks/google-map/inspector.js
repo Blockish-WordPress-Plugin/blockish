@@ -33,7 +33,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Google Maps', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['location', 'zoom', 'mapHeight']}>
 								<BlockishControl
 									type="TextControl"
 									label={ __( 'Location', 'blockish' ) }
@@ -60,7 +60,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Google Maps', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['mapCSSFiltersNormal', 'mapCSSFiltersHover', 'mapHoverTransition']}>
 								<BlockishControl
 									type="BlockishTab"
 									tabType="normal"

@@ -62,7 +62,7 @@ const Inspector = ({ clientId, attributes, advancedControls }) => {
 								type="BlockishPanelBody"
 								title={__('Tab Item', 'blockish')}
 								initialOpen={true}
-							>
+							indicatorSlugs={['title', 'tabIcon', 'defaultActive']}>
 								<BlockishControl
 									type="TextControl"
 									label={__('Tab Title', 'blockish')}

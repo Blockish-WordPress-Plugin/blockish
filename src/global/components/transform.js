@@ -221,7 +221,16 @@ const Transform = ( { attributes, setAttributes } ) => {
 	);
 
 	return (
-		<BlockishControl type="BlockishPanelBody" title={ __( 'Transform', 'blockish' ) }>
+		<BlockishControl
+			type="BlockishPanelBody"
+			title={ __( 'Transform', 'blockish' ) }
+			indicatorSlugs={ [
+				...getResetSlugs( false ),
+				...getResetSlugs( true ),
+				'applyTransform',
+				'applyTransformHover',
+			] }
+		>
 			<BlockishControl
 				type="BlockishTab"
 				tabs={ [

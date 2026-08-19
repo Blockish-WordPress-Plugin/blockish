@@ -43,6 +43,24 @@
 			text-align: left;
 		}
 
+		.blockish-typography-label-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 8px;
+			margin-bottom: 8px;
+			width: 100%;
+
+			.components-base-control__label,
+			legend {
+				margin-bottom: 0 !important;
+			}
+
+			.blockish-reset-button {
+				width: auto !important;
+			}
+		}
+
 		.blockish-typography-toggle-button {
 			font-size: 16px;
 			font-weight: 500;

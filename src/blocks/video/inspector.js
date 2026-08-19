@@ -35,7 +35,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Video', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['sourceType', 'selfHostedVideo']}>
 									<BlockishControl
 										type="BlockishSelect"
 										label={ __( 'Source', 'blockish' ) }
@@ -75,7 +75,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Playback', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['startTime', 'endTime', 'autoplay', 'muted', 'playOnMobile', 'loop', 'privacyMode', 'controls', 'captions', 'lazyLoad']}>
 									{ sourceType === 'selfHosted' && (
 										<BlockishControl
 											type="BlockishMediaUploader"
@@ -221,7 +221,10 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Image Overlay', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['showOverlay', 'showOverlayPlayIcon']}
+								indicatorWhen={{
+									showOverlayPlayIcon: 'showOverlay',
+								}}>
 									<BlockishControl
 										type="ToggleControl"
 										label={ __(
@@ -273,7 +276,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Video', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['alignment', 'videoAspectRatio', 'videoCSSFilters']}>
 									<BlockishResponsiveControl
 										type="BlockishToggleGroup"
 										label={ __( 'Alignment', 'blockish' ) }
@@ -337,7 +340,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 												'blockish'
 											) }
 											initialOpen={ false }
-										>
+										indicatorSlugs={['overlayPlayButtonSize', 'overlayPlayButtonIconSize', 'overlayPlayButtonBg', 'overlayPlayButtonIconColor', 'overlayPlayButtonBorderRadius']}>
 											<BlockishResponsiveControl
 												type="BlockishRangeUnit"
 												label={ __( 'Size', 'blockish' ) }

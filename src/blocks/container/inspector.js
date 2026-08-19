@@ -34,7 +34,63 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                         {
                             tabName === 'layout' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Layout', 'blockish')} initialOpen={true}>
+                                    <BlockishControl
+                                        type="BlockishPanelBody"
+                                        title={__('Layout', 'blockish')}
+                                        initialOpen={true}
+                                        indicatorSlugs={[
+                                            'containerWidth',
+                                            'customWidthContainer',
+                                            'innerContentWidth',
+                                            'innerContentMaxWidth',
+                                            'containerMinHeight',
+                                            'display',
+                                            'flexDirection',
+                                            'flexWrap',
+                                            'justifyContent',
+                                            'alignItems',
+                                            'gridLayoutType',
+                                            'gridColumns',
+                                            'gridRows',
+                                            'autoGridWidth',
+                                            'autoGridHeight',
+                                            'columnGap',
+                                            'rowGap',
+                                        ]}
+                                        indicatorDefaults={{
+                                            containerWidth: 'alignfull',
+                                            display: 'flex',
+                                            innerContentWidth: false,
+                                            gridLayoutType: 'auto',
+                                        }}
+                                        indicatorWhen={{
+                                            customWidthContainer: { slug: 'containerWidth', value: 'align-custom-width' },
+                                            innerContentMaxWidth: 'innerContentWidth',
+                                            flexDirection: { slug: 'display', value: 'flex' },
+                                            flexWrap: { slug: 'display', value: 'flex' },
+                                            justifyContent: { slug: 'display', value: 'flex' },
+                                            alignItems: { slug: 'display', value: 'flex' },
+                                            gridLayoutType: { slug: 'display', value: 'grid' },
+                                            gridColumns: [
+                                                { slug: 'display', value: 'grid' },
+                                                { slug: 'gridLayoutType', value: 'fixed' },
+                                            ],
+                                            gridRows: [
+                                                { slug: 'display', value: 'grid' },
+                                                { slug: 'gridLayoutType', value: 'fixed' },
+                                            ],
+                                            autoGridWidth: [
+                                                { slug: 'display', value: 'grid' },
+                                                { slug: 'gridLayoutType', value: 'auto' },
+                                            ],
+                                            autoGridHeight: [
+                                                { slug: 'display', value: 'grid' },
+                                                { slug: 'gridLayoutType', value: 'auto' },
+                                            ],
+                                            columnGap: { slug: 'display', not: 'block' },
+                                            rowGap: { slug: 'display', not: 'block' },
+                                        }}
+                                    >
                                         {
                                             !hasParent && (
                                                 <BlockishControl
@@ -303,7 +359,15 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                                             )
                                         }
                                     </BlockishControl>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Additional', 'blockish')} initialOpen={false}>
+                                    <BlockishControl
+                                        type="BlockishPanelBody"
+                                        title={__('Additional', 'blockish')}
+                                        initialOpen={false}
+                                        indicatorSlugs={['tagName', 'url', 'overflow']}
+                                        indicatorDefaults={{
+                                            tagName: { label: 'Div', value: 'div' },
+                                        }}
+                                    >
                                         <BlockishControl
                                             type="BlockishSelect"
                                             label={__('Tag', 'blockish')}
@@ -402,7 +466,7 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                         {
                             tabName === 'style' && (
                                 <>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Background', 'blockish')} initialOpen={true}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Background', 'blockish')} initialOpen={true} indicatorSlugs={['containerBackground', 'containerHoverBackground']}>
                                         <BlockishControl
                                             type="BlockishTab"
                                             tabs={[
@@ -443,7 +507,7 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                                             }
                                         </BlockishControl>
                                     </BlockishControl>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Background Overlay', 'blockish')} initialOpen={true}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Background Overlay', 'blockish')} initialOpen={true} indicatorSlugs={['containerBackgroundOverlay', 'containerHoverBackgroundOverlay']}>
                                         <BlockishControl
                                             type="BlockishTab"
                                             tabs={[
@@ -483,7 +547,7 @@ const Inspector = ({ attributes, advancedControls, hasParent }) => {
                                             }
                                         </BlockishControl>
                                     </BlockishControl>
-                                    <BlockishControl type="BlockishPanelBody" title={__('Border', 'blockish')}>
+                                    <BlockishControl type="BlockishPanelBody" title={__('Border', 'blockish')} indicatorSlugs={['containerBorder', 'containerBorderRadius', 'containerBoxShadow', 'containerHoverBorder', 'containerHoverBorderRadius', 'containerHoverBoxShadow']}>
                                         <BlockishControl
                                             type="BlockishTab"
                                             tabs={[

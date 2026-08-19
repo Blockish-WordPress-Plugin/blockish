@@ -34,7 +34,7 @@ const Inspector = ({ attributes, advancedControls }) => {
 						{
 							tabName === 'content' && (
 								<>
-									<BlockishControl type="BlockishPanelBody" title={__('Button', 'blockish')} initialOpen={true}>
+									<BlockishControl type="BlockishPanelBody" title={__('Button', 'blockish')} initialOpen={true} indicatorSlugs={['text', 'url', 'icon', 'iconPosition']} indicatorWhen={{ iconPosition: 'icon' }}>
 										<BlockishControl
 											type="TextControl"
 											label={__('Text', 'blockish')}
@@ -71,7 +71,7 @@ const Inspector = ({ attributes, advancedControls }) => {
 						{
 							tabName === 'style' && (
 								<>
-									<BlockishControl type="BlockishPanelBody" title={__('Button', 'blockish')} initialOpen={true}>
+									<BlockishControl type="BlockishPanelBody" title={__('Button', 'blockish')} initialOpen={true} indicatorSlugs={['buttonWidth', 'buttonMinHeight', 'buttonIconSize', 'buttonPlacement', 'buttonAlignment', 'buttonContentSpacing', 'buttonTypography', 'buttonTextShadow', 'buttonTextColor', 'buttonBackground', 'buttonBoxShadow', 'buttonHoverTextColor', 'buttonHoverBackground', 'buttonHoverBorderColor', 'buttonHoverBoxShadow', 'buttonHoverTransition', 'buttonBorder', 'buttonBorderRadius', 'buttonPadding']}>
 										<BlockishResponsiveControl
 											left="5ch"
 											type="BlockishRangeUnit"

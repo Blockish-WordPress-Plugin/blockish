@@ -27,7 +27,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Menu', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['justifyContent', 'alignItems', 'isVertical']}>
 								<BlockishResponsiveControl
 									type="BlockishSelect"
 									label={ __( 'Justify Content', 'blockish' ) }
@@ -69,7 +69,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Nav Items', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['navGap', 'itemColorNormal', 'itemBgNormal', 'itemColorHover', 'itemBgHover', 'itemColorActive', 'itemBgActive', 'itemTypography', 'itemBorderRadius', 'itemPadding']}>
 								<BlockishResponsiveControl
 									type="BlockishRangeUnit"
 									label={ __( 'Gap', 'blockish' ) }

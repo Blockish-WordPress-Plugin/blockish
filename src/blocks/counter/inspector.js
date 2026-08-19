@@ -37,7 +37,8 @@ const Inspector = ({ attributes, advancedControls }) => {
 								type="BlockishPanelBody"
 								title={__('Counter', 'blockish')}
 								initialOpen={true}
-							>
+							indicatorSlugs={['startNumber', 'endNumber', 'numberPrefix', 'numberSuffix', 'animationDuration', 'thousandSeparator', 'separator', 'title', 'titleTag']}
+							indicatorWhen={{ separator: 'thousandSeparator' }}>
 								<BlockishControl
 									type="BlockishNumber"
 									label={__('Starting Number', 'blockish')}
@@ -144,7 +145,7 @@ const Inspector = ({ attributes, advancedControls }) => {
 									type="BlockishPanelBody"
 									title={__('Counter', 'blockish')}
 									initialOpen={true}
-								>
+								indicatorSlugs={['titlePosition', 'titleHorizontalAlignment', 'titleVerticalAlignment', 'titleGap', 'numberPosition']}>
 									<BlockishControl
 										type="BlockishToggleGroup"
 										label={__('Title Position', 'blockish')}
@@ -252,7 +253,7 @@ const Inspector = ({ attributes, advancedControls }) => {
 									type="BlockishPanelBody"
 									title={__('Number', 'blockish')}
 									initialOpen={false}
-								>
+								indicatorSlugs={['numberTextColor', 'numberTypography', 'numberTextStroke', 'numberTextShadow']}>
 									<BlockishControl
 										type="BlockishColor"
 										label={__('Text Color', 'blockish')}
@@ -280,7 +281,7 @@ const Inspector = ({ attributes, advancedControls }) => {
 									type="BlockishPanelBody"
 									title={__('Title', 'blockish')}
 									initialOpen={false}
-								>
+								indicatorSlugs={['titleTextColor', 'titleTypography', 'titleTextStroke', 'titleTextShadow']}>
 									<BlockishControl
 										type="BlockishColor"
 										label={__('Text Color', 'blockish')}

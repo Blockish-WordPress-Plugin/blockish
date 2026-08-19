@@ -1,0 +1,22 @@
+.blockish-spacing-sizes-control {
+	position: relative;
+
+	.blockish-spacing-sizes-reset {
+		position: absolute;
+		top: -2px;
+		right: 24px;
+		z-index: 2;
+		min-width: 20px;
+		width: 20px;
+		height: 20px;
+
+		svg {
+			width: 20px;
+			height: 20px;
+		}
+	}
+
+	.spacing-sizes-control__header {
+		padding-right: 4px;
+	}
+}

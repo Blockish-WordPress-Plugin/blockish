@@ -23,7 +23,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Item', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['defaultOpen', 'expandIcon', 'collapseIcon', 'titleTag']}>
 								<BlockishControl
 									type="ToggleControl"
 									label={ __(

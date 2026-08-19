@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import BlockishResetButton from '../reset-button';
 const RANGE_CONTROL_CUSTOM_SETTINGS = {
     px: { max: 1000, step: 1 },
     '%': { max: 100, step: 1 },
@@ -27,7 +28,8 @@ export default function BlockishRangeUnit({
     label = __('Range Unit', 'blockish'),
     onChange,
     value,
-    units: unitProps = {}
+    units: unitProps = {},
+    showReset = true,
 }) {
     const customRangeValue = parseFloat(value);
     const availableUnits = Object.keys(unitProps);
@@ -84,12 +86,14 @@ export default function BlockishRangeUnit({
         }
     };
 
+    const hasValue = value !== undefined && value !== null && value !== '';
+
     return (
         <fieldset className="blockish-range-unit blockish-control">
             <BaseControl.VisualLabel as="legend" __nextHasNoMarginBottom={true}>
                 {label}
             </BaseControl.VisualLabel>
-            <Flex>
+            <Flex align="center">
                 <FlexItem isBlock>
                     <UnitControl
                         value={value}
@@ -118,6 +122,15 @@ export default function BlockishRangeUnit({
                         />
                     </Spacer>
                 </FlexItem>
+                {showReset && (
+                    <FlexItem>
+                        <BlockishResetButton
+                            onClick={() => onChange(undefined)}
+                            disabled={!hasValue}
+                            label={__('Reset', 'blockish')}
+                        />
+                    </FlexItem>
+                )}
             </Flex>
         </fieldset>
     );

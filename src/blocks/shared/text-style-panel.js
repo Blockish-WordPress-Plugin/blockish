@@ -19,7 +19,7 @@ export default function TextStylePanel( { title } ) {
 			type="BlockishPanelBody"
 			title={ title }
 			initialOpen={ true }
-		>
+		indicatorSlugs={['typography', 'color', 'textShadow', 'hoverColor', 'textShadowHover']}>
 			<BlockishControl
 				type="BlockishTypography"
 				label={ __( 'Typography', 'blockish' ) }

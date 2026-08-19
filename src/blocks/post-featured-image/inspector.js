@@ -29,7 +29,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Featured Image', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['imageSize']}>
 								<BlockishControl
 									type="BlockishSelect"
 									label={ __( 'Image Size', 'blockish' ) }
@@ -86,7 +86,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Layout', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['alignment', 'imageWidth', 'imageMaxWidth', 'imageHeight', 'objectFit']}>
 									<BlockishResponsiveControl
 										type="BlockishToggleGroup"
 										label={ __( 'Alignment', 'blockish' ) }
@@ -160,7 +160,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 										'blockish'
 									) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['border', 'borderRadius', 'boxShadow']}>
 									<BlockishGroupControl
 										type="BlockishBorder"
 										label={ __( 'Border', 'blockish' ) }

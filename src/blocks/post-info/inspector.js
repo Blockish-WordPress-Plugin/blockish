@@ -166,7 +166,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Layout', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['layout', 'separator']}>
 									<BlockishControl
 										type="BlockishSelect"
 										label={ __( 'Direction', 'blockish' ) }
@@ -213,7 +213,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Items', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['items']}>
 									<BlockishRepeater
 										repeaterItems={ attributes.items || [] }
 										onChange={ ( items ) =>
@@ -248,7 +248,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Layout', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['alignment', 'alignItems', 'gap']}>
 									<BlockishResponsiveControl
 										type="BlockishSelect"
 										label={ __( 'Alignment', 'blockish' ) }
@@ -343,7 +343,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Text', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['typography', 'color', 'hoverColor']}>
 									<BlockishControl
 										type="BlockishTypography"
 										label={ __( 'Typography', 'blockish' ) }
@@ -367,7 +367,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Icon', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['iconColor', 'iconSize', 'iconGap']}>
 									<BlockishControl
 										type="BlockishColor"
 										label={ __( 'Icon Color', 'blockish' ) }
@@ -390,7 +390,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Separator', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['separatorColor']}>
 									<BlockishControl
 										type="BlockishColor"
 										label={ __(

@@ -37,7 +37,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Social Icons', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['shape', 'flexDirection', 'flexWrap', 'alignment']}>
 								<BlockishControl
 									type="BlockishToggleGroup"
 									label={ __( 'Shape', 'blockish' ) }
@@ -109,7 +109,8 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Icon', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['iconColorMode', 'iconColor', 'iconSecondaryColor', 'iconSize', 'iconPadding', 'iconSpacing', 'iconRowsGap', 'iconBorder', 'iconBorderRadius']}
+								indicatorWhen={{ iconColor: { slug: 'iconColorMode', value: 'custom' } }}>
 									<BlockishControl
 										type="BlockishToggleGroup"
 										label={ __( 'Primary Color', 'blockish' ) }
@@ -178,7 +179,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Icon Hover', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['hoverAnimation']}>
 								<BlockishControl
 									type="BlockishSelect"
 									label={ __( 'Hover Animation', 'blockish' ) }

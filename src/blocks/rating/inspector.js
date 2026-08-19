@@ -38,7 +38,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Rating', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['ratingScale', 'rating', 'icon', 'alignment']}>
 								<BlockishControl
 									type="BlockishNumber"
 									label={ __( 'Rating Scale', 'blockish' ) }
@@ -122,7 +122,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Icon', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['iconSize', 'iconSpacing', 'iconColor', 'unmarkedColor']}>
 								<BlockishResponsiveControl
 									type="BlockishRangeUnit"
 									label={ __( 'Size', 'blockish' ) }

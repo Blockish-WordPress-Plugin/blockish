@@ -41,7 +41,7 @@ const Inspector = ( { attributes, setAttributes, advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Social Icon', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['network', 'label', 'icon', 'link']}>
 								<BlockishControl
 									type="BlockishSelect"
 									label={ __( 'Network', 'blockish' ) }

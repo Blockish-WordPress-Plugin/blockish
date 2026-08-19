@@ -28,7 +28,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Slide layout', 'blockish' ) }
 								initialOpen={ true }
-							>
+							indicatorSlugs={['minHeight', 'flexDirection', 'alignItems', 'justifyContent', 'gap']}>
 								<p className="blockish-carousel-slide-help">
 									{ __(
 										'Only content blocks are allowed here (no Container). Use Background below for hero fills.',
@@ -120,7 +120,7 @@ const Inspector = ( { advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Background', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['slideBackground', 'slideBackgroundOverlay']}>
 									<BlockishGroupControl
 										type="BlockishBackground"
 										label={ __( 'Background', 'blockish' ) }
@@ -135,7 +135,7 @@ const Inspector = ( { advancedControls } ) => {
 								<BlockishControl
 									type="BlockishPanelBody"
 									title={ __( 'Spacing', 'blockish' ) }
-								>
+								indicatorSlugs={['padding']}>
 									<BlockishResponsiveControl
 										type="BlockishSpacing"
 										label={ __( 'Padding', 'blockish' ) }

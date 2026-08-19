@@ -30,7 +30,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Offcanvas', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['syncWithMenu', 'hamburgerIcon', 'offcanvasSide', 'offcanvasAnimation']}>
 									<BlockishControl
 										type="ToggleControl"
 										label={ __( 'Sync with Menu', 'blockish' ) }
@@ -75,7 +75,12 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Header', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['headerType', 'headerImage', 'headerText', 'headerLogoWidth']}
+								indicatorWhen={{
+									headerImage: { slug: 'headerType', value: 'customImage' },
+									headerText: { slug: 'headerType', value: 'customText' },
+									headerLogoWidth: { slug: 'headerType', value: ['customImage', 'siteLogo'] },
+								}}>
 									<BlockishControl
 										type="SelectControl"
 										label={ __( 'Header Content', 'blockish' ) }
@@ -121,7 +126,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Panel', 'blockish' ) }
 									initialOpen={ true }
-								>
+								indicatorSlugs={['panelBg', 'panelWidth', 'panelPadding', 'overlayBg']}>
 									<BlockishGroupControl
 										type="BlockishBackground"
 										label={ __( 'Background', 'blockish' ) }
@@ -149,7 +154,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Header', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['headerBg', 'headerPadding', 'headerBorder', 'headerTitleColor', 'headerTitleTypography']}>
 									<BlockishGroupControl
 										type="BlockishBackground"
 										label={ __( 'Background', 'blockish' ) }
@@ -182,7 +187,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Close Button', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['closeSize', 'closeIconSize', 'closeBorderRadius', 'closeIconColor', 'closeBgNormal', 'closeIconColorHover', 'closeBgHover']}>
 									<BlockishResponsiveControl
 										type="BlockishRangeUnit"
 										label={ __( 'Button Size', 'blockish' ) }
@@ -246,7 +251,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Hamburger', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['hamburgerAlign', 'hamburgerColor', 'hamburgerSize']}>
 									<BlockishControl
 										type="BlockishToggleGroup"
 										label={ __( 'Alignment', 'blockish' ) }
@@ -274,7 +279,7 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									type="BlockishPanelBody"
 									title={ __( 'Menu Items', 'blockish' ) }
 									initialOpen={ false }
-								>
+								indicatorSlugs={['itemColorNormal', 'itemColorHover', 'itemTypography', 'itemPadding']}>
 									<BlockishControl
 										type="BlockishTab"
 										tabs={ [
