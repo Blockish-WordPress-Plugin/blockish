@@ -16,6 +16,7 @@ class ClassManager {
 	private const CSS_META_KEY = 'blockishClassManagerStyles';
 	private const CSS_FAILED_KEY = 'blockish_class_manager_css_file_failed';
 	private const CSS_INDEX_KEY = 'blockish_class_manager_css_index';
+	private const CSS_REV_KEY = 'blockish_class_manager_css_rev';
 	private const CSS_DIR = 'blockish';
 	private const CSS_FILE_PREFIX = 'class-manager-';
 	/** Unused hashed files older than this are pruned from uploads. */
@@ -29,6 +30,7 @@ class ClassManager {
 		add_action( 'init', array( $this, 'register_post_type' ) );
 		add_action( 'init', array( $this, 'register_runtime_hooks' ), 20 );
 		add_action( 'before_delete_post', array( $this, 'delete_child_classes_on_parent_delete' ) );
+		add_action( 'rest_api_init', array( $this, 'register_editor_css_route' ) );
 	}
 
 	public function register_runtime_hooks() {
@@ -526,6 +528,71 @@ class ClassManager {
 		delete_option( self::CSS_INDEX_KEY );
 		// Drop the previous single-file option if an older version left it behind.
 		delete_option( 'blockish_class_manager_css_file' );
+		$this->bump_css_revision();
+	}
+
+	/**
+	 * Editor JS uses this stamp to skip refetching compiled class CSS.
+	 */
+	public function bump_css_revision() {
+		$rev = (int) get_option( self::CSS_REV_KEY, 0 );
+		update_option( self::CSS_REV_KEY, $rev + 1, false );
+	}
+
+	public function get_css_revision() {
+		return (int) get_option( self::CSS_REV_KEY, 0 );
+	}
+
+	/**
+	 * Compiled class CSS for the block editor (meta concatenation).
+	 *
+	 * @param int $since Last revision the client already applied.
+	 * @return array{last_changed: int, unchanged: bool, css: string}
+	 */
+	public function get_editor_css_bundle( $since = 0 ) {
+		$last = $this->get_css_revision();
+		$since = absint( $since );
+
+		if ( $since > 0 && $since === $last ) {
+			return array(
+				'last_changed' => $last,
+				'unchanged'    => true,
+				'css'          => '',
+			);
+		}
+
+		return array(
+			'last_changed' => $last,
+			'unchanged'    => false,
+			'css'          => $this->get_all_class_styles(),
+		);
+	}
+
+	public function register_editor_css_route() {
+		register_rest_route(
+			'blockish/v1',
+			'/class-manager-css',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'get_editor_css_rest' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+				'args'                => array(
+					'since' => array(
+						'type'    => 'integer',
+						'minimum' => 0,
+						'default' => 0,
+					),
+				),
+			)
+		);
+	}
+
+	public function get_editor_css_rest( \WP_REST_Request $request ) {
+		return rest_ensure_response(
+			$this->get_editor_css_bundle( (int) $request->get_param( 'since' ) )
+		);
 	}
 
 	/**

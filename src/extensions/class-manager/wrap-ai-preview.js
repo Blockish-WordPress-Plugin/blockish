@@ -62,27 +62,34 @@ export const resolveClassPrevious = async ( action, extra = {} ) => {
 };
 
 const STYLE_TYPE = 'blockish-classes-styles';
-const CSS_META_KEY = 'blockishClassManagerStyles';
 
-const applyClassStylesToEditor = ( records = [] ) => {
+export const fetchClassManagerCssBundle = async ( since = 0 ) => {
+	const parsed = parseInt( since, 10 );
+	const stamp = Number.isFinite( parsed ) && parsed > 0 ? parsed : 0;
+	const path =
+		stamp > 0
+			? `/blockish/v1/class-manager-css?since=${ stamp }`
+			: '/blockish/v1/class-manager-css';
+	return apiFetch( { path } );
+};
+
+export const applyClassCssToEditor = ( css ) => {
 	const editorDispatch = dispatch( 'core/editor' );
 	if ( typeof editorDispatch?.updateEditorSettings !== 'function' ) {
 		return;
 	}
 
-	const css = ( Array.isArray( records ) ? records : [] )
-		.map( ( record ) => record?.meta?.[ CSS_META_KEY ] || record?.css || '' )
-		.join( '' );
-
 	const settings = select( 'core/editor' )?.getEditorSettings?.() || {};
 	const styles = Array.isArray( settings.styles ) ? [ ...settings.styles ] : [];
 	const index = styles.findIndex( ( style ) => style?.__unstableType === STYLE_TYPE );
-	const entry = { __unstableType: STYLE_TYPE, css };
+	const entry = { __unstableType: STYLE_TYPE, css: typeof css === 'string' ? css : '' };
 
 	if ( index === -1 ) {
 		styles.push( entry );
+	} else if ( styles[ index ]?.css === entry.css ) {
+		return;
 	} else {
-		styles[ index ] = { ...styles[ index ], css };
+		styles[ index ] = { ...styles[ index ], css: entry.css };
 	}
 
 	editorDispatch.updateEditorSettings( { styles } );
@@ -90,16 +97,11 @@ const applyClassStylesToEditor = ( records = [] ) => {
 
 export const refreshClassEntities = async ( extraIds = [] ) => {
 	const coreDispatch = dispatch( 'core' );
-	const coreSelect = select( 'core' );
-	if ( ! coreDispatch || ! coreSelect ) {
+	if ( ! coreDispatch ) {
 		return;
 	}
 
-	const cached = coreSelect.getEntityRecords?.( 'postType', CLASS_POST_TYPE, { per_page: -1 } ) || [];
-	const ids = new Set( [
-		...cached.map( ( record ) => record?.id ).filter( Boolean ),
-		...extraIds,
-	] );
+	const ids = [ ...new Set( ( Array.isArray( extraIds ) ? extraIds : [] ).filter( Boolean ) ) ];
 
 	ids.forEach( ( id ) => {
 		if ( typeof coreDispatch.clearEntityRecordEdits === 'function' ) {
@@ -108,35 +110,16 @@ export const refreshClassEntities = async ( extraIds = [] ) => {
 		coreDispatch.invalidateResolution?.( 'getEntityRecord', [ 'postType', CLASS_POST_TYPE, id ] );
 	} );
 
-	let fresh = [];
-	try {
-		fresh = await apiFetch( {
-			path: '/wp/v2/blockish-classes?per_page=-1&context=edit',
-		} );
-	} catch ( e ) {
-		console.error( 'Blockish Class Manager: failed to reload classes after preview', e );
-	}
-
-	if ( Array.isArray( fresh ) && typeof coreDispatch.receiveEntityRecords === 'function' ) {
-		coreDispatch.receiveEntityRecords(
-			'postType',
-			CLASS_POST_TYPE,
-			fresh,
-			{ per_page: -1, context: 'edit' },
-			true
-		);
-		coreDispatch.receiveEntityRecords(
-			'postType',
-			CLASS_POST_TYPE,
-			fresh,
-			{ per_page: -1 },
-			true
-		);
-	}
-
 	coreDispatch.invalidateResolution?.( 'getEntityRecords', [ 'postType', CLASS_POST_TYPE ] );
 	coreDispatch.invalidateResolution?.( 'getEntityRecords', [ 'postType', CLASS_POST_TYPE, { per_page: -1 } ] );
 	coreDispatch.invalidateResolution?.( 'getEntityRecords', [ 'postType', CLASS_POST_TYPE, { per_page: -1, parent: 0 } ] );
 
-	applyClassStylesToEditor( Array.isArray( fresh ) ? fresh : [] );
+	try {
+		const bundle = await fetchClassManagerCssBundle( 0 );
+		if ( ! bundle?.unchanged ) {
+			applyClassCssToEditor( bundle?.css || '' );
+		}
+	} catch ( e ) {
+		console.error( 'Blockish Class Manager: failed to reload class CSS after preview', e );
+	}
 };
