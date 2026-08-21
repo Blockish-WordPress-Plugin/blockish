@@ -33,7 +33,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Call this exactly once after you finish pushing a new pending block_schema via manage-post or manage-template, to force the user\'s editor to reload and show the neon preview box.'
+                'usage_notes' => 'Call this once after you finish pushing a pending block_schema via manage-post or manage-template. The open editor soft-syncs from the server (no full page reload). Prefer one call at the end of a batch when the editor is open.'
             ],
         ];
     }
