@@ -3,6 +3,7 @@ import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Card, CardBody, Button, TextControl, RadioControl, SelectControl, Notice, __experimentalHeading as Heading, __experimentalText as Text, __experimentalVStack as VStack, Flex } from '@wordpress/components';
 import { zap } from '../../components/icons/block-icons';
+import OverviewVideoModal, { getConnectVideoId } from './overview-video-modal';
 
 export default function McpConfigPage() {
 	const [step, setStep] = useState(0);
@@ -12,6 +13,9 @@ export default function McpConfigPage() {
 	const [appPassword, setAppPassword] = useState('');
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [isCopied, setIsCopied] = useState(false);
+	const [isConnectVideoOpen, setIsConnectVideoOpen] = useState(false);
+	const connectVideoId = getConnectVideoId();
+	const hasConnectVideo = !!connectVideoId;
 
 	useEffect(() => {
 		const cachedPass = window.localStorage.getItem('blockish_mcp_password');
@@ -106,10 +110,15 @@ export default function McpConfigPage() {
 			<Text>
 				{__('We have built an interactive wizard to generate a single copy-paste terminal command that installs dependencies and securely configures your AI client automatically.', 'blockish')}
 			</Text>
-			<div style={{ marginTop: '16px' }}>
+			<div style={{ marginTop: '16px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
 				<Button variant="primary" onClick={handleNext}>
 					{__('Start Configuration Wizard', 'blockish')}
 				</Button>
+				{hasConnectVideo ? (
+					<Button variant="secondary" onClick={() => setIsConnectVideoOpen(true)}>
+						{__('Watch how to connect', 'blockish')}
+					</Button>
+				) : null}
 			</div>
 		</VStack>
 	);
@@ -300,6 +309,14 @@ export default function McpConfigPage() {
 					{step === 3 && renderStep3()}
 				</CardBody>
 			</Card>
+
+			<OverviewVideoModal
+				isOpen={isConnectVideoOpen}
+				onClose={() => setIsConnectVideoOpen(false)}
+				videoId={connectVideoId}
+				title={__('How to connect', 'blockish')}
+				iframeTitle={__('Blockish MCP connect walkthrough', 'blockish')}
+			/>
 		</VStack>
 	);
 }

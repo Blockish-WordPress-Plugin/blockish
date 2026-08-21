@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	Icon,
@@ -10,8 +11,10 @@ import {
 import { info, plugins } from '@wordpress/icons';
 import { blocks as blocksIcon, zap } from '../../components/icons/block-icons';
 import StatCard from './stat-card';
+import OverviewVideoModal, { getOverviewVideoId } from './overview-video-modal';
 
 export default function DashboardHome({ data, onNavigate }) {
+	const [isOverviewOpen, setIsOverviewOpen] = useState(false);
 	const blockStats = data?.stats?.blocks || {};
 	const extensionStats = data?.stats?.extensions || {};
 	const activeBlocks = blockStats.active || 0;
@@ -21,6 +24,7 @@ export default function DashboardHome({ data, onNavigate }) {
 	const pluginVersion = data?.plugin?.version || '1.0.0';
 	const wpVersion = data?.plugin?.wpVersion || '6.4+';
 	const links = data?.plugin?.links || {};
+	const hasOverviewVideo = !!getOverviewVideoId();
 	const pluginTagline =
 		data?.plugin?.tagline || __('Creative Gutenberg blocks for modern websites.', 'blockish');
 
@@ -105,6 +109,15 @@ export default function DashboardHome({ data, onNavigate }) {
 					>
 						{__('Manage Extensions', 'blockish')}
 					</Button>
+					{hasOverviewVideo ? (
+						<Button
+							className="blockish-button-base blockish-button-secondary"
+							variant="secondary"
+							onClick={() => setIsOverviewOpen(true)}
+						>
+							{__('Watch overview', 'blockish')}
+						</Button>
+					) : null}
 				</HStack>
 			</section>
 
@@ -144,25 +157,28 @@ export default function DashboardHome({ data, onNavigate }) {
 					</Heading>
 					<ul className="blockish-links-list">
 						<li>
-							<Text as="a" href={safeLink(links.documentation, '#')} target="_blank" rel="noreferrer">
+							<Text as="a" href={safeLink(links.documentation, 'https://blockish.wowdevs.com/docs/')} target="_blank" rel="noreferrer">
 								{__('Documentation', 'blockish')}
 							</Text>
 						</li>
-						{links.support ? (
-							<li>
-								<Text as="a" href={safeLink(links.support, '#')} target="_blank" rel="noreferrer">
-									{__('Support Forum', 'blockish')}
-								</Text>
-							</li>
-						) : null}
 						<li>
-							<Text as="a" href={safeLink(links.changelog, '#')} target="_blank" rel="noreferrer">
-								{__('Changelog', 'blockish')}
+							<Text as="a" href={safeLink(links.roadmap, 'https://blockish.wowdevs.com/roadmap/')} target="_blank" rel="noreferrer">
+								{__('Roadmap', 'blockish')}
+							</Text>
+						</li>
+						<li>
+							<Text as="a" href={safeLink(links.support, 'https://blockish.wowdevs.com/contact/')} target="_blank" rel="noreferrer">
+								{__('Contact', 'blockish')}
 							</Text>
 						</li>
 					</ul>
 				</div>
 			</section>
+
+			<OverviewVideoModal
+				isOpen={isOverviewOpen}
+				onClose={() => setIsOverviewOpen(false)}
+			/>
 		</VStack>
 	);
 }

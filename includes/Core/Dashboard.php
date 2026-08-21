@@ -122,9 +122,13 @@ class Dashboard {
                         'version'  => BLOCKISH_VERSION,
                         'wpVersion'=> get_bloginfo( 'version' ),
                         'links'    => array(
-                            'documentation' => 'https://wordpress.org/plugins/blockish/',
-                            'support'       => '', // Add own support forum URL when ready.
+                            'documentation' => 'https://blockish.wowdevs.com/docs/',
+                            'roadmap'       => 'https://blockish.wowdevs.com/roadmap/',
+                            'support'       => 'https://blockish.wowdevs.com/contact/',
                             'changelog'     => 'https://wordpress.org/plugins/blockish/#developers',
+                            // Swap this id/URL when the product overview video changes.
+                            'overviewVideo' => 'https://www.youtube.com/watch?v=3q0V4Vru0o0',
+                            'connectVideo'  => 'https://www.youtube.com/watch?v=dVPnrbbFujo',
                         ),
                     ),
                     'addonsList'        => \Blockish\Config\AddonsList::get_instance()->get_list(),
