@@ -6,7 +6,7 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.0
-Stable tag: 1.2.6
+Stable tag: 1.2.7
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -167,6 +167,12 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.2.7 =
+
+* Added: Dashboard overview and MCP connect YouTube walkthroughs (separate videos)
+* Improved: Helpful Links — docs, roadmap, and contact point to blockish.wowdevs.com
+* Improved: Class Manager editor CSS loads from a revisioned bundle instead of every class entity (fewer editor REST requests)
 
 = 1.2.6 =
 
