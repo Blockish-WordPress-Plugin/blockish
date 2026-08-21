@@ -3,11 +3,14 @@ import { useSelect, useDispatch, select } from '@wordpress/data';
 import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
 import generateClassManagerStyles from './style';
 import { getEntityTitle } from './utils';
-import { CLASS_CSS_REGEN_EVENT } from './wrap-ai-preview';
+import {
+	CLASS_CSS_REGEN_EVENT,
+	applyClassCssToEditor,
+	fetchClassManagerCssBundle,
+} from './wrap-ai-preview';
 
 const POST_TYPE = 'blockish-classes';
 const META_KEY = 'blockishClassManagerStyles';
-const STYLE_TYPE = 'blockish-classes-styles';
 
 const getStyleValue = (content) => {
 	if (!content) {
@@ -29,219 +32,152 @@ const getStyleValue = (content) => {
 	return null;
 };
 
+const getDirtyClassIds = (selectStore) => {
+	const core = selectStore('core');
+	if (!core || typeof core.__experimentalGetDirtyEntityRecords !== 'function') {
+		return [];
+	}
+	const dirty = core.__experimentalGetDirtyEntityRecords();
+	if (!Array.isArray(dirty)) {
+		return [];
+	}
+	return dirty
+		.filter((record) => record?.kind === 'postType' && record?.name === POST_TYPE)
+		.map((record) => record?.key)
+		.filter((id) => id);
+};
+
+const buildDeviceCss = (item, breakpoints) => {
+	let css = '';
+	breakpoints.forEach((device) => {
+		const value = device?.value;
+		const slug = device?.slug || 'Desktop';
+		const deviceCss = generateClassManagerStyles([item], slug)?.[slug] || '';
+		if (!deviceCss) return;
+
+		if (value === 'base') {
+			css += deviceCss;
+		} else {
+			css += `@media (max-width: ${value}) { ${deviceCss} }`;
+		}
+	});
+	return css;
+};
+
 const RenderClassManagerStyles = () => {
-	const { updateEditorSettings } = useDispatch('core/editor');
-	const { editEntityRecord, saveEntityRecord } = useDispatch('core');
+	const { editEntityRecord } = useDispatch('core');
 	const { useDeviceList } = window.blockish.helpers;
 	const breakpoints = useDeviceList();
 
-	const editorSettings = useSelect((select) => {
-		const { getEditorSettings } = select('core/editor');
-		return getEditorSettings();
+	const lastChangedRef = useRef(0);
+	const baseCssRef = useRef('');
+	const prevDirtyCountRef = useRef(0);
+	const [regenTick, setRegenTick] = useState(0);
+	const [bundleTick, setBundleTick] = useState(0);
+
+	const styleEntryMissing = useSelect((selectStore) => {
+		const styles = selectStore('core/editor').getEditorSettings()?.styles;
+		if (!Array.isArray(styles)) {
+			return true;
+		}
+		return !styles.some((style) => style?.__unstableType === 'blockish-classes-styles');
 	}, []);
 
-	const classStylesCacheRef = useRef({ key: '[]', value: [] });
-	const classStyles = useSelect((select) => {
-		const { getEntityRecords, getEditedEntityRecord } = select('core');
-		const classes = getEntityRecords('postType', POST_TYPE, { per_page: -1 }) || [];
-		let nextValue = [];
+	const dirtyClasses = useSelect((selectStore) => {
+		const { getEditedEntityRecord } = selectStore('core');
+		const ids = getDirtyClassIds(selectStore);
 
-		if (classes.length > 0) {
-			const editedClasses = classes.map((item) =>
-				getEditedEntityRecord('postType', POST_TYPE, item?.id)
-			);
-			nextValue = editedClasses
-				.map((item) => {
-					const parent = getEditedEntityRecord('postType', POST_TYPE, item?.parent);
-					return {
-						id: item?.id,
-						title: getEntityTitle(item?.title),
-						style: getStyleValue(item?.content),
-						parent: getEntityTitle(parent?.title),
-						metaCss: item?.meta?.[META_KEY] || '',
-					};
-				})
-				.filter((item) => item?.id);
-		}
-
-		const nextKey = JSON.stringify(nextValue);
-		if (classStylesCacheRef.current.key === nextKey) {
-			return classStylesCacheRef.current.value;
-		}
-
-		classStylesCacheRef.current = {
-			key: nextKey,
-			value: nextValue,
-		};
-		return nextValue;
-	}, []);
-
-	const editedClassIds = useSelect(
-		(select) => {
-			const { hasEditsForEntityRecord } = select('core');
-			return classStyles
-				.map((item) => item?.id)
-				.filter((id) => id && hasEditsForEntityRecord('postType', POST_TYPE, id));
-		},
-		[classStyles]
-	);
-
-	const cssByClassId = useMemo(() => {
-		const byId = {};
-		classStyles.forEach((item) => {
-			let css = '';
-
-			breakpoints.forEach((device) => {
-				const value = device?.value;
-				const slug = device?.slug || 'Desktop';
-				const deviceCss = generateClassManagerStyles([item], slug)?.[slug] || '';
-				if (!deviceCss) return;
-
-				if (value === 'base') {
-					css += deviceCss;
-				} else {
-					css += `@media (max-width: ${value}) { ${deviceCss} }`;
+		return ids
+			.map((id) => {
+				const item = getEditedEntityRecord('postType', POST_TYPE, id);
+				if (!item?.id) {
+					return null;
 				}
-			});
-
-			// Freshly imported classes may already have compiled meta CSS before
-			// the content→CSS path has a chance to re-run.
-			byId[item.id] = css || item.metaCss || '';
-		});
-
-		return byId;
-	}, [breakpoints, classStyles]);
-
-	const generateStyles = useMemo(() => {
-		let styles = '';
-		Object.values(cssByClassId).forEach((css) => {
-			styles += css || '';
-		});
-
-		return styles;
-	}, [cssByClassId]);
-
-	const persistMetaCss = async (nextCssByClassId, idsToUpdate = [], { quiet = false } = {}) => {
-		const idsSet = new Set(idsToUpdate);
-		for (const item of classStyles) {
-			if (!item?.id || !idsSet.has(item.id)) continue;
-			const css = nextCssByClassId?.[item.id] || '';
-			const existing = select('core').getEditedEntityRecord('postType', POST_TYPE, item.id);
-			const payload = {
-				meta: {
-					...(existing?.meta || {}),
-					[META_KEY]: css,
-				},
-			};
-
-			if (quiet) {
-				await saveEntityRecord('postType', POST_TYPE, {
+				const parent = item?.parent
+					? getEditedEntityRecord('postType', POST_TYPE, item.parent)
+					: null;
+				return {
 					id: item.id,
-					...payload,
-				});
-			} else {
-				await editEntityRecord('postType', POST_TYPE, item.id, payload);
+					title: getEntityTitle(item?.title),
+					style: getStyleValue(item?.content),
+					parent: getEntityTitle(parent?.title),
+					metaCss: item?.meta?.[META_KEY] || '',
+				};
+			})
+			.filter(Boolean);
+	}, []);
+
+	const overlayCss = useMemo(() => {
+		let css = '';
+		dirtyClasses.forEach((item) => {
+			css += buildDeviceCss(item, breakpoints) || item.metaCss || '';
+		});
+		return css;
+	}, [breakpoints, dirtyClasses]);
+
+	const loadBundle = async (since = 0, { force = false } = {}) => {
+		try {
+			const bundle = await fetchClassManagerCssBundle(force ? 0 : since);
+			const nextStamp = parseInt(bundle?.last_changed, 10) || 0;
+
+			if (bundle?.unchanged) {
+				lastChangedRef.current = nextStamp || lastChangedRef.current;
+				return;
 			}
+
+			baseCssRef.current = bundle?.css || '';
+			lastChangedRef.current = nextStamp;
+			setBundleTick((tick) => tick + 1);
+		} catch (e) {
+			console.error('Blockish Class Manager: failed to load class CSS', e);
 		}
 	};
-
-	const idsWhereGeneratedDiffersFromMeta = (idsToCheck = null) => {
-		const limit = idsToCheck instanceof Set && idsToCheck.size > 0 ? idsToCheck : null;
-		return classStyles
-			.filter((item) => {
-				if (limit && !limit.has(item.id)) return false;
-				const newCss = cssByClassId[item.id] || '';
-				return item.style && item.metaCss !== newCss;
-			})
-			.map((item) => item.id);
-	};
-
-	const classStylesRef = useRef({});
-	const hasClassStylesInitialized = useRef(false);
-	const lastRegenTickRef = useRef(0);
-	const [regenRequest, setRegenRequest] = useState(null);
-	const editorStyles = editorSettings?.styles;
 
 	useEffect(() => {
-		const onRegen = (event) => {
-			const ids = event?.detail?.classIds;
-			setRegenRequest({
-				tick: Date.now(),
-				classIds: Array.isArray(ids) ? ids : [],
-				quiet: !!event?.detail?.quiet,
-			});
+		loadBundle(0);
+	}, []);
+
+	useEffect(() => {
+		const onRegen = () => {
+			setRegenTick((tick) => tick + 1);
+			loadBundle(0, { force: true });
 		};
 		window.addEventListener(CLASS_CSS_REGEN_EVENT, onRegen);
 		return () => window.removeEventListener(CLASS_CSS_REGEN_EVENT, onRegen);
 	}, []);
 
 	useEffect(() => {
-		if (!regenRequest || lastRegenTickRef.current === regenRequest.tick) {
-			return;
+		const dirtyCount = dirtyClasses.length;
+		if (prevDirtyCountRef.current > 0 && dirtyCount === 0) {
+			loadBundle(lastChangedRef.current);
 		}
-		lastRegenTickRef.current = regenRequest.tick;
-
-		const limit = new Set(
-			(regenRequest.classIds || [])
-				.map((id) => parseInt(id, 10))
-				.filter((id) => Number.isFinite(id) && id > 0)
-		);
-		const idsMissingCss = idsWhereGeneratedDiffersFromMeta(limit.size > 0 ? limit : null);
-		if (idsMissingCss.length > 0) {
-			persistMetaCss(cssByClassId, idsMissingCss, { quiet: regenRequest.quiet });
-		}
-		classStylesRef.current = cssByClassId;
-	}, [regenRequest, classStyles, cssByClassId]);
+		prevDirtyCountRef.current = dirtyCount;
+	}, [dirtyClasses.length]);
 
 	useEffect(() => {
-		if (!editorStyles) return;
+		applyClassCssToEditor(`${baseCssRef.current}${overlayCss}`);
+	}, [overlayCss, bundleTick, regenTick, styleEntryMissing]);
 
-		const styleIndex = editorStyles.findIndex(
-			(style) => style?.__unstableType === STYLE_TYPE
-		);
-
-		// The site editor and the global styles renderer rebuild settings.styles
-		// from scratch, dropping this entry — so re-add it whenever it is missing
-		// rather than trusting a one-time injection. Never flag it as
-		// isGlobalStyles: both rebuilds strip those entries by design.
-		if (styleIndex === -1) {
-			updateEditorSettings({
-				styles: [
-					...editorStyles,
-					{
-						__unstableType: STYLE_TYPE,
-						css: generateStyles,
-					},
-				],
-			});
-		} else if (editorStyles[styleIndex]?.css !== generateStyles) {
-			updateEditorSettings({
-				styles: editorStyles.map((style, index) =>
-					index === styleIndex ? { ...style, css: generateStyles } : style
-				),
-			});
-		}
-
-		const nextMap = JSON.stringify(cssByClassId);
-		const prevMap = JSON.stringify(classStylesRef.current);
-
-		if (!hasClassStylesInitialized.current) {
-			const idsMissingCss = idsWhereGeneratedDiffersFromMeta();
-
-			if (idsMissingCss.length > 0) {
-				persistMetaCss(cssByClassId, idsMissingCss, { quiet: true });
-			}
-
-			classStylesRef.current = cssByClassId;
-			hasClassStylesInitialized.current = true;
+	useEffect(() => {
+		if (!dirtyClasses.length) {
 			return;
 		}
 
-		if (nextMap !== prevMap && editedClassIds.length > 0) {
-			persistMetaCss(cssByClassId, editedClassIds);
-			classStylesRef.current = cssByClassId;
-		}
-	}, [generateStyles, cssByClassId, classStyles, editedClassIds, editorStyles]);
+		dirtyClasses.forEach((item) => {
+			const css = buildDeviceCss(item, breakpoints) || '';
+			if (!item.style || item.metaCss === css) {
+				return;
+			}
+
+			const existing = select('core').getEditedEntityRecord('postType', POST_TYPE, item.id);
+			editEntityRecord('postType', POST_TYPE, item.id, {
+				meta: {
+					...(existing?.meta || {}),
+					[META_KEY]: css,
+				},
+			});
+		});
+	}, [dirtyClasses, breakpoints, editEntityRecord]);
 
 	return <></>;
 };
