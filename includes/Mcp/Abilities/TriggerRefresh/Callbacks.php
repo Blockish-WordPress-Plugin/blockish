@@ -13,9 +13,9 @@ class Callbacks
             return ['error' => 'post_id is required'];
         }
 
-        // Monotonic-ish token so clients can soft-sync without hard reload.
-        set_transient( 'blockish_ai_refresh_' . $post_id, (string) microtime( true ), 60 );
+        // Set a short-lived transient flag (expires in 60 seconds)
+        set_transient('blockish_ai_refresh_' . $post_id, true, 60);
 
-        return [ 'success' => true ];
+        return ['success' => true];
     }
 }

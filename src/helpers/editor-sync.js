@@ -1,233 +1,207 @@
 /**
- * Editor Sync (MCP AI)
- *
- * Polls for trigger-refresh flags and soft-syncs the open editor from the
- * server — no full page reload, and never savePost over MCP-staged content.
+ * Custom Editor Sync
+ * Polls the backend every 3 seconds to check if the AI has explicitly requested a refresh.
+ * Saves unsaved edits first; reloads only after a successful save.
  */
-( function () {
-	if (
-		typeof wp === 'undefined' ||
-		typeof wp.data === 'undefined' ||
-		typeof wp.apiFetch === 'undefined' ||
-		typeof wp.blocks === 'undefined'
-	) {
-		return;
-	}
+(function() {
+    if (typeof wp === 'undefined' || typeof wp.data === 'undefined' || typeof wp.apiFetch === 'undefined') {
+        return;
+    }
 
-	let isPolling = false;
-	let pollInterval = null;
-	let isBusy = false;
-	let coalesceTimer = null;
-	let pendingSync = false;
+    let isPolling = false;
+    let pollInterval = null;
+    let isBusy = false;
 
-	const COALESCE_MS = 750;
+    const getDirtyEntityRecords = () => {
+        const core = wp.data.select('core');
+        if (core && typeof core.__experimentalGetDirtyEntityRecords === 'function') {
+            const dirty = core.__experimentalGetDirtyEntityRecords();
+            if (Array.isArray(dirty) && dirty.length > 0) {
+                return dirty;
+            }
+        }
+        return [];
+    };
 
-	const getEditorContext = () => {
-		const editorSelect = wp.data.select( 'core/editor' );
-		if ( ! editorSelect ) {
-			return null;
-		}
-		const postType = editorSelect.getCurrentPostType
-			? editorSelect.getCurrentPostType()
-			: null;
-		const postId = editorSelect.getCurrentPostId
-			? editorSelect.getCurrentPostId()
-			: null;
-		if ( ! postType || postId === null || postId === undefined || postId === '' ) {
-			return null;
-		}
-		return { postType, postId };
-	};
+    /**
+     * WP may still have beforeunload attached briefly after save.
+     * Suppress it so a confirmed save can reload cleanly.
+     */
+    const reloadEditor = () => {
+        isBusy = true;
 
-	/**
-	 * Pull latest post_content from the server into the block canvas.
-	 * Skips savePost so in-memory editor state cannot overwrite MCP staging.
-	 *
-	 * @return {Promise<boolean>}
-	 */
-	const softSyncFromServer = async () => {
-		const ctx = getEditorContext();
-		if ( ! ctx ) {
-			return false;
-		}
+        window.addEventListener(
+            'beforeunload',
+            (event) => {
+                event.stopImmediatePropagation();
+            },
+            { capture: true }
+        );
 
-		const { postType, postId } = ctx;
-		const coreDispatch = wp.data.dispatch( 'core' );
-		const blockEditorDispatch = wp.data.dispatch( 'core/block-editor' );
-		const editorDispatch = wp.data.dispatch( 'core/editor' );
+        window.location.reload();
+    };
 
-		if ( ! blockEditorDispatch || typeof blockEditorDispatch.resetBlocks !== 'function' ) {
-			return false;
-		}
+    /**
+     * Save the current editor post the same way the Save button does:
+     * serialize blocks → saveEntityRecord. Plain saveEditedEntityRecord alone
+     * often has nothing queued and silently no-ops.
+     */
+    const saveCurrentEditorPost = async () => {
+        const editorSelect = wp.data.select('core/editor');
+        const editorDispatch = wp.data.dispatch('core/editor');
+        const coreSelect = wp.data.select('core');
 
-		if ( coreDispatch && typeof coreDispatch.invalidateResolution === 'function' ) {
-			coreDispatch.invalidateResolution( 'getEntityRecord', [
-				'postType',
-				postType,
-				postId,
-			] );
-		}
+        if (!editorSelect || typeof editorSelect.isEditedPostDirty !== 'function') {
+            return true;
+        }
 
-		let record = null;
-		if ( wp.data.resolveSelect ) {
-			try {
-				record = await wp.data
-					.resolveSelect( 'core' )
-					.getEntityRecord( 'postType', postType, postId, {
-						context: 'edit',
-					} );
-			} catch ( e ) {
-				record = null;
-			}
-		}
+        if (!editorSelect.isEditedPostDirty()) {
+            return true;
+        }
 
-		if ( ! record ) {
-			try {
-				let restBase = postType;
-				if ( wp.data.resolveSelect ) {
-					const type = await wp.data
-						.resolveSelect( 'core' )
-						.getPostType( postType );
-					if ( type?.rest_base ) {
-						restBase = type.rest_base;
-					}
-				}
-				record = await wp.apiFetch( {
-					path: `/wp/v2/${ encodeURIComponent(
-						restBase
-					) }/${ encodeURIComponent( postId ) }?context=edit`,
-				} );
-			} catch ( e ) {
-				console.error( 'Blockish AI Refresh: failed to fetch post', e );
-				return false;
-			}
-		}
+        if (typeof editorSelect.isEditedPostSaveable === 'function' && !editorSelect.isEditedPostSaveable()) {
+            console.error('Blockish AI Refresh: post is not saveable');
+            return false;
+        }
 
-		const raw =
-			typeof record?.content === 'string'
-				? record.content
-				: record?.content?.raw;
+        const postType = editorSelect.getCurrentPostType();
+        const postId = editorSelect.getCurrentPostId();
 
-		if ( typeof raw !== 'string' ) {
-			console.error( 'Blockish AI Refresh: missing content.raw on record' );
-			return false;
-		}
+        await editorDispatch.savePost();
 
-		const blocks = wp.blocks.parse( raw );
-		blockEditorDispatch.resetBlocks( blocks );
+        const saveError = coreSelect.getLastEntitySaveError('postType', postType, postId);
+        if (saveError) {
+            console.error('Blockish AI Refresh: savePost failed', saveError);
+            return false;
+        }
 
-		// Keep editor entity edits aligned with the server snapshot so the
-		// canvas is not marked dirty against stale local content.
-		if ( editorDispatch && typeof editorDispatch.editPost === 'function' ) {
-			const patch = { content: raw };
-			if ( record.modified ) {
-				patch.modified = record.modified;
-			}
-			if ( record.modified_gmt ) {
-				patch.modified_gmt = record.modified_gmt;
-			}
-			try {
-				editorDispatch.editPost( patch, { undoIgnore: true } );
-			} catch ( e ) {
-				// Older WP may not accept the second arg.
-				editorDispatch.editPost( patch );
-			}
-		}
+        if (editorSelect.isEditedPostDirty()) {
+            console.error('Blockish AI Refresh: post still dirty after savePost');
+            return false;
+        }
 
-		return true;
-	};
+        return true;
+    };
 
-	const runPendingSync = async () => {
-		if ( isBusy ) {
-			pendingSync = true;
-			return;
-		}
+    /**
+     * Persist any other dirty entities (site settings, templates, etc.).
+     */
+    const saveOtherDirtyEntities = async () => {
+        const coreDispatch = wp.data.dispatch('core');
+        const coreSelect = wp.data.select('core');
+        const editorSelect = wp.data.select('core/editor');
 
-		isBusy = true;
-		pendingSync = false;
+        const postType = editorSelect ? editorSelect.getCurrentPostType() : null;
+        const postId = editorSelect ? editorSelect.getCurrentPostId() : null;
 
-		try {
-			const ok = await softSyncFromServer();
-			if ( ! ok ) {
-				console.error(
-					'Blockish AI Refresh: soft sync failed — leaving editor as-is (no hard reload)'
-				);
-			} else {
-				console.log( 'Blockish AI Refresh: soft-synced from server' );
-			}
-		} catch ( error ) {
-			console.error( 'Blockish AI Refresh: soft sync error', error );
-		} finally {
-			isBusy = false;
-			if ( pendingSync ) {
-				pendingSync = false;
-				scheduleSync();
-			}
-		}
-	};
+        const dirty = getDirtyEntityRecords().filter((record) => {
+            // MCP class writes already hit the DB. Saving in-memory Class Manager
+            // edits here would overwrite them.
+            if (record.kind === 'postType' && record.name === 'blockish-classes') {
+                return false;
+            }
+            if (!postType || postId === null || postId === undefined) {
+                return true;
+            }
+            return !(
+                record.kind === 'postType' &&
+                record.name === postType &&
+                String(record.key) === String(postId)
+            );
+        });
 
-	const scheduleSync = () => {
-		pendingSync = true;
-		if ( coalesceTimer ) {
-			clearTimeout( coalesceTimer );
-		}
-		coalesceTimer = setTimeout( () => {
-			coalesceTimer = null;
-			runPendingSync();
-		}, COALESCE_MS );
-	};
+        for (const record of dirty) {
+            const saved = await coreDispatch.saveEditedEntityRecord(
+                record.kind,
+                record.name,
+                record.key
+            );
 
-	wp.data.subscribe( () => {
-		if ( isPolling ) {
-			return;
-		}
+            if (!saved) {
+                console.error('Blockish AI Refresh: saveEditedEntityRecord failed', record);
+                return false;
+            }
 
-		const editor = wp.data.select( 'core/editor' );
-		let isReady = false;
+            const saveError = coreSelect.getLastEntitySaveError(
+                record.kind,
+                record.name,
+                record.key
+            );
+            if (saveError) {
+                console.error('Blockish AI Refresh: entity save error', record, saveError);
+                return false;
+            }
+        }
 
-		if ( editor && editor.__unstableIsEditorReady && editor.__unstableIsEditorReady() ) {
-			isReady = true;
-		}
+        return true;
+    };
 
-		const initialPostId = editor ? editor.getCurrentPostId() : null;
-		if ( ! isReady || ! initialPostId ) {
-			return;
-		}
+    const requestReload = async () => {
+        if (isBusy) {
+            return;
+        }
+        isBusy = true;
 
-		isPolling = true;
+        try {
+            const postSaved = await saveCurrentEditorPost();
+            if (!postSaved) {
+                isBusy = false;
+                return;
+            }
 
-		pollInterval = setInterval( () => {
-			if ( isBusy ) {
-				return;
-			}
+            const entitiesSaved = await saveOtherDirtyEntities();
+            if (!entitiesSaved) {
+                isBusy = false;
+                return;
+            }
 
-			const editorStore = wp.data.select( 'core/editor' );
-			if (
-				editorStore &&
-				editorStore.isSavingPost &&
-				editorStore.isSavingPost()
-			) {
-				return;
-			}
+            reloadEditor();
+        } catch (error) {
+            console.error('Blockish AI Refresh: save error — reload skipped', error);
+            isBusy = false;
+        }
+    };
 
-			const postId = editorStore ? editorStore.getCurrentPostId() : null;
-			if ( ! postId ) {
-				return;
-			}
+    wp.data.subscribe(() => {
+        if (isPolling) return;
 
-			wp.apiFetch( {
-				path: `/blockish/v1/check-refresh?post_id=${ encodeURIComponent(
-					postId
-				) }`,
-			} )
-				.then( ( response ) => {
-					if ( response && response.refresh ) {
-						scheduleSync();
-					}
-				} )
-				.catch( () => {
-					// Ignore transient network errors
-				} );
-		}, 3000 );
-	} );
-} )();
+        const editor = wp.data.select('core/editor');
+
+        let isReady = false;
+
+        if (editor && editor.__unstableIsEditorReady && editor.__unstableIsEditorReady()) {
+            isReady = true;
+        }
+
+        let initialPostId = editor ? editor.getCurrentPostId() : null;
+
+        if (!isReady || !initialPostId) return;
+
+        isPolling = true;
+
+        pollInterval = setInterval(() => {
+            if (isBusy) return;
+
+            const editorStore = wp.data.select('core/editor');
+
+            // Don't sync if the user is currently saving
+            if (editorStore && editorStore.isSavingPost && editorStore.isSavingPost()) return;
+
+            let postId = editorStore ? editorStore.getCurrentPostId() : null;
+
+            if (!postId) return;
+
+            wp.apiFetch({ path: `/blockish/v1/check-refresh?post_id=${encodeURIComponent(postId)}` })
+                .then((response) => {
+                    if (response && response.refresh) {
+                        console.log('Blockish AI Refresh triggered!');
+                        requestReload();
+                    }
+                })
+                .catch(() => {
+                    // Ignore transient network errors
+                });
+
+        }, 3000); // Check every 3 seconds
+    });
+})();
