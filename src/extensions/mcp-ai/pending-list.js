@@ -8,13 +8,20 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { BlockPreview } from '@wordpress/block-editor';
-import { createBlock, serialize } from '@wordpress/blocks';
+import { serialize } from '@wordpress/blocks';
 import { dispatch, select } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import {
 	collectClassIdsFromBlocks,
 	resolveClassPrevious,
 } from '../class-manager/wrap-ai-preview';
+import { schemaToBlocks } from './schema-to-blocks';
+import {
+	fetchQueueItem,
+	prepareResolveOrder,
+	resolvePendingPreviews,
+	savePostContent,
+} from './resolve-pending';
 import './pending-list.scss';
 
 const PAGE_SIZE = 8;
@@ -24,67 +31,6 @@ const PREVIEW_STYLES = [
 		css: 'body{height:auto;overflow:hidden;border:none;padding:0;}',
 	},
 ];
-
-const schemaToBlocks = (nodes) => {
-	if (!Array.isArray(nodes)) {
-		return [];
-	}
-	return nodes
-		.map((node) => {
-			if (!node?.name) {
-				return null;
-			}
-			try {
-				const inner = Array.isArray(node.innerBlocks)
-					? schemaToBlocks(node.innerBlocks)
-					: [];
-				return createBlock(node.name, node.attributes || {}, inner);
-			} catch (e) {
-				return null;
-			}
-		})
-		.filter(Boolean);
-};
-
-const collectNestedEntityIds = (nodes, ids = new Set()) => {
-	if (!Array.isArray(nodes)) {
-		return ids;
-	}
-	nodes.forEach((node) => {
-		if (!node || typeof node !== 'object') {
-			return;
-		}
-		if (node.name === 'core/block' && node.attributes?.ref) {
-			ids.add(absint(node.attributes.ref));
-		}
-		if (node.name === 'blockish-forms/form' && node.attributes?.formId) {
-			ids.add(absint(node.attributes.formId));
-		}
-		if (
-			node.name === 'blockish/navmenu-megamenu' &&
-			node.attributes?.megamenuId
-		) {
-			ids.add(absint(node.attributes.megamenuId));
-		}
-		if (Array.isArray(node.innerBlocks)) {
-			collectNestedEntityIds(node.innerBlocks, ids);
-		}
-	});
-	return ids;
-};
-
-const absint = (value) => {
-	const id = parseInt(value, 10);
-	return Number.isFinite(id) && id > 0 ? id : 0;
-};
-
-const fetchQueueItem = async (id) => {
-	try {
-		return await apiFetch({ path: `/blockish/v1/ai-preview-queue/${id}` });
-	} catch (e) {
-		return null;
-	}
-};
 
 const unwrapCurrentEditor = (nextBlocks) => {
 	const preview = (select('core/block-editor').getBlocks?.() || []).find(
@@ -107,54 +53,6 @@ const isCurrentEditorPost = (queueItem) => {
 		String(currentId) === String(queueItem.id) ||
 		String(currentId) === String(queueItem.rest_id || '')
 	);
-};
-
-const savePostContent = async (item, content) => {
-	const route = item?.rest_route;
-	if (!route) {
-		throw new Error(
-			sprintf(
-				/* translators: %d: post ID */
-				__('No REST route for preview %d.', 'blockish'),
-				item?.id || 0
-			)
-		);
-	}
-	await apiFetch({
-		path: route,
-		method: 'POST',
-		data: { content },
-	});
-};
-
-const prepareAcceptOrder = async (rootIds) => {
-	const orderedIds = [];
-	const seen = new Set();
-
-	const prepare = async (id) => {
-		if (!id || seen.has(id)) {
-			return;
-		}
-		seen.add(id);
-		const item = await fetchQueueItem(id);
-		if (!item) {
-			return;
-		}
-		const schema = item.pendingSchema || [];
-		const nested = [...collectNestedEntityIds(schema)].filter(
-			(nestedId) => nestedId !== id
-		);
-		for (const nestedId of nested) {
-			await prepare(nestedId);
-		}
-		orderedIds.push(id);
-	};
-
-	for (const id of rootIds) {
-		await prepare(id);
-	}
-
-	return orderedIds;
 };
 
 function PendingPreview({ itemId }) {
@@ -319,9 +217,16 @@ export default function AiPreviewPendingList() {
 		setBusyIds(nextIds);
 		setError('');
 		try {
+			if (action === 'resolve') {
+				await resolvePendingPreviews(nextIds);
+				setSelected((current) => current.filter((id) => !nextIds.includes(id)));
+				await loadInventory(true);
+				return;
+			}
+
 			const orderedIds =
 				action === 'accept'
-					? await prepareAcceptOrder(nextIds)
+					? await prepareResolveOrder(nextIds)
 					: nextIds;
 			const ids = orderedIds.length ? orderedIds : nextIds;
 
@@ -352,7 +257,9 @@ export default function AiPreviewPendingList() {
 				err?.message ||
 					(action === 'discard'
 						? __('Failed to discard.', 'blockish')
-						: __('Failed to accept.', 'blockish'))
+						: action === 'resolve'
+							? __('Failed to resolve.', 'blockish')
+							: __('Failed to accept.', 'blockish'))
 			);
 		} finally {
 			setBusyIds([]);
@@ -390,6 +297,31 @@ export default function AiPreviewPendingList() {
 					))}
 				</div>
 				<div className="blockish-ai-preview-pending__bulk">
+					<Button
+						size="compact"
+						variant="secondary"
+						disabled={!filtered.length || isBusy}
+						onClick={() =>
+							runAction(
+								'resolve',
+								filtered.map((item) => item.id)
+							)
+						}
+					>
+						{filtered.length
+							? sprintf(__('Resolve all (%d)', 'blockish'), filtered.length)
+							: __('Resolve all', 'blockish')}
+					</Button>
+					<Button
+						size="compact"
+						variant="secondary"
+						disabled={!selected.length || isBusy}
+						onClick={() => runAction('resolve', selected)}
+					>
+						{selected.length
+							? sprintf(__('Resolve (%d)', 'blockish'), selected.length)
+							: __('Resolve', 'blockish')}
+					</Button>
 					<Button
 						size="compact"
 						variant="primary"
@@ -487,6 +419,14 @@ export default function AiPreviewPendingList() {
 									</span>
 								</div>
 								<div className="blockish-ai-preview-pending__card-actions">
+									<Button
+										size="compact"
+										variant="secondary"
+										disabled={itemBusy}
+										onClick={() => runAction('resolve', [item.id])}
+									>
+										{__('Resolve', 'blockish')}
+									</Button>
 									<Button
 										size="compact"
 										variant="primary"

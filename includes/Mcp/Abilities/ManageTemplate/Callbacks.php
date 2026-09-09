@@ -160,6 +160,14 @@ class Callbacks {
 			'action'        => $action,
 			'schema_staged' => $schema_staged,
 		);
+		if ( $schema_staged && is_string( $result['edit_url'] ) && $result['edit_url'] !== '' ) {
+			// Templates have no single frontend permalink; resolve then stay in editor.
+			$result['resolve_url'] = \Blockish\Extensions\AiPreview::resolve_url(
+				$result['edit_url'],
+				'',
+				array( (int) $post_id )
+			);
+		}
 		if ( ! empty( $warnings ) ) {
 			$result['warnings'] = $warnings;
 		}

@@ -78,7 +78,7 @@ class Callbacks
         $steps = array(
             '7. Build sections as patterns first (`manage-pattern`). Never a monolithic page/template tree. Large JSON → `schema_url` (or server `schema_file`). Use only real IDs returned from manage-pattern — never invent `ref`.',
             '9. Pages (`manage-post`): Assemble with `core/block` refs. Full-bleed: `{"name":"core/block","attributes":{"ref":ID,"align":"full"}}`. Do NOT put header/footer template slots on pages — templates render them. Do NOT put pattern HTML in `post_content`. Do NOT set `attributes.content` on `core/block`.',
-            '11. Handoff: After any stage — `trigger-refresh` + share `edit_url`. Stop. User Accept/Discard. Do not share `post_url` by default. Do not auto-accept unless the user asked (then `get-automation-guideline`).',
+            '11. Handoff: After stage — `trigger-refresh` + share `edit_url` (review) or `resolve_url` (FE without Accept). Magic login `redirect_to` = resolve_url; ask once per session. Agent browser if available, else Puppeteer. Resolve = Accept-all schema→children (no unwrap). Settings → AI Preview: Resolve / Resolve all / Accept (unwrap) / Discard.',
             '12. Undo: live content → `get-revisions` / `restore-revision` confirm:true. Pending neon → Discard, not revisions.',
             '13. Interactions: entrance presets (`inView`/`ready`) over animation CSS. Device hide = `hideOn`. Details in get-block-docs.',
             '14. Stuck: do not invent CSS. Re-read get-block-docs + get-class-manager-docs. Then only the versioned GitHub files in `stuck_recovery`. Retry once. Still stuck → report + issue draft (do not open the issue).',

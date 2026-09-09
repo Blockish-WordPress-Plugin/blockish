@@ -13,7 +13,7 @@ addFilter(
 		tabs.unshift({
 			name: 'ai-preview',
 			title: __('AI Preview', 'blockish'),
-			description: __('Pending layouts waiting for Accept.', 'blockish'),
+			description: __('Pending layouts: Resolve (live FE), Accept (unwrap), or Discard.', 'blockish'),
 			render: AiPreviewSettingsTab,
 		});
 		return tabs;

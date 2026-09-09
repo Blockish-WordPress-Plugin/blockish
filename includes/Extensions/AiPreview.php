@@ -2,14 +2,99 @@
 
 namespace Blockish\Extensions;
 
+use Blockish\Config\ExtensionList;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Locates staged blockish/ai-preview blocks via a single posts-table LIKE query.
+ * Registers the dynamic block so resolved inner markup renders on the frontend.
  */
 class AiPreview {
 
 	private const BLOCK_COMMENT = '<!-- wp:blockish/ai-preview';
+
+	/**
+	 * Hook block registration when MCP AI is active.
+	 */
+	public static function boot(): void {
+		add_action( 'init', array( __CLASS__, 'register_block' ), 20 );
+	}
+
+	/**
+	 * Dynamic block: editor JS owns the schema attrs; PHP echoes saved children.
+	 */
+	public static function register_block(): void {
+		$active = ExtensionList::get_instance()->get_list( 'active' );
+		if ( empty( $active['mcp-ai'] ) ) {
+			return;
+		}
+
+		if ( \WP_Block_Type_Registry::get_instance()->is_registered( 'blockish/ai-preview' ) ) {
+			return;
+		}
+
+		register_block_type(
+			'blockish/ai-preview',
+			array(
+				'api_version'     => 3,
+				'title'           => __( 'AI Preview Wrapper', 'blockish' ),
+				'category'        => 'design',
+				'attributes'      => array(
+					'previousSchema' => array(
+						'type'    => 'string',
+						'default' => '',
+					),
+					'pendingSchema'  => array(
+						'type'    => 'string',
+						'default' => '',
+					),
+				),
+				'supports'        => array(
+					'inserter' => false,
+					'html'     => false,
+					'reusable' => false,
+				),
+				'render_callback' => array( __CLASS__, 'render' ),
+			)
+		);
+	}
+
+	/**
+	 * Frontend: output resolved inner blocks (empty until Resolve saves children).
+	 *
+	 * @param array  $attributes Block attributes.
+	 * @param string $content    Serialized inner blocks HTML.
+	 */
+	public static function render( array $attributes, string $content ): string {
+		return $content;
+	}
+
+	/**
+	 * Editor URL that boots mcp-ai resolve then redirects to the live URL.
+	 *
+	 * @param string $edit_url   Post/template edit URL.
+	 * @param string $redirect   Frontend (or other) URL after resolve.
+	 * @param int[]  $resolve_ids Optional post IDs; empty = entire pending queue.
+	 */
+	public static function resolve_url( string $edit_url, string $redirect = '', array $resolve_ids = array() ): string {
+		if ( '' === $edit_url ) {
+			return '';
+		}
+
+		$args = array(
+			'blockish_ai_resolve' => '1',
+		);
+		if ( '' !== $redirect ) {
+			$args['blockish_ai_resolve_redirect'] = $redirect;
+		}
+		$ids = array_values( array_filter( array_map( 'absint', $resolve_ids ) ) );
+		if ( ! empty( $ids ) ) {
+			$args['blockish_ai_resolve_ids'] = implode( ',', $ids );
+		}
+
+		return add_query_arg( $args, $edit_url );
+	}
 
 	/**
 	 * @return array<int, array{id:int,type:string,typeLabel:string,title:string,status:string,modified:string,edit_url:string}>
