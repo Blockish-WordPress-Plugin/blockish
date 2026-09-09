@@ -1,3 +1,5 @@
+import { acquireFixedEscape } from './fixed-escape';
+
 const BRIDGE = 8;
 const MARGIN = 8;
 
@@ -88,13 +90,16 @@ function getFixedContainingBlock( el ) {
 		const perspective = style.perspective;
 		const contain = style.contain || '';
 		const willChange = style.willChange || '';
+		const backdrop =
+			style.backdropFilter || style.webkitBackdropFilter || 'none';
 
 		if (
 			( transform && transform !== 'none' ) ||
 			( filter && filter !== 'none' ) ||
 			( perspective && perspective !== 'none' ) ||
 			contain.split( ' ' ).includes( 'paint' ) ||
-			willChange.includes( 'transform' )
+			willChange.includes( 'transform' ) ||
+			( backdrop && backdrop !== 'none' )
 		) {
 			return node;
 		}
@@ -146,6 +151,27 @@ function parseLengthPx( raw, refPx = 0 ) {
 		return ( refPx * n ) / 100;
 	}
 	return n;
+}
+
+/**
+ * Nesting depth for z-index — walk parents instead of scanning the whole subtree.
+ *
+ * @param {HTMLElement} item
+ * @return {number} Depth count.
+ */
+function getNavmenuItemDepth( item ) {
+	let depth = 0;
+	let node = item?.parentElement || null;
+	while ( node ) {
+		if ( node.classList?.contains( 'blockish-navmenu-item-children' ) ) {
+			depth += 1;
+		}
+		if ( node.classList?.contains( 'blockish-navmenu' ) ) {
+			break;
+		}
+		node = node.parentElement;
+	}
+	return depth;
 }
 
 /**
@@ -247,9 +273,7 @@ function positionNavmenuMegamenu( item, children, panel ) {
 	const navmenu = item.closest( '.blockish-navmenu' );
 	const vw = win.innerWidth;
 	const vh = win.innerHeight;
-	const depth = item.querySelectorAll(
-		':scope .blockish-navmenu-item-children'
-	).length;
+	const depth = getNavmenuItemDepth( item );
 	const editorClip = getEditorClipRect( item );
 
 	let widthMode = panel.dataset.widthMode || 'navigation';
@@ -416,6 +440,16 @@ export function positionNavmenuSubmenu( item ) {
 		return;
 	}
 
+	// Header/containers may use overflow:hidden (and glass blur). Escape those
+	// ancestors while open so fixed dropdowns are not clipped — no manual
+	// overflow:visible needed on the header.
+	if ( ! children._blockishFixedEscape ) {
+		children._blockishFixedEscape = acquireFixedEscape( children, {
+			overflow: true,
+			containingBlock: true,
+		} );
+	}
+
 	const megamenu = children.querySelector(
 		':scope > .blockish-navmenu-megamenu'
 	);
@@ -429,9 +463,7 @@ export function positionNavmenuSubmenu( item ) {
 	const itemRect = item.getBoundingClientRect();
 	const vw = win.innerWidth;
 	const vh = win.innerHeight;
-	const depth = item.querySelectorAll(
-		':scope .blockish-navmenu-item-children'
-	).length;
+	const depth = getNavmenuItemDepth( item );
 
 	children.classList.add( 'is-submenu-positioned' );
 	children.style.display = 'block';
@@ -605,6 +637,10 @@ export function clearNavmenuSubmenuPosition( item ) {
 		':scope > .blockish-navmenu-item-children'
 	);
 	if ( children ) {
+		if ( typeof children._blockishFixedEscape === 'function' ) {
+			children._blockishFixedEscape();
+			children._blockishFixedEscape = null;
+		}
 		children.classList.remove( 'is-submenu-positioned' );
 		[
 			'display',

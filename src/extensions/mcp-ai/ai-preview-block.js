@@ -1,6 +1,6 @@
 import { registerBlockType, createBlock, serialize, parse } from '@wordpress/blocks';
 import { useInnerBlocksProps } from '@wordpress/block-editor';
-import { useDispatch, dispatch, resolveSelect } from '@wordpress/data';
+import { useDispatch, dispatch, select, resolveSelect } from '@wordpress/data';
 import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -62,6 +62,34 @@ const parseSchemaAttr = ( value ) => {
 		console.error( 'Blockish AI: failed to parse schema attribute', e );
 	}
 	return [];
+};
+
+/**
+ * Accept/Discard must not wipe the parent canvas.
+ * Mega menus / forms / patterns can render their ai-preview inside an entity
+ * embed (header nav, page form block). resetEditorBlocks() always targets the
+ * root post — so nested Accept was replacing the whole header with mega content.
+ * Only reset when this preview is the sole root block; otherwise replace in place.
+ *
+ * @param {string} clientId
+ * @param {Object[]} nextBlocks
+ * @param {Function} resetEditorBlocks
+ */
+const unwrapAiPreview = ( clientId, nextBlocks, resetEditorBlocks ) => {
+	const parents =
+		select( 'core/block-editor' ).getBlockParents?.( clientId ) || [];
+	const roots = select( 'core/block-editor' ).getBlocks?.() || [];
+	const isSoleRootPreview =
+		parents.length === 0 &&
+		roots.length === 1 &&
+		roots[ 0 ]?.clientId === clientId;
+
+	if ( isSoleRootPreview ) {
+		resetEditorBlocks( nextBlocks );
+		return;
+	}
+
+	dispatch( 'core/block-editor' ).replaceBlocks( clientId, nextBlocks );
 };
 
 /**
@@ -151,6 +179,18 @@ const resolveNestedPending = async ( schemaNode ) => {
 		} );
 	}
 
+	if (
+		schemaNode.name === 'blockish/navmenu-megamenu' &&
+		schemaNode.attributes?.megamenuId
+	) {
+		await resolvePendingEntity( {
+			id: schemaNode.attributes.megamenuId,
+			restBase: 'blockish_megamenu',
+			postType: 'blockish_megamenu',
+			label: 'Mega menu',
+		} );
+	}
+
 	if ( Array.isArray( schemaNode.innerBlocks ) ) {
 		for ( const child of schemaNode.innerBlocks ) {
 			await resolveNestedPending( child );
@@ -231,7 +271,7 @@ registerBlockType( 'blockish/ai-preview', {
 			requestClassCssRegenerate( classIds, { quiet: true } );
 			const nextBlocks =
 				block && block.innerBlocks.length > 0 ? block.innerBlocks : [];
-			resetEditorBlocks( nextBlocks );
+			unwrapAiPreview( clientId, nextBlocks, resetEditorBlocks );
 		}, [ clientId, resetEditorBlocks ] );
 
 		/** Discard: restore page schema + Class Manager previousContent on used classes. */
@@ -263,7 +303,7 @@ registerBlockType( 'blockish/ai-preview', {
 			const nextBlocks = parseSchemaAttr( previousSchema )
 				.map( schemaNodeToBlock )
 				.filter( Boolean );
-			resetEditorBlocks( nextBlocks );
+			unwrapAiPreview( clientId, nextBlocks, resetEditorBlocks );
 		}, [ clientId, pendingSchema, previousSchema, resetEditorBlocks ] );
 
 		const innerBlockProps = useInnerBlocksProps(

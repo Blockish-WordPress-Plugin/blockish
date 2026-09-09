@@ -59,8 +59,10 @@ $link_attrs = sprintf(
 
 $submenu_markup = '';
 if ( $has_submenu ) {
+	$children_id = 'blockish-navmenu-children-' . wp_unique_id();
 	$submenu_markup = sprintf(
-		'<button type="button" class="blockish-navmenu-submenu-toggle" aria-expanded="false" aria-label="%1$s">%2$s</button><div class="blockish-navmenu-item-children">%3$s</div>',
+		'<button type="button" class="blockish-navmenu-submenu-toggle" aria-expanded="false" aria-controls="%1$s" aria-label="%2$s">%3$s</button><div id="%1$s" class="blockish-navmenu-item-children">%4$s</div>',
+		esc_attr( $children_id ),
 		esc_attr(
 			sprintf(
 				/* translators: %s: menu item label */

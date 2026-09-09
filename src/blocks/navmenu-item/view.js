@@ -10,34 +10,6 @@ import {
 const CLOSE_DELAY_MS = 600;
 const INTENT_DELAY_MS = 150;
 
-/** TEMP debug — remove after megamenu width debugging. */
-const DEBUG_FORCE_MEGAMENU_OPEN = false;
-
-const itemHasMegamenu = ( item ) =>
-	Boolean(
-		item?.querySelector(
-			':scope > .blockish-navmenu-item-children > .blockish-navmenu-megamenu'
-		)
-	);
-
-const forceOpenAllMegamenus = () => {
-	document
-		.querySelectorAll( '.blockish-block-navmenu-item.has-submenu' )
-		.forEach( ( item ) => {
-			if ( ! itemHasMegamenu( item ) ) {
-				return;
-			}
-			item.classList.add( 'is-submenu-open' );
-			const button = item.querySelector(
-				':scope > .blockish-navmenu-submenu-toggle'
-			);
-			if ( button ) {
-				button.setAttribute( 'aria-expanded', 'true' );
-			}
-			positionNavmenuSubmenu( item );
-		} );
-};
-
 const getCurrentEntityId = () => {
 	for ( const className of document.body.classList ) {
 		if ( className.startsWith( 'page-id-' ) ) {
@@ -69,6 +41,7 @@ const markActiveItems = () => {
 
 			if ( isActive ) {
 				item.classList.add( 'is-active' );
+				link?.setAttribute( 'aria-current', 'page' );
 			}
 		} );
 };
@@ -90,11 +63,6 @@ const clearIntentTimer = ( item ) => {
 };
 
 const forceCloseItem = ( item ) => {
-	// TEMP: keep megamenus pinned open for frontend width debugging.
-	if ( DEBUG_FORCE_MEGAMENU_OPEN && itemHasMegamenu( item ) ) {
-		positionNavmenuSubmenu( item );
-		return;
-	}
 	item.classList.remove( 'is-submenu-open' );
 	clearCloseTimer( item );
 	clearIntentTimer( item );
@@ -130,7 +98,6 @@ const setSubmenuOpen = ( item, isOpen ) => {
 		// Parent just opened — nested must start closed (no cascade open).
 		closeNestedSubmenus( item );
 		item.classList.add( 'is-submenu-open' );
-		positionNavmenuSubmenu( item );
 	} else {
 		forceCloseItem( item );
 		closeNestedSubmenus( item );
@@ -144,6 +111,7 @@ const setSubmenuOpen = ( item, isOpen ) => {
 	}
 
 	if ( isOpen ) {
+		// One coalesce path (sync + rAF) — avoid triple layout.
 		scheduleNavmenuSubmenuPosition( item );
 	}
 };
@@ -181,6 +149,17 @@ const bindOffcanvasSubmenuToggles = () => {
 					'aria-expanded',
 					isOpen ? 'true' : 'false'
 				);
+
+				const children = item.querySelector(
+					':scope > .blockish-navmenu-item-children'
+				);
+				if ( children ) {
+					if ( isOpen ) {
+						children.removeAttribute( 'inert' );
+					} else {
+						children.setAttribute( 'inert', '' );
+					}
+				}
 			} );
 		} );
 };
@@ -191,6 +170,27 @@ const repositionOpenSubmenus = () => {
 			'.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open'
 		)
 		.forEach( ( item ) => positionNavmenuSubmenu( item ) );
+};
+
+let repositionRaf = 0;
+const scheduleRepositionOpenSubmenus = () => {
+	if ( repositionRaf ) {
+		return;
+	}
+	repositionRaf = window.requestAnimationFrame( () => {
+		repositionRaf = 0;
+		repositionOpenSubmenus();
+	} );
+};
+
+const bindRepositionListeners = () => {
+	if ( window._blockishNavmenuPosBound === '1' ) {
+		return;
+	}
+	window._blockishNavmenuPosBound = '1';
+
+	window.addEventListener( 'resize', scheduleRepositionOpenSubmenus );
+	window.addEventListener( 'scroll', scheduleRepositionOpenSubmenus, true );
 };
 
 const bindDesktopSubmenus = () => {
@@ -207,6 +207,12 @@ const bindDesktopSubmenus = () => {
 			const isClick = navmenu
 				? navmenu.classList.contains( 'is-submenu-trigger-click' )
 				: item.classList.contains( 'is-submenu-trigger-click' );
+			// TODO(touch-safe): When submenuTrigger is "hover", force click-open on
+			// devices without real hover — e.g. matchMedia('(hover: hover) and
+			// (pointer: fine)').matches === false — without changing the inspector
+			// setting or desktop mouse UX. Also enable toggle pointer-events for
+			// that path (hover mode currently sets pointer-events:none on the
+			// chevron). Hybrid hover+touch devices may need a first-tap follow-up.
 			const trigger = isClick ? 'click' : 'hover';
 			const button = item.querySelector(
 				':scope > .blockish-navmenu-submenu-toggle'
@@ -279,6 +285,11 @@ const bindDesktopSubmenus = () => {
 						clearIntentTimer( sibling )
 					);
 				} );
+			}
+
+			if ( trigger === 'hover' && button ) {
+				// Decorative in hover mode — keep out of tab order (open via arrows).
+				button.setAttribute( 'tabindex', '-1' );
 			}
 
 			if ( trigger === 'click' && button ) {
@@ -364,25 +375,19 @@ const bindKeyboardNavigation = () => {
 		navmenu.addEventListener( 'keydown', ( event ) => {
 			const { key, target } = event;
 			const item = target.closest( '.blockish-block-navmenu-item' );
-			if ( ! item ) {
-				return;
-			}
 
-			const isLink = target.classList.contains(
-				'blockish-navmenu-item-link'
-			);
-			const isToggle = target.classList.contains(
-				'blockish-navmenu-submenu-toggle'
-			);
-			if ( ! isLink && ! isToggle ) {
-				return;
-			}
-
+			// Escape works from megamenu inner content too (not only link/toggle).
 			if ( key === 'Escape' ) {
-				const openParent = item.closest(
-					'.blockish-block-navmenu-item.is-submenu-open'
-				);
-				if ( openParent ) {
+				const openParent =
+					target.closest(
+						'.blockish-block-navmenu-item.has-submenu.is-submenu-open'
+					) ||
+					target
+						.closest( '.blockish-navmenu-item-children' )
+						?.parentElement?.closest?.(
+							'.blockish-block-navmenu-item.has-submenu.is-submenu-open'
+						);
+				if ( openParent && navmenu.contains( openParent ) ) {
 					event.preventDefault();
 					event.stopPropagation();
 					const returnTarget =
@@ -398,6 +403,20 @@ const bindKeyboardNavigation = () => {
 				return;
 			}
 
+			if ( ! item ) {
+				return;
+			}
+
+			const isLink = target.classList.contains(
+				'blockish-navmenu-item-link'
+			);
+			const isToggle = target.classList.contains(
+				'blockish-navmenu-submenu-toggle'
+			);
+			if ( ! isLink && ! isToggle ) {
+				return;
+			}
+
 			const isInsideSubmenu = Boolean(
 				item.closest( '.blockish-navmenu-submenu' )
 			);
@@ -407,6 +426,22 @@ const bindKeyboardNavigation = () => {
 				key === 'ArrowDown' &&
 				! isInsideSubmenu &&
 				! isVerticalNav &&
+				item.classList.contains( 'has-submenu' )
+			) {
+				event.preventDefault();
+				setSubmenuOpen( item, true );
+				const firstSubLink = item.querySelector(
+					':scope > .blockish-navmenu-item-children .blockish-navmenu-item-link'
+				);
+				firstSubLink?.focus();
+				return;
+			}
+
+			// Vertical nav: ArrowRight opens submenu (ArrowDown moves siblings).
+			if (
+				key === 'ArrowRight' &&
+				! isInsideSubmenu &&
+				isVerticalNav &&
 				item.classList.contains( 'has-submenu' )
 			) {
 				event.preventDefault();
@@ -500,27 +535,12 @@ const bindKeyboardNavigation = () => {
 	} );
 };
 
-const bindRepositionListeners = () => {
-	if ( window._blockishNavmenuPosBound === '1' ) {
-		return;
-	}
-	window._blockishNavmenuPosBound = '1';
-
-	window.addEventListener( 'resize', repositionOpenSubmenus );
-	window.addEventListener( 'scroll', repositionOpenSubmenus, true );
-};
-
 const init = () => {
 	markActiveItems();
 	bindOffcanvasSubmenuToggles();
 	bindDesktopSubmenus();
 	bindKeyboardNavigation();
 	bindRepositionListeners();
-	if ( DEBUG_FORCE_MEGAMENU_OPEN ) {
-		forceOpenAllMegamenus();
-		window.setTimeout( forceOpenAllMegamenus, 100 );
-		window.setTimeout( forceOpenAllMegamenus, 400 );
-	}
 };
 
 if ( document.readyState === 'loading' ) {

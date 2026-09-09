@@ -4,6 +4,13 @@
 	z-index: 5;
 	overflow: visible;
 
+	&,
+	&:hover {
+		// Same reason as navigation/offcanvas: identity/global transforms would
+		// make this the containing block for position:fixed dropdowns.
+		transform: none !important;
+	}
+
 	.blockish-navmenu-nav {
 		display: flex;
 		flex-wrap: wrap;

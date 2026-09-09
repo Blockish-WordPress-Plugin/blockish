@@ -272,6 +272,8 @@ class AiPreview {
 				return __( 'Pattern', 'blockish' );
 			case 'blockish_form':
 				return __( 'Form', 'blockish' );
+			case 'blockish_megamenu':
+				return __( 'Mega Menu', 'blockish' );
 			case 'page':
 			case 'blockish-page':
 				return __( 'Page', 'blockish' );

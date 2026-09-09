@@ -7,7 +7,12 @@ if ( ! $megamenu_id ) {
 }
 
 $post = get_post( $megamenu_id );
-if ( ! $post || 'publish' !== $post->post_status ) {
+if (
+	! $post
+	|| 'blockish_megamenu' !== $post->post_type
+	|| 'publish' !== $post->post_status
+	|| post_password_required( $post )
+) {
 	return;
 }
 

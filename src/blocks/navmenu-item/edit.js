@@ -211,7 +211,7 @@ export default function Edit( {
 	}, [ isInOffcanvas, popoverAnchor ] );
 
 	// Calculated fixed position in editor (same util as frontend).
-	// Re-run when item attributes change — style/padding/width shifts leave a stale megamenu box.
+	// Re-run when open/selection changes — avoid full `attributes` object deps.
 	useEffect( () => {
 		if ( ! popoverAnchor || ! isInNavmenu || isInOffcanvas || ! hasSubmenu ) {
 			return;
@@ -225,16 +225,26 @@ export default function Edit( {
 
 		scheduleNavmenuSubmenuPosition( popoverAnchor );
 
-		const onReposition = () => positionNavmenuSubmenu( popoverAnchor );
 		const win = popoverAnchor.ownerDocument.defaultView || window;
+		let raf = 0;
+		const onReposition = () => {
+			if ( raf ) {
+				return;
+			}
+			raf = win.requestAnimationFrame( () => {
+				raf = 0;
+				positionNavmenuSubmenu( popoverAnchor );
+			} );
+		};
+
 		win.addEventListener( 'resize', onReposition );
 		win.addEventListener( 'scroll', onReposition, true );
 
+		// Observe nav shell only — observing the item itself feedback-loops on style writes.
 		const resizeObserver =
 			typeof win.ResizeObserver === 'function'
 				? new win.ResizeObserver( onReposition )
 				: null;
-		resizeObserver?.observe( popoverAnchor );
 		const navmenu = popoverAnchor.closest( '.blockish-navmenu' );
 		if ( navmenu ) {
 			resizeObserver?.observe( navmenu );
@@ -244,6 +254,9 @@ export default function Edit( {
 			win.removeEventListener( 'resize', onReposition );
 			win.removeEventListener( 'scroll', onReposition, true );
 			resizeObserver?.disconnect();
+			if ( raf ) {
+				win.cancelAnimationFrame( raf );
+			}
 		};
 	}, [
 		popoverAnchor,
@@ -253,7 +266,6 @@ export default function Edit( {
 		isSubmenuOpen,
 		isSelected,
 		hasChildSelected,
-		attributes,
 	] );
 
 	useEffect(

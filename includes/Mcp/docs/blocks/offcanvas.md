@@ -5,7 +5,11 @@ Mobile slide-in drawer + hamburger trigger. **Parent: `blockish/navigation` only
 > [!WARNING]
 > **Hard rule — no transform on the wrapper:** Do not apply CSS `transform` on the offcanvas root. Any transform makes it the containing block for the fixed panel/overlay and breaks viewport positioning (stylesheet forces `transform: none !important`).
 >
-> **Hard rule — sync:** With `syncWithMenu: true` (default), leave `innerBlocks` empty — items mirror the sibling `navmenu`. Set `false` only when the drawer should own its own `navmenu-item` children.
+> **Hard rule — sync:** With `syncWithMenu: true` (default), leave `innerBlocks` empty — items (including nested `navmenu-submenu` / `navmenu-megamenu` trees) mirror the sibling `navmenu`. Set `false` only when the drawer should own its own `navmenu-item` children.
+>
+> **Hard rule — accordion, not desktop cards:** Synced dropdowns open as accordion inside the panel. Desktop submenu card chrome (white bg / box-shadow / min-width) is stripped under `.blockish-offcanvas` — do not restyle nested submenus as floating dropdowns for mobile.
+>
+> **Hard rule — hamburger placement in headers:** `hamburgerAlign` only aligns the button **inside** the offcanvas flex wrapper. It does **not** move that wrapper out of a centered `flex:1` middle header column. For logo | nav | CTA headers, at the breakpoint push the nav column to the end (`margin-left: auto; flex: 0 0 auto`) and/or nest navigation in the right actions column — see `navigation` docs. Prefer `hamburgerAlign: "right"` with `offcanvasSide: "right"`.
 
 #### Content / structure
 
@@ -15,7 +19,7 @@ Mobile slide-in drawer + hamburger trigger. **Parent: `blockish/navigation` only
 | `offcanvasSide` | Scalar | `"left"` (default) \| `"right"` → class `offcanvas-side-*`. |
 | `offcanvasAnimation` | Scalar | `"slide"` (default) \| `"fade"` \| `"slideFade"` \| `"scale"` → `offcanvas-animation-*`. |
 | `hamburgerIcon` | Icon | Optional; unset = three-bar spans. Prefer `get-icons`. |
-| `hamburgerAlign` | Scalar | `"left"` (default) \| `"center"` \| `"right"` → `hamburger-align-*`. |
+| `hamburgerAlign` | Scalar | `"left"` (default) \| `"center"` \| `"right"` → `hamburger-align-*`. Aligns within the offcanvas wrapper only — fix mid-header hamburger via header column CSS (see hard rule). |
 | `headerType` | Scalar | `"siteTitle"` (default) \| `"none"` \| `"siteLogo"` \| `"customImage"` \| `"customText"`. |
 | `headerText` | Scalar | Used when `headerType` is `"customText"`. |
 | `headerImage` | Image | Used when `headerType` is `"customImage"` (`url` / `alt`). |
@@ -53,7 +57,8 @@ Default from `render.php` (`save.js` only serializes inner nav items):
 | `headerType: "siteLogo"` | Theme custom logo `<img class="blockish-offcanvas-logo">` when set. |
 | `headerType: "customImage"` | `<img class="blockish-offcanvas-logo">` from `headerImage`. |
 | `headerType: "customText"` | Site-title span uses `headerText`. |
-| Open state (view script) | Root `is-open`; `body.blockish-offcanvas-open`. |
+| Open state (view script) | Root `is-open`; `body.blockish-offcanvas-open`. Panel uses dialog/`aria-*`; closed accordion branches are `inert`. |
+| Nested submenu / megamenu (synced) | Accordion under the parent item; toggle gets `aria-controls`. Desktop position JS does **not** run inside offcanvas. |
 
 #### Already-there CSS
 
@@ -244,6 +249,16 @@ body.blockish-offcanvas-open {
 
 .blockish-offcanvas .blockish-block-navmenu-item .blockish-navmenu-item-link:hover {
   background: rgba(0,0,0,.05);
+}
+
+/* Synced submenu — accordion chrome reset (do not fight with white card bg) */
+.blockish-offcanvas .blockish-navmenu-submenu,
+.blockish-offcanvas .wp-block-blockish-navmenu-submenu {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0;
+  min-width: 0;
+  width: 100%;
 }
 
 .blockish-offcanvas:not(.is-open).offcanvas-animation-slide.offcanvas-side-left .blockish-offcanvas-panel,

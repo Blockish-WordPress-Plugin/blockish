@@ -231,17 +231,29 @@ function MegamenuEdit( {
 		[ megamenuId ]
 	);
 
-	const { megamenus, hasMegamenusResolved } = useSelect( ( select ) => {
-		const core = select( coreStore );
-		return {
-			megamenus:
-				core.getEntityRecords( ...MEGAMENUS_SELECTOR_ARGS ) || [],
-			hasMegamenusResolved: core.hasFinishedResolution(
-				'getEntityRecords',
-				MEGAMENUS_SELECTOR_ARGS
-			),
-		};
-	}, [] );
+	const { megamenus, hasMegamenusResolved } = useSelect(
+		( select ) => {
+			// Full list is only needed for the picker modal.
+			if ( ! isPickerOpen ) {
+				return {
+					megamenus: [],
+					hasMegamenusResolved: true,
+				};
+			}
+			const core = select( coreStore );
+			return {
+				megamenus:
+					core.getEntityRecords( ...MEGAMENUS_SELECTOR_ARGS ) || [],
+				hasMegamenusResolved: core.hasFinishedResolution(
+					'getEntityRecords',
+					MEGAMENUS_SELECTOR_ARGS
+				),
+			};
+		},
+		[ isPickerOpen ]
+	);
+
+	const selectedTitle = record?.title?.rendered || '';
 
 	const serializeAttr = ( attr ) => {
 		if ( attr == null || attr === '' ) {
@@ -405,8 +417,8 @@ function MegamenuEdit( {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				advancedControls={ advancedControls }
-				megamenus={ megamenus }
-				hasResolved={ hasMegamenusResolved }
+				selectedTitle={ selectedTitle }
+				hasResolved={ hasRecordResolved }
 				onOpenPicker={ openPicker }
 			/>
 

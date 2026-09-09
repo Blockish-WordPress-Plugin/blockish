@@ -20,7 +20,7 @@ const WIDTH_MODES = [
 
 const Inspector = ( {
 	advancedControls,
-	megamenus,
+	selectedTitle = '',
 	hasResolved,
 	attributes,
 	setAttributes,
@@ -32,11 +32,6 @@ const Inspector = ( {
 	if ( ! BlockishControl ) {
 		return null;
 	}
-
-	const selected = ( megamenus || [] ).find(
-		( item ) => item.id === attributes.megamenuId
-	);
-	const selectedTitle = selected?.title?.rendered || '';
 
 	let widthModeValue =
 		typeof attributes.widthMode === 'string'

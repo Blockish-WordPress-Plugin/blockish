@@ -173,6 +173,7 @@ function PreviewLoading() {
 
 function MegamenuCardPreview( { content } ) {
 	const wrapRef = useRef( null );
+	const [ isVisible, setIsVisible ] = useState( false );
 	const blocks = useMemo( () => {
 		if ( ! content ) {
 			return [];
@@ -180,8 +181,28 @@ function MegamenuCardPreview( { content } ) {
 		return parse( content );
 	}, [ content ] );
 
+	// Lazy-mount BlockPreview only when the card nears the viewport.
 	useEffect( () => {
-		if ( ! blocks.length ) {
+		const wrap = wrapRef.current;
+		if ( ! wrap || typeof IntersectionObserver !== 'function' ) {
+			setIsVisible( true );
+			return undefined;
+		}
+		const io = new IntersectionObserver(
+			( entries ) => {
+				if ( entries.some( ( e ) => e.isIntersecting ) ) {
+					setIsVisible( true );
+					io.disconnect();
+				}
+			},
+			{ rootMargin: '120px' }
+		);
+		io.observe( wrap );
+		return () => io.disconnect();
+	}, [] );
+
+	useEffect( () => {
+		if ( ! isVisible || ! blocks.length ) {
 			return;
 		}
 		const wrap = wrapRef.current;
@@ -198,30 +219,22 @@ function MegamenuCardPreview( { content } ) {
 		};
 		run();
 
-		const ro = new ResizeObserver( run );
-		ro.observe( wrap );
+		const ro =
+			typeof ResizeObserver === 'function'
+				? new ResizeObserver( run )
+				: null;
+		ro?.observe( wrap );
 
-		const mo = new MutationObserver( run );
-		mo.observe( wrap, {
-			subtree: true,
-			childList: true,
-			attributes: true,
-			attributeFilter: [ 'style' ],
-		} );
-
-		const timers = [ 150, 400, 900 ].map( ( ms ) =>
-			setTimeout( run, ms )
-		);
+		const timers = [ 150, 400 ].map( ( ms ) => setTimeout( run, ms ) );
 		wrap.addEventListener( 'load', run, true );
 
 		return () => {
 			cancelAnimationFrame( raf );
-			ro.disconnect();
-			mo.disconnect();
+			ro?.disconnect();
 			timers.forEach( clearTimeout );
 			wrap.removeEventListener( 'load', run, true );
 		};
-	}, [ blocks ] );
+	}, [ blocks, isVisible ] );
 
 	if ( ! blocks.length ) {
 		return (
@@ -233,13 +246,17 @@ function MegamenuCardPreview( { content } ) {
 
 	return (
 		<div className="megamenu-preview-field" ref={ wrapRef }>
-			<BlockPreview.Async placeholder={ <PreviewLoading /> }>
-				<BlockPreview
-					blocks={ blocks }
-					viewportWidth={ VIEWPORT_WIDTH }
-					additionalStyles={ PREVIEW_STYLES }
-				/>
-			</BlockPreview.Async>
+			{ isVisible ? (
+				<BlockPreview.Async placeholder={ <PreviewLoading /> }>
+					<BlockPreview
+						blocks={ blocks }
+						viewportWidth={ VIEWPORT_WIDTH }
+						additionalStyles={ PREVIEW_STYLES }
+					/>
+				</BlockPreview.Async>
+			) : (
+				<PreviewLoading />
+			) }
 		</div>
 	);
 }
