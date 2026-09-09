@@ -61,39 +61,13 @@ class AiPreview {
 	}
 
 	/**
-	 * Frontend: output resolved inner blocks (empty until Resolve saves children).
+	 * Frontend: output resolved inner blocks (empty until editor-open resolve saves children).
 	 *
 	 * @param array  $attributes Block attributes.
 	 * @param string $content    Serialized inner blocks HTML.
 	 */
 	public static function render( array $attributes, string $content ): string {
 		return $content;
-	}
-
-	/**
-	 * Editor URL that boots mcp-ai resolve then redirects to the live URL.
-	 *
-	 * @param string $edit_url   Post/template edit URL.
-	 * @param string $redirect   Frontend (or other) URL after resolve.
-	 * @param int[]  $resolve_ids Optional post IDs; empty = entire pending queue.
-	 */
-	public static function resolve_url( string $edit_url, string $redirect = '', array $resolve_ids = array() ): string {
-		if ( '' === $edit_url ) {
-			return '';
-		}
-
-		$args = array(
-			'blockish_ai_resolve' => '1',
-		);
-		if ( '' !== $redirect ) {
-			$args['blockish_ai_resolve_redirect'] = $redirect;
-		}
-		$ids = array_values( array_filter( array_map( 'absint', $resolve_ids ) ) );
-		if ( ! empty( $ids ) ) {
-			$args['blockish_ai_resolve_ids'] = implode( ',', $ids );
-		}
-
-		return add_query_arg( $args, $edit_url );
 	}
 
 	/**
@@ -141,6 +115,7 @@ class AiPreview {
 				$title = '#' . $id;
 			}
 
+			$preview  = \Blockish\Mcp\SchemaUtils::find_ai_preview_block( (string) ( $row['post_content'] ?? '' ) );
 			$items[] = array(
 				'id'         => $id,
 				'type'       => $type,
@@ -151,10 +126,23 @@ class AiPreview {
 				'edit_url'   => self::edit_url( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
 				'rest_id'    => self::rest_id( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
 				'rest_route' => self::rest_route( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
+				'resolved'   => self::preview_has_children( $preview ),
 			);
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Whether the ai-preview block already has saved inner markup (FE-ready).
+	 *
+	 * @param array|null $preview Parsed block from find_ai_preview_block.
+	 */
+	public static function preview_has_children( ?array $preview ): bool {
+		if ( ! $preview ) {
+			return false;
+		}
+		return ! empty( $preview['innerBlocks'] );
 	}
 
 	public static function get_item( int $post_id ): ?array {
@@ -167,9 +155,7 @@ class AiPreview {
 		if ( ! $preview ) {
 			return null;
 		}
-		$pending = $preview
-			? \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['pendingSchema'] ?? '' )
-			: array();
+		$pending = \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['pendingSchema'] ?? '' );
 
 		$post_type = $post->post_type;
 		$post_name = (string) $post->post_name;
@@ -177,9 +163,8 @@ class AiPreview {
 		return array(
 			'id'             => $post_id,
 			'pendingSchema'  => $pending,
-			'previousSchema' => $preview
-				? \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' )
-				: array(),
+			'previousSchema' => \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' ),
+			'resolved'       => self::preview_has_children( $preview ),
 			'rest_id'        => self::rest_id( $post_id, $post_type, $post_name ),
 			'rest_route'     => self::rest_route( $post_id, $post_type, $post_name ),
 		);

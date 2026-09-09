@@ -10,56 +10,50 @@ class Callbacks
     {
         $guideline = '
 =========================================================
-BLOCKISH MCP - BROWSER / PUPPETEER GUIDELINES
+BLOCKISH MCP - BROWSER AUTOMATION
 =========================================================
-Staged layouts use blockish/ai-preview. Frontend stays empty until RESOLVE
-writes children into the wrapper (Accept-all logic, no unwrap).
+After staging: AGENT opens the editor → waits 10–15s → verifies on the
+frontend (screenshot) → only then hand off. Fix design issues after that.
 
-Resolve ≠ Accept:
-- Resolve: schema → markup as ai-preview children (queue / selected / all).
-- Accept: Settings unwrap to normal content. Discard restores previousSchema.
+WHO OPENS THE BROWSER
+- Default: the AGENT runs the browser (agent browser, else Puppeteer/Playwright).
+- Only hand the user a magic-login link if they ask to open it themselves, or
+  the agent cannot drive a browser in this environment.
+- Do not skip resolve and dump raw edit_url as the main handoff.
 
-[OPEN PRIORITY]
-1. Agent browser if available.
-2. Puppeteer only if no agent browser.
-3. User opens the resolve link.
+RESOLVE SCOPE (one open is usually enough)
+- Opening ANY editor auto-resolves ALL unresolved AI Preview queue items
+  (patterns, forms, megas, pages, templates) — not just the post you opened.
+- New page flow: stage patterns → stage page with refs → open the PAGE
+  edit_url once (preferred). Do NOT open every pattern editor separately.
+- Pattern-only update while a parent page is already in use: restage the
+  pattern, then restage that parent with its current schema, then open ONE
+  editor (parent preferred).
 
-[AUTHENTICATION]
-blockish/get-magic-login-url — ask permission ONCE per chat session.
-redirect_to = manage-post `resolve_url` (preferred), or manually:
+VERIFY LOOP (required)
+1. Ask magic-login permission ONCE per chat session.
+2. magic-login redirect_to = preferred edit_url (page/template when assembling;
+   otherwise the staged post you just wrote).
+3. Open that URL with waitUntil: "domcontentloaded" (or equivalent).
+   Do NOT use networkidle / networkidle2 — Site Editor keeps background
+   requests open and those waits often time out (~60s).
+4. After the editor UI is up, wait **10–15 seconds** (do not close early).
+5. Close (or leave) the editor, then open the **frontend** view URL
+   (post_url / home / relevant WP view).
+6. Check resolve: content should show real sections (not empty / only a
+   neon ai-preview shell). Take a **screenshot**.
+7. If NOT resolved: open the editor again → wait **10–15 seconds** →
+   re-check frontend. Retry once (max ~2 editor opens total unless clearly
+   still failing).
+8. When resolved: take a final frontend screenshot, then give the user the
+   frontend URL.
+9. If the screenshot shows design issues (width mismatch, contrast, spacing,
+   missing styles): fix via Class Manager / restage, then re-run this loop
+   for the affected items — do not declare done on a broken layout.
 
-  {edit_url}&blockish_ai_resolve=1&blockish_ai_resolve_redirect={post_url}
-  Optional: &blockish_ai_resolve_ids=12,34  (omit = resolve entire pending queue)
-
-[RESOLVE WORKFLOW]
-```javascript
-import puppeteer from \'puppeteer\';
-
-(async () => {
-    // magic login URL already includes redirect_to = edit_url + resolve query args
-    const magicLoginUrl = "INSERT_MAGIC_URL_HERE";
-
-    const browser = await puppeteer.launch({ headless: \'new\' });
-    const page = await browser.newPage();
-    try {
-        await page.goto(magicLoginUrl, { waitUntil: \'networkidle2\' });
-        // Editor boots → resolves queue → redirects to frontend
-        await page.waitForNavigation({ waitUntil: \'networkidle2\', timeout: 60000 });
-        await page.screenshot({ path: \'preview.png\', fullPage: true });
-    } catch (e) {
-        console.error(e);
-    } finally {
-        await browser.close();
-    }
-})();
-```
-
-[SETTINGS]
-Settings → AI Preview also has Resolve / Resolve all (same logic, no unwrap),
-plus Accept / Discard for finalize.
-
-[CLEANUP]
-Delete temporary automation.js / preview.png when done.
+Do not explain resolve internals. Do not push Accept/Discard.
+After verify: call `get-ai-preview-pending`. If count > 0, tell the user how many
+designs are pending and that they should Accept manually in Settings → AI Preview.
 ';
 
         return [

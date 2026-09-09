@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create, Edit or Delete Post', 'blockish'),
-            'description'         => __('Creates, edits, or deletes a post. To CREATE: omit post_id but provide post_title and post_type. To EDIT: provide post_id. To DELETE: provide post_id and set delete to true. For Blockish layouts, pass block_schema — this stages a blockish/ai-preview block into post_content (previousSchema + pendingSchema attrs). After staging: trigger-refresh + share edit_url (or resolve_url for FE without Accept). Settings → AI Preview: Resolve (children) / Accept (unwrap) / Discard. Do NOT send pattern-ref markup or block HTML in post_content. Never put core/template-part header/footer on pages. CRITICAL: call blockish/get-designer-workflow and blockish/get-block-docs before designing. For blog prose use blockish/write-blog, not this tool.', 'blockish'),
+            'description'         => __('Creates, edits, or deletes a post. To CREATE: omit post_id but provide post_title and post_type. To EDIT: provide post_id. To DELETE: provide post_id and set delete to true. For Blockish layouts, pass block_schema — stages blockish/ai-preview in post_content. After staging: AGENT opens edit_url once (prefer this page; resolves whole pending queue), waitUntil domcontentloaded, wait 10–15s, then give post_url. Do not push Accept/Discard unless asked. Never put core/template-part header/footer on pages. CRITICAL: call blockish/get-designer-workflow and blockish/get-block-docs before designing. For blog prose use blockish/write-blog, not this tool.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -36,7 +36,7 @@ class Config
                     ],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'REQUIRED for layouts — including empty pages. Array of block schema nodes ({name, attributes, innerBlocks}); pattern refs recommended for large pages: {name:"core/block", attributes:{ref:<real_id>, align:"full"}} for full-bleed sections (omit align only for content-width). Build sections with manage-pattern first — never invent refs. Do NOT include core/template-part header/footer on pages. Staged into post_content as a single blockish/ai-preview block (pendingSchema + previousSchema). Pass an empty array to clear. After staging share edit_url or resolve_url; Settings AI Preview for Resolve / Accept / Discard.',
+                        'description' => 'REQUIRED for layouts — including empty pages. Array of block schema nodes ({name, attributes, innerBlocks}); pattern refs recommended for large pages: {name:"core/block", attributes:{ref:<real_id>, align:"full"}} for full-bleed sections (omit align only for content-width). Build sections with manage-pattern first — never invent refs. Do NOT include core/template-part header/footer on pages. Staged as blockish/ai-preview. After staging open edit_url once, then share post_url.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [
@@ -80,7 +80,6 @@ class Config
                     'post_status'  => ['type' => 'string'],
                     'post_url'     => ['type' => 'string'],
                     'edit_url'     => ['type' => 'string'],
-                    'resolve_url'  => ['type' => 'string', 'description' => 'Present when schema_staged. Editor URL with resolve query args; opens editor, writes children, redirects to post_url. Prefer this (via magic-login redirect_to) for live FE without Accept.'],
                     'post_parent'  => ['type' => 'integer', 'description' => 'Parent post ID after save (0 = top-level).'],
                     'schema_staged' => ['type' => 'boolean', 'description' => 'True if non-empty block_schema was staged as an ai-preview block in post_content.'],
                     'featured_media_set' => ['type' => 'boolean', 'description' => 'True if featured_media was provided and successfully set as the post thumbnail.'],
@@ -92,7 +91,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'CRITICAL RULES (manage-post): 1) Send block_schema for layouts — staged as blockish/ai-preview in post_content (not meta). 2) Create patterns with manage-pattern FIRST; use returned real IDs only for core/block refs. 3) Full-bleed section refs MUST set attributes.align to "full" (omit align only for content-width). 4) NEVER send pattern-ref comments or block HTML into post_content. 5) Re-stage replaces pendingSchema only; previousSchema stays until Settings Accept/Discard. 6) Monolithic full-page schemas are REJECTED — patterns + refs. 7) NEVER put core/template-part header/footer on pages. 8) Call get-block-docs with required block_names (only blocks you need). 9) After staging: trigger-refresh + share edit_url (review) or resolve_url (FE without Accept via magic-login redirect_to). 10) Optional post_parent nests under a parent. 11) Settings → AI Preview: Resolve / Resolve all / Accept (unwrap) / Discard.',
+                'usage_notes' => 'CRITICAL RULES (manage-post): 1) Send block_schema for layouts — staged as blockish/ai-preview in post_content (not meta). 2) Create patterns with manage-pattern FIRST; use returned real IDs only for core/block refs. 3) Full-bleed section refs MUST set attributes.align to "full" (omit align only for content-width). 4) NEVER send pattern-ref comments or block HTML into post_content. 5) Re-stage replaces pendingSchema only; previousSchema stays until user Accepts/Discards in Settings (optional later). 6) Monolithic full-page schemas are REJECTED — patterns + refs. 7) NEVER put core/template-part header/footer on pages. 8) Call get-block-docs with required block_names (only blocks you need). 9) After staging: AGENT opens edit_url once (prefer the page; any editor resolves the whole pending queue — do not open every pattern). waitUntil domcontentloaded (not networkidle), wait 10–15s, then give post_url. 10) Optional post_parent. 11) Settings → AI Preview: Accept / Discard only when the user asks.',
             ],
         ];
     }

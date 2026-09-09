@@ -47,7 +47,7 @@ class Config
             'permission_callback' => fn() => current_user_can( 'edit_posts' ),
             'meta'                => [
                 'mcp'         => [ 'public' => true ],
-                'usage_notes' => 'ONLY when the user explicitly asks to restore. Pass confirm:true. Call trigger-refresh afterward if the editor is open.',
+                'usage_notes' => 'ONLY when the user explicitly asks to restore. Pass confirm:true.',
             ],
         ];
     }

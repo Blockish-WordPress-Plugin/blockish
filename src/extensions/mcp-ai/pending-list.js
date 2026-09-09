@@ -12,25 +12,70 @@ import { serialize } from '@wordpress/blocks';
 import { dispatch, select } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import {
+	CLASS_CSS_REGEN_EVENT,
 	collectClassIdsFromBlocks,
+	fetchClassManagerCssBundle,
 	resolveClassPrevious,
 } from '../class-manager/wrap-ai-preview';
 import { schemaToBlocks } from './schema-to-blocks';
-import {
-	fetchQueueItem,
-	prepareResolveOrder,
-	resolvePendingPreviews,
-	savePostContent,
-} from './resolve-pending';
+import { fetchQueueItem, savePostContent } from './resolve-pending';
 import './pending-list.scss';
+
+const AI_PREVIEW_PENDING_COUNT_EVENT = 'blockish-ai-preview-pending-count';
+
+const notifyAiPreviewPendingCount = (count) => {
+	window.dispatchEvent(
+		new CustomEvent(AI_PREVIEW_PENDING_COUNT_EVENT, {
+			detail: { count: Math.max(0, Number(count) || 0) },
+		})
+	);
+};
 
 const PAGE_SIZE = 8;
 
-const PREVIEW_STYLES = [
-	{
-		css: 'body{height:auto;overflow:hidden;border:none;padding:0;}',
-	},
-];
+const PREVIEW_BASE_CSS = `
+body {
+	height: auto;
+	overflow: hidden;
+	border: none;
+	padding: 0;
+	margin: 0;
+}
+.block-list-appender,
+.block-editor-inserter,
+.block-editor-block-list__insertion-point {
+	display: none !important;
+}
+`;
+
+const useClassManagerPreviewCss = () => {
+	const [classCss, setClassCss] = useState('');
+
+	const loadCss = useCallback(async () => {
+		try {
+			const bundle = await fetchClassManagerCssBundle(0);
+			setClassCss(typeof bundle?.css === 'string' ? bundle.css : '');
+		} catch (error) {
+			console.error(
+				'Blockish AI Preview: failed to load Class Manager CSS for Settings preview',
+				error
+			);
+		}
+	}, []);
+
+	useEffect(() => {
+		loadCss();
+		const onRegen = () => {
+			loadCss();
+		};
+		window.addEventListener(CLASS_CSS_REGEN_EVENT, onRegen);
+		return () => {
+			window.removeEventListener(CLASS_CSS_REGEN_EVENT, onRegen);
+		};
+	}, [loadCss]);
+
+	return classCss;
+};
 
 const unwrapCurrentEditor = (nextBlocks) => {
 	const preview = (select('core/block-editor').getBlocks?.() || []).find(
@@ -55,7 +100,7 @@ const isCurrentEditorPost = (queueItem) => {
 	);
 };
 
-function PendingPreview({ itemId }) {
+function PendingPreview({ itemId, classCss = '' }) {
 	const [schema, setSchema] = useState(null);
 	const [error, setError] = useState('');
 
@@ -80,6 +125,13 @@ function PendingPreview({ itemId }) {
 	}, [itemId]);
 
 	const blocks = useMemo(() => schemaToBlocks(schema || []), [schema]);
+	const additionalStyles = useMemo(
+		() => [
+			{ css: PREVIEW_BASE_CSS },
+			...(classCss ? [{ css: classCss }] : []),
+		],
+		[classCss]
+	);
 
 	if (error) {
 		return (
@@ -107,7 +159,7 @@ function PendingPreview({ itemId }) {
 		<BlockPreview
 			blocks={blocks}
 			viewportWidth={800}
-			additionalStyles={PREVIEW_STYLES}
+			additionalStyles={additionalStyles}
 		/>
 	);
 
@@ -127,6 +179,7 @@ export default function AiPreviewPendingList() {
 	const [typeFilter, setTypeFilter] = useState('all');
 	const [page, setPage] = useState(1);
 	const [selected, setSelected] = useState([]);
+	const classCss = useClassManagerPreviewCss();
 
 	const loadInventory = useCallback(async (silent = false) => {
 		if (!silent) {
@@ -136,7 +189,9 @@ export default function AiPreviewPendingList() {
 		try {
 			const response = await apiFetch({ path: '/blockish/v1/ai-preview-queue' });
 			const next = Array.isArray(response?.items) ? response.items : [];
-			setItems(next.filter((item) => item?.edit_url));
+			const visible = next.filter((item) => item?.edit_url);
+			setItems(visible);
+			notifyAiPreviewPendingCount(visible.length);
 		} catch (err) {
 			setError(err?.message || __('Failed to load pending AI previews.', 'blockish'));
 		} finally {
@@ -217,20 +272,7 @@ export default function AiPreviewPendingList() {
 		setBusyIds(nextIds);
 		setError('');
 		try {
-			if (action === 'resolve') {
-				await resolvePendingPreviews(nextIds);
-				setSelected((current) => current.filter((id) => !nextIds.includes(id)));
-				await loadInventory(true);
-				return;
-			}
-
-			const orderedIds =
-				action === 'accept'
-					? await prepareResolveOrder(nextIds)
-					: nextIds;
-			const ids = orderedIds.length ? orderedIds : nextIds;
-
-			for (const id of ids) {
+			for (const id of nextIds) {
 				const queueItem = await fetchQueueItem(id);
 				if (!queueItem) {
 					continue;
@@ -257,9 +299,7 @@ export default function AiPreviewPendingList() {
 				err?.message ||
 					(action === 'discard'
 						? __('Failed to discard.', 'blockish')
-						: action === 'resolve'
-							? __('Failed to resolve.', 'blockish')
-							: __('Failed to accept.', 'blockish'))
+						: __('Failed to accept.', 'blockish'))
 			);
 		} finally {
 			setBusyIds([]);
@@ -297,31 +337,6 @@ export default function AiPreviewPendingList() {
 					))}
 				</div>
 				<div className="blockish-ai-preview-pending__bulk">
-					<Button
-						size="compact"
-						variant="secondary"
-						disabled={!filtered.length || isBusy}
-						onClick={() =>
-							runAction(
-								'resolve',
-								filtered.map((item) => item.id)
-							)
-						}
-					>
-						{filtered.length
-							? sprintf(__('Resolve all (%d)', 'blockish'), filtered.length)
-							: __('Resolve all', 'blockish')}
-					</Button>
-					<Button
-						size="compact"
-						variant="secondary"
-						disabled={!selected.length || isBusy}
-						onClick={() => runAction('resolve', selected)}
-					>
-						{selected.length
-							? sprintf(__('Resolve (%d)', 'blockish'), selected.length)
-							: __('Resolve', 'blockish')}
-					</Button>
 					<Button
 						size="compact"
 						variant="primary"
@@ -402,7 +417,7 @@ export default function AiPreviewPendingList() {
 										target="_blank"
 										rel="noopener noreferrer"
 									>
-										<PendingPreview itemId={item.id} />
+										<PendingPreview itemId={item.id} classCss={classCss} />
 									</a>
 								</div>
 								<div className="blockish-ai-preview-pending__card-footer">
@@ -419,14 +434,6 @@ export default function AiPreviewPendingList() {
 									</span>
 								</div>
 								<div className="blockish-ai-preview-pending__card-actions">
-									<Button
-										size="compact"
-										variant="secondary"
-										disabled={itemBusy}
-										onClick={() => runAction('resolve', [item.id])}
-									>
-										{__('Resolve', 'blockish')}
-									</Button>
 									<Button
 										size="compact"
 										variant="primary"

@@ -19,7 +19,7 @@ class Config
                 'properties' => [
                     'redirect_to' => [ 
                         'type' => 'string', 
-                        'description' => 'Optional. URL after login — typically manage-post resolve_url (editor + blockish_ai_resolve args) so the queue resolves then redirects to the frontend.', 
+                        'description' => 'Optional. URL after login — usually the post/page `edit_url` so the editor opens and pending layouts resolve.', 
                     ],
                 ],
             ],
@@ -33,7 +33,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Ask permission once per chat session (interactive question tool), then reuse for further magic URLs in that session without re-prompting. New chat = ask again. Prefer agent browser over Puppeteer. URL is valid 15 minutes and single-use.'
+                'usage_notes' => 'Ask permission once per chat session (interactive question tool), then reuse for further magic URLs in that session without re-prompting. New chat = ask again. Prefer agent browser over Puppeteer. Follow get-automation-guideline verify loop: editor → 10–15s → frontend screenshot; retry editor once if unresolved; then fix design issues from the screenshot. waitUntil domcontentloaded (not networkidle). URL is valid 15 minutes and single-use.'
             ],
         ];
     }

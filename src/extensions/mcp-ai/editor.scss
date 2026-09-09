@@ -1,17 +1,12 @@
-// AI preview wrapper — pending layouts stay wrapped until Settings Accept.
-// Canvas has no Accept/Discard chrome; editor auto-resolves children in place.
+// AI preview wrapper — invisible shell. Pending is Settings-only; canvas/FE stay clean.
 
 .blockish-ai-preview-wrapper {
 	position: relative;
-	border: 1px dashed rgba(138, 43, 226, 0.35);
-	margin: 16px 0;
-	padding: 4px;
-	border-radius: 4px;
-	background: linear-gradient(
-		180deg,
-		rgba(138, 43, 226, 0.03) 0%,
-		rgba(138, 43, 226, 0.01) 100%
-	);
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	border-radius: 0;
 
 	.blockish-ai-preview-inner-blocks {
 		position: relative;

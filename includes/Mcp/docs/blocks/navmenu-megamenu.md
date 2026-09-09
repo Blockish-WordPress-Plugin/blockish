@@ -12,7 +12,7 @@ Wide mega dropdown under a menu item. Embeds a synced **`blockish_megamenu` CPT*
 > - Edge-to-edge band → `"full"`.
 > - Tiny single-column link list that should match the item → `"navigation"` only.
 >
-> **Nested pending (forms/patterns parity):** When the parent header/page still has `blockish/ai-preview`, opening it (or Settings Accept) auto-unwraps nested mega CPT pending content via `megamenuId` — same as `core/block` `ref` and `blockish-forms/form` `formId`. Prefer Accept on the parent after staging both; nested mega resolves first.
+> **Nested pending (forms/patterns parity):** Pattern / form / mega CPT pending stays in Settings until Accept/Discard on **that** item — Accept on a parent page does **not** cascade. Opening any editor auto-writes FE children for unresolved queue items without unwrapping.
 >
 > **Offcanvas:** Synced copy becomes accordion-like tree; mega panel is desktop/navmenu positioning — keep mega content usable when mirrored, or rely on sync only for simple structures.
 

@@ -37,7 +37,6 @@ import {
 	THEME_OVERRIDE_MAX,
 	NESTED_CLASS_PREFIX,
 } from "./theme-override";
-import "./editor-sync";
 
 if( window?.blockish?.screen ){
     window.blockish.helpers = {

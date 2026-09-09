@@ -220,13 +220,6 @@ class Callbacks
             'schema_staged'      => $schema_staged,
             'featured_media_set' => $featured_media_set,
         ];
-        if ( $schema_staged ) {
-            $result['resolve_url'] = \Blockish\Extensions\AiPreview::resolve_url(
-                $edit_url,
-                is_string( $post_url ) ? $post_url : '',
-                array( $post_id )
-            );
-        }
         if ( ! empty( $warnings ) ) {
             $result['warnings'] = $warnings;
         }
@@ -239,9 +232,9 @@ class Callbacks
      */
     private static function validate_post_content_input( string $content, string $post_type, string $existing_content, int $post_id ): ?string {
         if ( in_array( $post_type, [ 'wp_block', 'blockish_form', 'blockish_megamenu' ], true ) ) {
-            return 'Do not pass post_content for patterns, forms, or mega menus. Use block_schema / schema_file only. Share edit_url / resolve_url after staging; Settings AI Preview for Accept/Discard.';
+            return 'Do not pass post_content for patterns, forms, or mega menus. Use block_schema / schema_file only. After staging AGENT opens one edit_url (prefer parent page; resolves whole queue), waitUntil domcontentloaded, wait 10–15s, then share a frontend view URL.';
         }
 
-        return 'Do not pass post_content for page/post layouts. Stage with block_schema (writes blockish/ai-preview), trigger-refresh, share edit_url or resolve_url. After resolve, post_url shows the live frontend; Settings AI Preview for Accept/Discard.';
+        return 'Do not pass post_content for page/post layouts. Stage with block_schema (writes blockish/ai-preview), AGENT opens edit_url once so pending resolves (whole queue), waitUntil domcontentloaded, wait 10–15s, then share post_url.';
     }
 }

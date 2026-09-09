@@ -8,7 +8,7 @@ You build a **schema**: a JSON tree of `{ name, attributes, innerBlocks }`.
 - `attributes` — only values that differ from defaults. Omit = default.
 - `innerBlocks` — child schema nodes (only when "Accepts children: yes").
 
-**Never** write block HTML, hand-built markup, or layout CSS into `post_content`. Always stage via `block_schema` (`blockish/ai-preview` → user Accept/Discard). Share `edit_url`, not live preview URLs.
+**Never** write block HTML, hand-built markup, or layout CSS into `post_content`. Always stage via `block_schema` (`blockish/ai-preview`). AGENT opens `edit_url` once (prefer parent page; any editor resolves the whole queue) → waitUntil `domcontentloaded` → wait **10–15s** → give the user a frontend view URL. Settings Accept/Discard only when the user asks.
 
 ### Docs mismatch or plugin bug (escape hatch)
 
@@ -69,9 +69,12 @@ Build the whole section, then convert once:
 
 1. Create patterns first via `blockish/manage-pattern` — use only **returned real IDs**.
 2. Stage page with `block_schema` pattern refs only. Full-bleed: `{"name":"core/block","attributes":{"ref":163,"align":"full"}}`. Content-width: omit `align` or use `"wide"`.
-3. After staging: `trigger-refresh`, share **`edit_url`**.
+3. Resolve: AGENT follows `get-automation-guideline` verify loop — prefer the **page** `edit_url` → wait **10–15s** → frontend screenshot; retry editor once if unresolved; when resolved, final FE screenshot → share **`post_url`**. Then fix design issues if the shot shows them. Do not open every pattern `edit_url`.
 4. **Never** put `core/template-part` header/footer on a page.
 5. Templates use `block_schema` via `manage-template`.
+6. Later pattern edit while a parent already refs it: restage the pattern **and** re-stage that parent with its current schema, then open one editor again.
+
+**Attributes vs Class Manager:** structural layout props (`display`, `containerWidth`, `gridLayoutType`, `tagName`, …) on the block; visual paint in Class Manager — see `get-class-manager-docs` §2b.
 
 **meta_input:** Never invent meta keys — user supplies them, or `blockish-dynamicity/get-meta-list` when Dynamicity is active.
 
@@ -84,7 +87,7 @@ Do not invent complex schemas from scratch unless creating something new.
 1. Fetch with `get-posts` / `get-templates`.
 2. Edit the returned `schema`.
 3. Restage via `manage-post` / `manage-template` / `manage-pattern`.
-4. Share `edit_url` + `trigger-refresh`.
+4. Share `post_url` after resolve.
 
 ---
 

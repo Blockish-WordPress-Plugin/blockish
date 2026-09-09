@@ -13,7 +13,7 @@ addFilter(
 		tabs.unshift({
 			name: 'ai-preview',
 			title: __('AI Preview', 'blockish'),
-			description: __('Pending layouts: Resolve (live FE), Accept (unwrap), or Discard.', 'blockish'),
+			description: __('Pending layouts: Accept (unwrap) or Discard. Resolve runs automatically when the editor opens.', 'blockish'),
 			render: AiPreviewSettingsTab,
 		});
 		return tabs;

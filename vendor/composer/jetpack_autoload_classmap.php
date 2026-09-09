@@ -190,6 +190,14 @@ return array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Mcp/Abilities/FetchGoogleFonts/Config.php'
 	),
+	'Blockish\\Mcp\\Abilities\\GetAiPreviewPending\\Callbacks' => array(
+		'version' => 'dev-main',
+		'path'    => $baseDir . '/includes/Mcp/Abilities/GetAiPreviewPending/Callbacks.php'
+	),
+	'Blockish\\Mcp\\Abilities\\GetAiPreviewPending\\Config' => array(
+		'version' => 'dev-main',
+		'path'    => $baseDir . '/includes/Mcp/Abilities/GetAiPreviewPending/Config.php'
+	),
 	'Blockish\\Mcp\\Abilities\\GetAutomationGuideline\\Callbacks' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Mcp/Abilities/GetAutomationGuideline/Callbacks.php'
@@ -434,14 +442,6 @@ return array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Mcp/Abilities/ThemeBuilderTemplates.php'
 	),
-	'Blockish\\Mcp\\Abilities\\TriggerRefresh\\Callbacks' => array(
-		'version' => 'dev-main',
-		'path'    => $baseDir . '/includes/Mcp/Abilities/TriggerRefresh/Callbacks.php'
-	),
-	'Blockish\\Mcp\\Abilities\\TriggerRefresh\\Config' => array(
-		'version' => 'dev-main',
-		'path'    => $baseDir . '/includes/Mcp/Abilities/TriggerRefresh/Config.php'
-	),
 	'Blockish\\Mcp\\Abilities\\WriteBlog\\Callbacks' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Mcp/Abilities/WriteBlog/Callbacks.php'
@@ -533,10 +533,6 @@ return array(
 	'Blockish\\Routes\\DashboardToolsV1' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Routes/DashboardToolsV1.php'
-	),
-	'Blockish\\Routes\\EditorSyncV1' => array(
-		'version' => 'dev-main',
-		'path'    => $baseDir . '/includes/Routes/EditorSyncV1.php'
 	),
 	'Blockish\\Routes\\ExtensionsV1' => array(
 		'version' => 'dev-main',
