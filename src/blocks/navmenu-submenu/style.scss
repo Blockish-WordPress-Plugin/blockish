@@ -1,22 +1,15 @@
-:where( .blockish-navmenu-submenu ) {
-	background: #fff;
-	border: 1px solid rgba( 0, 0, 0, 0.1 );
-	border-radius: 8px;
-	box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.12 );
-	font-size: 16px;
-}
-
+// Base submenu list — default panel appearance.
 .blockish-navmenu-submenu {
-	display: flex;
+	display: none;
 	flex-direction: column;
-	list-style: none;
+	gap: 2px;
+	min-width: 200px;
 	margin: 0;
-	padding: 12px;
-	min-width: 180px;
-}
-
-// Padding lives on each item instead of the panel itself — also overridable
-// via the subItemPadding control (block.json), same :where() pattern.
-:where( .blockish-navmenu-submenu .blockish-block-navmenu-item ) {
 	padding: 8px;
+	list-style: none;
+	background: #fff;
+	border: 1px solid rgba( 0, 0, 0, 0.08 );
+	border-radius: 8px;
+	box-shadow: 0 10px 30px rgba( 0, 0, 0, 0.1 );
+	box-sizing: border-box;
 }

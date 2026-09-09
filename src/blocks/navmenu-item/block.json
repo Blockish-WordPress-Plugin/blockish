@@ -8,7 +8,12 @@
   "description": "Item for the Nav Menu block.",
   "parent": [
     "blockish/navmenu",
-    "blockish/offcanvas"
+    "blockish/offcanvas",
+    "blockish/navmenu-submenu"
+  ],
+  "allowedBlocks": [
+    "blockish/navmenu-submenu",
+    "blockish/navmenu-megamenu"
   ],
   "attributes": {
     "label": {

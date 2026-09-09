@@ -27,7 +27,7 @@ const Inspector = ( { advancedControls } ) => {
 								type="BlockishPanelBody"
 								title={ __( 'Menu', 'blockish' ) }
 								initialOpen={ true }
-							indicatorSlugs={['justifyContent', 'alignItems', 'isVertical']}>
+								indicatorSlugs={['justifyContent', 'alignItems', 'isVertical', 'submenuTrigger', 'submenuRevealAnimation']}>
 								<BlockishResponsiveControl
 									type="BlockishSelect"
 									label={ __( 'Justify Content', 'blockish' ) }
@@ -61,6 +61,28 @@ const Inspector = ( { advancedControls } ) => {
 									label={ __( 'Vertical Menu', 'blockish' ) }
 									slug="isVertical"
 									help={ __( 'It will make the menu vertical', 'blockish' ) }
+								/>
+								<BlockishControl
+									type="BlockishToggleGroup"
+									label={ __( 'Submenu Trigger', 'blockish' ) }
+									slug="submenuTrigger"
+									options={ [
+										{ value: 'hover', label: __( 'Hover', 'blockish' ) },
+										{ value: 'click', label: __( 'Click', 'blockish' ) },
+									] }
+									left="60px"
+								/>
+								<BlockishControl
+									type="BlockishSelect"
+									label={ __( 'Submenu Reveal', 'blockish' ) }
+									slug="submenuRevealAnimation"
+									options={ [
+										{ value: 'fade', label: __( 'Fade', 'blockish' ) },
+										{ value: 'slide', label: __( 'Slide', 'blockish' ) },
+										{ value: 'scale', label: __( 'Scale', 'blockish' ) },
+										{ value: 'soft', label: __( 'Soft', 'blockish' ) },
+									] }
+									left="60px"
 								/>
 							</BlockishControl>
 						) }

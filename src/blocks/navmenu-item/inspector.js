@@ -1,9 +1,6 @@
-import {
-	InspectorControls,
-	LinkControl,
-} from '@wordpress/block-editor';
-import { TextControl, ToggleControl, TextareaControl } from '@wordpress/components';
-import { memo } from '@wordpress/element';
+import { InspectorControls } from '@wordpress/block-editor';
+import { TextControl, ToggleControl, TextareaControl, Button } from '@wordpress/components';
+import { memo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import LinkPreviewCard from './link-preview-card';
 
@@ -12,6 +9,7 @@ const Inspector = ( {
 	setAttributes,
 	advancedControls,
 	hasRealLink,
+	hasSubmenu,
 	record,
 	setShowLinkPopover,
 	setLinkPopoverAnchor,
@@ -19,6 +17,7 @@ const Inspector = ( {
 	const { BlockishControl, BlockishGroupControl, BlockishResponsiveControl } =
 		window?.blockish?.controls;
 	const { label, url, openInNewTab, linkId, linkKind, linkType, description, rel } = attributes;
+	const emptyLinkButtonRef = useRef( null );
 
 	return (
 		<InspectorControls>
@@ -66,29 +65,17 @@ const Inspector = ( {
 											} }
 										/>
 									) : (
-										<LinkControl
-											hasRichPreviews
-											value={ {
-												url: url ? url : undefined,
-												title: label || undefined,
-												opensInNewTab: openInNewTab,
-												id: linkId || undefined,
-												kind: linkKind || undefined,
-												type: linkType || undefined,
+										<Button
+											ref={ emptyLinkButtonRef }
+											variant="secondary"
+											__next40pxDefaultSize
+											onClick={ () => {
+												setLinkPopoverAnchor( emptyLinkButtonRef.current );
+												setShowLinkPopover( true );
 											} }
-											onChange={ ( { url: newUrl, opensInNewTab, id, kind, type, title } ) => {
-												setAttributes( {
-													url: newUrl || '#',
-													openInNewTab: !! opensInNewTab,
-													linkId: id || 0,
-													linkKind: kind || '',
-													linkType: type || '',
-													...( ! label && { label: title || newUrl || '' } ),
-												} );
-											} }
-											showSuggestions
-											showInitialSuggestions
-										/>
+										>
+											{ __( 'Add link', 'blockish' ) }
+										</Button>
 									) }
 								</div>
 								<ToggleControl

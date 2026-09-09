@@ -1,5 +1,9 @@
 .blockish-navmenu {
+	overflow: visible;
+
 	.blockish-navmenu-nav {
+		overflow: visible;
+
 		> .block-list-appender {
 			position: relative !important;
 
@@ -8,5 +12,88 @@
 				display: flex !important;
 			}
 		}
+	}
+
+	// Editor submenu panel wrapper & list reset for Gutenberg inner blocks.
+	.blockish-navmenu-submenu__panel {
+		min-height: 0;
+		overflow: visible;
+	}
+
+	.blockish-navmenu-submenu__list {
+		display: flex;
+		flex-direction: column;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		background: transparent;
+		border: 0;
+		box-shadow: none;
+
+		:where(&) {
+			gap: 2px;
+		}
+
+		> .blockish-block-navmenu-item,
+		> .wp-block-blockish-navmenu-item {
+			max-width: none !important;
+			margin: 0 !important;
+			background: transparent !important;
+			box-shadow: none !important;
+
+			&.is-selected > .blockish-navmenu-item-link {
+				background: rgba( 0, 0, 0, 0.04 );
+			}
+		}
+	}
+
+	// Keep open/editing submenu + its appender above sibling nav items.
+	.blockish-block-navmenu-item.is-submenu-editing,
+	.blockish-block-navmenu-item.is-submenu-open {
+		z-index: 200;
+	}
+
+	.blockish-block-navmenu-item.is-submenu-editing > .blockish-navmenu-item-children,
+	.blockish-block-navmenu-item.is-submenu-open > .blockish-navmenu-item-children {
+		z-index: 1000;
+	}
+
+	.blockish-navmenu-submenu .block-list-appender {
+		z-index: 30;
+	}
+
+	// Selected branch reveals the dropdown for editing (after JS positions it).
+	.blockish-block-navmenu-item.is-submenu-editing > .blockish-navmenu-item-children {
+		display: block;
+	}
+
+	.blockish-block-navmenu-item.is-submenu-editing > .blockish-navmenu-item-children.is-submenu-positioned {
+		pointer-events: auto;
+	}
+
+	.blockish-block-navmenu-item.is-submenu-editing > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	.blockish-block-navmenu-item.is-submenu-editing > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-megamenu {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+		overflow: visible !important;
+	}
+
+	// Keep megamenu panel from being clipped by editor/parent overflow.
+	.blockish-block-navmenu-item.is-submenu-editing > .blockish-navmenu-item-children.is-submenu-positioned:has( > .blockish-navmenu-megamenu ) {
+		overflow: visible !important;
+	}
+
+	.blockish-block-navmenu-item.is-submenu-editing.has-submenu > .blockish-navmenu-submenu-toggle .blockish-navmenu-submenu-arrow {
+		transform: rotate( 180deg );
+	}
+
+	.blockish-navmenu-submenu .blockish-block-navmenu-item.is-submenu-editing.has-submenu > .blockish-navmenu-submenu-toggle .blockish-navmenu-submenu-arrow {
+		transform: rotate( 90deg );
 	}
 }

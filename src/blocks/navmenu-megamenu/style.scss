@@ -1,0 +1,50 @@
+.blockish-navmenu-megamenu {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	height: auto !important;
+	min-height: 0 !important;
+	margin: 0;
+	padding-top: 0;
+	overflow: visible;
+
+	// Theme / flow margins — editor zeroes these; frontend must too.
+	> * {
+		box-sizing: border-box;
+		margin-block-start: 0 !important;
+		margin-top: 0 !important;
+	}
+
+	// Beat Class Manager (0,2,0) so page-section min-heights don't inflate the panel.
+	.blockish-block-navmenu-item & .wp-block-blockish-container,
+	.blockish-block-navmenu-item & .blockish-block-container,
+	.blockish-block-navmenu-item & .blockish-container,
+	.blockish-block-navmenu-item & .wp-block-group {
+		height: auto !important;
+		min-height: 0 !important;
+		max-height: none;
+	}
+
+	// Direct root layout: fill width, stack from the top (no vertical centering gap).
+	> .wp-block-blockish-container,
+	> .blockish-block-container,
+	> .blockish-container,
+	> .wp-block-group {
+		width: 100% !important;
+		max-width: none !important;
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+		justify-content: flex-start !important;
+		align-items: flex-start !important;
+		align-content: flex-start !important;
+	}
+
+	.alignfull,
+	.alignwide {
+		width: 100% !important;
+		max-width: 100% !important;
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+	}
+}

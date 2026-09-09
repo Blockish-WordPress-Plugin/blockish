@@ -1,12 +1,11 @@
 import { registerBlockType } from '@wordpress/blocks';
-import { addSubmenu } from '@wordpress/icons';
+import { columns } from '@wordpress/icons';
 import './style.scss';
 import Edit from './edit';
-import Save from './save';
 import metadata from './block.json';
 
 registerBlockType( metadata.name, {
-	icon: addSubmenu,
+	icon: columns,
 	edit: Edit,
-	save: Save,
+	save: () => null,
 } );

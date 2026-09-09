@@ -1,5 +1,7 @@
 .blockish-block-navmenu-item {
 	z-index: 100;
+	position: relative;
+
 	.blockish-navmenu-item-link {
 		cursor: text;
 

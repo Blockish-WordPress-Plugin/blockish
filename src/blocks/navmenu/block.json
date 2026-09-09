@@ -23,6 +23,17 @@
       "type": "boolean",
       "default": false
     },
+    "submenuTrigger": {
+      "type": "string",
+      "default": "hover"
+    },
+    "submenuRevealAnimation": {
+      "type": "object",
+      "default": {
+        "label": "Slide",
+        "value": "slide"
+      }
+    },
     "justifyContent": {
       "type": "object",
       "selectors": {
@@ -112,6 +123,7 @@
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
+  "render": "file:./render.php",
   "usesContext": [
     "postId",
     "postType"

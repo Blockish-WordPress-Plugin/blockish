@@ -3,6 +3,13 @@ body.blockish-offcanvas-open {
 	overflow: hidden;
 }
 
+// Belt-and-suspenders: open-enter keyframes still translate off-screen briefly.
+// Clip root X so that never creates a lasting horizontal scrollbar (headers can
+// keep overflow:visible for nav dropdowns).
+body.blockish-frontend:has( .blockish-offcanvas ) {
+	overflow-x: clip;
+}
+
 .blockish-offcanvas {
 	// Blockish's global attributes stamp an (identity) `transform` on every
 	// block wrapper by default. Any non-`none` transform makes an element the
@@ -98,9 +105,20 @@ body.blockish-offcanvas-open {
 		z-index: 1000011;
 		overflow-y: auto;
 		padding: 20px;
+		// Instant hide when closed — never transition visibility. After slide-out,
+		// removing is-open drops animation fill (off-screen) back to transform:none;
+		// a visibility transition would briefly paint that docked panel, and with
+		// header backdrop-filter restored it shows as a clipped top strip.
 		visibility: hidden;
+		opacity: 0;
 		pointer-events: none;
-		transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s ease;
+		// Resting transform must stay on-screen. Off-screen translateX(±100%)
+		// while closed expands document scrollWidth (horizontal scrollbar) unless
+		// a parent clips — and clipping parents also kill nav dropdowns.
+		transform: none;
+		// Opacity only (fade/scale). Slide uses keyframes — do not transition
+		// transform/visibility or they fight the exit animation / cause flashes.
+		transition: opacity 0.4s ease;
 	}
 
 	// Which edge the panel attaches to.
@@ -175,41 +193,140 @@ body.blockish-offcanvas-open {
 		list-style: none;
 		margin: 0;
 		padding: 0;
+		width: 100%;
 	}
 
+	// —— Mobile accordion (offcanvas only) ——
 	.blockish-block-navmenu-item {
-		display: flex;
-		width: 100%;
+		display: flex !important;
+		flex-wrap: wrap;
+		align-items: center;
+		width: 100% !important;
+		max-width: 100%;
+		box-sizing: border-box;
+		column-gap: 4px;
 
 		.blockish-navmenu-item-link {
 			display: flex;
 			align-items: center;
-			width: 100%;
+			flex: 1 1 auto;
+			width: auto;
+			min-width: 0;
 			padding: 12px 8px;
 			color: inherit;
 			text-decoration: none;
 			white-space: normal;
 			border-radius: 4px;
 			transition: background 0.15s ease;
+			box-sizing: border-box;
 
 			&:hover {
 				background: rgba( 0, 0, 0, 0.05 );
 			}
 		}
-	}
 
-	&:not( .is-open ) {
-		&.offcanvas-animation-slide,
-		&.offcanvas-animation-slideFade {
-			&.offcanvas-side-left .blockish-offcanvas-panel {
-				transform: translateX( -100% );
+		.blockish-navmenu-submenu-toggle {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			flex: 0 0 auto;
+			align-self: center;
+			padding: 4px;
+			margin: 0;
+			background: none;
+			border: none;
+			color: inherit;
+			cursor: pointer;
+			line-height: 0;
+			border-radius: 4px;
+			transition: background 0.15s ease, box-shadow 0.15s ease;
+
+			&:hover {
+				background: rgba( 0, 0, 0, 0.05 );
 			}
 
-			&.offcanvas-side-right .blockish-offcanvas-panel {
-				transform: translateX( 100% );
+			&:focus-visible {
+				outline: none;
+				box-shadow: inset 0 0 0 2px currentColor;
 			}
 		}
 
+		.blockish-navmenu-submenu-arrow {
+			display: block;
+			transition: transform 0.3s cubic-bezier( 0.22, 1, 0.36, 1 );
+		}
+
+		&.is-submenu-open > .blockish-navmenu-submenu-toggle .blockish-navmenu-submenu-arrow {
+			transform: rotate( 180deg );
+		}
+
+		> .blockish-navmenu-item-children {
+			display: grid;
+			grid-template-rows: 0fr;
+			flex: 1 1 100%;
+			width: 100%;
+			min-width: 100%;
+			opacity: 0;
+			transition:
+				grid-template-rows 0.36s cubic-bezier( 0.22, 1, 0.36, 1 ),
+				opacity 0.28s ease;
+		}
+
+		&.is-submenu-open > .blockish-navmenu-item-children {
+			grid-template-rows: 1fr;
+			opacity: 1;
+		}
+	}
+
+	// Strip desktop dropdown “card” chrome so accordion inherits the offcanvas panel.
+	// Class Manager / Advanced background on the submenu block must not paint a white box here.
+	.blockish-navmenu-submenu,
+	.wp-block-blockish-navmenu-submenu {
+		display: flex;
+		flex-direction: column;
+		list-style: none;
+		margin: 0;
+		// No padding while collapsed — padding would fight 0fr accordion height.
+		padding: 0;
+		width: 100%;
+		min-width: 0;
+		max-width: none;
+		min-height: 0;
+		overflow: hidden;
+		box-sizing: border-box;
+		gap: 0;
+		border-radius: 0;
+		border: 0;
+		border-left: 2px solid color-mix( in srgb, currentColor 18%, transparent );
+		background: transparent !important;
+		background-image: none !important;
+		box-shadow: none !important;
+	}
+
+	.blockish-block-navmenu-item.is-submenu-open
+		> .blockish-navmenu-item-children
+		> .blockish-navmenu-submenu,
+	.blockish-block-navmenu-item.is-submenu-open
+		> .blockish-navmenu-item-children
+		> .wp-block-blockish-navmenu-submenu {
+		padding: 4px 4px 4px 12px;
+	}
+
+	.blockish-navmenu-submenu .blockish-navmenu-submenu,
+	.wp-block-blockish-navmenu-submenu .wp-block-blockish-navmenu-submenu {
+		border-left-color: color-mix( in srgb, currentColor 12%, transparent );
+	}
+
+	@media ( prefers-reduced-motion: reduce ) {
+		.blockish-block-navmenu-item {
+			> .blockish-navmenu-item-children,
+			.blockish-navmenu-submenu-arrow {
+				transition: none;
+			}
+		}
+	}
+
+	&:not( .is-open ) {
 		&.offcanvas-animation-fade .blockish-offcanvas-panel,
 		&.offcanvas-animation-slideFade .blockish-offcanvas-panel {
 			opacity: 0;
@@ -220,6 +337,9 @@ body.blockish-offcanvas-open {
 			opacity: 0;
 			transform-origin: center;
 		}
+
+		// Slide variants: keep panel docked (transform:none) while closed so it
+		// cannot widen the page. Enter/exit animations run only while open/closing.
 	}
 
 	&.is-open {
@@ -230,7 +350,114 @@ body.blockish-offcanvas-open {
 
 		.blockish-offcanvas-panel {
 			visibility: visible;
+			opacity: 1;
 			pointer-events: auto;
+		}
+
+		&.offcanvas-animation-slide.offcanvas-side-left .blockish-offcanvas-panel,
+		&.offcanvas-animation-slideFade.offcanvas-side-left .blockish-offcanvas-panel {
+			animation: blockishOffcanvasSlideInLeft 0.4s ease both;
+		}
+
+		&.offcanvas-animation-slide.offcanvas-side-right .blockish-offcanvas-panel,
+		&.offcanvas-animation-slideFade.offcanvas-side-right .blockish-offcanvas-panel {
+			animation: blockishOffcanvasSlideInRight 0.4s ease both;
+		}
+
+		// Exit: keep is-open (and fixed-escape) until animation ends so restoring
+		// header backdrop-filter cannot re-contain the panel mid-viewport.
+			&.is-closing {
+			.blockish-offcanvas-overlay {
+				opacity: 0;
+				visibility: hidden;
+			}
+
+			.blockish-offcanvas-panel {
+				pointer-events: none;
+			}
+
+			&.offcanvas-animation-fade .blockish-offcanvas-panel,
+			&.offcanvas-animation-slideFade .blockish-offcanvas-panel {
+				opacity: 0;
+			}
+
+			&.offcanvas-animation-scale .blockish-offcanvas-panel {
+				transform: scale( 0.92 );
+				opacity: 0;
+				transform-origin: center;
+			}
+
+			// Pure slide stays opaque while keyframes move it off-screen.
+			&.offcanvas-animation-slide .blockish-offcanvas-panel {
+				opacity: 1;
+			}
+
+			&.offcanvas-animation-slide.offcanvas-side-left .blockish-offcanvas-panel,
+			&.offcanvas-animation-slideFade.offcanvas-side-left .blockish-offcanvas-panel {
+				animation: blockishOffcanvasSlideOutLeft 0.4s ease both;
+			}
+
+			&.offcanvas-animation-slide.offcanvas-side-right .blockish-offcanvas-panel,
+			&.offcanvas-animation-slideFade.offcanvas-side-right .blockish-offcanvas-panel {
+				animation: blockishOffcanvasSlideOutRight 0.4s ease both;
+			}
+		}
+	}
+}
+
+@keyframes blockishOffcanvasSlideInLeft {
+	from {
+		transform: translateX( -100% );
+	}
+
+	to {
+		transform: none;
+	}
+}
+
+@keyframes blockishOffcanvasSlideInRight {
+	from {
+		transform: translateX( 100% );
+	}
+
+	to {
+		transform: none;
+	}
+}
+
+@keyframes blockishOffcanvasSlideOutLeft {
+	from {
+		transform: none;
+	}
+
+	to {
+		transform: translateX( -100% );
+	}
+}
+
+@keyframes blockishOffcanvasSlideOutRight {
+	from {
+		transform: none;
+	}
+
+	to {
+		transform: translateX( 100% );
+	}
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+	.blockish-offcanvas.is-open {
+		&.offcanvas-animation-slide .blockish-offcanvas-panel,
+		&.offcanvas-animation-slideFade .blockish-offcanvas-panel {
+			animation: none;
+		}
+
+		&.is-closing {
+			&.offcanvas-animation-slide .blockish-offcanvas-panel,
+			&.offcanvas-animation-slideFade .blockish-offcanvas-panel {
+				animation: none;
+				visibility: hidden;
+			}
 		}
 	}
 }

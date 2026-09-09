@@ -1,0 +1,356 @@
+.blockish-navmenu-megamenu {
+	// Editor-only: Gutenberg chrome (inner edit is locked via editing mode).
+	.block-editor-block-list__layout {
+		min-height: 0 !important;
+		height: auto !important;
+	}
+
+	// Gutenberg default block margins create a fake top gap inside the panel.
+	.block-editor-block-list__layout > .wp-block,
+	.block-editor-block-list__layout > .blockish-block-container {
+		margin-block-start: 0 !important;
+		margin-block-end: 0 !important;
+	}
+
+	.block-list-appender,
+	.block-editor-inserter,
+	.block-editor-block-list__insertion-point {
+		display: none !important;
+	}
+}
+
+/* Mega menu picker modal */
+.blockish-megamenu-picker-modal.components-modal__frame {
+	display: flex;
+	flex-direction: column;
+	width: min(100%, 840px);
+	height: auto;
+	max-height: min(85vh, 720px);
+	overflow: hidden;
+}
+
+.blockish-megamenu-picker-modal {
+	.components-modal__content {
+		display: flex;
+		flex-direction: column;
+		flex: 0 1 auto;
+		min-height: 0;
+		height: auto;
+		max-height: calc(min(85vh, 720px) - 72px);
+		margin-top: 72px;
+		padding: 0 !important;
+		overflow: hidden !important;
+	}
+
+	.blockish-megamenu-picker-modal__layout {
+		display: flex;
+		flex-direction: column;
+		flex: 0 1 auto;
+		min-height: 0;
+		height: auto;
+		max-height: 100%;
+	}
+
+	.blockish-megamenu-picker-modal__toolbar {
+		flex: 0 0 auto;
+		padding: 16px 24px 12px;
+		border-bottom: 1px solid #e0e0e0;
+		background: #fff;
+	}
+
+	.blockish-megamenu-picker-modal__body {
+		flex: 1 1 auto;
+		min-height: 0;
+		max-height: min(52vh, 440px);
+		overflow-x: hidden;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		padding: 16px 24px;
+	}
+
+	.blockish-megamenu-picker-modal__loading,
+	.blockish-megamenu-picker-modal__empty {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 160px;
+		margin: 0;
+		color: #757575;
+	}
+
+	.blockish-megamenu-picker-modal__grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+		gap: 16px;
+	}
+
+	.blockish-megamenu-picker-card {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		padding: 0;
+		border: 2px solid #dcdcde;
+		border-radius: 10px;
+		background: #fff;
+		text-align: left;
+		cursor: pointer;
+		overflow: hidden;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+		&:hover {
+			border-color: #a7aaad;
+		}
+
+		&.is-selected {
+			border-color: var(--wp-admin-theme-color, #3858e9);
+			box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #3858e9);
+		}
+
+		/* Theme-builder preview shell + height-aware scale target. */
+		.blockish-megamenu-picker-card__preview {
+			position: relative;
+			aspect-ratio: 4 / 3;
+			background: #f0f0f0;
+			overflow: hidden;
+			pointer-events: none;
+
+			.megamenu-preview-field {
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				min-width: 0;
+				overflow: hidden;
+				pointer-events: none;
+
+				.block-editor-block-preview__container {
+					position: absolute;
+					inset: 0;
+					width: 100% !important;
+					height: 100% !important;
+					overflow: hidden;
+				}
+
+				.block-editor-block-preview__content {
+					margin: 0;
+					transform-origin: top left;
+				}
+			}
+
+			.megamenu-preview-field--empty,
+			.megamenu-preview-field--loading {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 10px;
+				height: 100%;
+				min-height: 160px;
+				color: #757575;
+				font-size: 13px;
+				background: #f6f7f7;
+			}
+
+			.megamenu-preview-field__loading-label {
+				font-size: 12px;
+				line-height: 1.4;
+			}
+		}
+
+		.blockish-megamenu-picker-card__title {
+			display: block;
+			padding: 0 12px 12px;
+			font-size: 13px;
+			font-weight: 600;
+			color: #1e1e1e;
+			line-height: 1.3;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+
+	.blockish-megamenu-picker-modal__footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 16px 24px;
+		border-top: 1px solid #e0e0e0;
+		background: #fff;
+		flex-shrink: 0;
+	}
+
+	.blockish-megamenu-picker-modal__footer-actions {
+		display: flex;
+		gap: 8px;
+	}
+}
+
+/* Create mega menu modal */
+.create-megamenu-modal.components-modal__frame {
+	display: flex;
+	flex-direction: column;
+	width: min(100%, 720px);
+	height: auto;
+	max-height: min(85vh, 600px);
+	overflow: hidden;
+}
+
+.create-megamenu-modal {
+	.components-modal__content {
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
+		min-height: 0;
+		padding: 24px !important;
+		overflow-y: auto;
+	}
+
+	.create-megamenu-modal__lead {
+		margin: 0 0 20px;
+		color: #646970;
+		font-size: 13px;
+	}
+
+	.preset-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		gap: 16px;
+	}
+
+	.preset-card {
+		display: flex;
+		gap: 14px;
+		padding: 16px;
+		border: 1px solid #dcdcde;
+		border-radius: 8px;
+		background: #fff;
+		text-align: left;
+		cursor: pointer;
+		transition: all 0.15s ease;
+
+		&:hover {
+			border-color: var(--wp-admin-theme-color, #3858e9);
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+		}
+
+		.preset-card__icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 40px;
+			height: 40px;
+			border-radius: 6px;
+			background: #f0f0f1;
+			color: #1e1e1e;
+			flex-shrink: 0;
+		}
+
+		.preset-card__body {
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+		}
+
+		.preset-card__title {
+			font-size: 14px;
+			font-weight: 600;
+			color: #1e1e1e;
+		}
+
+		.preset-card__description {
+			font-size: 12px;
+			color: #646970;
+			line-height: 1.4;
+		}
+	}
+
+	.create-megamenu-modal__name {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.create-megamenu-modal__back {
+		align-self: flex-start;
+		margin-bottom: 8px;
+	}
+
+	.create-megamenu-modal__selected {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 16px;
+		background: #f6f7f7;
+		border-radius: 8px;
+
+		.create-megamenu-modal__selected-icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+			height: 32px;
+			border-radius: 6px;
+			background: #fff;
+			border: 1px solid #dcdcde;
+		}
+
+		.create-megamenu-modal__selected-copy {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			font-size: 13px;
+
+			.create-megamenu-modal__selected-label {
+				color: #646970;
+				font-size: 11px;
+				text-transform: uppercase;
+				font-weight: 500;
+			}
+		}
+	}
+
+	.create-megamenu-modal__field {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.create-megamenu-modal__field-label {
+		font-size: 13px;
+		font-weight: 500;
+		color: #1e1e1e;
+	}
+
+	.create-megamenu-modal__input {
+		padding: 8px 12px;
+		font-size: 14px;
+		border: 1px solid #8c8f94;
+		border-radius: 4px;
+
+		&:focus {
+			border-color: var(--wp-admin-theme-color, #3858e9);
+			box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #3858e9);
+			outline: none;
+		}
+	}
+
+	.create-megamenu-modal__help {
+		margin: 0;
+		color: #646970;
+		font-size: 12px;
+	}
+
+	.create-megamenu-modal__error {
+		margin: 0;
+		color: #cc1818;
+		font-size: 12px;
+	}
+
+	.create-megamenu-modal__footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 8px;
+		margin-top: 16px;
+	}
+}

@@ -1,12 +1,23 @@
 import { useBlockProps, useInnerBlocksProps, store as blockEditorStore } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { cloneBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import clsx from 'clsx';
 import Inspector from './inspector';
 import Branding from './branding';
 import './editor.scss';
+
+const CLOSE_MS = 420;
+
+/** Stable signature of a block tree (name + attrs + nested children). */
+function blockTreeSig( blocks ) {
+	return blocks.map( ( block ) => ( {
+		name: block.name,
+		attributes: block.attributes,
+		innerBlocks: blockTreeSig( block.innerBlocks || [] ),
+	} ) );
+}
 
 export default function Edit( props ) {
 	const { attributes, clientId } = props;
@@ -34,11 +45,47 @@ export default function Edit( props ) {
 	);
 
 	const [ isOpen, setIsOpen ] = useState( false );
+	const [ isClosing, setIsClosing ] = useState( false );
+	const closeTimerRef = useRef( null );
+
+	const openPanel = useCallback( () => {
+		if ( closeTimerRef.current ) {
+			window.clearTimeout( closeTimerRef.current );
+			closeTimerRef.current = null;
+		}
+		setIsClosing( false );
+		setIsOpen( true );
+	}, [] );
+
+	const closePanel = useCallback( () => {
+		if ( closeTimerRef.current ) {
+			return;
+		}
+		setIsOpen( ( open ) => {
+			if ( ! open ) {
+				return open;
+			}
+			setIsClosing( true );
+			closeTimerRef.current = window.setTimeout( () => {
+				setIsOpen( false );
+				setIsClosing( false );
+				closeTimerRef.current = null;
+			}, CLOSE_MS );
+			return open;
+		} );
+	}, [] );
+
+	useEffect(
+		() => () => {
+			if ( closeTimerRef.current ) {
+				window.clearTimeout( closeTimerRef.current );
+			}
+		},
+		[]
+	);
 
 	// Find the sibling navmenu under the shared parent and read its items.
-	// A serialized signature of those items' attributes lets the sync effect
-	// depend on a primitive (stable across renders) instead of fresh array
-	// references, so it only fires when the source actually changes.
+	// Signature includes nested submenu trees so sync fires when children change.
 	const { sourceItems, sourceSig } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, getBlocks } = select( blockEditorStore );
@@ -51,7 +98,7 @@ export default function Edit( props ) {
 
 			return {
 				sourceItems: items,
-				sourceSig: JSON.stringify( items.map( ( item ) => item.attributes ) ),
+				sourceSig: JSON.stringify( blockTreeSig( items ) ),
 			};
 		},
 		[ clientId ]
@@ -60,9 +107,7 @@ export default function Edit( props ) {
 	const currentSig = useSelect(
 		( select ) =>
 			JSON.stringify(
-				select( blockEditorStore )
-					.getBlocks( clientId )
-					.map( ( block ) => block.attributes )
+				blockTreeSig( select( blockEditorStore ).getBlocks( clientId ) )
 			),
 		[ clientId ]
 	);
@@ -71,15 +116,19 @@ export default function Edit( props ) {
 
 	useEffect( () => {
 		if ( ! syncWithMenu || sourceSig === currentSig ) {
-			return;
+			return undefined;
 		}
 
-		replaceInnerBlocks(
-			clientId,
-			sourceItems.map( ( item ) => createBlock( 'blockish/navmenu-item', item.attributes ) ),
-			false
-		);
-	}, [ syncWithMenu, sourceSig, currentSig, clientId, replaceInnerBlocks ] );
+		const timer = window.setTimeout( () => {
+			replaceInnerBlocks(
+				clientId,
+				sourceItems.map( ( item ) => cloneBlock( item ) ),
+				false
+			);
+		}, 250 );
+
+		return () => window.clearTimeout( timer );
+	}, [ syncWithMenu, sourceSig, currentSig, sourceItems, clientId, replaceInnerBlocks ] );
 
 	const blockProps = useBlockProps( {
 		className: clsx(
@@ -87,7 +136,7 @@ export default function Edit( props ) {
 			`offcanvas-animation-${ offcanvasAnimation || 'slide' }`,
 			`offcanvas-side-${ offcanvasSide || 'left' }`,
 			`hamburger-align-${ hamburgerAlign || 'left' }`,
-			{ 'is-open': isOpen }
+			{ 'is-open': isOpen, 'is-closing': isClosing }
 		),
 	} );
 
@@ -110,14 +159,21 @@ export default function Edit( props ) {
 					'has-icon': !! hamburgerIcon,
 				} ) }
 				aria-label={ __( 'Toggle menu', 'blockish' ) }
-				onClick={ () => setIsOpen( ( open ) => ! open ) }
+				aria-expanded={ isOpen && ! isClosing }
+				onClick={ () => {
+					if ( isOpen && ! isClosing ) {
+						closePanel();
+					} else if ( ! isOpen ) {
+						openPanel();
+					}
+				} }
 			>
 				{ hamburgerContent }
 			</button>
 			<div
 				className="blockish-offcanvas-overlay"
 				aria-hidden="true"
-				onClick={ () => setIsOpen( false ) }
+				onClick={ closePanel }
 			/>
 			<div className="blockish-offcanvas-panel">
 				<div className="blockish-offcanvas-header">
@@ -132,7 +188,7 @@ export default function Edit( props ) {
 						type="button"
 						className="blockish-offcanvas-close"
 						aria-label={ __( 'Close menu', 'blockish' ) }
-						onClick={ () => setIsOpen( false ) }
+						onClick={ closePanel }
 					>
 						&times;
 					</button>

@@ -2,8 +2,13 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-const Inspector = ( { advancedControls } ) => {
-	const { BlockishControl, BlockishGroupControl, BlockishResponsiveControl } = window?.blockish?.controls;
+const Inspector = ( { advancedControls, isInOffcanvas } ) => {
+	const { BlockishControl, BlockishResponsiveControl } =
+		window?.blockish?.controls || {};
+
+	if ( ! BlockishControl ) {
+		return null;
+	}
 
 	return (
 		<InspectorControls>
@@ -11,175 +16,133 @@ const Inspector = ( { advancedControls } ) => {
 				type="BlockishTab"
 				tabType="top-level"
 				tabs={ [
-					{ name: 'content', title: 'Content' },
-					{ name: 'style', title: 'Style' },
-					{ name: 'advanced', title: 'Advanced' },
+					{ name: 'style', title: __( 'Style', 'blockish' ) },
+					{ name: 'advanced', title: __( 'Advanced', 'blockish' ) },
 				] }
 			>
 				{ ( { name: tabName } ) => (
 					<>
-						{ tabName === 'content' && (
-							<BlockishControl
-								type="BlockishPanelBody"
-								title={ __( 'Submenu', 'blockish' ) }
-								initialOpen={ true }
-							indicatorSlugs={['alignment', 'containerWidth', 'itemGap']}>
-								<BlockishResponsiveControl
-									type="BlockishSelect"
-									label={ __( 'Alignment', 'blockish' ) }
-									slug="alignment"
-									options={ [
-										{ value: 'flex-start', label: __( 'Start', 'blockish' ) },
-										{ value: 'center', label: __( 'Center', 'blockish' ) },
-										{ value: 'flex-end', label: __( 'End', 'blockish' ) },
-										{ value: 'space-between', label: __( 'Space Between', 'blockish' ) },
-									] }
-									__nextHasNoMarginBottom={ true }
-									help={ __( 'Justifies the label and submenu indicator within each item.', 'blockish' ) }
-								/>
-								<BlockishResponsiveControl
-									type="BlockishRangeUnit"
-									label={ __( 'Width', 'blockish' ) }
-									slug="containerWidth"
-									left="44px"
-								/>
-								<BlockishResponsiveControl
-									type="BlockishRangeUnit"
-									label={ __( 'Item Gap', 'blockish' ) }
-									slug="itemGap"
-									left="60px"
-								/>
-							</BlockishControl>
-						) }
 						{ tabName === 'style' && (
 							<>
 								<BlockishControl
 									type="BlockishPanelBody"
-									title={ __( 'Panel', 'blockish' ) }
+									title={ __( 'Submenu', 'blockish' ) }
 									initialOpen={ true }
-								indicatorSlugs={['panelBg', 'panelBorder', 'panelBorderRadius', 'panelPadding', 'panelBoxShadow']}>
-									<BlockishGroupControl
-										type="BlockishBackground"
-										label={ __( 'Background', 'blockish' ) }
-										slug="panelBg"
-									/>
-									<BlockishGroupControl
-										type="BlockishBorder"
-										label={ __( 'Border', 'blockish' ) }
-										slug="panelBorder"
+									indicatorSlugs={ [ 'alignment', 'itemGap' ] }
+								>
+									<BlockishResponsiveControl
+										type="BlockishSelect"
+										label={ __( 'Alignment', 'blockish' ) }
+										slug="alignment"
+										left="68px"
+										options={ [
+											{
+												value: 'flex-start',
+												label: __( 'Start', 'blockish' ),
+											},
+											{
+												value: 'center',
+												label: __( 'Center', 'blockish' ),
+											},
+											{
+												value: 'flex-end',
+												label: __( 'End', 'blockish' ),
+											},
+											{
+												value: 'space-between',
+												label: __(
+													'Space Between',
+													'blockish'
+												),
+											},
+										] }
+										__nextHasNoMarginBottom={ true }
+										help={ __(
+											'Justifies the label within each submenu item.',
+											'blockish'
+										) }
 									/>
 									<BlockishResponsiveControl
-										type="BlockishBorderRadius"
-										label={ __( 'Border Radius', 'blockish' ) }
-										slug="panelBorderRadius"
-										left="44px"
-									/>
-									<BlockishResponsiveControl
-										type="BlockishSpacingSizes"
-										label={ __( 'Padding', 'blockish' ) }
-										slug="panelPadding"
-										left="52px"
-									/>
-									<BlockishGroupControl
-										type="BlockishBoxShadow"
-										label={ __( 'Box Shadow', 'blockish' ) }
-										slug="panelBoxShadow"
+										type="BlockishRangeUnit"
+										label={ __( 'Item Gap', 'blockish' ) }
+										slug="itemGap"
+										left="60px"
 									/>
 								</BlockishControl>
-								<BlockishControl
-									type="BlockishPanelBody"
-									title={ __( 'Submenu Item', 'blockish' ) }
-									initialOpen={ false }
-								indicatorSlugs={['subItemTypography', 'subItemBgNormal', 'subItemColorNormal', 'subItemBorderNormal', 'subItemBgHover', 'subItemColorHover', 'subItemBorderColorHover', 'subItemBgActive', 'subItemColorActive', 'subItemBorderColorActive', 'subItemPadding', 'subItemBorderRadius']}>
-									<BlockishGroupControl
-										type="BlockishTypography"
-										label={ __( 'Typography', 'blockish' ) }
-										slug="subItemTypography"
-									/>
+
+								{ ! isInOffcanvas && (
 									<BlockishControl
-										type="BlockishTab"
-										tabs={ [
-											{ name: 'sub-item-normal', title: 'Normal' },
-											{ name: 'sub-item-hover', title: 'Hover' },
-											{ name: 'sub-item-active', title: 'Active' },
+										type="BlockishPanelBody"
+										title={ __(
+											'Layout & Position',
+											'blockish'
+										) }
+										initialOpen={ true }
+										indicatorSlugs={ [
+											'positionAlign',
+											'offsetY',
+											'offsetX',
 										] }
 									>
-										{ ( { name } ) => (
-											<>
-												{ name === 'sub-item-normal' && (
-													<>
-														<BlockishGroupControl
-															type="BlockishBackground"
-															label={ __( 'Background', 'blockish' ) }
-															slug="subItemBgNormal"
-														/>
-														<BlockishControl
-															type="BlockishColor"
-															label={ __( 'Text Color', 'blockish' ) }
-															slug="subItemColorNormal"
-														/>
-														<BlockishGroupControl
-															type="BlockishBorder"
-															label={ __( 'Border', 'blockish' ) }
-															slug="subItemBorderNormal"
-														/>
-													</>
-												) }
-												{ name === 'sub-item-hover' && (
-													<>
-														<BlockishGroupControl
-															type="BlockishBackground"
-															label={ __( 'Background', 'blockish' ) }
-															slug="subItemBgHover"
-														/>
-														<BlockishControl
-															type="BlockishColor"
-															label={ __( 'Text Color', 'blockish' ) }
-															slug="subItemColorHover"
-														/>
-														<BlockishControl
-															type="BlockishColor"
-															label={ __( 'Border Color', 'blockish' ) }
-															slug="subItemBorderColorHover"
-														/>
-													</>
-												) }
-												{ name === 'sub-item-active' && (
-													<>
-														<BlockishGroupControl
-															type="BlockishBackground"
-															label={ __( 'Background', 'blockish' ) }
-															slug="subItemBgActive"
-														/>
-														<BlockishControl
-															type="BlockishColor"
-															label={ __( 'Text Color', 'blockish' ) }
-															slug="subItemColorActive"
-														/>
-														<BlockishControl
-															type="BlockishColor"
-															label={ __( 'Border Color', 'blockish' ) }
-															slug="subItemBorderColorActive"
-														/>
-													</>
-												) }
-											</>
-										) }
+										<BlockishControl
+											type="BlockishToggleGroup"
+											label={ __(
+												'Horizontal Alignment',
+												'blockish'
+											) }
+											slug="positionAlign"
+											options={ [
+												{
+													value: 'left',
+													label: __(
+														'Left',
+														'blockish'
+													),
+												},
+												{
+													value: 'center',
+													label: __(
+														'Center',
+														'blockish'
+													),
+												},
+												{
+													value: 'right',
+													label: __(
+														'Right',
+														'blockish'
+													),
+												},
+											] }
+											help={ __(
+												'Aligns the dropdown to the parent menu item.',
+												'blockish'
+											) }
+										/>
+
+										<BlockishControl type="BlockishDivider" />
+
+										<BlockishResponsiveControl
+											type="BlockishRangeUnit"
+											label={ __(
+												'Top Distance (Offset Y)',
+												'blockish'
+											) }
+											slug="offsetY"
+											left="148px"
+										/>
+
+										<BlockishResponsiveControl
+											type="BlockishRangeUnit"
+											label={ __(
+												'Horizontal Offset (X)',
+												'blockish'
+											) }
+											slug="offsetX"
+											left="140px"
+										/>
 									</BlockishControl>
-									<BlockishControl type="BlockishDivider" />
-									<BlockishResponsiveControl
-										type="BlockishSpacingSizes"
-										label={ __( 'Padding', 'blockish' ) }
-										slug="subItemPadding"
-										left="52px"
-									/>
-									<BlockishResponsiveControl
-										type="BlockishBorderRadius"
-										label={ __( 'Border Radius', 'blockish' ) }
-										slug="subItemBorderRadius"
-										left="44px"
-									/>
-								</BlockishControl>
+								) }
 							</>
 						) }
 						{ tabName === 'advanced' && advancedControls }

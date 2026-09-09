@@ -1,0 +1,191 @@
+// Submenu open reveal — applied when .is-submenu-open is toggled (JS).
+// Preset class on .blockish-navmenu sets CSS variables consumed below.
+
+@keyframes blockishSubmenuDropdownFade {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes blockishSubmenuDropdownSlide {
+	from {
+		opacity: 0;
+		transform: translateY( -8px );
+	}
+	to {
+		opacity: 1;
+		transform: translateY( 0 );
+	}
+}
+
+@keyframes blockishSubmenuDropdownScale {
+	from {
+		opacity: 0;
+		transform: translateY( -4px ) scale( 0.96 );
+	}
+	to {
+		opacity: 1;
+		transform: translateY( 0 ) scale( 1 );
+	}
+}
+
+@keyframes blockishSubmenuDropdownSoft {
+	from {
+		opacity: 0;
+		transform: translateY( -10px );
+		filter: blur( 2px );
+	}
+	to {
+		opacity: 1;
+		transform: translateY( 0 );
+		filter: blur( 0 );
+	}
+}
+
+@keyframes blockishSubmenuFlyoutFade {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes blockishSubmenuFlyoutSlide {
+	from {
+		opacity: 0;
+		transform: translateX( -8px );
+	}
+	to {
+		opacity: 1;
+		transform: translateX( 0 );
+	}
+}
+
+@keyframes blockishSubmenuFlyoutScale {
+	from {
+		opacity: 0;
+		transform: translateX( -4px ) scale( 0.96 );
+	}
+	to {
+		opacity: 1;
+		transform: translateX( 0 ) scale( 1 );
+	}
+}
+
+@keyframes blockishSubmenuFlyoutSoft {
+	from {
+		opacity: 0;
+		transform: translateX( -10px );
+		filter: blur( 2px );
+	}
+	to {
+		opacity: 1;
+		transform: translateX( 0 );
+		filter: blur( 0 );
+	}
+}
+
+.blockish-navmenu {
+	--blockish-submenu-dropdown-reveal: blockishSubmenuDropdownSlide 0.32s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+	--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutSlide 0.32s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+
+	&.submenu-reveal-fade,
+	&.submenu-reveal--fade {
+		--blockish-submenu-dropdown-reveal: blockishSubmenuDropdownFade 0.28s ease both;
+		--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutFade 0.28s ease both;
+	}
+
+	&.submenu-reveal-slide,
+	&.submenu-reveal--slide {
+		--blockish-submenu-dropdown-reveal: blockishSubmenuDropdownSlide 0.32s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+		--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutSlide 0.32s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+	}
+
+	&.submenu-reveal-scale,
+	&.submenu-reveal--scale {
+		--blockish-submenu-dropdown-reveal: blockishSubmenuDropdownScale 0.3s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+		--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutScale 0.3s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+	}
+
+	&.submenu-reveal-soft,
+	&.submenu-reveal--soft {
+		--blockish-submenu-dropdown-reveal: blockishSubmenuDropdownSoft 0.36s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+		--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutSoft 0.36s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+	}
+}
+
+// Fire reveal only after JS positions the panel (avoids animation finishing while still hidden).
+.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-megamenu {
+	animation: var( --blockish-submenu-dropdown-reveal );
+}
+
+.blockish-navmenu .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
+	animation: var( --blockish-submenu-flyout-reveal );
+}
+
+// Flyout opened to the start (left in LTR) — mirror slide direction.
+.blockish-navmenu .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
+	--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutSlideStart 0.32s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+}
+
+.blockish-navmenu.submenu-reveal-fade .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+.blockish-navmenu.submenu-reveal--fade .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
+	--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutFade 0.28s ease both;
+}
+
+.blockish-navmenu.submenu-reveal-scale .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+.blockish-navmenu.submenu-reveal--scale .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
+	--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutScaleStart 0.3s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+}
+
+.blockish-navmenu.submenu-reveal-soft .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+.blockish-navmenu.submenu-reveal--soft .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
+	--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutSoftStart 0.36s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
+}
+
+@keyframes blockishSubmenuFlyoutSlideStart {
+	from {
+		opacity: 0;
+		transform: translateX( 8px );
+	}
+	to {
+		opacity: 1;
+		transform: translateX( 0 );
+	}
+}
+
+@keyframes blockishSubmenuFlyoutScaleStart {
+	from {
+		opacity: 0;
+		transform: translateX( 4px ) scale( 0.96 );
+	}
+	to {
+		opacity: 1;
+		transform: translateX( 0 ) scale( 1 );
+	}
+}
+
+@keyframes blockishSubmenuFlyoutSoftStart {
+	from {
+		opacity: 0;
+		transform: translateX( 10px );
+		filter: blur( 2px );
+	}
+	to {
+		opacity: 1;
+		transform: translateX( 0 );
+		filter: blur( 0 );
+	}
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+	.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+	.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-megamenu {
+		animation: none;
+	}
+}

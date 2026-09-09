@@ -158,7 +158,10 @@ Hard rule: convert `justify-content:center` on the button root; parent alignment
       "innerBlocks": [
         {
           "name": "blockish/navmenu",
-          "attributes": {},
+          "attributes": {
+            "submenuTrigger": "hover",
+            "submenuRevealAnimation": { "label": "Slide", "value": "slide" }
+          },
           "innerBlocks": [
             {
               "name": "blockish/navmenu-item",
@@ -172,13 +175,36 @@ Hard rule: convert `justify-content:center` on the button root; parent alignment
               "attributes": {
                 "label": "Features",
                 "url": "/features"
-              }
+              },
+              "innerBlocks": [
+                {
+                  "name": "blockish/navmenu-submenu",
+                  "attributes": { "positionAlign": "left" },
+                  "innerBlocks": [
+                    {
+                      "name": "blockish/navmenu-item",
+                      "attributes": {
+                        "label": "Overview",
+                        "url": "/features"
+                      }
+                    },
+                    {
+                      "name": "blockish/navmenu-item",
+                      "attributes": {
+                        "label": "MCP",
+                        "url": "/mcp"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         {
           "name": "blockish/offcanvas",
           "attributes": {
+            "syncWithMenu": true,
             "offcanvasSide": "right"
           },
           "innerBlocks": []

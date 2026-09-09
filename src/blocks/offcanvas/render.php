@@ -48,6 +48,8 @@ switch ( $header_type ) {
 		break;
 }
 
+$panel_id = 'blockish-offcanvas-panel-' . wp_unique_id();
+
 $wrapper_attrs = get_block_wrapper_attributes( array(
 	'class' => implode( ' ', array(
 		'blockish-offcanvas',
@@ -58,11 +60,23 @@ $wrapper_attrs = get_block_wrapper_attributes( array(
 ) );
 ?>
 <div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper attributes generated safely by core. ?>>
-	<button type="button" class="<?php echo esc_attr( $hamburger_class ); ?>" aria-label="<?php esc_attr_e( 'Toggle menu', 'blockish' ); ?>" aria-expanded="false">
+	<button
+		type="button"
+		class="<?php echo esc_attr( $hamburger_class ); ?>"
+		aria-label="<?php esc_attr_e( 'Toggle menu', 'blockish' ); ?>"
+		aria-expanded="false"
+		aria-controls="<?php echo esc_attr( $panel_id ); ?>"
+	>
 		<?php echo $hamburger_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized in render_icon ?>
 	</button>
 	<div class="blockish-offcanvas-overlay" aria-hidden="true"></div>
-	<div class="blockish-offcanvas-panel">
+	<div
+		id="<?php echo esc_attr( $panel_id ); ?>"
+		class="blockish-offcanvas-panel"
+		role="dialog"
+		aria-modal="true"
+		aria-label="<?php esc_attr_e( 'Mobile navigation', 'blockish' ); ?>"
+	>
 		<div class="blockish-offcanvas-header">
 			<div class="blockish-offcanvas-branding"><?php echo $branding; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Contains SVG. ?></div>
 			<button type="button" class="blockish-offcanvas-close" aria-label="<?php esc_attr_e( 'Close menu', 'blockish' ); ?>">&times;</button>

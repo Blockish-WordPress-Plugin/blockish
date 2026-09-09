@@ -1,22 +1,24 @@
 ### `blockish/navmenu`
 
-Desktop menu row. **Parent: `blockish/navigation` only.** **Accepts children: yes** — only `blockish/navmenu-item` (see that doc for `label` / `url` / icon / submenu).
+Desktop menu row. **Parent: `blockish/navigation` only.** **Accepts children: yes** — only `blockish/navmenu-item` (items may nest `navmenu-submenu` or `navmenu-megamenu`).
 
 #### Content / structure
 
 | Attribute | Type | Notes |
 |---|---|---|
-| `isVertical` | Scalar (bool) | `false` (default). When `true`, root class `is-vertical` → nav stacks as a column. |
+| `isVertical` | Scalar (bool) | `false` (default). Root class `is-vertical` → column stack. |
+| `submenuTrigger` | Scalar | `"hover"` (default) \| `"click"`. Root class `is-submenu-trigger-*`. |
+| `submenuRevealAnimation` | Object / scalar | Prefer `{ "label": "Slide", "value": "slide" }`. Values: `fade` \| `slide` \| `scale` \| `soft`. Root class `submenu-reveal--{value}`. |
 | `anchor` / `align` | Scalar | `"align"`: `"wide"` \| `"full"`. |
 
-Item labels, hrefs, icons, and dropdowns live on **child** `blockish/navmenu-item` nodes — not on this block.
+Item labels, hrefs, icons, dropdowns live on **child** `navmenu-item` nodes.
+
+Style attrs (convert-css / inspector): `justifyContent`, `alignItems`, `navGap`, item color/bg/typography/padding/radius, active state — see block.json selectors on `.blockish-navmenu-nav` / `.blockish-block-navmenu-item`.
 
 #### Markup
 
-Default:
-
 ```html
-<div class="wp-block-blockish-navmenu blockish-navmenu">
+<div class="wp-block-blockish-navmenu blockish-navmenu is-submenu-trigger-hover submenu-reveal--slide">
   <nav class="blockish-navmenu-nav" aria-label="Navigation">
     <!-- navmenu-item innerBlocks -->
   </nav>
@@ -25,14 +27,14 @@ Default:
 
 | When | What changes |
 |---|---|
-| `isVertical: true` | Root class `is-vertical` (nav becomes column). |
+| `isVertical: true` | Root `is-vertical`. |
+| `submenuTrigger` | `is-submenu-trigger-hover` or `…-click`. |
+| Reveal value set | `submenu-reveal--fade\|slide\|scale\|soft`. |
 
 Style with convert-css:
-- row alignment / gap → `{{ROOT}} .blockish-navmenu-nav { justify-content: …; align-items: …; gap: …; }`
-- item color / hover (selectors live on this block) → `{{ROOT}} .blockish-block-navmenu-item { color: …; }` and `{{ROOT}} .blockish-block-navmenu-item:hover { … }`
-- item padding / radius / background → target `.blockish-navmenu-item-link` via convert-css on **navmenu-item**, or Class Manager if shared
-Already-there gap is `12px` — only convert when different.
-Do not invent markup.
+- row → `{{ROOT}} .blockish-navmenu-nav { justify-content; align-items; gap }`
+- items → `{{ROOT}} .blockish-block-navmenu-item { color; … }`
+Default gap `12px` — only convert when different.
 
 #### Already-there CSS
 
@@ -65,14 +67,30 @@ Do not invent markup.
 ```json
 {
   "name": "blockish/navmenu",
-  "attributes": {},
+  "attributes": {
+    "submenuTrigger": "hover",
+    "submenuRevealAnimation": { "label": "Slide", "value": "slide" }
+  },
   "innerBlocks": [
     {
       "name": "blockish/navmenu-item",
-      "attributes": {
-        "label": "Home",
-        "url": "/"
-      }
+      "attributes": { "label": "Home", "url": "/" }
+    },
+    {
+      "name": "blockish/navmenu-item",
+      "attributes": { "label": "Products", "url": "/products" },
+      "innerBlocks": [
+        {
+          "name": "blockish/navmenu-submenu",
+          "attributes": {},
+          "innerBlocks": [
+            {
+              "name": "blockish/navmenu-item",
+              "attributes": { "label": "App", "url": "/app" }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

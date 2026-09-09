@@ -6,12 +6,17 @@ import './editor.scss';
 
 export default function Edit( props ) {
 	const { attributes } = props;
-	const { isVertical } = attributes;
+	const { isVertical, submenuTrigger = 'hover', submenuRevealAnimation } = attributes;
 
 	const blockProps = useBlockProps( {
-		className: clsx( 'blockish-navmenu', {
-			'is-vertical': isVertical,
-		} ),
+		className: clsx(
+			'blockish-navmenu',
+			`is-submenu-trigger-${ submenuTrigger }`,
+			{
+				'is-vertical': isVertical,
+				[`submenu-reveal--${ submenuRevealAnimation?.value }`]: submenuRevealAnimation?.value,
+			}
+		),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps(

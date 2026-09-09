@@ -11,7 +11,19 @@ Responsive nav wrapper that pairs a desktop `navmenu` with a mobile `offcanvas`,
 | `hasStarted` | Scalar | Editor bootstrap flag — leave unset / `true` after children exist; do not invent. |
 | `anchor` / `align` | Scalar | `"align"`: `"wide"` \| `"full"`. |
 
-Typical children: one `blockish/navmenu` + one `blockish/offcanvas`. With offcanvas `syncWithMenu: true`, put menu items only under the navmenu.
+Typical children: one `blockish/navmenu` + one `blockish/offcanvas`. With offcanvas `syncWithMenu: true`, put menu items (and nested `navmenu-submenu` / `navmenu-megamenu`) only under the navmenu — the drawer mirrors that tree as a mobile accordion.
+
+Before staging headers: call `get-block-docs` for `navigation`, `navmenu`, `navmenu-item`, and (when used) `navmenu-submenu` / `navmenu-megamenu` / `offcanvas`.
+
+> [!WARNING]
+> **Hard rule — hamburger must not sit mid-header:** A common broken layout is `logo | nav (flex:1, centered) | CTA` with `space-between`. At the breakpoint the CTA hides but the **nav column still flex-grows in the middle**, so the offcanvas hamburger floats mid-bar with empty space on the right.
+>
+> When collapsed, the hamburger must read as **top-right** (or top-left if the design is intentionally left). Fix with Class Manager on the header, not by hoping `hamburgerAlign` alone moves it across columns:
+> - At the nav breakpoint (usually `max-width: 1024px`): nav column `flex: 0 0 auto; margin-left: auto; justify-content: flex-end;` (or put `navigation` inside the right actions column).
+> - Hide the empty actions column when its CTA is hidden (`display: none` on the actions wrapper, not only the button).
+> - Prefer `hamburgerAlign: "right"` when the trigger lives on the right.
+>
+> Do **not** leave a centered `flex: 1` middle column as the only home for the hamburger.
 
 #### Markup
 
@@ -96,15 +108,40 @@ Style with convert-css against `{{ROOT}} .blockish-navigation-inner` for justify
 ```json
 {
   "name": "blockish/navigation",
-  "attributes": {},
+  "attributes": {
+    "menuBreakpoint": "tablet"
+  },
   "innerBlocks": [
     {
       "name": "blockish/navmenu",
-      "attributes": {},
+      "attributes": {
+        "submenuTrigger": "hover",
+        "submenuRevealAnimation": { "label": "Slide", "value": "slide" }
+      },
       "innerBlocks": [
         {
           "name": "blockish/navmenu-item",
           "attributes": { "label": "Home", "url": "/" }
+        },
+        {
+          "name": "blockish/navmenu-item",
+          "attributes": { "label": "Products", "url": "/products" },
+          "innerBlocks": [
+            {
+              "name": "blockish/navmenu-submenu",
+              "attributes": { "positionAlign": "left" },
+              "innerBlocks": [
+                {
+                  "name": "blockish/navmenu-item",
+                  "attributes": { "label": "App", "url": "/app" }
+                },
+                {
+                  "name": "blockish/navmenu-item",
+                  "attributes": { "label": "API", "url": "/api" }
+                }
+              ]
+            }
+          ]
         },
         {
           "name": "blockish/navmenu-item",
@@ -114,7 +151,11 @@ Style with convert-css against `{{ROOT}} .blockish-navigation-inner` for justify
     },
     {
       "name": "blockish/offcanvas",
-      "attributes": { "syncWithMenu": true },
+      "attributes": {
+        "syncWithMenu": true,
+        "offcanvasSide": "right",
+        "hamburgerAlign": "right"
+      },
       "innerBlocks": []
     }
   ]

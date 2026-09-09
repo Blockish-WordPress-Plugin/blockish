@@ -60,6 +60,12 @@ const collectNestedEntityIds = (nodes, ids = new Set()) => {
 		if (node.name === 'blockish-forms/form' && node.attributes?.formId) {
 			ids.add(absint(node.attributes.formId));
 		}
+		if (
+			node.name === 'blockish/navmenu-megamenu' &&
+			node.attributes?.megamenuId
+		) {
+			ids.add(absint(node.attributes.megamenuId));
+		}
 		if (Array.isArray(node.innerBlocks)) {
 			collectNestedEntityIds(node.innerBlocks, ids);
 		}

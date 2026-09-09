@@ -1,25 +1,32 @@
 ### `blockish/navmenu-item`
 
-Single menu link. **Parent: `blockish/navmenu` or `blockish/offcanvas`.** **Accepts children: yes** — only one nested `blockish/navmenu-submenu` (optional). Dynamic block (`render.php`). Does **not** support `anchor`.
+Single menu link. **Parent: `blockish/navmenu`, `blockish/offcanvas`, or nested `blockish/navmenu-submenu`.** **Accepts children: yes** — at most **one** of: `blockish/navmenu-submenu` **or** `blockish/navmenu-megamenu`. Dynamic (`render.php`). Does **not** support `anchor`.
 
 #### Content / structure
 
 | Attribute | Type | Notes |
 |---|---|---|
 | `label` | Scalar | Default `""`. Link text (bold/italic allowed). |
-| `url` | Scalar | Href string (e.g. `"/about"`). Prefer this over internal entity fields. |
-| `openInNewTab` | Scalar | `false` (default). Adds `target="_blank"` + `noopener noreferrer`. |
+| `url` | Scalar | Href (e.g. `"/about"`). Prefer over entity meta fields. |
+| `openInNewTab` | Scalar | `false` (default). `target="_blank"` + `noopener noreferrer`. |
 | `rel` | Scalar | Optional extra `rel` tokens. |
-| `description` | Scalar | Optional; unused in default render markup. |
+| `description` | Scalar | Optional; unused in default render. |
 | `icon` | Icon | Optional; prefer `get-icons`. |
 | `iconPosition` | Scalar | `"left"` (default) \| `"right"`. |
 | `linkId` / `linkKind` / `linkType` | Scalar | Editor entity link metadata — do not invent; use `url`. |
 
-For a dropdown, nest exactly one `blockish/navmenu-submenu` with further `navmenu-item` children.
+**Dropdown choice**
+
+| Child | Use when |
+|---|---|
+| `blockish/navmenu-submenu` | Simple link list / nested flyouts. |
+| `blockish/navmenu-megamenu` | Wide layout from a `blockish_megamenu` CPT (`megamenuId`). |
+
+Never nest both under the same item. Nested submenu items can again nest submenu (flyout).
 
 #### Markup
 
-Default (no icon, no submenu) from `render.php`:
+Default (no icon, no child):
 
 ```html
 <div class="wp-block-blockish-navmenu-item blockish-block-navmenu-item">
@@ -31,19 +38,15 @@ Default (no icon, no submenu) from `render.php`:
 
 | When | What changes |
 |---|---|
-| `linkId` set | Wrapper `data-id="…"`. |
-| `icon` set | Link gains `has-icon`; icon span before (or after if `iconPosition: "right"`) the label. |
-| `iconPosition: "right"` | Also class `icon-position-right`. |
-| `openInNewTab: true` | `target="_blank"` + `rel` including `noopener noreferrer`. |
-| Nested `navmenu-submenu` present | Sibling `<button class="blockish-navmenu-submenu-toggle">` with arrow SVG, then submenu markup. |
-
-`save.js` only serializes innerBlocks (submenu); chrome comes from `render.php`.
+| `linkId` set | Wrapper `data-id`. |
+| `icon` set | Link `has-icon`; icon span before/after label. |
+| Child submenu or megamenu | `has-submenu`; `<button class="blockish-navmenu-submenu-toggle" aria-expanded aria-controls>` + `<div id class="blockish-navmenu-item-children">`. |
+| Active page (view) | Class `is-active` + `aria-current="page"` on the link. |
 
 Style with convert-css:
-- link chrome → `{{ROOT}} .blockish-navmenu-item-link { padding: …; color: …; }`
-- icon size → `{{ROOT}} .blockish-navmenu-item-icon svg { width: …; height: …; }`
-Shared item colors across the whole menu can also be converted on the parent `navmenu` (selectors target `.blockish-block-navmenu-item`).
-Do not invent markup.
+- link chrome → `{{ROOT}} .blockish-navmenu-item-link { … }`
+- icon size → `{{ROOT}} .blockish-navmenu-item-icon svg { … }`
+Shared colors: parent `navmenu` selectors on `.blockish-block-navmenu-item`.
 
 #### Already-there CSS
 
@@ -63,15 +66,7 @@ Do not invent markup.
   display: inline-flex;
   gap: 6px;
   text-decoration: none;
-  transition: background .15s ease,color .15s ease;
   white-space: nowrap;
-}
-
-.blockish-block-navmenu-item .blockish-navmenu-item-icon {
-  align-items: center;
-  display: inline-flex;
-  flex-shrink: 0;
-  line-height: 0;
 }
 
 .blockish-block-navmenu-item .blockish-navmenu-item-icon svg {
@@ -82,42 +77,18 @@ Do not invent markup.
 }
 
 .blockish-block-navmenu-item .blockish-navmenu-submenu-toggle {
-  align-items: center;
   background: none;
   border: none;
   color: inherit;
-  cursor: pointer;
-  display: inline-flex;
-  flex-shrink: 0;
-  justify-content: center;
-  padding: 4px;
-}
-
-.blockish-block-navmenu-item .blockish-navmenu-submenu-toggle:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 1px;
-}
-
-.blockish-block-navmenu-item .blockish-navmenu-submenu-arrow {
-  flex-shrink: 0;
-  transition: transform .15s ease;
-}
-
-@keyframes blockishSubmenuRotateY {
-  0% {
-    transform: rotateY(90deg);
-  }
-  80% {
-    transform: rotateY(-10deg);
-  }
-  to {
-    transform: rotateY(0);
-  }
-  ;
+  display: none;
+  line-height: 0;
+  padding: 0;
 }
 ```
 
-#### Minimal schema
+(Desktop navmenu CSS shows the toggle when `.has-submenu`.)
+
+#### Minimal schema (with submenu)
 
 ```json
 {
@@ -129,13 +100,37 @@ Do not invent markup.
   "innerBlocks": [
     {
       "name": "blockish/navmenu-submenu",
-      "attributes": {},
+      "attributes": { "positionAlign": "left" },
       "innerBlocks": [
         {
           "name": "blockish/navmenu-item",
           "attributes": { "label": "App", "url": "/app" }
         }
       ]
+    }
+  ]
+}
+```
+
+#### Minimal schema (with megamenu)
+
+```json
+{
+  "name": "blockish/navmenu-item",
+  "attributes": {
+    "label": "Platform",
+    "url": "/platform"
+  },
+  "innerBlocks": [
+    {
+      "name": "blockish/navmenu-megamenu",
+      "attributes": {
+        "megamenuId": 123,
+        "widthMode": "custom",
+        "customWidth": { "Desktop": { "value": 1100, "unit": "px" } },
+        "positionAlign": "center",
+        "alignRelativeTo": "navigation"
+      }
     }
   ]
 }

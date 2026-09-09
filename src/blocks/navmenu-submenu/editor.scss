@@ -1,11 +1,26 @@
+// Accordion editing styles are scoped to .blockish-offcanvas.
+// Desktop dropdown editor chrome lives in navmenu/editor.scss.
 .blockish-navmenu-submenu {
-	min-width: 180px;
+	position: relative;
+	overflow: visible;
 
+	// Float below the panel — not inside the list flow (avoids Gutenberg block chrome).
 	.block-list-appender {
 		position: absolute !important;
-		bottom: -32px;
+		bottom: -36px;
 		left: 0;
 		right: 0;
+		width: 100% !important;
+		max-width: none !important;
+		height: 0 !important;
+		min-height: 0 !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		overflow: visible !important;
+		background: transparent !important;
+		border: none !important;
+		box-shadow: none !important;
+		outline: none !important;
 	}
 }
 

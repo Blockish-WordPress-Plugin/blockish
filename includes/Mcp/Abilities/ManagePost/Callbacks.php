@@ -37,7 +37,7 @@ class Callbacks
         }
 
         $schema_context = 'page';
-        $pattern_like_types = array( 'wp_block', 'blockish_form', 'blockish-pattern', 'blockish-page' );
+        $pattern_like_types = array( 'wp_block', 'blockish_form', 'blockish_megamenu', 'blockish-pattern', 'blockish-page' );
         if ( ! empty( $input['post_type'] ) && in_array( $input['post_type'], $pattern_like_types, true ) ) {
             $schema_context = 'pattern';
         } elseif ( ! empty( $input['post_id'] ) ) {
@@ -230,8 +230,8 @@ class Callbacks
      * Layouts must be staged via block_schema → ai-preview in content.
      */
     private static function validate_post_content_input( string $content, string $post_type, string $existing_content, int $post_id ): ?string {
-        if ( in_array( $post_type, [ 'wp_block', 'blockish_form' ], true ) ) {
-            return 'Do not pass post_content for patterns or forms. Use block_schema / schema_file only. Share edit_url after staging so the user can Accept in the editor.';
+        if ( in_array( $post_type, [ 'wp_block', 'blockish_form', 'blockish_megamenu' ], true ) ) {
+            return 'Do not pass post_content for patterns, forms, or mega menus. Use block_schema / schema_file only. Share edit_url after staging so the user can Accept in the editor.';
         }
 
         return 'Do not pass post_content for page/post layouts. Stage pattern refs with block_schema (writes blockish/ai-preview into content), call blockish/trigger-refresh, and share edit_url (not post_url).';

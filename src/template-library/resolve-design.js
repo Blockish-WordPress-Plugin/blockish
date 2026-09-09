@@ -113,6 +113,10 @@ export function remapContent(content, idMap) {
 		const l = String(localId);
 		out = out.replace(new RegExp(`"ref"\\s*:\\s*${c}\\b`, 'g'), `"ref":${l}`);
 		out = out.replace(new RegExp(`"formId"\\s*:\\s*${c}\\b`, 'g'), `"formId":${l}`);
+		out = out.replace(
+			new RegExp(`"megamenuId"\\s*:\\s*${c}\\b`, 'g'),
+			`"megamenuId":${l}`
+		);
 	});
 
 	// Remap Class Manager ids only inside classManager / classManagerSubselector payloads.
