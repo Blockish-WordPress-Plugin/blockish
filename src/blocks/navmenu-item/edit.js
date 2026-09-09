@@ -47,27 +47,31 @@ export default function Edit( {
 	} = attributes;
 	const hasRealLink = !! url;
 
-	const { hasSubmenu, isInNavmenu, isSelected, hasChildSelected } = useSelect(
-		( select ) => {
-			const {
-				getBlocks,
-				getBlockParents,
-				getBlockName,
-				isBlockSelected,
-				hasSelectedInnerBlock,
-			} = select( blockEditorStore );
-			const parents = getBlockParents( clientId );
-			return {
-				hasSubmenu: getBlocks( clientId ).length > 0,
-				isInNavmenu: parents.some(
-					( id ) => getBlockName( id ) === 'blockish/navmenu'
-				),
-				isSelected: isBlockSelected( clientId ),
-				hasChildSelected: hasSelectedInnerBlock( clientId, true ),
-			};
-		},
-		[ clientId ]
-	);
+	const { hasSubmenu, isInNavmenu, isInOffcanvas, isSelected, hasChildSelected } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlocks,
+					getBlockParents,
+					getBlockName,
+					isBlockSelected,
+					hasSelectedInnerBlock,
+				} = select( blockEditorStore );
+				const parents = getBlockParents( clientId );
+				return {
+					hasSubmenu: getBlocks( clientId ).length > 0,
+					isInNavmenu: parents.some(
+						( id ) => getBlockName( id ) === 'blockish/navmenu'
+					),
+					isInOffcanvas: parents.some(
+						( id ) => getBlockName( id ) === 'blockish/offcanvas'
+					),
+					isSelected: isBlockSelected( clientId ),
+					hasChildSelected: hasSelectedInnerBlock( clientId, true ),
+				};
+			},
+			[ clientId ]
+		);
 
 	const useDesktopHover = hasSubmenu && isInNavmenu;
 
@@ -199,9 +203,17 @@ export default function Edit( {
 		};
 	}, [ popoverAnchor, clientId, clearCloseTimer, clearIntentTimer ] );
 
-	// Calculated fixed position in editor (same util as frontend).
+	// Strip any leftover desktop dropdown geometry if this item lives in offcanvas.
 	useEffect( () => {
-		if ( ! popoverAnchor || ! isInNavmenu || ! hasSubmenu ) {
+		if ( isInOffcanvas && popoverAnchor ) {
+			clearNavmenuSubmenuPosition( popoverAnchor );
+		}
+	}, [ isInOffcanvas, popoverAnchor ] );
+
+	// Calculated fixed position in editor (same util as frontend).
+	// Re-run when item attributes change — style/padding/width shifts leave a stale megamenu box.
+	useEffect( () => {
+		if ( ! popoverAnchor || ! isInNavmenu || isInOffcanvas || ! hasSubmenu ) {
 			return;
 		}
 
@@ -218,17 +230,30 @@ export default function Edit( {
 		win.addEventListener( 'resize', onReposition );
 		win.addEventListener( 'scroll', onReposition, true );
 
+		const resizeObserver =
+			typeof win.ResizeObserver === 'function'
+				? new win.ResizeObserver( onReposition )
+				: null;
+		resizeObserver?.observe( popoverAnchor );
+		const navmenu = popoverAnchor.closest( '.blockish-navmenu' );
+		if ( navmenu ) {
+			resizeObserver?.observe( navmenu );
+		}
+
 		return () => {
 			win.removeEventListener( 'resize', onReposition );
 			win.removeEventListener( 'scroll', onReposition, true );
+			resizeObserver?.disconnect();
 		};
 	}, [
 		popoverAnchor,
 		isInNavmenu,
+		isInOffcanvas,
 		hasSubmenu,
 		isSubmenuOpen,
 		isSelected,
 		hasChildSelected,
+		attributes,
 	] );
 
 	useEffect(
@@ -252,6 +277,9 @@ export default function Edit( {
 			'has-submenu': hasSubmenu,
 			// Hover/click only — never mix selection into this class (that opened all nested).
 			'is-submenu-open': hasSubmenu && isSubmenuOpen,
+			// Gutenberg select / child-select — editor chrome only.
+			'is-submenu-editing':
+				hasSubmenu && ( isSelected || hasChildSelected ),
 		} ),
 		ref: useMergeRefs( [ setPopoverAnchor ] ),
 		onMouseEnter: useDesktopHover
@@ -334,7 +362,10 @@ export default function Edit( {
 				: undefined,
 		},
 		{
-			allowedBlocks: [ 'blockish/navmenu-submenu' ],
+			allowedBlocks: [
+				'blockish/navmenu-submenu',
+				'blockish/navmenu-megamenu',
+			],
 			renderAppender: false,
 		}
 	);
@@ -396,6 +427,15 @@ export default function Edit( {
 						className="blockish-navmenu-submenu-toggle"
 						aria-expanded={ isSubmenuOpen }
 						aria-label={ __( 'Toggle submenu', 'blockish' ) }
+						onMouseDown={
+							isInOffcanvas
+								? ( event ) => {
+										// Keep click for toggle; don't let editor selection steal it.
+										event.preventDefault();
+										event.stopPropagation();
+								  }
+								: undefined
+						}
 						onClick={ ( event ) => {
 							event.preventDefault();
 							event.stopPropagation();

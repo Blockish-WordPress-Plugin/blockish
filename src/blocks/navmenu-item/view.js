@@ -10,6 +10,34 @@ import {
 const CLOSE_DELAY_MS = 600;
 const INTENT_DELAY_MS = 150;
 
+/** TEMP debug — remove after megamenu width debugging. */
+const DEBUG_FORCE_MEGAMENU_OPEN = false;
+
+const itemHasMegamenu = ( item ) =>
+	Boolean(
+		item?.querySelector(
+			':scope > .blockish-navmenu-item-children > .blockish-navmenu-megamenu'
+		)
+	);
+
+const forceOpenAllMegamenus = () => {
+	document
+		.querySelectorAll( '.blockish-block-navmenu-item.has-submenu' )
+		.forEach( ( item ) => {
+			if ( ! itemHasMegamenu( item ) ) {
+				return;
+			}
+			item.classList.add( 'is-submenu-open' );
+			const button = item.querySelector(
+				':scope > .blockish-navmenu-submenu-toggle'
+			);
+			if ( button ) {
+				button.setAttribute( 'aria-expanded', 'true' );
+			}
+			positionNavmenuSubmenu( item );
+		} );
+};
+
 const getCurrentEntityId = () => {
 	for ( const className of document.body.classList ) {
 		if ( className.startsWith( 'page-id-' ) ) {
@@ -62,6 +90,11 @@ const clearIntentTimer = ( item ) => {
 };
 
 const forceCloseItem = ( item ) => {
+	// TEMP: keep megamenus pinned open for frontend width debugging.
+	if ( DEBUG_FORCE_MEGAMENU_OPEN && itemHasMegamenu( item ) ) {
+		positionNavmenuSubmenu( item );
+		return;
+	}
 	item.classList.remove( 'is-submenu-open' );
 	clearCloseTimer( item );
 	clearIntentTimer( item );
@@ -483,6 +516,11 @@ const init = () => {
 	bindDesktopSubmenus();
 	bindKeyboardNavigation();
 	bindRepositionListeners();
+	if ( DEBUG_FORCE_MEGAMENU_OPEN ) {
+		forceOpenAllMegamenus();
+		window.setTimeout( forceOpenAllMegamenus, 100 );
+		window.setTimeout( forceOpenAllMegamenus, 400 );
+	}
 };
 
 if ( document.readyState === 'loading' ) {

@@ -12,7 +12,8 @@
     "blockish/navmenu-submenu"
   ],
   "allowedBlocks": [
-    "blockish/navmenu-submenu"
+    "blockish/navmenu-submenu",
+    "blockish/navmenu-megamenu"
   ],
   "attributes": {
     "label": {

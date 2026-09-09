@@ -1,39 +1,39 @@
 {
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
-  "name": "blockish/navmenu-submenu",
+  "name": "blockish/navmenu-megamenu",
   "version": "1.0.0",
-  "title": "Nav Menu Submenu",
+  "title": "Nav Menu Mega Menu",
   "category": "blockish-framework",
-  "description": "Dropdown submenu panel for a Nav Menu Item.",
+  "description": "Dropdown mega menu panel for a Nav Menu Item.",
   "keywords": [
     "nav",
     "menu",
-    "submenu",
+    "megamenu",
     "dropdown"
   ],
   "parent": [
     "blockish/navmenu-item"
   ],
-  "allowedBlocks": [
-    "blockish/navmenu-item"
-  ],
   "attributes": {
-    "itemGap": {
-      "type": "object",
-      "selectors": {
-        ".{{WRAPPER}}, .{{WRAPPER}} .blockish-navmenu-submenu__list": "gap: {{VALUE}};"
-      }
+    "megamenuId": {
+      "type": "number",
+      "default": 0
     },
-    "alignment": {
-      "type": "object",
-      "selectors": {
-        ".{{WRAPPER}} .blockish-navmenu-item-link": "justify-content: {{VALUE}};"
-      }
+    "widthMode": {
+      "type": "string",
+      "default": "navigation"
+    },
+    "customWidth": {
+      "type": "object"
     },
     "positionAlign": {
       "type": "string",
       "default": "left"
+    },
+    "alignRelativeTo": {
+      "type": "string",
+      "default": "navigation"
     },
     "offsetY": {
       "type": "object"
@@ -44,16 +44,11 @@
   },
   "supports": {
     "html": false,
-    "anchor": false,
     "reusable": false
   },
   "textdomain": "blockish",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
   "style": "file:./style-index.css",
-  "render": "file:./render.php",
-  "usesContext": [
-    "postId",
-    "postType"
-  ]
+  "render": "file:./render.php"
 }

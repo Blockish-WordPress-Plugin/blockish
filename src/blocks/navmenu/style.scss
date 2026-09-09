@@ -76,6 +76,18 @@
 		pointer-events: none;
 	}
 
+	// Megamenu: JS sets width/top/left only. Static box model lives in CSS.
+	.blockish-block-navmenu-item > .blockish-navmenu-item-children:has( > .blockish-navmenu-megamenu ) {
+		box-sizing: border-box;
+		width: auto;
+		min-width: 0;
+		max-width: none;
+		margin: 0;
+		padding: 0;
+		height: auto;
+		overflow: visible;
+	}
+
 	// Nested dropdown (flyout) panel starts at left: 100% so it never overlays its parent item.
 	.blockish-navmenu-submenu .blockish-block-navmenu-item > .blockish-navmenu-item-children {
 		position: absolute;
@@ -108,8 +120,21 @@
 		// No transform/opacity transition — open uses keyframe reveal.
 	}
 
+	.blockish-block-navmenu-item > .blockish-navmenu-item-children > .blockish-navmenu-megamenu {
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		box-sizing: border-box;
+	}
+
 	// Open state — toggled by view.js / editor (hover + click).
 	.blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	.blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-megamenu {
 		opacity: 1;
 		visibility: visible;
 		pointer-events: auto;
@@ -122,13 +147,17 @@
 	// Items inside the dropdown.
 	.blockish-navmenu-submenu .blockish-block-navmenu-item {
 		display: flex;
+		align-items: center;
 		width: 100%;
 		min-width: 180px;
+		// Nested flyout must never stretch this row’s height.
+		flex-wrap: nowrap;
 
 		> .blockish-navmenu-item-link {
 			display: flex;
 			flex: 1 1 auto;
 			width: 100%;
+			min-width: 0;
 			padding: 8px 10px;
 			border-radius: 6px;
 			white-space: nowrap;
@@ -136,6 +165,19 @@
 			&:hover {
 				background: rgba( 0, 0, 0, 0.04 );
 			}
+		}
+
+		// Keep flyout out of parent panel layout (closed or open).
+		> .blockish-navmenu-item-children {
+			position: absolute;
+			top: 0;
+			left: 100%;
+			width: max-content;
+			height: auto;
+			margin: 0;
+			padding: 0;
+			border: 0;
+			flex: none;
 		}
 	}
 

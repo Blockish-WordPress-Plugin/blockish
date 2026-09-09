@@ -118,32 +118,33 @@
 	}
 }
 
-// Fire reveal only while open — closing snaps (no reverse keyframe needed).
-.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu {
+// Fire reveal only after JS positions the panel (avoids animation finishing while still hidden).
+.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-megamenu {
 	animation: var( --blockish-submenu-dropdown-reveal );
 }
 
-.blockish-navmenu .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu {
+.blockish-navmenu .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
 	animation: var( --blockish-submenu-flyout-reveal );
 }
 
 // Flyout opened to the start (left in LTR) — mirror slide direction.
-.blockish-navmenu .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu {
+.blockish-navmenu .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
 	--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutSlideStart 0.32s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
 }
 
-.blockish-navmenu.submenu-reveal-fade .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu,
-.blockish-navmenu.submenu-reveal--fade .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu {
+.blockish-navmenu.submenu-reveal-fade .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+.blockish-navmenu.submenu-reveal--fade .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
 	--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutFade 0.28s ease both;
 }
 
-.blockish-navmenu.submenu-reveal-scale .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu,
-.blockish-navmenu.submenu-reveal--scale .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu {
+.blockish-navmenu.submenu-reveal-scale .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+.blockish-navmenu.submenu-reveal--scale .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
 	--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutScaleStart 0.3s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
 }
 
-.blockish-navmenu.submenu-reveal-soft .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu,
-.blockish-navmenu.submenu-reveal--soft .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu {
+.blockish-navmenu.submenu-reveal-soft .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+.blockish-navmenu.submenu-reveal--soft .blockish-navmenu-submenu .blockish-block-navmenu-item.has-submenu.is-submenu-flyout-start.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu {
 	--blockish-submenu-flyout-reveal: blockishSubmenuFlyoutSoftStart 0.36s cubic-bezier( 0.22, 1, 0.36, 1 ) both;
 }
 
@@ -183,7 +184,8 @@
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-	.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children > .blockish-navmenu-submenu {
+	.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-submenu,
+	.blockish-navmenu .blockish-block-navmenu-item.has-submenu.is-submenu-open > .blockish-navmenu-item-children.is-submenu-positioned > .blockish-navmenu-megamenu {
 		animation: none;
 	}
 }

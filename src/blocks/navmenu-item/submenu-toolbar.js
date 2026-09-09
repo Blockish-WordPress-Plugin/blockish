@@ -5,23 +5,11 @@ import { createBlock } from '@wordpress/blocks';
 import { addSubmenu, columns } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
-const ROOT_PARENTS = [ 'blockish/navmenu', 'blockish/offcanvas' ];
-
 export default function SubmenuToolbar( { clientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 
-	const { hasChild, isRootItem } = useSelect(
-		( select ) => {
-			const { getBlocks, getBlockRootClientId, getBlockName } =
-				select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
-			const parentName = rootClientId ? getBlockName( rootClientId ) : '';
-
-			return {
-				hasChild: getBlocks( clientId ).length > 0,
-				isRootItem: ROOT_PARENTS.includes( parentName ),
-			};
-		},
+	const hasChild = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks( clientId ).length > 0,
 		[ clientId ]
 	);
 
@@ -38,6 +26,15 @@ export default function SubmenuToolbar( { clientId } ) {
 		);
 	};
 
+	const handleAddMegamenu = () => {
+		insertBlock(
+			createBlock( 'blockish/navmenu-megamenu' ),
+			undefined,
+			clientId,
+			true
+		);
+	};
+
 	return (
 		<BlockControls group="block">
 			<ToolbarGroup>
@@ -46,13 +43,11 @@ export default function SubmenuToolbar( { clientId } ) {
 					label={ __( 'Add submenu', 'blockish' ) }
 					onClick={ handleAddSubmenu }
 				/>
-				{ isRootItem ? (
-					<ToolbarButton
-						icon={ columns }
-						label={ __( 'Megamenu', 'blockish' ) }
-						onClick={ () => window.alert( 'Megamenu' ) }
-					/>
-				) : null }
+				<ToolbarButton
+					icon={ columns }
+					label={ __( 'Add mega menu', 'blockish' ) }
+					onClick={ handleAddMegamenu }
+				/>
 			</ToolbarGroup>
 		</BlockControls>
 	);

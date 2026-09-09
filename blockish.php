@@ -23,6 +23,7 @@ use Blockish\Core\Blocks;
 use Blockish\Core\Dashboard;
 use Blockish\Core\Enqueue;
 use Blockish\Core\LicenseNotice;
+use Blockish\Core\MegamenuPostType;
 use Blockish\Core\SEO;
 use Blockish\Core\StyleGenerator;
 use Blockish\Extensions\ExtensionsLoader;
@@ -172,6 +173,7 @@ final class Blockish
         Blocks::get_instance();
         ExtensionsLoader::get_instance();
         SEO::get_instance();
+        MegamenuPostType::get_instance();
         \Blockish\Core\MagicLogin::get_instance();
 
         if (! class_exists('WP\MCP\Core\McpAdapter')) {

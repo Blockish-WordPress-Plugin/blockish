@@ -1,4 +1,31 @@
 .blockish-offcanvas {
+	.blockish-offcanvas-panel {
+		margin: 0;
+		scrollbar-width: thin;
+		scrollbar-color: #a7aaad transparent;
+
+		&::-webkit-scrollbar {
+			width: 3px;
+			height: 3px;
+		}
+
+		&::-webkit-scrollbar-track {
+			margin: 0;
+			background: transparent;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			margin: 0;
+			background-color: #a7aaad;
+			border: 0;
+			border-radius: 3px;
+		}
+
+		&::-webkit-scrollbar-corner {
+			background: transparent;
+		}
+	}
+
 	.blockish-offcanvas-nav {
 		display: flex;
 		flex-direction: column;
@@ -72,7 +99,9 @@
 			background: transparent;
 		}
 
-		&.is-selected > .blockish-navmenu-item-children,
+		// Accordion open = indicator toggle only (is-submenu-open).
+		// Do not bind to is-selected — that blocked close while the item was selected.
+		// has-child-selected keeps ancestors open so nested items stay editable.
 		&.is-submenu-open > .blockish-navmenu-item-children,
 		&.has-child-selected > .blockish-navmenu-item-children {
 			grid-template-rows: 1fr;

@@ -124,6 +124,278 @@ function toContainingBlockCoords( el, top, left ) {
 }
 
 /**
+ * Read a CSS length from data attrs (string or responsive Desktop value).
+ *
+ * @param {string|undefined} raw
+ * @param {number}           refPx Reference for % values.
+ * @return {number} Pixel length.
+ */
+function parseLengthPx( raw, refPx = 0 ) {
+	if ( raw == null || raw === '' ) {
+		return 0;
+	}
+	const str = String( raw ).trim();
+	if ( ! str ) {
+		return 0;
+	}
+	const n = parseFloat( str );
+	if ( Number.isNaN( n ) ) {
+		return 0;
+	}
+	if ( str.endsWith( '%' ) ) {
+		return ( refPx * n ) / 100;
+	}
+	return n;
+}
+
+/**
+ * Closest layout box for megamenu width: Navigation block, then navmenu.
+ * Never use the page/editor content shell — that is often wider than the nav.
+ *
+ * @param {HTMLElement} item
+ * @return {{ el: HTMLElement|null, rect: { left: number, width: number, right: number, top: number, bottom: number } }}
+ */
+function getMegamenuLayoutRef( item ) {
+	const navigation =
+		item.closest( '.blockish-navigation' ) ||
+		item.closest( '.blockish-navigation-inner' );
+	if ( navigation ) {
+		const rect = navigation.getBoundingClientRect();
+		return {
+			el: navigation,
+			rect: {
+				left: rect.left,
+				width: rect.width,
+				right: rect.right,
+				top: rect.top,
+				bottom: rect.bottom,
+			},
+		};
+	}
+
+	const navmenu = item.closest( '.blockish-navmenu' );
+	if ( navmenu ) {
+		const rect = navmenu.getBoundingClientRect();
+		return {
+			el: navmenu,
+			rect: {
+				left: rect.left,
+				width: rect.width,
+				right: rect.right,
+				top: rect.top,
+				bottom: rect.bottom,
+			},
+		};
+	}
+
+	const itemRect = item.getBoundingClientRect();
+	return {
+		el: null,
+		rect: {
+			left: itemRect.left,
+			width: itemRect.width,
+			right: itemRect.right,
+			top: itemRect.top,
+			bottom: itemRect.bottom,
+		},
+	};
+}
+
+/**
+ * Editor canvas clip box (iframe / styles wrapper). Null on frontend.
+ *
+ * @param {HTMLElement} item
+ * @return {{ left: number, right: number, width: number }|null} Clip rect in viewport coords.
+ */
+function getEditorClipRect( item ) {
+	const doc = item?.ownerDocument;
+	if ( ! doc ) {
+		return null;
+	}
+
+	const shell =
+		item.closest( '.editor-styles-wrapper' ) ||
+		doc.querySelector( '.editor-styles-wrapper' ) ||
+		doc.querySelector( '.block-editor-iframe__body .is-root-container' ) ||
+		( doc.body?.classList?.contains( 'block-editor-iframe__body' )
+			? doc.body
+			: null );
+
+	if ( ! shell ) {
+		return null;
+	}
+
+	const rect = shell.getBoundingClientRect();
+	return {
+		left: rect.left + MARGIN,
+		right: rect.right - MARGIN,
+		width: Math.max( rect.width - MARGIN * 2, 100 ),
+	};
+}
+
+/**
+ * Position a mega menu panel: width + left/top from data-* attrs.
+ *
+ * @param {HTMLElement} item
+ * @param {HTMLElement} children
+ * @param {HTMLElement} panel   .blockish-navmenu-megamenu
+ */
+function positionNavmenuMegamenu( item, children, panel ) {
+	const win = item.ownerDocument.defaultView || window;
+	const itemRect = item.getBoundingClientRect();
+	const { rect: navigationRect } = getMegamenuLayoutRef( item );
+	const navmenu = item.closest( '.blockish-navmenu' );
+	const vw = win.innerWidth;
+	const vh = win.innerHeight;
+	const depth = item.querySelectorAll(
+		':scope .blockish-navmenu-item-children'
+	).length;
+	const editorClip = getEditorClipRect( item );
+
+	let widthMode = panel.dataset.widthMode || 'navigation';
+	// Legacy modes → navigation.
+	if ( ! [ 'navigation', 'full', 'custom' ].includes( widthMode ) ) {
+		widthMode = 'navigation';
+	}
+	const positionAlign = panel.dataset.positionAlign || 'left';
+	const alignRelativeTo = panel.dataset.alignRelativeTo || 'navigation';
+	const customWidthRaw = panel.dataset.customWidth || '';
+	const offsetY = parseLengthPx( panel.dataset.offsetY, vh );
+	const offsetX = parseLengthPx( panel.dataset.offsetX, vw );
+
+	let refRect = navigationRect;
+	if ( alignRelativeTo === 'item' ) {
+		refRect = itemRect;
+	} else if ( alignRelativeTo === 'viewport' ) {
+		refRect = { left: 0, width: vw, right: vw, top: 0, bottom: vh };
+	} else if (
+		alignRelativeTo === 'navmenu' ||
+		alignRelativeTo === 'navigation'
+	) {
+		refRect = navigationRect;
+	}
+
+	children.classList.add( 'is-submenu-positioned' );
+	children.style.display = 'block';
+	children.style.position = 'fixed';
+	children.style.right = 'auto';
+	children.style.bottom = 'auto';
+	children.style.zIndex = String( 100000 + depth );
+	// Reset any previous overflow cap from a prior open.
+	children.style.maxHeight = '';
+	children.style.overflowY = '';
+	panel.style.maxHeight = '';
+	panel.style.overflowY = '';
+
+	// Cap to editor canvas or viewport.
+	const maxOuter = editorClip ? editorClip.width : vw;
+	let widthPx = navigationRect.width;
+
+	if ( widthMode === 'full' ) {
+		// Full width ignores align controls — always edge-to-edge.
+		widthPx = maxOuter;
+		refRect = editorClip
+			? {
+					left: editorClip.left,
+					width: editorClip.width,
+					right: editorClip.right,
+					top: 0,
+					bottom: vh,
+			  }
+			: { left: 0, width: vw, right: vw, top: 0, bottom: vh };
+	} else if ( widthMode === 'custom' && customWidthRaw ) {
+		// Custom width — never exceed the screen / editor canvas (auto 100%).
+		// Keep refRect from alignRelativeTo above.
+		widthPx = Math.min(
+			Math.max( parseLengthPx( customWidthRaw, maxOuter ), 1 ),
+			maxOuter
+		);
+	} else {
+		// Navigation width — keep refRect from alignRelativeTo (do not overwrite).
+		widthPx = navigationRect.width;
+	}
+
+	widthPx = Math.min( Math.max( widthPx, 1 ), maxOuter );
+
+	children.style.width = `${ Math.round( widthPx ) }px`;
+
+	// Flush under the menu row (not a tall content shell / logo column).
+	const navList = item.closest( '.blockish-navmenu-nav' );
+	const topAnchor = navList || navmenu || item;
+	const topAnchorRect = topAnchor.getBoundingClientRect();
+	const megaGap = 0;
+	let top = topAnchorRect.bottom + megaGap + offsetY;
+	let placementY = 'below';
+	const availableBelow = Math.max( vh - top - MARGIN, 120 );
+	const availableAbove = Math.max(
+		topAnchorRect.top - MARGIN - megaGap,
+		120
+	);
+
+	// Content-sized height — scroll the wrapper only if content exceeds the viewport.
+	// Do not lock the panel to 100%/overflow; that + flex centering creates a fake top gap.
+	const naturalH = Math.max(
+		panel.scrollHeight || 0,
+		panel.offsetHeight || 0,
+		1
+	);
+	if ( naturalH > availableBelow + 1 ) {
+		if ( availableAbove > availableBelow ) {
+			placementY = 'above';
+			const capped = Math.min( naturalH, availableAbove );
+			top = topAnchorRect.top - megaGap - capped + offsetY;
+			children.style.maxHeight = `${ Math.round( availableAbove ) }px`;
+		} else {
+			children.style.maxHeight = `${ Math.round( availableBelow ) }px`;
+		}
+		children.style.overflowY = 'auto';
+	}
+	if ( top < MARGIN ) {
+		top = MARGIN;
+	}
+
+	let left = refRect.left + offsetX;
+	if ( widthMode === 'full' ) {
+		// True edge-to-edge — do not inset with MARGIN or re-fit width.
+		left = ( editorClip ? editorClip.left : 0 ) + offsetX;
+		widthPx = editorClip ? editorClip.width : vw;
+		children.style.width = `${ Math.round( widthPx ) }px`;
+	} else {
+		if ( positionAlign === 'center' ) {
+			left = refRect.left + ( refRect.width - widthPx ) / 2 + offsetX;
+		} else if ( positionAlign === 'right' ) {
+			left = refRect.left + refRect.width - widthPx + offsetX;
+		}
+
+		const clipLeft = editorClip ? editorClip.left : MARGIN;
+		const clipRight = editorClip ? editorClip.right : vw - MARGIN;
+
+		if ( left + widthPx > clipRight ) {
+			left = Math.max( clipLeft, clipRight - widthPx );
+		}
+		if ( left < clipLeft ) {
+			left = clipLeft;
+		}
+		// Re-fit width if still overflowing the editor canvas on the right.
+		if ( left + widthPx > clipRight ) {
+			widthPx = Math.max( 100, clipRight - left );
+			children.style.width = `${ Math.round( widthPx ) }px`;
+		}
+	}
+
+	const coords = toContainingBlockCoords( children, top, left );
+	children.style.top = `${ Math.round( coords.top ) }px`;
+	children.style.left = `${ Math.round( coords.left ) }px`;
+
+	children.dataset.submenuPlacementX = positionAlign;
+	children.dataset.submenuPlacementY = placementY;
+	item.classList.remove( 'is-submenu-flyout-start', 'is-submenu-flyout-end' );
+	item.classList.toggle( 'is-submenu-drop-above', placementY === 'above' );
+	item.classList.toggle( 'is-submenu-drop-below', placementY === 'below' );
+	item.classList.add( 'has-megamenu' );
+}
+
+/**
  * @param {HTMLElement} item .blockish-block-navmenu-item
  */
 export function positionNavmenuSubmenu( item ) {
@@ -131,10 +403,24 @@ export function positionNavmenuSubmenu( item ) {
 		return;
 	}
 
+	// Offcanvas is accordion layout — never apply desktop dropdown/flyout geometry.
+	if ( item.closest( '.blockish-offcanvas' ) ) {
+		clearNavmenuSubmenuPosition( item );
+		return;
+	}
+
 	const children = item.querySelector(
 		':scope > .blockish-navmenu-item-children'
 	);
 	if ( ! children ) {
+		return;
+	}
+
+	const megamenu = children.querySelector(
+		':scope > .blockish-navmenu-megamenu'
+	);
+	if ( megamenu ) {
+		positionNavmenuMegamenu( item, children, megamenu );
 		return;
 	}
 
@@ -175,6 +461,8 @@ export function positionNavmenuSubmenu( item ) {
 		const panelRect = panel.getBoundingClientRect();
 		const panelW = Math.max( panelRect.width || 0, 1 );
 		const panelH = Math.max( panelRect.height || 0, 1 );
+		const offsetY = parseLengthPx( panel.dataset?.offsetY, vh );
+		const offsetX = parseLengthPx( panel.dataset?.offsetX, vw );
 
 		// Check parent flyout placement if this item is nested inside another flyout.
 		const parentFlyoutItem = parentSubmenu
@@ -205,20 +493,23 @@ export function positionNavmenuSubmenu( item ) {
 		if ( placementX === 'start' ) {
 			const offsetRight = itemRect.right - parentRect.left;
 			children.style.left = 'auto';
-			children.style.right = `${ Math.round( offsetRight ) }px`;
+			children.style.right = `${ Math.round( offsetRight - offsetX ) }px`;
 			children.style.paddingLeft = '0';
-			children.style.paddingRight = '0';
+			children.style.paddingRight = `${ BRIDGE }px`;
 		} else {
 			const offsetLeft = parentRect.right - itemRect.left;
-			children.style.left = `${ Math.round( offsetLeft ) }px`;
+			children.style.left = `${ Math.round( offsetLeft + offsetX ) }px`;
 			children.style.right = 'auto';
-			children.style.paddingLeft = '0';
+			children.style.paddingLeft = `${ BRIDGE }px`;
 			children.style.paddingRight = '0';
 		}
 
-		let topOffset = 0;
-		if ( itemRect.top + panelH > vh - MARGIN ) {
-			topOffset = Math.min( 0, vh - MARGIN - panelH - itemRect.top );
+		let topOffset = offsetY;
+		if ( itemRect.top + panelH + topOffset > vh - MARGIN ) {
+			topOffset = Math.min(
+				offsetY,
+				vh - MARGIN - panelH - itemRect.top
+			);
 		}
 		if ( itemRect.top + topOffset < MARGIN ) {
 			topOffset = MARGIN - itemRect.top;
@@ -249,6 +540,9 @@ export function positionNavmenuSubmenu( item ) {
 	const panelRect = panel.getBoundingClientRect();
 	const panelW = Math.max( panelRect.width || 0, 1 );
 	const panelH = Math.max( panelRect.height || 0, 1 );
+	const positionAlign = panel.dataset?.positionAlign || 'left';
+	const offsetY = parseLengthPx( panel.dataset?.offsetY, vh );
+	const offsetX = parseLengthPx( panel.dataset?.offsetX, vw );
 
 	let top = 0;
 	let left = 0;
@@ -260,15 +554,22 @@ export function positionNavmenuSubmenu( item ) {
 
 	if ( spaceBelow < need && spaceAbove > spaceBelow ) {
 		placementY = 'above';
-		top = itemRect.top - need;
+		top = itemRect.top - need - offsetY;
 		children.style.paddingBottom = `${ BRIDGE }px`;
 	} else {
 		placementY = 'below';
-		top = itemRect.bottom;
+		top = itemRect.bottom + offsetY;
 		children.style.paddingTop = `${ BRIDGE }px`;
 	}
 
-	left = itemRect.left;
+	if ( positionAlign === 'center' ) {
+		left = itemRect.left + ( itemRect.width - panelW ) / 2 + offsetX;
+	} else if ( positionAlign === 'right' ) {
+		left = itemRect.right - panelW + offsetX;
+	} else {
+		left = itemRect.left + offsetX;
+	}
+
 	if ( left + panelW > vw - MARGIN ) {
 		left = Math.max( MARGIN, vw - MARGIN - panelW );
 	}
@@ -285,7 +586,7 @@ export function positionNavmenuSubmenu( item ) {
 	children.style.top = `${ Math.round( coords.top ) }px`;
 	children.style.left = `${ Math.round( coords.left ) }px`;
 
-	children.dataset.submenuPlacementX = 'end';
+	children.dataset.submenuPlacementX = positionAlign;
 	children.dataset.submenuPlacementY = placementY;
 	item.classList.remove( 'is-submenu-flyout-start', 'is-submenu-flyout-end' );
 	item.classList.toggle( 'is-submenu-drop-above', placementY === 'above' );
@@ -315,7 +616,15 @@ export function clearNavmenuSubmenuPosition( item ) {
 			'zIndex',
 			'width',
 			'minWidth',
+			'maxWidth',
+			'maxHeight',
+			'minHeight',
+			'height',
 			'boxSizing',
+			'overflow',
+			'overflowX',
+			'overflowY',
+			'margin',
 			'padding',
 			'paddingTop',
 			'paddingRight',
@@ -326,13 +635,23 @@ export function clearNavmenuSubmenuPosition( item ) {
 		} );
 		delete children.dataset.submenuPlacementX;
 		delete children.dataset.submenuPlacementY;
+
+		const megamenu = children.querySelector(
+			':scope > .blockish-navmenu-megamenu'
+		);
+		if ( megamenu ) {
+			[ 'maxHeight', 'overflow', 'overflowY' ].forEach( ( key ) => {
+				megamenu.style[ key ] = '';
+			} );
+		}
 	}
 
 	item.classList.remove(
 		'is-submenu-flyout-start',
 		'is-submenu-flyout-end',
 		'is-submenu-drop-above',
-		'is-submenu-drop-below'
+		'is-submenu-drop-below',
+		'has-megamenu'
 	);
 }
 
