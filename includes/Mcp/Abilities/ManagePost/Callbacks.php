@@ -210,10 +210,11 @@ class Callbacks
             $edit_url = admin_url( 'post.php?post=' . (int) $post_id . '&action=edit' );
         }
 
-        $result = [
+        $post_url = get_permalink( $post_id ) ?: '';
+        $result   = [
             'post_id'            => $post_id,
             'post_status'        => get_post_status( $post_id ),
-            'post_url'           => get_permalink( $post_id ) ?: '',
+            'post_url'           => $post_url,
             'edit_url'           => $edit_url,
             'post_parent'        => (int) get_post_field( 'post_parent', $post_id ),
             'schema_staged'      => $schema_staged,
@@ -231,9 +232,9 @@ class Callbacks
      */
     private static function validate_post_content_input( string $content, string $post_type, string $existing_content, int $post_id ): ?string {
         if ( in_array( $post_type, [ 'wp_block', 'blockish_form', 'blockish_megamenu' ], true ) ) {
-            return 'Do not pass post_content for patterns, forms, or mega menus. Use block_schema / schema_file only. Share edit_url after staging so the user can Accept in the editor.';
+            return 'Do not pass post_content for patterns, forms, or mega menus. Use block_schema / schema_file only. After staging AGENT opens one edit_url (prefer parent page; resolves whole queue), waitUntil domcontentloaded, wait 10–15s, then share a frontend view URL.';
         }
 
-        return 'Do not pass post_content for page/post layouts. Stage pattern refs with block_schema (writes blockish/ai-preview into content), call blockish/trigger-refresh, and share edit_url (not post_url).';
+        return 'Do not pass post_content for page/post layouts. Stage with block_schema (writes blockish/ai-preview), AGENT opens edit_url once so pending resolves (whole queue), waitUntil domcontentloaded, wait 10–15s, then share post_url.';
     }
 }

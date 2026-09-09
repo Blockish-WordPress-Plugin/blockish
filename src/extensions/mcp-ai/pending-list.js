@@ -8,82 +8,73 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { BlockPreview } from '@wordpress/block-editor';
-import { createBlock, serialize } from '@wordpress/blocks';
+import { serialize } from '@wordpress/blocks';
 import { dispatch, select } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import {
+	CLASS_CSS_REGEN_EVENT,
 	collectClassIdsFromBlocks,
+	fetchClassManagerCssBundle,
 	resolveClassPrevious,
 } from '../class-manager/wrap-ai-preview';
+import { schemaToBlocks } from './schema-to-blocks';
+import { fetchQueueItem, savePostContent } from './resolve-pending';
 import './pending-list.scss';
+
+const AI_PREVIEW_PENDING_COUNT_EVENT = 'blockish-ai-preview-pending-count';
+
+const notifyAiPreviewPendingCount = (count) => {
+	window.dispatchEvent(
+		new CustomEvent(AI_PREVIEW_PENDING_COUNT_EVENT, {
+			detail: { count: Math.max(0, Number(count) || 0) },
+		})
+	);
+};
 
 const PAGE_SIZE = 8;
 
-const PREVIEW_STYLES = [
-	{
-		css: 'body{height:auto;overflow:hidden;border:none;padding:0;}',
-	},
-];
+const PREVIEW_BASE_CSS = `
+body {
+	height: auto;
+	overflow: hidden;
+	border: none;
+	padding: 0;
+	margin: 0;
+}
+.block-list-appender,
+.block-editor-inserter,
+.block-editor-block-list__insertion-point {
+	display: none !important;
+}
+`;
 
-const schemaToBlocks = (nodes) => {
-	if (!Array.isArray(nodes)) {
-		return [];
-	}
-	return nodes
-		.map((node) => {
-			if (!node?.name) {
-				return null;
-			}
-			try {
-				const inner = Array.isArray(node.innerBlocks)
-					? schemaToBlocks(node.innerBlocks)
-					: [];
-				return createBlock(node.name, node.attributes || {}, inner);
-			} catch (e) {
-				return null;
-			}
-		})
-		.filter(Boolean);
-};
+const useClassManagerPreviewCss = () => {
+	const [classCss, setClassCss] = useState('');
 
-const collectNestedEntityIds = (nodes, ids = new Set()) => {
-	if (!Array.isArray(nodes)) {
-		return ids;
-	}
-	nodes.forEach((node) => {
-		if (!node || typeof node !== 'object') {
-			return;
+	const loadCss = useCallback(async () => {
+		try {
+			const bundle = await fetchClassManagerCssBundle(0);
+			setClassCss(typeof bundle?.css === 'string' ? bundle.css : '');
+		} catch (error) {
+			console.error(
+				'Blockish AI Preview: failed to load Class Manager CSS for Settings preview',
+				error
+			);
 		}
-		if (node.name === 'core/block' && node.attributes?.ref) {
-			ids.add(absint(node.attributes.ref));
-		}
-		if (node.name === 'blockish-forms/form' && node.attributes?.formId) {
-			ids.add(absint(node.attributes.formId));
-		}
-		if (
-			node.name === 'blockish/navmenu-megamenu' &&
-			node.attributes?.megamenuId
-		) {
-			ids.add(absint(node.attributes.megamenuId));
-		}
-		if (Array.isArray(node.innerBlocks)) {
-			collectNestedEntityIds(node.innerBlocks, ids);
-		}
-	});
-	return ids;
-};
+	}, []);
 
-const absint = (value) => {
-	const id = parseInt(value, 10);
-	return Number.isFinite(id) && id > 0 ? id : 0;
-};
+	useEffect(() => {
+		loadCss();
+		const onRegen = () => {
+			loadCss();
+		};
+		window.addEventListener(CLASS_CSS_REGEN_EVENT, onRegen);
+		return () => {
+			window.removeEventListener(CLASS_CSS_REGEN_EVENT, onRegen);
+		};
+	}, [loadCss]);
 
-const fetchQueueItem = async (id) => {
-	try {
-		return await apiFetch({ path: `/blockish/v1/ai-preview-queue/${id}` });
-	} catch (e) {
-		return null;
-	}
+	return classCss;
 };
 
 const unwrapCurrentEditor = (nextBlocks) => {
@@ -109,55 +100,7 @@ const isCurrentEditorPost = (queueItem) => {
 	);
 };
 
-const savePostContent = async (item, content) => {
-	const route = item?.rest_route;
-	if (!route) {
-		throw new Error(
-			sprintf(
-				/* translators: %d: post ID */
-				__('No REST route for preview %d.', 'blockish'),
-				item?.id || 0
-			)
-		);
-	}
-	await apiFetch({
-		path: route,
-		method: 'POST',
-		data: { content },
-	});
-};
-
-const prepareAcceptOrder = async (rootIds) => {
-	const orderedIds = [];
-	const seen = new Set();
-
-	const prepare = async (id) => {
-		if (!id || seen.has(id)) {
-			return;
-		}
-		seen.add(id);
-		const item = await fetchQueueItem(id);
-		if (!item) {
-			return;
-		}
-		const schema = item.pendingSchema || [];
-		const nested = [...collectNestedEntityIds(schema)].filter(
-			(nestedId) => nestedId !== id
-		);
-		for (const nestedId of nested) {
-			await prepare(nestedId);
-		}
-		orderedIds.push(id);
-	};
-
-	for (const id of rootIds) {
-		await prepare(id);
-	}
-
-	return orderedIds;
-};
-
-function PendingPreview({ itemId }) {
+function PendingPreview({ itemId, classCss = '' }) {
 	const [schema, setSchema] = useState(null);
 	const [error, setError] = useState('');
 
@@ -182,6 +125,13 @@ function PendingPreview({ itemId }) {
 	}, [itemId]);
 
 	const blocks = useMemo(() => schemaToBlocks(schema || []), [schema]);
+	const additionalStyles = useMemo(
+		() => [
+			{ css: PREVIEW_BASE_CSS },
+			...(classCss ? [{ css: classCss }] : []),
+		],
+		[classCss]
+	);
 
 	if (error) {
 		return (
@@ -209,7 +159,7 @@ function PendingPreview({ itemId }) {
 		<BlockPreview
 			blocks={blocks}
 			viewportWidth={800}
-			additionalStyles={PREVIEW_STYLES}
+			additionalStyles={additionalStyles}
 		/>
 	);
 
@@ -229,6 +179,7 @@ export default function AiPreviewPendingList() {
 	const [typeFilter, setTypeFilter] = useState('all');
 	const [page, setPage] = useState(1);
 	const [selected, setSelected] = useState([]);
+	const classCss = useClassManagerPreviewCss();
 
 	const loadInventory = useCallback(async (silent = false) => {
 		if (!silent) {
@@ -238,7 +189,9 @@ export default function AiPreviewPendingList() {
 		try {
 			const response = await apiFetch({ path: '/blockish/v1/ai-preview-queue' });
 			const next = Array.isArray(response?.items) ? response.items : [];
-			setItems(next.filter((item) => item?.edit_url));
+			const visible = next.filter((item) => item?.edit_url);
+			setItems(visible);
+			notifyAiPreviewPendingCount(visible.length);
 		} catch (err) {
 			setError(err?.message || __('Failed to load pending AI previews.', 'blockish'));
 		} finally {
@@ -319,13 +272,7 @@ export default function AiPreviewPendingList() {
 		setBusyIds(nextIds);
 		setError('');
 		try {
-			const orderedIds =
-				action === 'accept'
-					? await prepareAcceptOrder(nextIds)
-					: nextIds;
-			const ids = orderedIds.length ? orderedIds : nextIds;
-
-			for (const id of ids) {
+			for (const id of nextIds) {
 				const queueItem = await fetchQueueItem(id);
 				if (!queueItem) {
 					continue;
@@ -470,7 +417,7 @@ export default function AiPreviewPendingList() {
 										target="_blank"
 										rel="noopener noreferrer"
 									>
-										<PendingPreview itemId={item.id} />
+										<PendingPreview itemId={item.id} classCss={classCss} />
 									</a>
 								</div>
 								<div className="blockish-ai-preview-pending__card-footer">

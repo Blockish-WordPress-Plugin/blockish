@@ -2,14 +2,73 @@
 
 namespace Blockish\Extensions;
 
+use Blockish\Config\ExtensionList;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Locates staged blockish/ai-preview blocks via a single posts-table LIKE query.
+ * Registers the dynamic block so resolved inner markup renders on the frontend.
  */
 class AiPreview {
 
 	private const BLOCK_COMMENT = '<!-- wp:blockish/ai-preview';
+
+	/**
+	 * Hook block registration when MCP AI is active.
+	 */
+	public static function boot(): void {
+		add_action( 'init', array( __CLASS__, 'register_block' ), 20 );
+	}
+
+	/**
+	 * Dynamic block: editor JS owns the schema attrs; PHP echoes saved children.
+	 */
+	public static function register_block(): void {
+		$active = ExtensionList::get_instance()->get_list( 'active' );
+		if ( empty( $active['mcp-ai'] ) ) {
+			return;
+		}
+
+		if ( \WP_Block_Type_Registry::get_instance()->is_registered( 'blockish/ai-preview' ) ) {
+			return;
+		}
+
+		register_block_type(
+			'blockish/ai-preview',
+			array(
+				'api_version'     => 3,
+				'title'           => __( 'AI Preview Wrapper', 'blockish' ),
+				'category'        => 'design',
+				'attributes'      => array(
+					'previousSchema' => array(
+						'type'    => 'string',
+						'default' => '',
+					),
+					'pendingSchema'  => array(
+						'type'    => 'string',
+						'default' => '',
+					),
+				),
+				'supports'        => array(
+					'inserter' => false,
+					'html'     => false,
+					'reusable' => false,
+				),
+				'render_callback' => array( __CLASS__, 'render' ),
+			)
+		);
+	}
+
+	/**
+	 * Frontend: output resolved inner blocks (empty until editor-open resolve saves children).
+	 *
+	 * @param array  $attributes Block attributes.
+	 * @param string $content    Serialized inner blocks HTML.
+	 */
+	public static function render( array $attributes, string $content ): string {
+		return $content;
+	}
 
 	/**
 	 * @return array<int, array{id:int,type:string,typeLabel:string,title:string,status:string,modified:string,edit_url:string}>
@@ -56,6 +115,7 @@ class AiPreview {
 				$title = '#' . $id;
 			}
 
+			$preview  = \Blockish\Mcp\SchemaUtils::find_ai_preview_block( (string) ( $row['post_content'] ?? '' ) );
 			$items[] = array(
 				'id'         => $id,
 				'type'       => $type,
@@ -66,10 +126,23 @@ class AiPreview {
 				'edit_url'   => self::edit_url( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
 				'rest_id'    => self::rest_id( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
 				'rest_route' => self::rest_route( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
+				'resolved'   => self::preview_has_children( $preview ),
 			);
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Whether the ai-preview block already has saved inner markup (FE-ready).
+	 *
+	 * @param array|null $preview Parsed block from find_ai_preview_block.
+	 */
+	public static function preview_has_children( ?array $preview ): bool {
+		if ( ! $preview ) {
+			return false;
+		}
+		return ! empty( $preview['innerBlocks'] );
 	}
 
 	public static function get_item( int $post_id ): ?array {
@@ -82,9 +155,7 @@ class AiPreview {
 		if ( ! $preview ) {
 			return null;
 		}
-		$pending = $preview
-			? \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['pendingSchema'] ?? '' )
-			: array();
+		$pending = \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['pendingSchema'] ?? '' );
 
 		$post_type = $post->post_type;
 		$post_name = (string) $post->post_name;
@@ -92,9 +163,8 @@ class AiPreview {
 		return array(
 			'id'             => $post_id,
 			'pendingSchema'  => $pending,
-			'previousSchema' => $preview
-				? \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' )
-				: array(),
+			'previousSchema' => \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' ),
+			'resolved'       => self::preview_has_children( $preview ),
 			'rest_id'        => self::rest_id( $post_id, $post_type, $post_name ),
 			'rest_route'     => self::rest_route( $post_id, $post_type, $post_name ),
 		);

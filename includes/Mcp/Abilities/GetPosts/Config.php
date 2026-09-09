@@ -12,12 +12,12 @@ class Config
     {
         return [
             'label'               => __('Get Posts', 'blockish'),
-            'description'         => __('Reads existing posts, pages or any registered post type, filterable by post_type, search, status and pagination, or fetch one by post_id.', 'blockish'),
+            'description'         => __('Reads existing posts, pages or any registered post type, filterable by post_type, search, status and pagination, or fetch one by post_id. To get full content + schema you MUST pass post_id (not id, include, or WP REST list params).', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
                 'properties' => [
-                    'post_id'   => [ 'type' => 'integer', 'description' => 'Fetch this exact post, ignoring all other filters. NOTE: You MUST provide a post_id if you want to retrieve the full post content or schema.' ],
+                    'post_id'   => [ 'type' => 'integer', 'description' => 'Fetch this exact post and return full content + schema. CRITICAL: parameter name is post_id only — do NOT send id, include, or WP REST collection filters for a single-post schema fetch.' ],
                     'post_type' => [ 'type' => 'string',  'description' => 'Post type slug. Defaults to "post".' ],
                     'search'    => [ 'type' => 'string',  'description' => 'Search term matched against title/content.' ],
                     // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
@@ -71,7 +71,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Use this to find a post by title or ID before editing it with blockish/manage-post. When fetching by post_id, `schema` is the edit truth: pendingSchema if an ai-preview is staged in content, otherwise the live content schema. `content` is raw markup.',
+                'usage_notes' => 'Full schema requires post_id (not id or include). List queries omit content/schema. When fetching by post_id, `schema` is the edit truth: pendingSchema if an ai-preview is staged in content, otherwise the live content schema.',
             ],
         ];
     }

@@ -1,39 +1,12 @@
-// Styles for the AI in-canvas preview UI.
-// Deliberately not WP-default-looking — these need to read as "something the
-// AI is asking you to review," and visually distinct from static chrome.
-
-@keyframes blockish-ai-neon-pulse {
-	0%, 100% {
-		box-shadow: 
-            0 0 10px rgba(138, 43, 226, 0.4), 
-            0 0 20px rgba(138, 43, 226, 0.2), 
-            inset 0 0 10px rgba(138, 43, 226, 0.1);
-		border-color: rgba(138, 43, 226, 0.6);
-	}
-	50% {
-		box-shadow: 
-            0 0 15px rgba(138, 43, 226, 0.8), 
-            0 0 35px rgba(168, 85, 247, 0.5), 
-            inset 0 0 15px rgba(138, 43, 226, 0.25);
-		border-color: rgba(168, 85, 247, 1);
-	}
-}
+// AI preview wrapper — invisible shell. Pending is Settings-only; canvas/FE stay clean.
 
 .blockish-ai-preview-wrapper {
 	position: relative;
-	border: 2px solid transparent;
-	margin: 24px 0;
-	animation: blockish-ai-neon-pulse 2.5s ease-in-out infinite;
-
-	// Add a subtle futuristic background tint
-	background: linear-gradient(180deg, rgba(138, 43, 226, 0.03) 0%, rgba(138, 43, 226, 0.01) 100%);
-
-	// Always show Accept/Discard — hiding behind hover made staging look "broken".
-	.blockish-ai-preview-actions {
-		opacity: 1;
-		visibility: visible;
-		transform: translateY(0);
-	}
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	border-radius: 0;
 
 	.blockish-ai-preview-inner-blocks {
 		position: relative;
@@ -42,95 +15,6 @@
 
 		.wp-block-template-part {
 			max-width: none !important;
-		}
-	}
-}
-
-.blockish-ai-preview-actions {
-	position: sticky;
-	top: 16px;
-	z-index: 100000;
-	display: flex;
-	justify-content: flex-end;
-	align-items: flex-start;
-	padding: 0 16px;
-	pointer-events: none;
-	// Reserve pill height for sticky, then pull preview content up so the
-	// bar overlays instead of leaving an empty row above the first block.
-	height: 40px;
-	margin-bottom: -40px;
-
-	.blockish-ai-button-group {
-		pointer-events: auto;
-		background: rgba(255, 255, 255, 0.85);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		border: 1px solid rgba(138, 43, 226, 0.15);
-		border-radius: 20px;
-		box-shadow: 
-            0 4px 15px rgba(0, 0, 0, 0.08), 
-            0 0 0 1px rgba(255,255,255,0.8) inset;
-		padding: 4px;
-		display: flex;
-		gap: 6px;
-	}
-
-	.components-button {
-		height: 32px;
-		padding: 0 12px;
-		border-radius: 16px;
-		font-weight: 600;
-		font-size: 13px;
-		transition: all 0.2s ease;
-
-		// WordPress overrides
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 4px; // Explicitly control the gap between icon and text
-
-		svg {
-			width: 16px;
-			height: 16px;
-			margin: 0 !important; // Remove WP core margins that cause extra gaps
-		}
-
-		&.is-primary {
-			background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-			color: #fff;
-			border: none !important;
-			box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3) !important;
-
-			svg {
-				fill: #fff;
-			}
-
-			&:hover,
-			&:focus:not(:disabled) {
-				background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
-				box-shadow: 0 4px 12px rgba(168, 85, 247, 0.5) !important;
-				transform: translateY(-1px);
-				color: #fff;
-			}
-		}
-
-		&.is-destructive {
-			background: transparent;
-			color: #ef4444;
-			border: 1px solid rgba(239, 68, 68, 0.4) !important; // Restored outline
-			box-shadow: none !important;
-
-			svg {
-				fill: #ef4444;
-			}
-
-			&:hover,
-			&:focus:not(:disabled) {
-				background: rgba(239, 68, 68, 0.08);
-				border-color: #ef4444 !important; // Darken outline on hover
-				color: #dc2626;
-				transform: translateY(-1px);
-			}
 		}
 	}
 }

@@ -23,12 +23,21 @@ class Callbacks
         // Store the token mapped to the user ID for 15 minutes
         set_transient('blockish_magic_token_' . $token, $user_id, 15 * MINUTE_IN_SECONDS);
 
-        // Build the magic login URL
+        // Build the magic login URL. Encode redirect_to ourselves so nested
+        // query strings in edit_url stay intact.
         $redirect_to = $input['redirect_to'] ?? admin_url();
-        $magic_url = add_query_arg([
-            'blockish_magic_token' => $token,
-            'redirect_to'          => $redirect_to,
-        ], site_url());
+        if ( ! is_string( $redirect_to ) || $redirect_to === '' ) {
+            $redirect_to = admin_url();
+        }
+        $magic_url = site_url( '/' ) . '?' . http_build_query(
+            array(
+                'blockish_magic_token' => $token,
+                'redirect_to'          => $redirect_to,
+            ),
+            '',
+            '&',
+            PHP_QUERY_RFC3986
+        );
 
         return ['url' => $magic_url];
     }

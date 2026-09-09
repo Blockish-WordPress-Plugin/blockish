@@ -63,6 +63,16 @@ class AiPreviewQueueV1 extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/count',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_pending_count' ),
+				'permission_callback' => array( $this, 'permissions_check' ),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>\d+)',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -88,6 +98,14 @@ class AiPreviewQueueV1 extends WP_REST_Controller {
 			array(
 				'items' => $items,
 				'count' => count( $items ),
+			)
+		);
+	}
+
+	public function get_pending_count() {
+		return rest_ensure_response(
+			array(
+				'count' => count( AiPreview::find_pending() ),
 			)
 		);
 	}

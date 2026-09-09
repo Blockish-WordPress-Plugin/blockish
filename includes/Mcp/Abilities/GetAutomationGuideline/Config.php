@@ -14,7 +14,7 @@ class Config
     {
         return [
             'label'               => __('Get Automation Guideline', 'blockish'),
-            'description'         => __('Provides critical instructions and code snippets for writing a Node.js Puppeteer script to automatically accept staged layouts, inspect the DOM, and take screenshots. MUST BE READ before attempting browser automation.', 'blockish'),
+            'description'         => __('Provides browser automation + verify-loop instructions for resolving staged AI previews (editor open, wait 10–15s, frontend screenshot). MUST BE READ before browser automation.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',

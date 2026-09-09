@@ -28,7 +28,7 @@ class Callbacks
 
     public static function manage_options(array $args): array
     {
-        $action = $args['action'] ?? '';
+        $action = $args['action'] ?? 'get';
 
         if ($action === 'get') {
             return self::get_options($args);
@@ -36,7 +36,7 @@ class Callbacks
             return self::update_options($args);
         }
 
-        return ['error' => 'Invalid action. Use "get" or "update".'];
+        return ['error' => 'Invalid action. Use "get" or "update" (omit action to get).'];
     }
 
     private static function is_key_allowed(string $key): bool

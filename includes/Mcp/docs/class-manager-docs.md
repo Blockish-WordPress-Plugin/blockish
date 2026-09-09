@@ -39,6 +39,25 @@ Only write **deltas** (colors, type scale, custom padding, shadows, decorative s
 
 ---
 
+## 2b. Attributes vs Class Manager (checklist)
+
+Class Manager is for **visual CSS**. Block **attributes** own structure / layout mode. Putting structure only in Class Manager often conflicts with the block stylesheet.
+
+| MUST set on the block (schema attributes) | Prefer Class Manager CSS |
+|---|---|
+| `display` (`flex` / `grid` / `block`) — drives `layout-type-*` | Colors, backgrounds, gradients |
+| `containerWidth` (`alignfull` / `alignwide` / `align-custom-width`) | Padding, margin, gap (spacing polish) |
+| `gridLayoutType` (`auto` / `fixed`) when `display` is `grid` | Typography (size, weight, letter-spacing) |
+| `tagName` (object `{label,value}`) | Borders, radius, shadows |
+| `align` on blocks / `core/block` refs (`full` / `wide`) | Hover / focus polish |
+| Content: `content`, `text`, `url`, `ref`, `formId`, `megamenuId`, … | Decorative selectors (`::before`, descendants) |
+| Layout drivers when intentional: `flexDirection`, `alignItems`, `justifyContent` (esp. stretch / flex-start vs default center) | `@media` responsive tweaks of the above visuals |
+| `innerContentWidth` / `innerContentMaxWidth` when constraining children | Max-width on **inner** shells (with margin auto) |
+
+**Rule of thumb:** If the property changes a root **class** on the block (`layout-type-grid`, `align-custom-width`, semantic tag), it is an attribute. If it only paints the look, use Class Manager.
+
+---
+
 ## 3. Write one stylesheet (root + hover + descendants)
 
 ```css

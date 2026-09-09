@@ -14,7 +14,7 @@ class Config
     {
         return [
             'label'               => __('Create or Update a Component Pattern', 'blockish'),
-            'description'         => __('Use this tool to create or update reusable component patterns (Hero, Footer, etc.). Stages block_schema onto the wp_block as a blockish/ai-preview (previousSchema + pendingSchema). CRITICAL: After staging a pattern, if the user is currently editing a parent page/template, you MUST also use manage-post or manage-template to re-stage that parent with its current schema so they can Accept on the active page.', 'blockish'),
+            'description'         => __('Use this tool to create or update reusable component patterns (Hero, Footer, etc.). Stages block_schema onto the wp_block as a blockish/ai-preview (previousSchema + pendingSchema). New page build: stage patterns, then stage the page with refs, then open the PAGE edit_url once (any editor resolves the whole pending queue — do not open every pattern editor). If the user is already editing a parent page/template that refs this pattern, also re-stage that parent with its current schema after updating the pattern.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -59,7 +59,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'CRITICAL RULE: Always use this tool to build individual sections (Patterns) when designing a full page. Do NOT send one massive nested schema to manage-post. Send small patterns here, then assemble the final page in manage-post using core/block references with align:"full" for full-bleed sections (omit align only when content-width is intentional).',
+                'usage_notes' => 'Build sections as patterns here, then assemble the page in manage-post with core/block refs (align:"full" for full-bleed). New page: stage patterns → stage page → open the PAGE edit_url once (any editor resolves the whole pending queue — do not open every pattern editor). If a parent already refs this pattern and you updated it, re-stage that parent too.',
             ],
         ];
     }

@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Create or Edit Template', 'blockish'),
-            'description'         => __('Creates, updates or deletes a template or template part. Block themes: FSE wp_template / wp_template_part. Classic themes with Theme Builder: same type values map to TB templates and parts. Pass Blockish layouts as block_schema, never raw HTML. Staged as blockish/ai-preview. Share edit_url for Accept/Discard. Call get-designer-workflow and get-block-docs first. Always trigger-refresh after staging.', 'blockish'),
+            'description'         => __('Creates, updates or deletes a template or template part. Block themes: FSE wp_template / wp_template_part. Classic themes with Theme Builder: same type values map to TB templates and parts. Pass Blockish layouts as block_schema, never raw HTML. Staged as blockish/ai-preview. After staging AGENT opens edit_url once (resolves whole pending queue), waitUntil domcontentloaded, wait 10–15s, then give a normal WordPress frontend view URL for that template (home, a page, etc.). Settings Accept/Discard only if asked. Call get-designer-workflow and get-block-docs first.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -62,7 +62,7 @@ class Config
                     'backend'       => ['type' => 'string', 'description' => 'fse or theme_builder.'],
                     'id'            => ['type' => 'integer'],
                     'slug'          => ['type' => 'string'],
-                    'edit_url'      => ['type' => 'string', 'description' => 'URL to edit the template in the Site Editor. Share this when schema is staged.'],
+                    'edit_url'      => ['type' => 'string', 'description' => 'URL to edit the template in the Site Editor.'],
                     'action'        => ['type' => 'string', 'description' => '"created", "updated", or "deleted"'],
                     'schema_staged' => ['type' => 'boolean'],
                     'warnings'      => ['type' => 'array', 'description' => 'Non-blocking agent warnings.', 'items' => ['type' => 'string']],
@@ -73,7 +73,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_theme_options'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'Same tool on block themes (FSE) and classic + Theme Builder. FSE: core/template-part with theme slug on wp_template. Theme Builder: blockish/template-part with area or catalog slug (checkout-header, mini-cart, …). Header/footer parts: set show_on. TB template example: [{"name":"blockish/template-part","attributes":{"slug":"header"}},{"name":"blockish/container","attributes":{"tagName":{"label":"Main","value":"main"},"flexDirection":{"Desktop":"column"},"innerContentWidth":true},"innerBlocks":[{"name":"blockish/post-content","attributes":{"align":"full"}}]},{"name":"blockish/template-part","attributes":{"slug":"footer"}}]. ALWAYS trigger-refresh (numeric id) and share edit_url.',
+                'usage_notes' => 'Same tool on block themes (FSE) and classic + Theme Builder. FSE: core/template-part with theme slug on wp_template. Theme Builder: blockish/template-part with area or catalog slug (checkout-header, mini-cart, …). Header/footer parts: set show_on. TB template example: [{"name":"blockish/template-part","attributes":{"slug":"header"}},{"name":"blockish/container","attributes":{"tagName":{"label":"Main","value":"main"},"flexDirection":{"Desktop":"column"},"innerContentWidth":true},"innerBlocks":[{"name":"blockish/post-content","attributes":{"align":"full"}}]},{"name":"blockish/template-part","attributes":{"slug":"footer"}}]. After staging: AGENT opens edit_url once (any editor resolves the whole pending queue), waitUntil domcontentloaded, wait 10–15s, then suggest a normal WP frontend view URL for that template.',
             ],
         ];
     }

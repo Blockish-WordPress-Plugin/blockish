@@ -1,202 +1,11 @@
-import { registerBlockType, createBlock, serialize, parse } from '@wordpress/blocks';
-import { useInnerBlocksProps } from '@wordpress/block-editor';
-import { useDispatch, dispatch, select, resolveSelect } from '@wordpress/data';
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { registerBlockType } from '@wordpress/blocks';
+import { InnerBlocks, useInnerBlocksProps } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
 import {
-	collectClassIdsFromBlocks,
-	refreshClassEntities,
-	requestClassCssRegenerate,
-	resolveClassPrevious,
-} from '../class-manager/wrap-ai-preview';
-
-const schemaNodeToBlock = ( node ) => {
-	if ( ! node || typeof node !== 'object' || ! node.name ) {
-		return null;
-	}
-	try {
-		const innerBlocks = Array.isArray( node.innerBlocks )
-			? node.innerBlocks.map( schemaNodeToBlock ).filter( Boolean )
-			: [];
-		return createBlock( node.name, node.attributes || {}, innerBlocks );
-	} catch ( e ) {
-		console.error(
-			'Blockish AI: failed to create block from schema node',
-			node?.name,
-			e
-		);
-		return null;
-	}
-};
-
-/** Schema nodes → InnerBlocks template: [ name, attributes, innerTemplate? ] */
-const schemaNodeToTemplate = ( node ) => {
-	if ( ! node || typeof node !== 'object' || ! node.name ) {
-		return null;
-	}
-	const attrs = node.attributes || {};
-	const children = Array.isArray( node.innerBlocks )
-		? node.innerBlocks.map( schemaNodeToTemplate ).filter( Boolean )
-		: [];
-	return children.length ? [ node.name, attrs, children ] : [ node.name, attrs ];
-};
-
-const parseSchemaAttr = ( value ) => {
-	if ( ! value ) {
-		return [];
-	}
-	if ( Array.isArray( value ) ) {
-		return value;
-	}
-	try {
-		const parsed = typeof value === 'string' ? JSON.parse( value ) : value;
-		if ( Array.isArray( parsed ) ) {
-			return parsed;
-		}
-		if ( parsed && typeof parsed === 'object' && parsed.name ) {
-			return [ parsed ];
-		}
-	} catch ( e ) {
-		console.error( 'Blockish AI: failed to parse schema attribute', e );
-	}
-	return [];
-};
-
-/**
- * Accept/Discard must not wipe the parent canvas.
- * Mega menus / forms / patterns can render their ai-preview inside an entity
- * embed (header nav, page form block). resetEditorBlocks() always targets the
- * root post — so nested Accept was replacing the whole header with mega content.
- * Only reset when this preview is the sole root block; otherwise replace in place.
- *
- * @param {string} clientId
- * @param {Object[]} nextBlocks
- * @param {Function} resetEditorBlocks
- */
-const unwrapAiPreview = ( clientId, nextBlocks, resetEditorBlocks ) => {
-	const parents =
-		select( 'core/block-editor' ).getBlockParents?.( clientId ) || [];
-	const roots = select( 'core/block-editor' ).getBlocks?.() || [];
-	const isSoleRootPreview =
-		parents.length === 0 &&
-		roots.length === 1 &&
-		roots[ 0 ]?.clientId === clientId;
-
-	if ( isSoleRootPreview ) {
-		resetEditorBlocks( nextBlocks );
-		return;
-	}
-
-	dispatch( 'core/block-editor' ).replaceBlocks( clientId, nextBlocks );
-};
-
-/**
- * Nested pattern/form still staged as ai-preview → write pending into their content
- * so parent refs resolve when previewing.
- */
-const resolvePendingEntity = async ( { id, restBase, postType, label } ) => {
-	const record = await apiFetch( {
-		path: `/wp/v2/${ restBase }/${ id }?context=edit`,
-	} );
-
-	const rawContent =
-		typeof record?.content === 'object'
-			? record.content?.raw || ''
-			: record?.content || '';
-
-	if ( ! rawContent || ! rawContent.includes( 'blockish/ai-preview' ) ) {
-		return;
-	}
-
-	const parsedBlocks = parse( rawContent );
-	const preview = parsedBlocks.find( ( b ) => b.name === 'blockish/ai-preview' );
-	if ( ! preview ) {
-		return;
-	}
-
-	const pending = parseSchemaAttr( preview.attributes?.pendingSchema );
-	if ( ! pending.length ) {
-		return;
-	}
-
-	await resolveNestedPending( pending );
-
-	const nextBlocks = pending.map( schemaNodeToBlock ).filter( Boolean );
-	if ( ! nextBlocks.length ) {
-		throw new Error( `${ label } ${ id }: pending schema produced 0 blocks` );
-	}
-
-	await apiFetch( {
-		path: `/wp/v2/${ restBase }/${ id }`,
-		method: 'POST',
-		data: { content: serialize( nextBlocks ) },
-	} );
-
-	dispatch( 'core' ).invalidateResolution( 'getEntityRecord', [
-		'postType',
-		postType,
-		id,
-	] );
-	await resolveSelect( 'core' ).getEntityRecord( 'postType', postType, id, {
-		context: 'edit',
-	} );
-};
-
-const resolveNestedPending = async ( schemaNode ) => {
-	if ( ! schemaNode ) {
-		return;
-	}
-	if ( Array.isArray( schemaNode ) ) {
-		for ( const node of schemaNode ) {
-			await resolveNestedPending( node );
-		}
-		return;
-	}
-	if ( typeof schemaNode !== 'object' ) {
-		return;
-	}
-
-	if ( schemaNode.name === 'core/block' && schemaNode.attributes?.ref ) {
-		await resolvePendingEntity( {
-			id: schemaNode.attributes.ref,
-			restBase: 'blocks',
-			postType: 'wp_block',
-			label: 'Pattern',
-		} );
-	}
-
-	if (
-		schemaNode.name === 'blockish-forms/form' &&
-		schemaNode.attributes?.formId
-	) {
-		await resolvePendingEntity( {
-			id: schemaNode.attributes.formId,
-			restBase: 'blockish_form',
-			postType: 'blockish_form',
-			label: 'Form',
-		} );
-	}
-
-	if (
-		schemaNode.name === 'blockish/navmenu-megamenu' &&
-		schemaNode.attributes?.megamenuId
-	) {
-		await resolvePendingEntity( {
-			id: schemaNode.attributes.megamenuId,
-			restBase: 'blockish_megamenu',
-			postType: 'blockish_megamenu',
-			label: 'Mega menu',
-		} );
-	}
-
-	if ( Array.isArray( schemaNode.innerBlocks ) ) {
-		for ( const child of schemaNode.innerBlocks ) {
-			await resolveNestedPending( child );
-		}
-	}
-};
+	parseSchemaAttr,
+	schemaNodeToTemplate,
+} from './schema-to-blocks';
 
 registerBlockType( 'blockish/ai-preview', {
 	title: __( 'AI Preview Wrapper', 'blockish' ),
@@ -220,91 +29,14 @@ registerBlockType( 'blockish/ai-preview', {
 	},
 	edit: ( props ) => {
 		const {
-			clientId,
-			attributes: { previousSchema, pendingSchema },
+			attributes: { pendingSchema },
 		} = props;
-
-		const { resetEditorBlocks, lockPostSaving, unlockPostSaving } =
-			useDispatch( 'core/editor' );
-
-		const resolvedKey = useRef( '' );
 
 		const template = useMemo( () => {
 			return parseSchemaAttr( pendingSchema )
 				.map( schemaNodeToTemplate )
 				.filter( Boolean );
 		}, [ pendingSchema ] );
-
-		useEffect( () => {
-			lockPostSaving( 'blockish-ai-preview' );
-			return () => {
-				unlockPostSaving( 'blockish-ai-preview' );
-			};
-		}, [ lockPostSaving, unlockPostSaving ] );
-
-		// Resolve nested pattern/form pending once per pendingSchema.
-		useEffect( () => {
-			if ( ! pendingSchema || resolvedKey.current === pendingSchema ) {
-				return;
-			}
-			resolvedKey.current = pendingSchema;
-			resolveNestedPending( parseSchemaAttr( pendingSchema ) ).catch(
-				( e ) => {
-					console.error( 'Blockish AI: nested resolve failed', e );
-				}
-			);
-		}, [ pendingSchema ] );
-
-		/** Accept: unwrap + commit Class Manager previousContent on used classes. */
-		const handleApprove = useCallback( async () => {
-			const block = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlock( clientId );
-			const classIds = collectClassIdsFromBlocks(
-				block?.innerBlocks?.length ? block.innerBlocks : []
-			);
-			await resolveClassPrevious(
-				'accept',
-				classIds.length ? { class_ids: classIds } : {}
-			);
-			await refreshClassEntities( classIds );
-			requestClassCssRegenerate( classIds, { quiet: true } );
-			const nextBlocks =
-				block && block.innerBlocks.length > 0 ? block.innerBlocks : [];
-			unwrapAiPreview( clientId, nextBlocks, resetEditorBlocks );
-		}, [ clientId, resetEditorBlocks ] );
-
-		/** Discard: restore page schema + Class Manager previousContent on used classes. */
-		const handleReject = useCallback( async () => {
-			const block = window.wp.data
-				.select( 'core/block-editor' )
-				.getBlock( clientId );
-			const classIds = collectClassIdsFromBlocks(
-				block?.innerBlocks?.length
-					? block.innerBlocks
-					: parseSchemaAttr( pendingSchema )
-			);
-			const result = await resolveClassPrevious(
-				'discard',
-				classIds.length ? { class_ids: classIds } : {}
-			);
-			const restoredIds = Array.isArray( result?.restored )
-				? result.restored.flatMap( ( row ) => {
-					const ids = [ row?.id ];
-					( row?.records || [] ).forEach( ( record ) => {
-						if ( record?.id ) {
-							ids.push( record.id );
-						}
-					} );
-					return ids.filter( Boolean );
-				} )
-				: [];
-			await refreshClassEntities( restoredIds.length ? restoredIds : classIds );
-			const nextBlocks = parseSchemaAttr( previousSchema )
-				.map( schemaNodeToBlock )
-				.filter( Boolean );
-			unwrapAiPreview( clientId, nextBlocks, resetEditorBlocks );
-		}, [ clientId, pendingSchema, previousSchema, resetEditorBlocks ] );
 
 		const innerBlockProps = useInnerBlocksProps(
 			{
@@ -319,23 +51,10 @@ registerBlockType( 'blockish/ai-preview', {
 
 		return (
 			<div className="blockish-ai-preview-wrapper alignfull">
-				<div className="blockish-ai-preview-actions">
-					<div className="blockish-ai-button-group">
-						<Button variant="primary" onClick={ handleApprove }>
-							<span>{ __( 'Accept', 'blockish' ) }</span>
-						</Button>
-						<Button
-							variant="secondary"
-							isDestructive
-							onClick={ handleReject }
-						>
-							<span>{ __( 'Discard', 'blockish' ) }</span>
-						</Button>
-					</div>
-				</div>
 				<div { ...innerBlockProps }></div>
 			</div>
 		);
 	},
-	save: () => null,
+	// Children persist for PHP render_callback after Settings/magic resolve.
+	save: () => <InnerBlocks.Content />,
 } );
