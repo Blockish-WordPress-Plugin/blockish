@@ -240,6 +240,37 @@
         "type": "BlockishTypography",
         "selector": ".{{WRAPPER}} .blockish-countdown__expired"
       }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "text": [
+          {
+            "slug": "dueDate",
+            "title": "Due Date"
+          },
+          {
+            "slug": "expiredMessage",
+            "title": "Expired Message"
+          },
+          {
+            "slug": "daysLabel",
+            "title": "Days Label"
+          },
+          {
+            "slug": "hoursLabel",
+            "title": "Hours Label"
+          },
+          {
+            "slug": "minutesLabel",
+            "title": "Minutes Label"
+          },
+          {
+            "slug": "secondsLabel",
+            "title": "Seconds Label"
+          }
+        ]
+      }
     }
   },
   "supports": {
@@ -254,5 +285,9 @@
   "editorScript": "file:./index.js",
   "viewScript": "file:./view.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
 }

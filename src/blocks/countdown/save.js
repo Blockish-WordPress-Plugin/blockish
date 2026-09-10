@@ -28,6 +28,9 @@ export default function Save( { attributes } ) {
 	return (
 		<div { ...blockProps }>
 			<div className="blockish-countdown__inner">
+				<span hidden data-countdown-due>
+					{ settings.dueDate }
+				</span>
 				{ isFlip ? (
 					<div className="blockish-countdown__flipdown" />
 				) : (

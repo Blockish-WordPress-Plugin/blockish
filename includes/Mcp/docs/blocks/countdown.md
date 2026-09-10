@@ -25,6 +25,7 @@ Default (empty attributes, due date filled by editor):
 ```html
 <div class="wp-block-blockish-countdown blockish-countdown is-layout-boxes" data-blockish-countdown="true" data-due-date="2026-09-17T12:00" data-layout="boxes" data-pad-zeros="true" data-show-labels="true" data-separator=":" data-circular-days-max="30" data-show-expired-message="true" data-show-days="true" data-show-hours="true" data-show-minutes="true" data-show-seconds="true" data-days-label="Days" data-hours-label="Hours" data-minutes-label="Minutes" data-seconds-label="Seconds">
   <div class="blockish-countdown__inner">
+    <span hidden data-countdown-due>2026-09-17T12:00</span>
     <div class="blockish-countdown__units">
       <div class="blockish-countdown__unit is-unit-days" data-unit="days" data-progress="0.0000">
         <div class="blockish-countdown__unit-surface">
@@ -50,7 +51,7 @@ Default (empty attributes, due date filled by editor):
 | Expired | Root gets `is-expired`; units `hidden`; expired wrap shown when `showExpiredMessage`. |
 | Unit toggles / labels | Matching `data-*` on root; only visible units rendered. |
 
-Style with convert-css against `.blockish-countdown`, `.blockish-countdown__unit-surface`, `.blockish-countdown__value`, `.blockish-countdown__label`, `.blockish-countdown__ring-*`, `.blockish-countdown__flip-face` — not invented markup.
+Style with convert-css against `.blockish-countdown`, `.blockish-countdown__unit-surface`, `.blockish-countdown__value`, `.blockish-countdown__label`, `.blockish-countdown__ring-*`, `.blockish-flip` — not invented markup.
 
 #### Already-there CSS
 
@@ -64,9 +65,7 @@ Stylesheet + defaults (omit = these already apply). Write only what differs.
 :where(.blockish-countdown .blockish-countdown__unit) { gap: 0.45rem; }
 :where(.blockish-countdown .blockish-countdown__label) { color: color-mix(in srgb, currentColor 65%, transparent); font-size: 0.75rem; font-weight: 600; }
 :where(.blockish-countdown.is-layout-boxes .blockish-countdown__unit-surface),
-:where(.blockish-countdown.is-layout-stacked .blockish-countdown__unit-surface),
-:where(.blockish-countdown.is-layout-flip .blockish-countdown__unit-surface) { background: color-mix(in srgb, currentColor 6%, transparent); border-radius: 12px; }
-:where(.blockish-countdown.is-layout-flip .blockish-countdown__flip-face) { background: color-mix(in srgb, currentColor 10%, transparent); border-radius: 8px; }
+:where(.blockish-countdown.is-layout-stacked .blockish-countdown__unit-surface) { background: color-mix(in srgb, currentColor 6%, transparent); border-radius: 12px; }
 :where(.blockish-countdown .blockish-countdown__ring-track) { stroke: color-mix(in srgb, currentColor 15%, transparent); }
 :where(.blockish-countdown .blockish-countdown__ring-progress) { stroke: currentColor; transition: stroke-dashoffset 0.35s ease; }
 .blockish-countdown .blockish-countdown__inner { display: flex; flex-direction: column; width: 100%; }
@@ -82,7 +81,6 @@ Stylesheet + defaults (omit = these already apply). Write only what differs.
 .blockish-countdown.is-layout-stacked .blockish-countdown__unit { flex-direction: row; justify-content: space-between; width: 100%; max-width: 20rem; }
 .blockish-countdown.is-layout-circular .blockish-countdown__unit-surface { width: 6.5rem; height: 6.5rem; background: transparent; border: 0; box-shadow: none; padding: 0; }
 .blockish-countdown.is-layout-circular .blockish-countdown__value { position: relative; z-index: 1; font-size: 1.65rem; font-weight: 700; }
-.blockish-countdown.is-layout-flip .blockish-countdown__flip-face { font-size: 2rem; font-weight: 700; }
 ```
 
 #### Minimal schema

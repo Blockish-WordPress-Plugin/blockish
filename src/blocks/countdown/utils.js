@@ -27,11 +27,40 @@ export const toDatetimeLocalValue = ( date ) => {
 };
 
 export const parseDueDate = ( value ) => {
-	if ( ! value || typeof value !== 'string' ) {
+	if ( value == null ) {
 		return null;
 	}
 
-	const normalized = value.includes( 'T' ) ? value : value.replace( ' ', 'T' );
+	const raw = String( value ).trim();
+	if ( ! raw ) {
+		return null;
+	}
+
+	if ( /^\d{10}$/.test( raw ) ) {
+		const unix = new Date( Number( raw ) * 1000 );
+		return Number.isNaN( unix.getTime() ) ? null : unix;
+	}
+
+	if ( /^\d{13}$/.test( raw ) ) {
+		const unixMs = new Date( Number( raw ) );
+		return Number.isNaN( unixMs.getTime() ) ? null : unixMs;
+	}
+
+	if ( /^\d{8}$/.test( raw ) ) {
+		const ymd = new Date(
+			`${ raw.slice( 0, 4 ) }-${ raw.slice( 4, 6 ) }-${ raw.slice(
+				6,
+				8
+			) }T00:00:00`
+		);
+		return Number.isNaN( ymd.getTime() ) ? null : ymd;
+	}
+
+	let normalized = raw.includes( 'T' ) ? raw : raw.replace( ' ', 'T' );
+	if ( /^\d{4}-\d{2}-\d{2}$/.test( normalized ) ) {
+		normalized = `${ normalized }T00:00:00`;
+	}
+
 	const date = new Date( normalized );
 	return Number.isNaN( date.getTime() ) ? null : date;
 };
@@ -197,6 +226,20 @@ export const getSettingsFromDataset = ( dataset = {} ) =>
 		minutesLabel: dataset?.minutesLabel || 'Minutes',
 		secondsLabel: dataset?.secondsLabel || 'Seconds',
 	} );
+
+export const applyDomDueDate = ( element, settings ) => {
+	if ( ! element || ! settings ) {
+		return settings;
+	}
+
+	const dueNode = element.querySelector( '[data-countdown-due]' );
+	const dueFromDom = dueNode?.textContent?.trim();
+	if ( dueFromDom && parseDueDate( dueFromDom ) ) {
+		return { ...settings, dueDate: dueFromDom };
+	}
+
+	return settings;
+};
 
 const RING_RADIUS = 42;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;

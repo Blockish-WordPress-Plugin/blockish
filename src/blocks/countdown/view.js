@@ -1,4 +1,5 @@
 import {
+	applyDomDueDate,
 	getRemainingParts,
 	getRingGeometry,
 	getSettingsFromDataset,
@@ -82,19 +83,16 @@ const renderCountdown = ( element, settings, now = Date.now() ) => {
 			updateRing( unitElement, progress );
 		}
 
-		const labelElement = unitElement.querySelector(
-			'.blockish-countdown__label'
-		);
-		if ( labelElement && settings.showLabels ) {
-			labelElement.textContent = unit.label;
-		}
 	} );
 };
 
 class BlockishCountdown {
 	constructor( element ) {
 		this.element = element;
-		this.settings = getSettingsFromDataset( element?.dataset || {} );
+		this.settings = applyDomDueDate(
+			element,
+			getSettingsFromDataset( element?.dataset || {} )
+		);
 		this.timerId = null;
 		this.flipClock = null;
 	}
