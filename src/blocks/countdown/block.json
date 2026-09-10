@@ -1,0 +1,293 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/countdown",
+  "version": "1.0.0",
+  "title": "Countdown",
+  "category": "blockish-framework",
+  "description": "Live countdown timer with multiple design layouts.",
+  "keywords": [
+    "blockish",
+    "countdown",
+    "timer",
+    "clock",
+    "deadline"
+  ],
+  "example": {
+    "attributes": {
+      "preview": true
+    }
+  },
+  "attributes": {
+    "dueDate": {
+      "type": "string",
+      "default": "2026-09-17T12:00"
+    },
+    "layout": {
+      "type": "object",
+      "default": {
+        "label": "Boxes",
+        "value": "boxes"
+      }
+    },
+    "showDays": {
+      "type": "boolean",
+      "default": true
+    },
+    "showHours": {
+      "type": "boolean",
+      "default": true
+    },
+    "showMinutes": {
+      "type": "boolean",
+      "default": true
+    },
+    "showSeconds": {
+      "type": "boolean",
+      "default": true
+    },
+    "padZeros": {
+      "type": "boolean",
+      "default": true
+    },
+    "daysLabel": {
+      "type": "string",
+      "default": "Days"
+    },
+    "hoursLabel": {
+      "type": "string",
+      "default": "Hours"
+    },
+    "minutesLabel": {
+      "type": "string",
+      "default": "Minutes"
+    },
+    "secondsLabel": {
+      "type": "string",
+      "default": "Seconds"
+    },
+    "showLabels": {
+      "type": "boolean",
+      "default": true
+    },
+    "separator": {
+      "type": "object",
+      "default": {
+        "label": "Colon (:)",
+        "value": ":"
+      }
+    },
+    "circularDaysMax": {
+      "type": "number",
+      "default": 30
+    },
+    "expiredMessage": {
+      "type": "string",
+      "default": "This offer has ended"
+    },
+    "showExpiredMessage": {
+      "type": "boolean",
+      "default": true
+    },
+    "alignment": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__inner": "align-items: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-countdown__units": "justify-content: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-countdown__flipdown": "justify-content: {{VALUE}};"
+      }
+    },
+    "unitsGap": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__units": "gap: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-flip": "gap: {{VALUE}};"
+      }
+    },
+    "unitMinWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__unit": "min-width: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-flip": "--blockish-flip-rotor-w: {{VALUE}}; --blockish-flip-rotor-h: calc({{VALUE}} * 1.6);"
+      }
+    },
+    "unitBackground": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__unit-surface": "background: {{VALUE}};"
+      }
+    },
+    "unitBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-countdown__unit-surface"
+      }
+    },
+    "unitBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__unit-surface": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "unitPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__unit-surface": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "unitBoxShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBoxShadow",
+        "selector": ".{{WRAPPER}} .blockish-countdown__unit-surface"
+      }
+    },
+    "numberTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__value": "color: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-countdown__separator": "color: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-flip": "--blockish-flip-color: {{VALUE}};"
+      }
+    },
+    "numberTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-countdown__value, .{{WRAPPER}} .blockish-flip .rotor"
+      }
+    },
+    "labelTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__label": "color: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-flip .rotor-group-heading:before": "color: {{VALUE}};"
+      }
+    },
+    "labelTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-countdown__label, .{{WRAPPER}} .blockish-flip .rotor-group-heading:before"
+      }
+    },
+    "labelGap": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__unit": "gap: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-flip .rotor-group-heading": "margin-bottom: {{VALUE}};"
+      }
+    },
+    "ringColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__ring-progress": "stroke: {{VALUE}};"
+      }
+    },
+    "ringTrackColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__ring-track": "stroke: {{VALUE}};"
+      }
+    },
+    "ringSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__ring": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "ringStrokeWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}": "--blockish-countdown-ring-stroke: {{VALUE}};"
+      }
+    },
+    "flipCardBackground": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-flip": "--blockish-flip-bg-top: {{VALUE}}; --blockish-flip-bg-bottom: {{VALUE}}; --blockish-flip-dot: {{VALUE}};"
+      }
+    },
+    "flipCardColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-flip": "--blockish-flip-color: {{VALUE}};"
+      }
+    },
+    "separatorTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__separator": "color: {{VALUE}};"
+      }
+    },
+    "separatorTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-countdown__separator"
+      }
+    },
+    "expiredTextColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-countdown__expired": "color: {{VALUE}};"
+      }
+    },
+    "expiredTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-countdown__expired"
+      }
+    },
+    "dynamicData": {
+      "type": "object",
+      "ddMeta": {
+        "text": [
+          {
+            "slug": "dueDate",
+            "title": "Due Date"
+          },
+          {
+            "slug": "expiredMessage",
+            "title": "Expired Message"
+          },
+          {
+            "slug": "daysLabel",
+            "title": "Days Label"
+          },
+          {
+            "slug": "hoursLabel",
+            "title": "Hours Label"
+          },
+          {
+            "slug": "minutesLabel",
+            "title": "Minutes Label"
+          },
+          {
+            "slug": "secondsLabel",
+            "title": "Seconds Label"
+          }
+        ]
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "viewScript": "file:./view.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "usesContext": [
+    "postId",
+    "postType"
+  ]
+}
