@@ -173,6 +173,12 @@ class BlocksList extends ConfigList {
                 'package' => 'free',
                 'status'  => 'active',
             ),
+            'countdown' => array(
+                'name'    => __('Countdown', 'blockish'),
+                'description' => __('A live countdown to a target date/time with multiple design layouts (boxes, inline, stacked, circular rings, flip clock). Toggle days/hours/minutes/seconds, custom labels, and an expired message. Use for launches, sales, events, and limited-time offers.', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
             'progress-bar' => array(
                 'name'    => __('Progress Bar', 'blockish'),
                 'description' => __('An animated horizontal bar that fills to a given percentage on scroll. Supports a title, an inner text label inside the fill, and custom colors. Use for skills sections, fundraising progress, or any percentage-based visual indicator.', 'blockish'),
