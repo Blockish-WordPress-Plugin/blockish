@@ -1,0 +1,44 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/html-child",
+	"version": "1.0.0",
+	"title": "HTML Child",
+	"category": "blockish-framework",
+	"description": "Dynamic HTML element with customizable tag, key-value props, and optional content.",
+	"keywords": [ "html", "child", "element", "tag", "props", "inline" ],
+	"attributes": {
+		"isVariationPicked": {
+			"type": "boolean",
+			"default": false
+		},
+		"tag": {
+			"type": "object",
+			"default": {
+				"label": "span",
+				"value": "span"
+			}
+		},
+		"props": {
+			"type": "array",
+			"default": []
+		},
+		"content": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": true,
+		"anchor": true,
+		"align": [ "wide", "full" ],
+		"customClassName": true,
+		"reusable": true,
+		"__experimentalSlashInserter": true
+	},
+
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}

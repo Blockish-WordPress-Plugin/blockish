@@ -1,0 +1,43 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "blockish/html-wrapper",
+	"version": "1.0.0",
+	"title": "HTML Wrapper",
+	"category": "blockish-framework",
+	"description": "Dynamic HTML wrapper container with customizable tag and key-value props.",
+	"keywords": [ "html", "wrapper", "container", "tag", "props", "element" ],
+	"attributes": {
+		"isVariationPicked": {
+			"type": "boolean",
+			"default": false
+		},
+		"tag": {
+			"type": "object",
+			"default": {
+				"label": "div",
+				"value": "div"
+			}
+		},
+		"props": {
+			"type": "array",
+			"default": []
+		}
+	},
+	"supports": {
+		"html": true,
+		"anchor": true,
+		"align": [
+			"wide",
+			"full"
+		],
+		"customClassName": true,
+		"reusable": true,
+		"__experimentalSlashInserter": true
+	},
+
+	"textdomain": "blockish",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}
