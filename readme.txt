@@ -69,7 +69,7 @@ Built for AI-assisted design — and fully usable for manual site building:
 
 * **Heading** — Customizable headings with typography, colors, and shadow options.
 
-* **Paragraph** — Paragraph block with advanced typography and spacing controls.
+* **Paragraph** — Paragraph block with typography, spacing, and styling controls.
 
 = Media =
 
