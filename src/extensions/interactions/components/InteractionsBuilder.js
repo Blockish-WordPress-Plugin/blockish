@@ -10,6 +10,7 @@ export default function InteractionsBuilder({
 	attributes,
 	setAttributes,
 	isEmbedded,
+	clientId,
 }) {
 	if (isEmbedded) {
 		return <GlobalInteractionsBuilder onClose={onClose} />;
@@ -21,6 +22,7 @@ export default function InteractionsBuilder({
 			onClose={onClose}
 			attributes={attributes}
 			setAttributes={setAttributes}
+			clientId={clientId}
 		/>
 	);
 }

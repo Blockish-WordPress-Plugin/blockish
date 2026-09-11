@@ -62,6 +62,7 @@ const InteractionsPanel = ({ clientId }) => {
 					onClose={() => setIsModalOpen(false)}
 					attributes={attributes}
 					setAttributes={setAttributes}
+					clientId={clientId}
 				/>
 			)}
 		</>

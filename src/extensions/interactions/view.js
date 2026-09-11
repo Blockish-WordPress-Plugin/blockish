@@ -3,6 +3,20 @@
  * Supports legacy event+callbacks, entrance presets, inView, and cross-block emit/listen.
  */
 import './style.scss';
+import {
+	applyScrollScrub,
+	clickDirection,
+	collectPlayTargets,
+	getActionType,
+	getPresetOptions,
+	getScrollY,
+	isPresetForward,
+	playsForWrap,
+	prepareInitialState,
+	resolveTargets,
+	runAction,
+	runOnTargets,
+} from './utils/engine';
 
 (function () {
 	const READY_EVENTS = { ready: true, init: true };
@@ -44,19 +58,6 @@ import './style.scss';
 
 	window.blockishInteractions = bus;
 
-	const executeCallbacks = (callbacks, event, blockElement) => {
-		if (!Array.isArray(callbacks)) return;
-		callbacks.forEach((codeStr) => {
-			if (typeof codeStr !== 'string' || !codeStr.trim()) return;
-			try {
-				const fn = new Function('event', 'blockElement', codeStr);
-				fn(event, blockElement);
-			} catch (err) {
-				console.error('Blockish Interaction Error executing code:', err, codeStr);
-			}
-		});
-	};
-
 	const makeReadyEvent = () => {
 		try {
 			return new Event('blockish-ready', { bubbles: false, cancelable: false });
@@ -67,124 +68,62 @@ import './style.scss';
 		}
 	};
 
-	const resolveTargets = (interaction, rootElement) => {
-		const selector = interaction.selector || interaction.when?.selector || '';
-		if (selector && rootElement.querySelectorAll) {
-			const targets = Array.from(rootElement.querySelectorAll(selector));
-			if (
-				!targets.length &&
-				rootElement.matches &&
-				rootElement.matches(selector)
-			) {
-				return [rootElement];
-			}
-			return targets;
-		}
-		return [rootElement === document ? document.body : rootElement];
-	};
-
-	const getActionType = (interaction) =>
-		interaction.actionType ||
-		interaction.action?.type ||
-		(interaction.callbacks?.length ? 'custom' : null);
-
-	const getPreset = (interaction) =>
-		interaction.preset || interaction.action?.preset || 'fadeUp';
-
-	const getPresetOptions = (interaction) => {
-		const opts =
-			interaction.presetOptions ||
-			interaction.action?.presetOptions ||
-			{};
-		return {
-			duration: Number(opts.duration) || 600,
-			delay: Number(opts.delay) || 0,
-			once: opts.once !== false,
-		};
-	};
-
-	const PRESET_IDS = [
-		'fadeIn',
-		'fadeUp',
-		'fadeDown',
-		'fadeLeft',
-		'fadeRight',
-		'zoomIn',
-	];
-
-	const clearPresetClasses = (el) => {
-		if (!el || !el.classList) return;
-		el.classList.remove('blockish-ix-prep', 'blockish-ix-run');
-		PRESET_IDS.forEach((id) => {
-			el.classList.remove(`blockish-ix-prep-${id}`, `blockish-ix-run-${id}`);
-		});
-	};
-
-	const preparePreset = (el, preset) => {
-		if (!el || !el.classList) return;
-		clearPresetClasses(el);
-		el.classList.add('blockish-ix-prep', `blockish-ix-prep-${preset}`);
-	};
-
-	const runPreset = (el, interaction) => {
-		if (!el || !el.classList) return;
-		const preset = getPreset(interaction);
-		const opts = getPresetOptions(interaction);
-
-		// Hard reset so a second click can replay from the start.
-		el.style.transition = 'none';
-		el.style.transitionDelay = '0ms';
-		preparePreset(el, preset);
-		void el.offsetWidth;
-
-		const play = () => {
-			el.style.transition = `opacity ${opts.duration}ms ease, transform ${opts.duration}ms ease`;
-			el.style.transitionDelay = `${opts.delay}ms`;
-			el.classList.add('blockish-ix-run', `blockish-ix-run-${preset}`);
-			el.classList.remove('blockish-ix-prep', `blockish-ix-prep-${preset}`);
-		};
-
-		// Double rAF ensures the prep state is painted before transitioning.
-		requestAnimationFrame(() => {
-			requestAnimationFrame(play);
-		});
-	};
-
-	const runEmit = (interaction, event, blockElement) => {
-		const name =
-			interaction.emitEventName ||
-			interaction.action?.eventName ||
-			'';
-		const phase =
-			interaction.emitPhase || interaction.action?.phase || 'start';
-		bus.emit(name, phase, { event, blockElement, interactionId: interaction.id });
-	};
-
-	const runAction = (interaction, event, blockElement) => {
-		const type = getActionType(interaction);
-		if (type === 'preset') {
-			runPreset(blockElement, interaction);
-		} else if (type === 'emit') {
-			runEmit(interaction, event, blockElement);
-		} else {
-			const callbacks =
-				interaction.callbacks ||
-				interaction.action?.callbacks ||
-				[];
-			executeCallbacks(callbacks, event, blockElement);
-		}
-	};
-
-	const runOnTargets = (interaction, rootElement, event) => {
-		resolveTargets(interaction, rootElement).forEach((target) => {
-			runAction(interaction, event, target);
-		});
-	};
-
 	const getEventName = (interaction) => {
 		if (interaction.when?.source === 'listen') return 'listen';
 		return interaction.event || interaction.when?.event || '';
 	};
+
+	const getEmitName = (interaction) =>
+		interaction.emitEventName || interaction.action?.eventName || '';
+
+	const getEmitWhen = (interaction) => {
+		if (getActionType(interaction) === 'emit') {
+			return interaction.emitPhase || interaction.action?.phase || 'start';
+		}
+		return interaction.emitPhase || interaction.action?.phase || 'end';
+	};
+
+	const runEmit = (interaction, event, blockElement, phase) => {
+		const name = getEmitName(interaction);
+		const p = phase || getEmitWhen(interaction);
+		bus.emit(name, p, { event, blockElement, interactionId: interaction.id });
+	};
+
+	const fire = (interaction, event, blockElement, direction, extraDelay = 0) => {
+		if (getActionType(interaction) === 'emit') {
+			runEmit(interaction, event, blockElement);
+			return;
+		}
+		const name = getEmitName(interaction);
+		const whenPhase = getEmitWhen(interaction);
+		let goingForward = direction === 'forward';
+		if (direction === 'toggle') {
+			goingForward = getActionType(interaction) === 'preset'
+				? !isPresetForward(blockElement)
+				: true;
+		}
+		if (name && goingForward && whenPhase === 'start' && direction !== 'reverse') {
+			runEmit(interaction, event, blockElement, 'start');
+		}
+		runAction(interaction, event, blockElement, direction, extraDelay, () => {
+			if (name && goingForward && whenPhase === 'end' && direction !== 'reverse') {
+				runEmit(interaction, event, blockElement, 'end');
+			}
+		});
+	};
+
+	const fireOnRoot = (interaction, rootElement, event, direction = 'forward') => {
+		if (getActionType(interaction) === 'emit') {
+			resolveTargets(interaction, rootElement).forEach((target) => {
+				runEmit(interaction, event, target);
+			});
+			return;
+		}
+		runOnTargets(interaction, rootElement, event, direction);
+	};
+
+	const searchRoot = (rootElement, isGlobal) =>
+		isGlobal ? document.body : rootElement;
 
 	const runReadyInteractions = (interactions, rootElement) => {
 		if (!Array.isArray(interactions)) return;
@@ -194,7 +133,62 @@ import './style.scss';
 			if (!interaction) return;
 			const eventName = getEventName(interaction);
 			if (!READY_EVENTS[eventName]) return;
-			runOnTargets(interaction, rootElement, readyEvent);
+			fireOnRoot(interaction, rootElement, readyEvent, 'forward');
+		});
+	};
+
+	const bindTarget = (interaction, target) => {
+		const eventName = getEventName(interaction);
+
+		if (eventName === 'mouseenter') {
+			target.addEventListener('mouseenter', (e) => {
+				playsForWrap(interaction, target).forEach(({ el, extraDelay }) => {
+					fire(interaction, e, el, 'forward', extraDelay);
+				});
+			});
+			target.addEventListener('mouseleave', (e) => {
+				playsForWrap(interaction, target).forEach(({ el, extraDelay }) => {
+					fire(interaction, e, el, 'reverse', extraDelay);
+				});
+			});
+			return;
+		}
+
+		if (eventName === 'focus') {
+			target.addEventListener('focusin', (e) => {
+				if (e.target !== target && !target.contains(e.target)) return;
+				playsForWrap(interaction, target).forEach(({ el, extraDelay }) => {
+					fire(interaction, e, el, 'forward', extraDelay);
+				});
+			});
+			target.addEventListener('focusout', (e) => {
+				if (target.contains(e.relatedTarget)) return;
+				playsForWrap(interaction, target).forEach(({ el, extraDelay }) => {
+					fire(interaction, e, el, 'reverse', extraDelay);
+				});
+			});
+			return;
+		}
+
+		if (eventName === 'click') {
+			target.addEventListener('click', (e) => {
+				playsForWrap(interaction, target).forEach(({ el, extraDelay }) => {
+					fire(
+						interaction,
+						e,
+						el,
+						clickDirection(interaction),
+						extraDelay
+					);
+				});
+			});
+			return;
+		}
+
+		target.addEventListener(eventName, (e) => {
+			playsForWrap(interaction, target).forEach(({ el, extraDelay }) => {
+				fire(interaction, e, el, 'forward', extraDelay);
+			});
 		});
 	};
 
@@ -206,24 +200,11 @@ import './style.scss';
 			const eventName = getEventName(interaction);
 			if (!eventName || READY_EVENTS[eventName]) return;
 			if (eventName === 'inView' || eventName === 'listen') return;
+			if (eventName === 'scroll' || eventName === 'scrollProgress') return;
 
-			const targetEl = isGlobal ? document.body : rootElement;
-			const selector = interaction.selector || interaction.when?.selector || '';
-
-			targetEl.addEventListener(eventName, (e) => {
-				if (selector) {
-					const target = e.target.closest(selector);
-					if (!target) return;
-					if (!isGlobal && !rootElement.contains(target)) return;
-					runAction(interaction, e, target);
-				} else {
-					runAction(
-						interaction,
-						e,
-						isGlobal ? document.body : rootElement
-					);
-				}
-			});
+			resolveTargets(interaction, searchRoot(rootElement, isGlobal)).forEach(
+				(target) => bindTarget(interaction, target)
+			);
 		});
 	};
 
@@ -235,12 +216,11 @@ import './style.scss';
 		interactions.forEach((interaction) => {
 			if (!interaction || getEventName(interaction) !== 'inView') return;
 			const opts = getPresetOptions(interaction);
-			const targets = resolveTargets(interaction, rootElement);
+			const wraps = resolveTargets(interaction, rootElement);
 
-			targets.forEach((target) => {
-				if (getActionType(interaction) === 'preset') {
-					preparePreset(target, getPreset(interaction));
-				}
+			wraps.forEach((wrap) => {
+				prepareInitialState(interaction, wrap);
+				const plays = playsForWrap(interaction, wrap);
 
 				let done = false;
 				const observer = new IntersectionObserver(
@@ -248,14 +228,16 @@ import './style.scss';
 						entries.forEach((entry) => {
 							if (!entry.isIntersecting) return;
 							if (opts.once && done) return;
-							done = true;
-							runAction(interaction, entry, target);
+							if (opts.once) done = true;
+							plays.forEach(({ el, extraDelay }) => {
+								fire(interaction, entry, el, 'forward', extraDelay);
+							});
 							if (opts.once) observer.disconnect();
 						});
 					},
 					{ threshold: 0.15 }
 				);
-				observer.observe(target);
+				observer.observe(wrap);
 			});
 		});
 	};
@@ -267,36 +249,156 @@ import './style.scss';
 			if (!interaction || getEventName(interaction) !== 'listen') return;
 
 			const name =
-				interaction.listenEventName ||
-				interaction.when?.eventName ||
-				'';
+				interaction.listenEventName || interaction.when?.eventName || '';
 			const phase =
-				interaction.listenPhase ||
-				interaction.when?.phase ||
-				'start';
+				interaction.listenPhase || interaction.when?.phase || 'start';
 
 			if (!name) return;
 
 			const opts = getPresetOptions(interaction);
 			let done = false;
 
-			if (getActionType(interaction) === 'preset') {
-				resolveTargets(interaction, rootElement).forEach((t) =>
-					preparePreset(t, getPreset(interaction))
-				);
-			}
+			collectAndPrepare(interaction, rootElement);
 
 			bus.on(name, phase, (payload) => {
 				if (opts.once && done) return;
-				done = true;
-				runOnTargets(interaction, rootElement, payload);
+				if (opts.once) done = true;
+				fireOnRoot(interaction, rootElement, payload, 'forward');
 			});
 		});
 	};
 
+	const scrollJobs = [];
+	let scrollTicking = false;
+	let scrollBound = false;
+
+	const runScrollJobs = () => {
+		scrollTicking = false;
+		const y = window.scrollY || window.pageYOffset || 0;
+		scrollJobs.forEach((job) => {
+			try {
+				job(y);
+			} catch (err) {
+				console.error('Blockish Interaction scroll error:', err);
+			}
+		});
+	};
+
+	const onWindowScroll = () => {
+		if (scrollTicking) return;
+		scrollTicking = true;
+		requestAnimationFrame(runScrollJobs);
+	};
+
+	const bindWindowScroll = () => {
+		if (scrollBound) return;
+		scrollBound = true;
+		window.addEventListener('scroll', onWindowScroll, { passive: true });
+		window.addEventListener('resize', onWindowScroll, { passive: true });
+	};
+
+	const elementProgress = (el) => {
+		const rect = el.getBoundingClientRect();
+		const vh = window.innerHeight || 1;
+		const start = vh;
+		const end = -rect.height;
+		const span = start - end || 1;
+		const p = (start - rect.top) / span;
+		return Math.min(1, Math.max(0, p));
+	};
+
+	const registerScrollInteractions = (interactions, rootElement) => {
+		if (!Array.isArray(interactions)) return;
+
+		interactions.forEach((interaction) => {
+			if (!interaction) return;
+			const eventName = getEventName(interaction);
+			if (eventName !== 'scroll' && eventName !== 'scrollProgress') return;
+
+			if (eventName === 'scroll') {
+				const threshold = getScrollY(interaction);
+				let active = false;
+				const job = (y) => {
+					const past = y >= threshold;
+					if (past === active) return;
+					active = past;
+					collectPlayTargets(interaction, rootElement).forEach(
+						({ el, extraDelay }) => {
+							fire(
+								interaction,
+								{ type: 'scroll', scrollY: y },
+								el,
+								past ? 'forward' : 'reverse',
+								extraDelay
+							);
+						}
+					);
+				};
+				scrollJobs.push(job);
+				bindWindowScroll();
+				job(window.scrollY || window.pageYOffset || 0);
+				return;
+			}
+
+			const anim =
+				typeof window !== 'undefined' ? window.blockishAnimation : null;
+			if (anim?.attachScrollProgress) {
+				let attached = false;
+				resolveTargets(interaction, rootElement).forEach((wrap) => {
+					playsForWrap(interaction, wrap).forEach(({ el }) => {
+						if (anim.attachScrollProgress(el, interaction, wrap)) {
+							attached = true;
+						}
+					});
+				});
+				if (attached) return;
+			}
+
+			const job = () => {
+				collectPlayTargets(interaction, rootElement).forEach(({ el }) => {
+					applyScrollScrub(el, interaction, elementProgress(el));
+				});
+			};
+			scrollJobs.push(job);
+			bindWindowScroll();
+			job();
+		});
+	};
+
+	const collectAndPrepare = (interaction, rootElement) => {
+		if (interaction.applyTo || interaction.action?.applyTo) {
+			prepareInitialState(interaction, rootElement);
+			return;
+		}
+		resolveTargets(interaction, rootElement).forEach((wrap) => {
+			prepareInitialState(interaction, wrap);
+		});
+	};
+
+	const prepareAll = (interactions, rootElement) => {
+		if (!Array.isArray(interactions)) return;
+		interactions.forEach((interaction) => {
+			if (!interaction) return;
+			const eventName = getEventName(interaction);
+			if (READY_EVENTS[eventName] && getActionType(interaction) === 'preset') {
+				collectAndPrepare(interaction, rootElement);
+				return;
+			}
+			if (eventName === 'inView' || eventName === 'listen') {
+				return;
+			}
+			if (eventName === 'scrollProgress') {
+				return;
+			}
+			collectAndPrepare(interaction, rootElement);
+		});
+	};
+
 	const processInteractions = (interactions, rootElement, isGlobal) => {
+		prepareAll(interactions, rootElement);
 		registerDomInteractions(interactions, rootElement, isGlobal);
 		registerInViewInteractions(interactions, rootElement);
+		registerScrollInteractions(interactions, rootElement);
 		registerListenInteractions(interactions, rootElement);
 		runReadyInteractions(interactions, rootElement);
 	};
@@ -328,9 +430,13 @@ import './style.scss';
 		});
 	};
 
+	const scheduleBoot = () => {
+		requestAnimationFrame(boot);
+	};
+
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', boot);
+		document.addEventListener('DOMContentLoaded', scheduleBoot);
 	} else {
-		boot();
+		scheduleBoot();
 	}
 })();
