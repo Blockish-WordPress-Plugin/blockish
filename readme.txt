@@ -197,20 +197,5 @@ Terms of Service: https://freemius.com/terms/
 * Fixed: Magic Login redirect encoding (no double urlencode; `add_query_arg` handles encoding)
 * Improved: Media upload cleanup uses `wp_delete_file()`; stricter base64 decode for MCP uploads
 
-= 1.2.8 =
-
-* Added: Theme Builder extension (classic themes) — build headers, footers, and page templates with Blockish blocks; includes WooCommerce template and part starters
-* Added: MCP support for Theme Builder — AI can list and stage classic-theme templates and template parts via `get-templates` and `manage-template`
-* Added: Theme Override control on blocks — choose when Blockish styling should win over theme CSS
-* Improved: MCP-created pages and posts default to published status (layout changes still stage for Accept/Discard in the editor)
-* Improved: AI Preview Accept/Discard bar overlays the staged layout instead of leaving a blank row at the top
-* Note: Theme Builder is for classic themes only — block themes continue to use the Site Editor
-
-= 1.2.7 =
-
-* Added: Dashboard overview and MCP connect YouTube walkthroughs (separate videos)
-* Improved: Helpful Links — docs, roadmap, and contact point to blockish.wowdevs.com
-* Improved: Class Manager editor CSS loads from a revisioned bundle instead of every class entity (fewer editor REST requests)
-
 [See full changelog history in CHANGELOG.md](https://github.com/Blockish-WordPress-Plugin/blockish/blob/main/CHANGELOG.md)
 
