@@ -2,10 +2,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem, Icon } from '@wordpress/components';
 import { moreVertical, pencil, trash, layout } from '@wordpress/icons';
 import ItemPreview from './ItemPreview';
-import {
-	showOnFromConditions,
-	showOnLabel,
-} from '../utils/partConditions';
+import { showOnFromConditions, showOnLabel } from '../utils/partConditions';
 
 function getMeta( item, key ) {
 	return item?.meta?.[ key ] ?? '';
@@ -15,7 +12,11 @@ function getTitle( item ) {
 	if ( typeof item.title === 'string' ) {
 		return item.title;
 	}
-	return item.title?.raw || item.title?.rendered || __( '(no title)', 'blockish' );
+	return (
+		item.title?.raw ||
+		item.title?.rendered ||
+		__( '(no title)', 'blockish' )
+	);
 }
 
 function getContent( item ) {
@@ -56,7 +57,9 @@ function areaDisplayLabel( area ) {
 
 function getPartShowOn( item ) {
 	const conditions = getMeta( item, 'blockish_tb_conditions' );
-	return showOnFromConditions( Array.isArray( conditions ) ? conditions : [] );
+	return showOnFromConditions(
+		Array.isArray( conditions ) ? conditions : []
+	);
 }
 
 function stopCardNav( event ) {
@@ -160,7 +163,11 @@ export default function ItemCard( {
 	);
 
 	return (
-		<article className={ `blockish-tb-card ${ isSelected ? 'is-selected' : '' }` }>
+		<article
+			className={ `blockish-tb-card ${
+				isSelected ? 'is-selected' : ''
+			}` }
+		>
 			{ showPreview ? (
 				<div className="blockish-tb-card__preview-wrap">
 					{ selectControl }
@@ -171,7 +178,10 @@ export default function ItemCard( {
 						onClick={ onEdit }
 						aria-label={ __( 'Edit', 'blockish' ) }
 					>
-						<ItemPreview content={ getContent( item ) } />
+						<ItemPreview
+							item={ item }
+							content={ getContent( item ) }
+						/>
 					</button>
 				</div>
 			) : (
@@ -183,7 +193,11 @@ export default function ItemCard( {
 
 			<div className="blockish-tb-card__body">
 				{ showTitle ? (
-					<button type="button" className="blockish-tb-card__title" onClick={ onEdit }>
+					<button
+						type="button"
+						className="blockish-tb-card__title"
+						onClick={ onEdit }
+					>
 						{ title }
 					</button>
 				) : null }
@@ -201,7 +215,7 @@ export default function ItemCard( {
 				{ showAuthor ? (
 					<div className="blockish-tb-card__meta">
 						<span className="blockish-tb-card__author">
-							{ __( 'Author', 'blockish' ) }{' '}
+							{ __( 'Author', 'blockish' ) }{ ' ' }
 							<strong>{ getAuthor( item ) }</strong>
 						</span>
 						<span className="blockish-tb-card__source">

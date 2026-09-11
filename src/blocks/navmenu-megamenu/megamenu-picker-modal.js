@@ -1,165 +1,52 @@
 import {
 	useMemo,
 	useState,
+	useCallback,
 	useEffect,
-	useRef,
 	memo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { BlockPreview } from '@wordpress/block-editor';
-import {
-	Button,
-	Modal,
-	SearchControl,
-	Spinner,
-} from '@wordpress/components';
+import { Button, Modal, SearchControl, Spinner } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { EditorProvider } from '@wordpress/editor';
+import {
+	CLASS_CSS_REGEN_EVENT,
+	fetchClassManagerCssBundle,
+} from '../../extensions/class-manager/wrap-ai-preview';
 
-const VIEWPORT_WIDTH = 1200;
+const useClassManagerPreviewCss = () => {
+	const [ classCss, setClassCss ] = useState( '' );
 
-/**
- * Theme-builder-style preview CSS.
- * Also injected last into the preview iframe — Class Manager often
- * overrides `additionalStyles` on specificity/order.
- */
-const PREVIEW_CSS = `
-	body {
-		padding: 24px !important;
-		margin: 0 !important;
-		background: #fff !important;
-	}
-	.block-list-appender,
-	.block-editor-inserter,
-	.block-editor-block-list__insertion-point {
-		display: none !important;
-	}
-	.block-editor-block-list__layout {
-		padding: 0 !important;
-		margin: 0 !important;
-	}
-	.block-editor-block-list__block {
-		max-width: none !important;
-		margin-left: 0 !important;
-		margin-right: 0 !important;
-	}
-	html body .wp-block-blockish-container,
-	html body .blockish-container,
-	html body .wp-block-group,
-	html body .editor-styles-wrapper .wp-block-blockish-container,
-	html body .editor-styles-wrapper .blockish-container,
-	html body .editor-styles-wrapper .wp-block-group {
-		min-height: 0 !important;
-		height: auto !important;
-		max-height: none !important;
-	}
-`;
-
-const PREVIEW_STYLES = [ { css: PREVIEW_CSS } ];
-
-const PREVIEW_STYLE_ID = 'blockish-megamenu-preview-styles';
-
-/**
- * Force preview CSS into the iframe last so it beats Class Manager.
- *
- * @param {HTMLIFrameElement|null} iframe
- * @return {boolean} Whether styles were applied.
- */
-function injectPreviewStyles( iframe ) {
-	try {
-		const doc = iframe?.contentDocument || iframe?.contentWindow?.document;
-		if ( ! doc?.head ) {
-			return false;
+	const loadCss = useCallback( async () => {
+		try {
+			const bundle = await fetchClassManagerCssBundle( 0 );
+			setClassCss( typeof bundle?.css === 'string' ? bundle.css : '' );
+		} catch ( _err ) {
+			// silent fallback
 		}
-		let style = doc.getElementById( PREVIEW_STYLE_ID );
-		if ( ! style ) {
-			style = doc.createElement( 'style' );
-			style.id = PREVIEW_STYLE_ID;
-			doc.head.appendChild( style );
-		}
-		if ( style.textContent !== PREVIEW_CSS ) {
-			style.textContent = PREVIEW_CSS;
-		}
-		// Keep our rules last if other styles are appended later.
-		if ( style.nextSibling ) {
-			doc.head.appendChild( style );
-		}
-		return true;
-	} catch ( e ) {
-		return false;
-	}
-}
+	}, [] );
 
-/**
- * BlockPreview only scales by width. Recompute scale from real content
- * height so the full design fits the card (contain, top-left).
- *
- * @param {HTMLElement|null} wrap
- */
-function applyHeightAwareScale( wrap ) {
-	if ( ! wrap ) {
-		return;
-	}
-	const contentEl = wrap.querySelector(
-		'.block-editor-block-preview__content'
-	);
-	if ( ! contentEl ) {
-		return;
-	}
+	useEffect( () => {
+		loadCss();
+		const onRegen = () => {
+			loadCss();
+		};
+		window.addEventListener( CLASS_CSS_REGEN_EVENT, onRegen );
+		return () => {
+			window.removeEventListener( CLASS_CSS_REGEN_EVENT, onRegen );
+		};
+	}, [ loadCss ] );
 
-	const cw = wrap.clientWidth;
-	const ch = wrap.clientHeight;
-	if ( cw < 2 || ch < 2 ) {
-		return;
-	}
-
-	const iframe = contentEl.querySelector( 'iframe' );
-	injectPreviewStyles( iframe );
-
-	let contentHeight = 0;
-	try {
-		const doc = iframe?.contentDocument || iframe?.contentWindow?.document;
-		const body = doc?.body;
-		const html = doc?.documentElement;
-		if ( body ) {
-			contentHeight = Math.max(
-				body.scrollHeight || 0,
-				body.offsetHeight || 0,
-				html?.scrollHeight || 0,
-				1
-			);
-		}
-	} catch ( e ) {
-		// ignore
-	}
-
-	if ( ! contentHeight ) {
-		const fallbackScale = cw / VIEWPORT_WIDTH;
-		const rect = contentEl.getBoundingClientRect();
-		contentHeight = Math.max( rect.height / ( fallbackScale || 1 ), 1 );
-	}
-
-	const scale = Math.min( cw / VIEWPORT_WIDTH, ch / contentHeight );
-	const rounded = Math.round( scale * 10000 ) / 10000;
-	const next = `scale(${ rounded })`;
-
-	if (
-		contentEl.style.transform === next &&
-		contentEl.style.transformOrigin === 'top left' &&
-		contentEl.style.width === `${ VIEWPORT_WIDTH }px`
-	) {
-		return;
-	}
-
-	contentEl.style.transformOrigin = 'top left';
-	contentEl.style.transform = next;
-	contentEl.style.width = `${ VIEWPORT_WIDTH }px`;
-}
+	return classCss;
+};
 
 function PreviewLoading() {
 	return (
 		<div
-			className="megamenu-preview-field megamenu-preview-field--loading"
+			className="page-templates-preview-field--loading megamenu-preview-field--loading"
 			aria-busy="true"
 			aria-live="polite"
 		>
@@ -171,97 +58,70 @@ function PreviewLoading() {
 	);
 }
 
-function MegamenuCardPreview( { content } ) {
-	const wrapRef = useRef( null );
-	const [ isVisible, setIsVisible ] = useState( false );
-	const blocks = useMemo( () => {
-		if ( ! content ) {
-			return [];
-		}
-		return parse( content );
-	}, [ content ] );
-
-	// Lazy-mount BlockPreview only when the card nears the viewport.
-	useEffect( () => {
-		const wrap = wrapRef.current;
-		if ( ! wrap || typeof IntersectionObserver !== 'function' ) {
-			setIsVisible( true );
-			return undefined;
-		}
-		const io = new IntersectionObserver(
-			( entries ) => {
-				if ( entries.some( ( e ) => e.isIntersecting ) ) {
-					setIsVisible( true );
-					io.disconnect();
-				}
-			},
-			{ rootMargin: '120px' }
+function MegamenuPreviewField( { item, classCss } ) {
+	const editorSettings = useSelect( ( select ) => {
+		return (
+			select( 'core/block-editor' )?.getSettings?.() ||
+			select( 'core/editor' )?.getEditorSettings?.() ||
+			{}
 		);
-		io.observe( wrap );
-		return () => io.disconnect();
 	}, [] );
 
-	useEffect( () => {
-		if ( ! isVisible || ! blocks.length ) {
-			return;
+	const settings = useMemo( () => {
+		const baseStyles = Array.isArray( editorSettings.styles )
+			? [ ...editorSettings.styles ]
+			: [];
+		if ( classCss ) {
+			baseStyles.push( { css: classCss } );
 		}
-		const wrap = wrapRef.current;
-		if ( ! wrap ) {
-			return;
+		return {
+			...editorSettings,
+			styles: baseStyles,
+			isPreviewMode: true,
+		};
+	}, [ editorSettings, classCss ] );
+
+	const backgroundColor = useMemo( () => {
+		return editorSettings?.colors?.background || 'white';
+	}, [ editorSettings ] );
+
+	const rawContent = useMemo( () => {
+		if ( typeof item?.content === 'string' ) {
+			return item.content;
 		}
+		return item?.content?.raw || item?.content?.rendered || '';
+	}, [ item ] );
 
-		let raf = 0;
-		const run = () => {
-			cancelAnimationFrame( raf );
-			raf = requestAnimationFrame( () =>
-				applyHeightAwareScale( wrap )
-			);
-		};
-		run();
-
-		const ro =
-			typeof ResizeObserver === 'function'
-				? new ResizeObserver( run )
-				: null;
-		ro?.observe( wrap );
-
-		const timers = [ 150, 400 ].map( ( ms ) => setTimeout( run, ms ) );
-		wrap.addEventListener( 'load', run, true );
-
-		return () => {
-			cancelAnimationFrame( raf );
-			ro?.disconnect();
-			timers.forEach( clearTimeout );
-			wrap.removeEventListener( 'load', run, true );
-		};
-	}, [ blocks, isVisible ] );
+	const blocks = useMemo( () => {
+		if ( ! rawContent ) {
+			return [];
+		}
+		return parse( rawContent );
+	}, [ rawContent ] );
 
 	if ( ! blocks.length ) {
 		return (
-			<div className="megamenu-preview-field megamenu-preview-field--empty">
+			<div className="page-templates-preview-field--empty megamenu-preview-field--empty">
 				{ __( 'Empty', 'blockish' ) }
 			</div>
 		);
 	}
 
 	return (
-		<div className="megamenu-preview-field" ref={ wrapRef }>
-			{ isVisible ? (
+		<EditorProvider post={ item } settings={ settings }>
+			<div
+				className="page-templates-preview-field"
+				style={ { backgroundColor } }
+			>
 				<BlockPreview.Async placeholder={ <PreviewLoading /> }>
-					<BlockPreview
-						blocks={ blocks }
-						viewportWidth={ VIEWPORT_WIDTH }
-						additionalStyles={ PREVIEW_STYLES }
-					/>
+					<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
 				</BlockPreview.Async>
-			) : (
-				<PreviewLoading />
-			) }
-		</div>
+			</div>
+		</EditorProvider>
 	);
 }
 
-const MemoMegamenuCardPreview = memo( MegamenuCardPreview );
+const MemoMegamenuPreviewField = memo( MegamenuPreviewField );
 
 export default function MegamenuPickerModal( {
 	items,
@@ -273,6 +133,7 @@ export default function MegamenuPickerModal( {
 } ) {
 	const [ search, setSearch ] = useState( '' );
 	const [ selectedId, setSelectedId ] = useState( currentId || 0 );
+	const classCss = useClassManagerPreviewCss();
 
 	const filtered = useMemo( () => {
 		const query = search.trim().toLowerCase();
@@ -291,7 +152,6 @@ export default function MegamenuPickerModal( {
 			title={ __( 'Select Mega Menu', 'blockish' ) }
 			onRequestClose={ onCancel }
 			className="blockish-megamenu-picker-modal"
-			size="large"
 		>
 			<div className="blockish-megamenu-picker-modal__layout">
 				<div className="blockish-megamenu-picker-modal__toolbar">
@@ -317,36 +177,34 @@ export default function MegamenuPickerModal( {
 					) : null }
 
 					{ hasResolved && filtered.length > 0 ? (
-						<div className="blockish-megamenu-picker-modal__grid">
+						<div className="blockish-megamenu-picker-modal__grid dataviews-view-grid">
 							{ filtered.map( ( item ) => {
 								const isSelected = selectedId === item.id;
 								return (
 									<button
 										key={ item.id }
 										type="button"
-										className={ `blockish-megamenu-picker-card${
+										className={ `blockish-megamenu-picker-card dataviews-view-grid__card${
 											isSelected ? ' is-selected' : ''
 										}` }
 										onClick={ () =>
 											setSelectedId( item.id )
 										}
+										onDoubleClick={ () => {
+											setSelectedId( item.id );
+											onApply( item.id );
+										} }
 										aria-pressed={ isSelected }
 									>
-										<div className="blockish-megamenu-picker-card__preview">
-											<MemoMegamenuCardPreview
-												content={
-													item.content?.raw ||
-													item.content?.rendered ||
-													''
-												}
+										<div className="blockish-megamenu-picker-card__preview dataviews-view-grid__media">
+											<MemoMegamenuPreviewField
+												item={ item }
+												classCss={ classCss }
 											/>
 										</div>
 										<span className="blockish-megamenu-picker-card__title">
 											{ item.title?.rendered ||
-												__(
-													'(Untitled)',
-													'blockish'
-												) }
+												__( '(Untitled)', 'blockish' ) }
 										</span>
 									</button>
 								);
