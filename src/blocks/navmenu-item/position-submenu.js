@@ -349,12 +349,8 @@ function positionNavmenuMegamenu( item, children, panel ) {
 	const topAnchorRect = topAnchor.getBoundingClientRect();
 	const megaGap = 0;
 	let top = topAnchorRect.bottom + megaGap + offsetY;
-	let placementY = 'below';
+	const placementY = 'below';
 	const availableBelow = Math.max( vh - top - MARGIN, 120 );
-	const availableAbove = Math.max(
-		topAnchorRect.top - MARGIN - megaGap,
-		120
-	);
 
 	// Content-sized height — scroll the wrapper only if content exceeds the viewport.
 	// Do not lock the panel to 100%/overflow; that + flex centering creates a fake top gap.
@@ -364,14 +360,7 @@ function positionNavmenuMegamenu( item, children, panel ) {
 		1
 	);
 	if ( naturalH > availableBelow + 1 ) {
-		if ( availableAbove > availableBelow ) {
-			placementY = 'above';
-			const capped = Math.min( naturalH, availableAbove );
-			top = topAnchorRect.top - megaGap - capped + offsetY;
-			children.style.maxHeight = `${ Math.round( availableAbove ) }px`;
-		} else {
-			children.style.maxHeight = `${ Math.round( availableBelow ) }px`;
-		}
+		children.style.maxHeight = `${ Math.round( availableBelow ) }px`;
 		children.style.overflowY = 'auto';
 	}
 	if ( top < MARGIN ) {
@@ -571,28 +560,14 @@ export function positionNavmenuSubmenu( item ) {
 		children;
 	const panelRect = panel.getBoundingClientRect();
 	const panelW = Math.max( panelRect.width || 0, 1 );
-	const panelH = Math.max( panelRect.height || 0, 1 );
 	const positionAlign = panel.dataset?.positionAlign || 'left';
 	const offsetY = parseLengthPx( panel.dataset?.offsetY, vh );
 	const offsetX = parseLengthPx( panel.dataset?.offsetX, vw );
 
-	let top = 0;
 	let left = 0;
-	let placementY = 'below';
-
-	const need = panelH + BRIDGE;
-	const spaceBelow = vh - itemRect.bottom - MARGIN;
-	const spaceAbove = itemRect.top - MARGIN;
-
-	if ( spaceBelow < need && spaceAbove > spaceBelow ) {
-		placementY = 'above';
-		top = itemRect.top - need - offsetY;
-		children.style.paddingBottom = `${ BRIDGE }px`;
-	} else {
-		placementY = 'below';
-		top = itemRect.bottom + offsetY;
-		children.style.paddingTop = `${ BRIDGE }px`;
-	}
+	const placementY = 'below';
+	const top = itemRect.bottom + offsetY;
+	children.style.paddingTop = `${ BRIDGE }px`;
 
 	if ( positionAlign === 'center' ) {
 		left = itemRect.left + ( itemRect.width - panelW ) / 2 + offsetX;
