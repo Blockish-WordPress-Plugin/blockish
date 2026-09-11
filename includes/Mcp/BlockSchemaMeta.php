@@ -53,6 +53,11 @@ class BlockSchemaMeta
                         $block['attributes'] = [];
                     }
                     $block['attributes']['hasStarted'] = true;
+                } elseif ($block['name'] === 'blockish/html-wrapper' || $block['name'] === 'blockish/html-child') {
+                    if (!isset($block['attributes']) || !is_array($block['attributes'])) {
+                        $block['attributes'] = [];
+                    }
+                    $block['attributes']['isVariationPicked'] = true;
                 } elseif ($block['name'] === 'core/block') {
                     // WP core/block `content` must be an overrides object or omitted.
                     // Agents often send content:"" which triggers foreach() warnings in

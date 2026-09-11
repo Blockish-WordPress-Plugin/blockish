@@ -34,6 +34,18 @@ class BlocksList extends ConfigList {
                 'package' => 'free',
                 'status'  => 'active',
             ),
+            'html-wrapper' => array(
+                'name'    => __('HTML Wrapper', 'blockish'),
+                'description' => __('Dynamic HTML wrapper container with customizable tag and key-value props.', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
+            'html-child' => array(
+                'name'    => __('HTML Child', 'blockish'),
+                'description' => __('Dynamic HTML element with customizable tag, key-value props, and optional content.', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
             'icon' => array(
                 'name'    => __('Icon', 'blockish'),
                 'description' => __('Displays a single SVG icon with color, size, rotation, and an optional link. Use for decorative accents, feature highlights, or standalone icon links.', 'blockish'),

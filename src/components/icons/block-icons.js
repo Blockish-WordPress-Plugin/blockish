@@ -1,17 +1,90 @@
 import { Icon } from '@wordpress/components';
-export const BlockishIcon = ({ icon }) => (
-    <span className="blockish-brand-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--wp--preset--color--primary, #4F46E5)' }}>
-        <Icon icon={icon} />
-    </span>
+export const BlockishIcon = ( { icon } ) => (
+	<span
+		className="blockish-brand-icon"
+		style={ {
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'center',
+			color: 'var(--wp--preset--color--primary, #4F46E5)',
+		} }
+	>
+		<Icon icon={ icon } />
+	</span>
 );
 
-export const container = <BlockishIcon icon={<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="2" d="M1 1h62v14H1zM1 15h62v48H1zM22 15v48M22 38h41" aria-hidden="true" focusable="false"/></svg>} />;
+export const container = (
+	<BlockishIcon
+		icon={
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+				<path
+					fill="none"
+					stroke="currentColor"
+					strokeMiterlimit="10"
+					strokeWidth="2"
+					d="M1 1h62v14H1zM1 15h62v48H1zM22 15v48M22 38h41"
+					aria-hidden="true"
+					focusable="false"
+				/>
+			</svg>
+		}
+	/>
+);
 
-export const icon = <BlockishIcon icon={<svg width="24" height="24" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true" fill="currentColor"><path d="M288.1-32c9 0 17.3 5.1 21.4 13.1L383 125.3 542.9 150.7c8.9 1.4 16.3 7.7 19.1 16.3s.5 18-5.8 24.4L441.7 305.9 467 465.8c1.4 8.9-2.3 17.9-9.6 23.2s-17 6.1-25 2L288.1 417.6 143.8 491c-8 4.1-17.7 3.3-25-2s-11-14.2-9.6-23.2L134.4 305.9 20 191.4c-6.4-6.4-8.6-15.8-5.8-24.4s10.1-14.9 19.1-16.3l159.9-25.4 73.6-144.2c4.1-8 12.4-13.1 21.4-13.1zm0 76.8L230.3 158c-3.5 6.8-10 11.6-17.6 12.8l-125.5 20 89.8 89.9c5.4 5.4 7.9 13.1 6.7 20.7l-19.8 125.5 113.3-57.6c6.8-3.5 14.9-3.5 21.8 0l113.3 57.6-19.8-125.5c-1.2-7.6 1.3-15.3 6.7-20.7l89.8-89.9-125.5-20c-7.6-1.2-14.1-6-17.6-12.8L288.1 44.8z"></path></svg>} />;
+export const icon = (
+	<BlockishIcon
+		icon={
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 576 512"
+				xmlns="http://www.w3.org/2000/svg"
+				focusable="false"
+				aria-hidden="true"
+				fill="currentColor"
+			>
+				<path d="M288.1-32c9 0 17.3 5.1 21.4 13.1L383 125.3 542.9 150.7c8.9 1.4 16.3 7.7 19.1 16.3s.5 18-5.8 24.4L441.7 305.9 467 465.8c1.4 8.9-2.3 17.9-9.6 23.2s-17 6.1-25 2L288.1 417.6 143.8 491c-8 4.1-17.7 3.3-25-2s-11-14.2-9.6-23.2L134.4 305.9 20 191.4c-6.4-6.4-8.6-15.8-5.8-24.4s10.1-14.9 19.1-16.3l159.9-25.4 73.6-144.2c4.1-8 12.4-13.1 21.4-13.1zm0 76.8L230.3 158c-3.5 6.8-10 11.6-17.6 12.8l-125.5 20 89.8 89.9c5.4 5.4 7.9 13.1 6.7 20.7l-19.8 125.5 113.3-57.6c6.8-3.5 14.9-3.5 21.8 0l113.3 57.6-19.8-125.5c-1.2-7.6 1.3-15.3 6.7-20.7l89.8-89.9-125.5-20c-7.6-1.2-14.1-6-17.6-12.8L288.1 44.8z"></path>
+			</svg>
+		}
+	/>
+);
 
-export const rotate = <svg xmlns="http://www.w3.org/2000/svg" color="transparent" fill="none" viewBox="0 0 24 24"><path stroke="#464455" strokeLinecap="round" strokeLinejoin="round" d="M11.9231 19c-1.462 0-2.88651-.468-4.06931-1.3369-1.18279-.8689-2.06316-2.0941-2.51495-3.5-.45179-1.4059-.45179-2.9203 0-4.32622.45179-1.4059 1.33216-2.6311 2.51496-3.5C9.03659 5.46798 10.4611 5 11.9231 5c1.462 0 2.8865.46799 4.0693 1.33688 1.1828.8689 2.0631 2.0941 2.5149 3.5.4518 1.40592.4518 2.92032 0 4.32622M17.5 12.7778l.9615 1.5555L20 13.1667"/></svg>
+export const rotate = (
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		color="transparent"
+		fill="none"
+		viewBox="0 0 24 24"
+	>
+		<path
+			stroke="#464455"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			d="M11.9231 19c-1.462 0-2.88651-.468-4.06931-1.3369-1.18279-.8689-2.06316-2.0941-2.51495-3.5-.45179-1.4059-.45179-2.9203 0-4.32622.45179-1.4059 1.33216-2.6311 2.51496-3.5C9.03659 5.46798 10.4611 5 11.9231 5c1.462 0 2.8865.46799 4.0693 1.33688 1.1828.8689 2.0631 2.0941 2.5149 3.5.4518 1.40592.4518 2.92032 0 4.32622M17.5 12.7778l.9615 1.5555L20 13.1667"
+		/>
+	</svg>
+);
 
-export const counter = <BlockishIcon icon={<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100"><text x="50%" y="50%" fill="currentColor" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="100" font-weight="bold" text-anchor="middle">123</text></svg>} />;
+export const counter = (
+	<BlockishIcon
+		icon={
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+				<text
+					x="50%"
+					y="50%"
+					fill="currentColor"
+					dominant-baseline="middle"
+					font-family="Arial, Helvetica, sans-serif"
+					font-size="100"
+					font-weight="bold"
+					text-anchor="middle"
+				>
+					123
+				</text>
+			</svg>
+		}
+	/>
+);
 
 export const countdown = (
 	<BlockishIcon
@@ -170,7 +243,6 @@ export const database = (
 	</svg>
 );
 
-
 export const accordion = <BlockishIcon icon="menu-alt3" />;
 export const accordionItem = <BlockishIcon icon="excerpt-view" />;
 export const button = <BlockishIcon icon="button" />;
@@ -322,7 +394,12 @@ export const queryTitle = (
 				<path style={ { fill: 'none' } } d="M4 6h16" />
 				<path style={ { fill: 'none' } } d="M4 12h10" />
 				<path style={ { fill: 'none' } } d="M4 18h7" />
-				<circle style={ { fill: 'none' } } cx="17.5" cy="17.5" r="2.5" />
+				<circle
+					style={ { fill: 'none' } }
+					cx="17.5"
+					cy="17.5"
+					r="2.5"
+				/>
 				<path style={ { fill: 'none' } } d="m19.3 19.3 1.7 1.7" />
 			</svg>
 		}
@@ -397,8 +474,22 @@ export const carousel = (
 				aria-hidden="true"
 				focusable="false"
 			>
-				<rect x="1.5" y="6.5" width="4" height="11" rx="1" opacity="0.45" />
-				<rect x="18.5" y="6.5" width="4" height="11" rx="1" opacity="0.45" />
+				<rect
+					x="1.5"
+					y="6.5"
+					width="4"
+					height="11"
+					rx="1"
+					opacity="0.45"
+				/>
+				<rect
+					x="18.5"
+					y="6.5"
+					width="4"
+					height="11"
+					rx="1"
+					opacity="0.45"
+				/>
 				<rect x="6" y="5" width="12" height="14" rx="1.5" />
 				<path d="M9.25 12H7.75" />
 				<path d="M8.5 10.75 7.25 12l1.25 1.25" />
@@ -422,3 +513,60 @@ export const socialIcons = <BlockishIcon icon="share" />;
 export const tab = <BlockishIcon icon="index-card" />;
 export const tabItem = <BlockishIcon icon="excerpt-view" />;
 export const video = <BlockishIcon icon="format-video" />;
+
+export const htmlWrapper = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"
+				width="24"
+				height="24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				style={ { fill: 'none', stroke: 'currentColor' } }
+				aria-hidden="true"
+				focusable="false"
+			>
+				<rect
+					style={ { fill: 'none' } }
+					width="18"
+					height="18"
+					x="3"
+					y="3"
+					rx="2"
+				/>
+				<path style={ { fill: 'none' } } d="m10 10-2 2 2 2" />
+				<path style={ { fill: 'none' } } d="m14 14 2-2-2-2" />
+			</svg>
+		}
+	/>
+);
+
+export const htmlChild = (
+	<BlockishIcon
+		icon={
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"
+				width="24"
+				height="24"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				style={ { fill: 'none', stroke: 'currentColor' } }
+				aria-hidden="true"
+				focusable="false"
+			>
+				<path style={ { fill: 'none' } } d="m18 16 4-4-4-4" />
+				<path style={ { fill: 'none' } } d="m6 8-4 4 4 4" />
+				<path style={ { fill: 'none' } } d="m14.5 4-5 16" />
+			</svg>
+		}
+	/>
+);
