@@ -6,19 +6,19 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.1
-Stable tag: 1.2.9
+Stable tag: 1.3.0
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Build sites with AI via MCP (Cursor, Claude). 30+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
+Build sites with AI via MCP (Cursor, Claude). 35+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
 
 == Description ==
 
 **Blockish connects MCP-compatible AI assistants to the Block Editor** so you can design real WordPress layouts with natural language — not just edit posts or run admin tasks.
 
-Connect Cursor, Claude Desktop, Windsurf, or another MCP client, then ask for a section or page. Blockish gives the AI **30+ structured Gutenberg blocks** and a **Class Manager** for reusable CSS, so generated layouts stay clean, responsive, and editable in the native block sidebar.
+Connect Cursor, Claude Desktop, Windsurf, or another MCP client, then ask for a section or page. Blockish gives the AI **35+ structured Gutenberg blocks** and a **Class Manager** for reusable CSS, so generated layouts stay clean, responsive, and editable in the native block sidebar.
 
 You can still build manually. When AI helps, you review an inline preview and Accept before anything goes live.
 
@@ -44,18 +44,22 @@ Blockish is built so both humans and AI assistants can work in the same Gutenber
 
 * **Template Library:** 1-click page and pattern import in the Block Editor.
 * **Magic Login:** Secure 1-click login from your AI agent.
-* **EditorSync:** Keep the open editor in sync when the AI stages changes.
+* **AI Preview Queue:** Review staged layouts with live Class Manager CSS, pending count badges, and 1-click Accept or Discard.
 * **Interactions:** Entrance presets, emit/listen signals, custom JS, plus page-level and global libraries.
 * **Visibility:** Hide blocks per device (desktop / tablet / mobile) without custom CSS.
 * **Add-ons hub:** Discover companion products (Forms, Dynamicity) from the Blockish dashboard.
 
-== 30+ AI-Optimized Blocks ==
+== 35+ AI-Optimized Blocks ==
 
 Built for AI-assisted design — and fully usable for manual site building:
 
-= Layout =
+= Layout & Custom HTML =
 
 * **Container** — Flexible section wrapper with background, spacing, flexbox/grid, and layout controls.
+
+* **HTML Wrapper** — Dynamic HTML wrapper container with custom tag selection, InnerBlocks, and key-value attributes.
+
+* **HTML Child** — Dynamic semantic HTML element with custom tag, optional text content, and key-value attributes.
 
 * **Carousel** — InnerBlocks carousel for heroes, testimonials, and logo strips (with Carousel Slide children).
 
@@ -89,11 +93,17 @@ Built for AI-assisted design — and fully usable for manual site building:
 
 * **Tab** — Tabbed content panels for organizing information.
 
-* **Navigation** — Flexible navigation for headers (nav menu, items, submenu, offcanvas).
+* **Navigation** — Flexible navigation for headers (nav menu, items, submenu, mega menu, offcanvas).
+
+* **Mega Menu** — Full-width, custom-width, and navigation-aligned rich dropdowns with block layouts.
+
+* **Submenu** — Nested flyout dropdown menus with responsive alignment and gap controls.
 
 * **Offcanvas** — Slide-out panel for menus, filters, and secondary content.
 
 = Data & Stats =
+
+* **Countdown** — Dynamic countdown with boxes, inline, stacked, circular ring, and flip-clock digit layouts.
 
 * **Counter** — Animated number counter for statistics and milestones.
 
@@ -167,6 +177,17 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.3.0 =
+
+* Added: Nav Menu Mega Menu and Nav Menu Submenu blocks with responsive alignment, custom offsets, width controls (navigation, full, custom), and offcanvas accordion sync
+* Added: Mega Menus management tab in Blockish Settings with live template previews, search, and direct edit shortcuts
+* Added: Countdown block with multiple layouts (boxes, inline, stacked, circular ring, and flip-digit clock) and dynamic date binding support
+* Added: HTML Wrapper and HTML Child dynamic blocks for custom HTML tag structures and key-value attributes
+* Added: Core Interactions CSS motion player and visual builder UI supporting scroll, scrub, and toggle triggers
+* Added: Real-time AI preview pending count badge in the admin toolbar and GetAiPreviewPending MCP ability
+* Improved: AI Preview resolution pipeline with live Class Manager CSS rendering in Settings preview cards
+* Improved: MCP developer documentation and schema definitions for navigation and interactions
 
 = 1.2.9 =
 

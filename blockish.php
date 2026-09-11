@@ -2,10 +2,10 @@
 
 /**
  * Plugin Name:       Blockish – MCP AI Site Builder for Block Editor
- * Description:       Build sites with AI via MCP (Cursor, Claude). 30+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
+ * Description:       Build sites with AI via MCP (Cursor, Claude). 35+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
  * Requires at least: 6.2
  * Requires PHP:      7.4
- * Version:           1.2.9
+ * Version:           1.3.0
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/
@@ -55,7 +55,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.2.8';
+    const VERSION = '1.3.0';
 
     /**
      * Holds the instance of this class.
