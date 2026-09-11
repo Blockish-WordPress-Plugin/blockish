@@ -1,39 +1,51 @@
-import { useMemo, memo } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useCallback,
+	useEffect,
+	memo,
+} from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { BlockPreview } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { EditorProvider } from '@wordpress/editor';
+import {
+	CLASS_CSS_REGEN_EVENT,
+	fetchClassManagerCssBundle,
+} from '../../class-manager/wrap-ai-preview';
 
-const PREVIEW_STYLES = [
-	{
-		css: `
-			body {
-				padding: 24px;
-				margin: 0;
-				background: #fff;
-			}
-			.block-list-appender,
-			.block-editor-inserter,
-			.block-editor-block-list__insertion-point {
-				display: none !important;
-			}
-			.block-editor-block-list__layout {
-				padding: 0;
-				margin: 0;
-			}
-			.block-editor-block-list__block {
-				max-width: none !important;
-				margin-left: 0 !important;
-				margin-right: 0 !important;
-			}
-		`,
-	},
-];
+const useClassManagerPreviewCss = () => {
+	const [ classCss, setClassCss ] = useState( '' );
+
+	const loadCss = useCallback( async () => {
+		try {
+			const bundle = await fetchClassManagerCssBundle( 0 );
+			setClassCss( typeof bundle?.css === 'string' ? bundle.css : '' );
+		} catch ( _err ) {
+			// silent fallback
+		}
+	}, [] );
+
+	useEffect( () => {
+		loadCss();
+		const onRegen = () => {
+			loadCss();
+		};
+		window.addEventListener( CLASS_CSS_REGEN_EVENT, onRegen );
+		return () => {
+			window.removeEventListener( CLASS_CSS_REGEN_EVENT, onRegen );
+		};
+	}, [ loadCss ] );
+
+	return classCss;
+};
 
 function PreviewLoading() {
 	return (
 		<div
-			className="blockish-tb-preview blockish-tb-preview--loading"
+			className="page-templates-preview-field--loading blockish-tb-preview blockish-tb-preview--loading"
 			aria-busy="true"
 			aria-live="polite"
 		>
@@ -45,32 +57,77 @@ function PreviewLoading() {
 	);
 }
 
-function ItemPreview( { content } ) {
+function ItemPreview( { item, content } ) {
+	const classCss = useClassManagerPreviewCss();
+
+	const editorSettings = useSelect( ( select ) => {
+		return (
+			select( 'core/block-editor' )?.getSettings?.() ||
+			select( 'core/editor' )?.getEditorSettings?.() ||
+			{}
+		);
+	}, [] );
+
+	const settings = useMemo( () => {
+		const baseStyles = Array.isArray( editorSettings.styles )
+			? [ ...editorSettings.styles ]
+			: [];
+		if ( classCss ) {
+			baseStyles.push( { css: classCss } );
+		}
+		return {
+			...editorSettings,
+			styles: baseStyles,
+			isPreviewMode: true,
+		};
+	}, [ editorSettings, classCss ] );
+
+	const backgroundColor = useMemo( () => {
+		return editorSettings?.colors?.background || 'white';
+	}, [ editorSettings ] );
+
+	const rawContent = useMemo( () => {
+		if ( content ) {
+			return content;
+		}
+		if ( typeof item?.content === 'string' ) {
+			return item.content;
+		}
+		return item?.content?.raw || item?.content?.rendered || '';
+	}, [ item, content ] );
+
 	const blocks = useMemo( () => {
-		if ( ! content ) {
+		if ( ! rawContent ) {
 			return [];
 		}
-		return parse( content );
-	}, [ content ] );
+		return parse( rawContent );
+	}, [ rawContent ] );
 
 	if ( ! blocks.length ) {
 		return (
-			<div className="blockish-tb-preview blockish-tb-preview--empty">
+			<div className="page-templates-preview-field--empty blockish-tb-preview blockish-tb-preview--empty">
 				{ __( 'Empty template', 'blockish' ) }
 			</div>
 		);
 	}
 
+	const postItem = item || {
+		id: 0,
+		type: 'wp_template',
+		content: { raw: rawContent },
+	};
+
 	return (
-		<div className="blockish-tb-preview">
-			<BlockPreview.Async placeholder={ <PreviewLoading /> }>
-				<BlockPreview
-					blocks={ blocks }
-					viewportWidth={ 1200 }
-					additionalStyles={ PREVIEW_STYLES }
-				/>
-			</BlockPreview.Async>
-		</div>
+		<EditorProvider post={ postItem } settings={ settings }>
+			<div
+				className="page-templates-preview-field blockish-tb-preview"
+				style={ { backgroundColor } }
+			>
+				<BlockPreview.Async placeholder={ <PreviewLoading /> }>
+					<BlockPreview blocks={ blocks } />
+				</BlockPreview.Async>
+			</div>
+		</EditorProvider>
 	);
 }
 
