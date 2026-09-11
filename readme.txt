@@ -6,19 +6,19 @@ Contributors: bdkoder, mizan42047
 Donate link: https://wowdevs.com/
 Tags: mcp, ai site builder, gutenberg, block editor, class manager
 Tested up to: 7.1
-Stable tag: 1.2.9
+Stable tag: 1.3.0
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Build sites with AI via MCP (Cursor, Claude). 30+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
+Build sites with AI via MCP (Cursor, Claude). 35+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
 
 == Description ==
 
 **Blockish connects MCP-compatible AI assistants to the Block Editor** so you can design real WordPress layouts with natural language — not just edit posts or run admin tasks.
 
-Connect Cursor, Claude Desktop, Windsurf, or another MCP client, then ask for a section or page. Blockish gives the AI **30+ structured Gutenberg blocks** and a **Class Manager** for reusable CSS, so generated layouts stay clean, responsive, and editable in the native block sidebar.
+Connect Cursor, Claude Desktop, Windsurf, or another MCP client, then ask for a section or page. Blockish gives the AI **35+ structured Gutenberg blocks** and a **Class Manager** for reusable CSS, so generated layouts stay clean, responsive, and editable in the native block sidebar.
 
 You can still build manually. When AI helps, you review an inline preview and Accept before anything goes live.
 
@@ -44,18 +44,22 @@ Blockish is built so both humans and AI assistants can work in the same Gutenber
 
 * **Template Library:** 1-click page and pattern import in the Block Editor.
 * **Magic Login:** Secure 1-click login from your AI agent.
-* **EditorSync:** Keep the open editor in sync when the AI stages changes.
+* **AI Preview Queue:** Review staged layouts with live Class Manager CSS, pending count badges, and 1-click Accept or Discard.
 * **Interactions:** Entrance presets, emit/listen signals, custom JS, plus page-level and global libraries.
 * **Visibility:** Hide blocks per device (desktop / tablet / mobile) without custom CSS.
 * **Add-ons hub:** Discover companion products (Forms, Dynamicity) from the Blockish dashboard.
 
-== 30+ AI-Optimized Blocks ==
+== 35+ AI-Optimized Blocks ==
 
 Built for AI-assisted design — and fully usable for manual site building:
 
-= Layout =
+= Layout & Custom HTML =
 
 * **Container** — Flexible section wrapper with background, spacing, flexbox/grid, and layout controls.
+
+* **HTML Wrapper** — Dynamic HTML wrapper container with custom tag selection, InnerBlocks, and key-value attributes.
+
+* **HTML Child** — Dynamic semantic HTML element with custom tag, optional text content, and key-value attributes.
 
 * **Carousel** — InnerBlocks carousel for heroes, testimonials, and logo strips (with Carousel Slide children).
 
@@ -65,7 +69,7 @@ Built for AI-assisted design — and fully usable for manual site building:
 
 * **Heading** — Customizable headings with typography, colors, and shadow options.
 
-* **Paragraph** — Paragraph block with advanced typography and spacing controls.
+* **Paragraph** — Paragraph block with typography, spacing, and styling controls.
 
 = Media =
 
@@ -89,11 +93,17 @@ Built for AI-assisted design — and fully usable for manual site building:
 
 * **Tab** — Tabbed content panels for organizing information.
 
-* **Navigation** — Flexible navigation for headers (nav menu, items, submenu, offcanvas).
+* **Navigation** — Flexible navigation for headers (nav menu, items, submenu, mega menu, offcanvas).
+
+* **Mega Menu** — Full-width, custom-width, and navigation-aligned rich dropdowns with block layouts.
+
+* **Submenu** — Nested flyout dropdown menus with responsive alignment and gap controls.
 
 * **Offcanvas** — Slide-out panel for menus, filters, and secondary content.
 
 = Data & Stats =
+
+* **Countdown** — Dynamic countdown with boxes, inline, stacked, circular ring, and flip-clock digit layouts.
 
 * **Counter** — Animated number counter for statistics and milestones.
 
@@ -168,6 +178,17 @@ Terms of Service: https://freemius.com/terms/
 
 == Changelog ==
 
+= 1.3.0 =
+
+* Added: Nav Menu Mega Menu and Nav Menu Submenu blocks with responsive alignment, custom offsets, width controls (navigation, full, custom), and offcanvas accordion sync
+* Added: Mega Menus management tab in Blockish Settings with live template previews, search, and direct edit shortcuts
+* Added: Countdown block with multiple layouts (boxes, inline, stacked, circular ring, and flip-digit clock) and dynamic date binding support
+* Added: HTML Wrapper and HTML Child dynamic blocks for custom HTML tag structures and key-value attributes
+* Added: Core Interactions CSS motion player and visual builder UI supporting scroll, scrub, and toggle triggers
+* Added: Real-time AI preview pending count badge in the admin toolbar and GetAiPreviewPending MCP ability
+* Improved: AI Preview resolution pipeline with live Class Manager CSS rendering in Settings preview cards
+* Improved: MCP developer documentation and schema definitions for navigation and interactions
+
 = 1.2.9 =
 
 * Improved: PHPCS/WPCS configuration — focus on security and compatibility checks; skip formatting-only sniffs
@@ -176,167 +197,5 @@ Terms of Service: https://freemius.com/terms/
 * Fixed: Magic Login redirect encoding (no double urlencode; `add_query_arg` handles encoding)
 * Improved: Media upload cleanup uses `wp_delete_file()`; stricter base64 decode for MCP uploads
 
-= 1.2.8 =
+[See full changelog history in CHANGELOG.md](https://github.com/Blockish-WordPress-Plugin/blockish/blob/main/CHANGELOG.md)
 
-* Added: Theme Builder extension (classic themes) — build headers, footers, and page templates with Blockish blocks; includes WooCommerce template and part starters
-* Added: MCP support for Theme Builder — AI can list and stage classic-theme templates and template parts via `get-templates` and `manage-template`
-* Added: Theme Override control on blocks — choose when Blockish styling should win over theme CSS
-* Improved: MCP-created pages and posts default to published status (layout changes still stage for Accept/Discard in the editor)
-* Improved: AI Preview Accept/Discard bar overlays the staged layout instead of leaving a blank row at the top
-* Note: Theme Builder is for classic themes only — block themes continue to use the Site Editor
-
-= 1.2.7 =
-
-* Added: Dashboard overview and MCP connect YouTube walkthroughs (separate videos)
-* Improved: Helpful Links — docs, roadmap, and contact point to blockish.wowdevs.com
-* Improved: Class Manager editor CSS loads from a revisioned bundle instead of every class entity (fewer editor REST requests)
-
-= 1.2.6 =
-
-* Added: Inspector reset on Blockish controls (per-control, without colliding with device/responsive UI)
-* Added: Class Manager control search — match panel titles and labels, sticky header, compact scrollable panel
-* Added: Panel change dots on inspector and Class Manager when a section has non-default stored values
-* Improved: Change dots ignore nested values when their controlling condition is off (hidden controls no longer look “dirty”)
-
-= 1.2.5 =
-
-* Added: Container inner content width — constrain inner content independently of a full-bleed section
-* Added: MCP `manage-plugins-themes` to install/activate plugins and themes
-* Improved: MCP connect wizard client list matches `blockish-mcp-cli` (Claude Desktop/Code, Cursor, Codex, Cline, Windsurf, Antigravity, Trae, Qwen Code, Kimi Code)
-* Improved: Manage Theme JSON — restore global-styles revisions
-* Improved: Class Manager — Flex, Grid, and Position controls; unitless number fields
-* Improved: `convert-css` maps grid layout for Container and Loop
-* Improved: Template Library — All filter by default; Dynamicity/Forms designs need an active license (Get add-on CTA); library hidden in the form editor
-* Improved: MCP `fetch-cloud-templates` omits unlicensed Dynamicity/Forms cloud designs
-
-= 1.2.4 =
-
-* Improved: Settings AI Preview Accept/Discard writes via the WordPress REST route from JS (templates/parts use `theme//slug`, not numeric IDs)
-* Improved: Accepting the currently open post from Settings unwraps `blockish/ai-preview` with `replaceBlocks`
-* Improved: Settings queue layout — scrollable card grid, sticky pagination footer, taller previews, hover/selected checkboxes
-* Improved: MCP designer workflow — discover blocks with `get-blocks-info` first; pick the right Blockish block for logos, nav, buttons, social icons, FAQs
-* Improved: Social Icons is always flex (row/column + wrap); Visibility hide applies in the current editor device preview
-* Improved: Docs for container header/footer landmarks, social-icons, and a versioned GitHub stuck-recovery path
-
-= 1.2.3 =
-
-* Added: Settings → AI Preview queue — list pending staged layouts (pages, patterns, templates, template parts) with Gutenberg BlockPreview, search, type filters, and pagination
-* Added: Accept / Discard from the Settings list, including multi-select and bulk actions
-* Added: Accepting a page from Settings also unwraps nested staged patterns and forms
-* Added: Class Manager previous-content snapshots so Accept keeps live CSS and Discard restores the pre-AI stylesheet (or removes a class created in that cycle)
-* Improved: Queue matching uses the real `<!-- wp:blockish/ai-preview` block comment so body text cannot fake a pending item
-* Improved: Settings Accept serializes with Gutenberg `createBlock` (no PHP fake markup / block recovery)
-* Improved: Class Manager popups stay focused without stealing the editor canvas
-* Improved: Video block poster handling
-
-= 1.2.2 =
-
-* Added: Global Integrations hub — connect Mailchimp, Kit, HubSpot, Brevo, ActiveCampaign, Zapier, Make, Webhooks, Slack, Discord (and related destinations) from the Blockish dashboard
-* Added: Integration setup modal with credential fields and deep links to provider key pages
-* Added: REST API for integrations (`IntegrationsV1`) and shared connection helpers used by companion Forms destinations
-* Added: License notice surface for companion add-ons / Freemius status in the dashboard
-* Added: Containerize — wrap the selected blocks in a Blockish Container from the block settings menu (Ungroup via existing container transform)
-* Improved: Interactions editor — separate builders/panels for block, page, and global scopes; clearer footer controls and UI polish
-* Improved: MCP interactions abilities (`ManageInteractions`); media manage/upload docs and callbacks
-* Improved: SVG upload system and background control style generation
-* Improved: Template Library / pattern insert flow when adding designs
-* Improved: Add-ons marketing page and integrations dashboard UI
-
-= 1.2.1 =
-
-* Fixed: Freemius REST early boot — companion add-ons register CPT/REST routes correctly (no more missing-route editor save failures); Freemius SDK still skipped on normal front-end views for performance
-* Added: PostPrime — early synced-pattern (`core/block` ref) cache priming before block theme template render
-* Improved: Class Manager loads published classes once per request (bulk fetch + meta prime) and uses PostPrime for pattern walks
-* Improved: Visibility extension uses PostPrime when scanning patterns for styles
-* Improved: Extension schema registry persists in one batched admin write instead of per-extension option updates on every load
-* Improved: StyleGenerator defers CSS cache writes to `shutdown` and keys cache by request path
-* Improved: MCP `get-posts` / `manage-post` always return a usable `edit_url` (admin fallback) and safer empty permalink handling
-
-= 1.2.0 =
-
-* Added: Carousel + Carousel Slide blocks for hero, testimonial, and logo-strip layouts
-* Added: Before/After Slider block for interactive image comparison
-* Added: Theme & query blocks — Site Title, Site Tagline, Site Logo, Post Title, Post Excerpt, Post Content, Post Featured Image, Post Info, Query Title, Query Total, Archive Description
-* Added: Visibility extension to hide blocks per device
-* Added: Interactions system (entrance presets, emit/listen, custom JS) with block, page, and global scopes
-* Added: Image lightbox option
-* Added: Nav menu submenu support and improved navigation building
-* Added: MCP abilities for Get Revisions and Restore Revision
-* Added: Add-ons marketing hub and Freemius license checks for companion products
-* Improved: MCP Accept workflow — safer editor sync, pattern + form pending resolve, preview save lock until Accept/Discard
-* Improved: Empty-page assembly via pattern-ref `post_content`; non-empty pages stage for Accept
-* Improved: Container flex defaults — top-level Center, nested unset; cleaner variations
-* Improved: Manage Theme JSON, Manage Post, designer workflow, and block docs for AI agents
-* Improved: Tab styling and overall editor polish
-
-= 1.1.3 =
-
-* Added: 4 new MCP AI abilities (`GetAutomationGuideline`, `JsonHelper`, `ManagePattern`, `TriggerRefresh`)
-* Added: Magic Login feature and corresponding AI ability for quick access
-* Added: EditorSync functionality for improved block editor synchronization
-* Improved: Renamed `UploadMedia` ability to `ManageMedia` for broader functionality
-* Improved: AI developer documentation and schema definitions for all blocks
-* Improved: Backward compatibility and styling fixes for Social Icons, Button, Container, and Google Map blocks
-
-= 1.1.2 =
-
-* Improved: Refined AI developer documentation with precise JSON option arrays for robust MCP styling
-
-= 1.1.1 =
-
-* Added: Paragraph block optimized for AI site building
-* Improved: Unified block icon styling across all blocks for consistent editor branding
-* Added: Template Library feature with 1-click page and pattern import in Block Editor
-* Improved: Template Library UI and infinite scroll performance
-* Fixed: Cross-Origin Resource Sharing (CORS) preflight errors with token-based query authentication
-* Improved: Enqueue logic using wp_localize_script for safer JS configuration
-* Added: Automated MCP Connection Wizard with 1-click command generation
-* Added: `ManageOptions` MCP AI ability to read and update WordPress core settings.
-* Added: `ManageComments` MCP AI ability for autonomous comment moderation.
-* Improved: `ManageThemeJson` MCP AI ability now properly merges custom typography.
-
-= 1.1.0 =
-
-* Added: Global SEO Meta Description setting in the dashboard
-* Added: Batch upload support in UploadMedia MCP ability
-* Added: Taxonomy query filtering support in GetPosts MCP ability
-* Added: Active plugin detection in GetSiteInfo MCP ability
-* Improved: Escaped block render outputs to meet strict security standards
-
-= 1.0.9 =
-
-* Added: 3 new MCP AI abilities
-* Added: Inline AI preview block for MCP schema approval
-* Improved: MCP AI documentation and approval workflow
-
-= 1.0.8 =
-
-* Added: New MCP AI abilities
-* Improved: Existing MCP AI abilities to reduce token cost
-
-= 1.0.7 =
-
-* Fixed: Icon block folder casing for compatibility with case-sensitive file systems
-
-= 1.0.6 =
-
-* Added: WordPress Playground Blueprint support for live interactive previews
-
-= 1.0.5 =
-
-* Added: MCP AI extension
-* Improved: Overall UI/UX improvements
-* Fixed: Class Manager subselector UI detachment issues
-
-= 1.0.4 =
-
-* Improved: Overall UI/UX improvements
-
-= 1.0.3 =
-
-* Added: Accordion, Button, Counter, Google Map, Heading, Icon, Image, Icon List, Progress Bar, Rating, Social Icons, Tab, and Video blocks.
-* Improved: System architecture and performance enhancements
-
-= 1.0.0 =
-
-* Initial release
