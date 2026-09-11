@@ -27,7 +27,7 @@ export default function InteractionsFooter({
 						onClick={onSave}
 						disabled={isFormSaveDisabled(draft)}
 					>
-						{__('Save', 'blockish')}
+						{__('Apply', 'blockish')}
 					</Button>
 				</>
 			) : (

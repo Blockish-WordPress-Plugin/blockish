@@ -30,6 +30,14 @@ export function isFormSaveDisabled(draft) {
 	if (draft?.action?.type === 'emit' && !draft?.action?.eventName?.trim()) {
 		return true;
 	}
+	if (
+		draft?.action?.type === 'toggleClass' &&
+		!String(draft?.action?.className || '')
+			.replace(/^\./, '')
+			.trim()
+	) {
+		return true;
+	}
 	return false;
 }
 

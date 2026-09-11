@@ -246,13 +246,25 @@ Prefer structured presets. Legacy `{ event, selector, callbacks }` still works a
   "action": {
     "type": "preset",
     "preset": "fadeUp",
+    "motion": {
+      "tweens": [
+        {
+          "from": { "x": 0, "y": 40, "scale": 1, "rotation": 0, "opacity": 0 },
+          "to": { "x": 0, "y": 0, "scale": 1, "rotation": 0, "opacity": 1 },
+          "duration": 0.6,
+          "delay": 0,
+          "ease": "power2.out"
+        }
+      ]
+    },
     "presetOptions": {
-      "duration": 600,
+      "duration": 0.6,
       "delay": 0,
       "once": true
     },
+    "applyTo": "",
     "eventName": "",
-    "phase": "start",
+    "phase": "end",
     "callbacks": [
       ""
     ]
@@ -263,10 +275,19 @@ Prefer structured presets. Legacy `{ event, selector, callbacks }` still works a
 | Field | Notes |
 |---|---|
 | `when.source` | `"dom"` \| `"listen"` |
-| `when.event` (dom) | `"ready"` \| `"click"` \| `"mouseenter"` \| `"focus"` \| `"inView"` |
-| `when.selector` | Optional CSS selector relative to this block |
-| `action.type` | `"preset"` \| `"emit"` \| `"custom"` |
-| `action.preset` | `"fadeIn"` `"fadeUp"` `"fadeDown"` `"fadeLeft"` `"fadeRight"` `"zoomIn"` |
+| `when.event` (dom) | `"ready"` \| `"click"` \| `"mouseenter"` \| `"focus"` \| `"inView"` \| `"scroll"` \| `"scrollProgress"` |
+| `when.selector` | Optional — listen/click target **inside this block** |
+| `when.scrollY` | `scroll` only — px from top; reverses when scrolling back up |
+| `action.applyTo` | Optional — where the action runs (any page selector). Empty = this block |
+| `action.eventName` | `emit` = the signal. Other types = optional **then-signal** for sequences |
+| `action.phase` | `emit`: signal tag. Other types: send then-signal when this `start`s or `end`s (default `end`) |
+| `action.type` | `"preset"` \| `"show"` \| `"hide"` \| `"toggle"` \| `"toggleClass"` \| `"emit"` \| `"custom"` |
+| `action.preset` | Seeds motion: `"fadeIn"` `"fadeUp"` `"fadeDown"` `"fadeLeft"` `"fadeRight"` `"zoomIn"` `"custom"` |
+| `action.motion.tweens` | Canonical animation. One CSS tween: `from`/`to` with used keys only (`x`, `y`, `scale`, `rotation`, `opacity`), `duration`/`delay` in **seconds**, `ease`. Play `tweens[0]` only. |
+| `action.className` | For `toggleClass` — class without the dot |
+| `presetOptions` | Mirror of first tween: **seconds** duration/delay/stagger, once, flat fromX… if `motion` omitted |
+
+Hover (`mouseenter`) reverses on leave. Click toggles class, visibility, and presets. `prefers-reduced-motion` skips transform. `show` / `toggle` start hidden until the trigger. `scrollProgress` + preset **scrubs** from→to with viewport progress (also `--blockish-ix-progress` 0–1).
 
 **Emit/listen:** one block `action.type:"emit"` + `eventName`; another `when.source:"listen"` + same `eventName`.
 

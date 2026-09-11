@@ -9,7 +9,9 @@ const eventLabels = {
 	mouseenter: __('On hover', 'blockish'),
 	focus: __('On focus', 'blockish'),
 	inView: __('When visible', 'blockish'),
-	listen: __('On signal', 'blockish'),
+	scroll: __('After scroll', 'blockish'),
+	scrollProgress: __('While scrolling', 'blockish'),
+	listen: __('Waits for a name', 'blockish'),
 };
 
 const phaseLabel = (phase) => {
@@ -37,6 +39,19 @@ export function summarizeInteraction(raw) {
 	} else if (action.type === 'preset') {
 		const preset = PRESETS.find((p) => p.id === action.preset);
 		actionLabel = preset?.label || __('Animation', 'blockish');
+	} else if (action.type === 'toggleClass') {
+		const cls = String(action.className || '')
+			.replace(/^\./, '')
+			.trim();
+		actionLabel = cls
+			? `${__('Toggle', 'blockish')} .${cls}`
+			: __('Toggle a class', 'blockish');
+	} else if (action.type === 'show') {
+		actionLabel = __('Show', 'blockish');
+	} else if (action.type === 'hide') {
+		actionLabel = __('Hide', 'blockish');
+	} else if (action.type === 'toggle') {
+		actionLabel = __('Toggle visibility', 'blockish');
 	} else {
 		actionLabel = __('Custom code', 'blockish');
 	}

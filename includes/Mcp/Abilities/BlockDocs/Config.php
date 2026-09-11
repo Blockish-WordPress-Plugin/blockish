@@ -42,7 +42,7 @@ class Config
             'permission_callback' => fn() => current_user_can('edit_posts'),
             'meta'                => [
                 'mcp' => ['public' => true],
-                'usage_notes' => 'ALWAYS pass block_names with only the blocks you need. Omitting it does NOT return the full library — you get an error plus blocks/extensions catalogs; choose names from those and call again. Prefer get-blocks-info first when exploring.',
+                'usage_notes' => 'ALWAYS pass block_names with only the blocks you need. Omitting it does NOT return the full library — you get an error plus blocks/extensions catalogs; choose names from those and call again. Prefer get-blocks-info first when exploring. Addon docs when those plugins are active: include `"blockish-forms"` or `"blockish-dynamicity"` in block_names.',
             ],
         ];
     }

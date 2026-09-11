@@ -13,6 +13,8 @@ export default function BlockInteractionsPanel({
 	draft,
 	setDraft,
 	knownEventNames,
+	clientId,
+	onPreview,
 }) {
 	if (editing && draft) {
 		return (
@@ -21,6 +23,8 @@ export default function BlockInteractionsPanel({
 				onChange={setDraft}
 				knownEventNames={knownEventNames}
 				scope="block"
+				clientId={clientId}
+				onPreview={onPreview}
 			/>
 		);
 	}

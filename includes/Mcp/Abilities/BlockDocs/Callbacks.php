@@ -16,7 +16,7 @@ class Callbacks
             return [
                 'error'      => 'block_names is required. Do not fetch the full library — it wastes context. Choose the blocks you need from `blocks` (and related addons from `extensions`), then call again with those names, e.g. block_names: ["blockish/container", "blockish/heading", "blockish/button"].',
                 'blocks'     => get_option( 'blockish_block_list', [] ),
-                'extensions' => get_option( 'blockish_extension_list', [] ),
+                'extensions' => self::mcp_extension_catalog(),
             ];
         }
 
@@ -64,9 +64,24 @@ class Callbacks
         if ( ! empty( $missing ) ) {
             $result['warning'] = 'No docs file for: ' . implode( ', ', $missing ) . '. Check `blocks` / `extensions` for valid names, then retry.';
             $result['blocks']  = get_option( 'blockish_block_list', [] );
-            $result['extensions'] = get_option( 'blockish_extension_list', [] );
+            $result['extensions'] = self::mcp_extension_catalog();
         }
 
         return $result;
+    }
+
+    /**
+     * MCP catalog — omit Animation until that addon is documented for AI.
+     *
+     * @return array
+     */
+    private static function mcp_extension_catalog(): array
+    {
+        $list = get_option( 'blockish_extension_list', [] );
+        if ( ! is_array( $list ) ) {
+            return [];
+        }
+        unset( $list['animation'] );
+        return $list;
     }
 }

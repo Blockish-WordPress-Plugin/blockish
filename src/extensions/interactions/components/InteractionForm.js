@@ -1,10 +1,12 @@
 import { useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import {
 	SelectControl,
 	TextControl,
 	ToggleControl,
 	RangeControl,
+	Button,
 } from '@wordpress/components';
 import {
 	ACTION_TYPES,
@@ -14,7 +16,14 @@ import {
 	PRESETS,
 	SOURCE_OPTIONS,
 	DEFAULT_PRESET_OPTIONS,
+	CUSTOM_JS_PLACEHOLDER,
+	VISIBILITY_MODES,
+	EASING_OPTIONS,
+	getPresetAnimate,
+	isBlankCustomJs,
 } from '../utils/constants';
+import { cssEaseToGsap, cssOptsToTween, patchMotionFirstTween, toSeconds } from '../utils/motion';
+import MotionProperties from './MotionProperties';
 
 function ChoiceCards({ options, value, onChange, name }) {
 	return (
@@ -43,20 +52,27 @@ function ChoiceCards({ options, value, onChange, name }) {
 	);
 }
 
-function PresetGrid({ value, onChange }) {
+function ChipGrid({ items, value, onChange, name, columns = 4 }) {
 	return (
-		<div className="blockish-ix-preset-grid">
-			{PRESETS.map((preset) => {
-				const selected = value === preset.id;
+		<div
+			className={`blockish-ix-preset-grid blockish-ix-preset-grid--${columns}`}
+			role="radiogroup"
+			aria-label={name}
+		>
+			{items.map((item) => {
+				const id = item.id ?? item.value;
+				const selected = value === id;
 				return (
 					<button
-						key={preset.id}
+						key={id}
 						type="button"
+						role="radio"
+						aria-checked={selected}
 						className={`blockish-ix-preset${selected ? ' is-selected' : ''}`}
-						onClick={() => onChange(preset.id)}
+						title={item.hint || item.description || item.label}
+						onClick={() => onChange(id)}
 					>
-						<span className="blockish-ix-preset__label">{preset.label}</span>
-						<span className="blockish-ix-preset__hint">{preset.hint}</span>
+						<span className="blockish-ix-preset__label">{item.label}</span>
 					</button>
 				);
 			})}
@@ -78,11 +94,20 @@ export default function InteractionForm({
 	onChange,
 	knownEventNames = [],
 	scope,
+	clientId,
+	onPreview,
 }) {
 	const { BlockishCodeEditor, BlockishSelect } =
 		window?.blockish?.components || {};
 	const [showAdvanced, setShowAdvanced] = useState(
 		!!(draft?.when?.selector || '').trim()
+	);
+	const [showApplyTo, setShowApplyTo] = useState(
+		!!(draft?.action?.applyTo || '').trim()
+	);
+	const [showNotify, setShowNotify] = useState(
+		!!(draft?.action?.eventName || '').trim() ||
+			draft?.action?.type === 'emit'
 	);
 
 	if (!draft) {
@@ -98,11 +123,32 @@ export default function InteractionForm({
 
 	const updateWhen = (patch) => onChange({ ...draft, when: { ...when, ...patch } });
 	const updateAction = (patch) => onChange({ ...draft, action: { ...action, ...patch } });
-	const updatePresetOptions = (patch) =>
-		updateAction({ presetOptions: { ...presetOptions, ...patch } });
+	const updatePresetOptions = (patch) => {
+		const next = { ...presetOptions, ...patch };
+		updateAction({
+			presetOptions: next,
+			motion: patchMotionFirstTween(action.motion, next),
+		});
+	};
+	const replacePresetOptions = (next) => {
+		updateAction({
+			presetOptions: next,
+			motion: patchMotionFirstTween(action.motion, next),
+		});
+	};
 
-	const durationSec = (presetOptions.duration / 1000).toFixed(1).replace(/\.0$/, '');
-	const delaySec = (presetOptions.delay / 1000).toFixed(1).replace(/\.0$/, '');
+	const durationSec = Math.round(toSeconds(presetOptions.duration, 0.6) * 100) / 100;
+	const delaySec = Math.round(toSeconds(presetOptions.delay, 0) * 100) / 100;
+	const staggerSec = Math.round(toSeconds(presetOptions.stagger, 0) * 100) / 100;
+	const visibilityTypes = { show: true, hide: true, toggle: true };
+	const actionGroup = visibilityTypes[action.type] ? 'visibility' : action.type || 'preset';
+	const canPreview =
+		scope === 'block' &&
+		!!clientId &&
+		typeof onPreview === 'function' &&
+		actionGroup !== 'emit' &&
+		actionGroup !== 'custom';
+	const isScrollScrub = when.event === 'scrollProgress';
 
 	const eventNameSuggestions = knownEventNames.map((name) => ({
 		label: name,
@@ -113,11 +159,8 @@ export default function InteractionForm({
 		...eventNameSuggestions,
 		{ label: __('Type a custom name…', 'blockish'), value: '__custom__' },
 	];
-	const selectedTrigger = DOM_EVENTS.find((o) => o.value === (when.event || 'ready')) || null;
 	const selectedListenPhase =
 		LISTEN_PHASE_OPTIONS.find((o) => o.value === (when.phase || 'start')) || null;
-	const selectedEmitPhase =
-		PHASE_OPTIONS.find((o) => o.value === (action.phase || 'start')) || null;
 	const selectedSignal = (() => {
 		if (!when.eventName) {
 			return signalSelectOptions[0];
@@ -157,15 +200,17 @@ export default function InteractionForm({
 							{__('When should this run?', 'blockish')}
 						</h3>
 						<p className="blockish-ix-card__subtitle">
-							{__('Pick what starts this interaction.', 'blockish')}
+							{__('How this interaction starts — on this block, or when another one broadcasts a name.', 'blockish')}
 						</p>
 					</div>
 				</header>
 
-				<ChoiceCards
-					name={__('Trigger', 'blockish')}
-					options={SOURCE_OPTIONS}
+				<p className="blockish-ix-field-label">{__('How it starts', 'blockish')}</p>
+				<ChipGrid
+					name={__('How it starts', 'blockish')}
+					items={SOURCE_OPTIONS}
 					value={when.source || 'dom'}
+					columns={2}
 					onChange={(source) => updateWhen({ source })}
 				/>
 
@@ -214,7 +259,7 @@ export default function InteractionForm({
 							<TextControl
 								label={__('Signal name', 'blockish')}
 								help={__(
-									'Use the same name as the “Send a signal” action on the other block.',
+									'Same name as “Tell another interaction” on the other block. For a sequence, choose when that name finishes.',
 									'blockish'
 								)}
 								placeholder={__('e.g. open-menu', 'blockish')}
@@ -244,23 +289,26 @@ export default function InteractionForm({
 					</div>
 				) : (
 					<div className="blockish-ix-card__fields">
-						{BlockishSelect ? (
-							<BlockishSelect
-								label={__('Trigger', 'blockish')}
-								value={selectedTrigger}
-								options={DOM_EVENTS}
-								isClearable={false}
-								onChange={(val) =>
-									updateWhen({ event: parseSelectValue(val) || 'ready' })
-								}
-								{...selectPortalProps}
-							/>
-						) : (
-							<SelectControl
-								label={__('Trigger', 'blockish')}
-								value={when.event || 'ready'}
-								options={DOM_EVENTS}
-								onChange={(event) => updateWhen({ event })}
+						<p className="blockish-ix-field-label">{__('Trigger', 'blockish')}</p>
+						<ChipGrid
+							name={__('Trigger', 'blockish')}
+							items={DOM_EVENTS}
+							value={when.event || 'ready'}
+							onChange={(event) => updateWhen({ event })}
+						/>
+
+						{when.event === 'scroll' && (
+							<RangeControl
+								label={__('After scrolling', 'blockish')}
+								help={__(
+									'Runs once the page has scrolled this far. Scrolls back above it reverses.',
+									'blockish'
+								)}
+								value={Number(when.scrollY) >= 0 ? Number(when.scrollY) : 80}
+								onChange={(scrollY) => updateWhen({ scrollY })}
+								min={0}
+								max={1000}
+								step={10}
 							/>
 						)}
 
@@ -270,13 +318,13 @@ export default function InteractionForm({
 								className="blockish-ix-link-btn"
 								onClick={() => setShowAdvanced(true)}
 							>
-								{__('Target a specific part inside this block…', 'blockish')}
+								{__('Click a child inside this block…', 'blockish')}
 							</button>
 						) : (
 							<TextControl
-								label={__('Inner target (optional)', 'blockish')}
+								label={__('Click / hover this child (optional)', 'blockish')}
 								help={__(
-									'Usually leave this blank. Only needed if you want a child element — use a class from Class Manager.',
+									'Leave empty to use the whole block. Does not change where the animation plays.',
 									'blockish'
 								)}
 								placeholder={__('e.g. .hero-image', 'blockish')}
@@ -296,7 +344,12 @@ export default function InteractionForm({
 							{__('What should happen?', 'blockish')}
 						</h3>
 						<p className="blockish-ix-card__subtitle">
-							{__('Choose an animation, a signal, or custom code.', 'blockish')}
+							{isScrollScrub
+								? __(
+										'From → to follows this block through the viewport as you scroll.',
+										'blockish'
+								  )
+								: __('What this block does. Telling another block is optional, underneath.', 'blockish')}
 						</p>
 					</div>
 				</header>
@@ -304,35 +357,135 @@ export default function InteractionForm({
 				<ChoiceCards
 					name={__('Action', 'blockish')}
 					options={ACTION_TYPES}
-					value={action.type || 'preset'}
-					onChange={(type) => updateAction({ type })}
+					value={actionGroup}
+					onChange={(group) => {
+						if (group === 'visibility') {
+							updateAction({
+								type: visibilityTypes[action.type]
+									? action.type
+									: 'toggle',
+							});
+							return;
+						}
+						if (group === 'emit') {
+							setShowNotify(true);
+							updateAction({ type: 'emit', phase: 'start' });
+							return;
+						}
+						updateAction({
+							type: group,
+							phase: action.phase || 'end',
+						});
+					}}
 				/>
 
 				{action.type === 'preset' && (
 					<div className="blockish-ix-card__fields">
 						<p className="blockish-ix-field-label">{__('Animation', 'blockish')}</p>
-						<PresetGrid
+						<ChipGrid
+							name={__('Animation', 'blockish')}
+							items={PRESETS}
 							value={action.preset || 'fadeUp'}
-							onChange={(preset) => updateAction({ preset })}
+							onChange={(preset) => {
+								const next = {
+									duration: presetOptions.duration,
+									delay: presetOptions.delay,
+									once: presetOptions.once,
+									stagger: presetOptions.stagger,
+									...getPresetAnimate(preset),
+								};
+								updateAction({
+									preset,
+									presetOptions: next,
+									motion: {
+										...(action.motion || {}),
+										tweens: [cssOptsToTween(next)],
+									},
+								});
+							}}
 						/>
-						<RangeControl
-							label={__('How long', 'blockish')}
-							help={`${durationSec}s`}
-							value={presetOptions.duration}
-							onChange={(duration) => updatePresetOptions({ duration })}
-							min={100}
-							max={3000}
-							step={50}
-						/>
-						<RangeControl
-							label={__('Wait before starting', 'blockish')}
-							help={presetOptions.delay ? `${delaySec}s` : __('No wait', 'blockish')}
-							value={presetOptions.delay}
-							onChange={(delay) => updatePresetOptions({ delay })}
-							min={0}
-							max={3000}
-							step={50}
-						/>
+						{applyFilters(
+							'blockish.interactions.motionFields',
+							<div className="blockish-ix-motion-panel">
+								<div className="blockish-ix-motion-split">
+									<MotionProperties
+										presetOptions={presetOptions}
+										updatePresetOptions={updatePresetOptions}
+										replacePresetOptions={replacePresetOptions}
+									/>
+									{!isScrollScrub && (
+										<div className="blockish-ix-timing-row">
+											<label className="blockish-ix-timing-row__item">
+												<span>{__('Time', 'blockish')}</span>
+												<span className="blockish-ix-timing-row__field">
+													<input
+														className="blockish-ix-num"
+														type="number"
+														min={0.05}
+														max={5}
+														step={0.05}
+														aria-label={__('Duration', 'blockish')}
+														value={durationSec}
+														onChange={(event) => {
+															const next = Number(event.target.value);
+															updatePresetOptions({
+																duration: Math.max(
+																	0.05,
+																	Number.isFinite(next) ? next : 0.6
+																),
+															});
+														}}
+													/>
+													<span className="blockish-ix-prop-row__unit">s</span>
+												</span>
+											</label>
+											<label className="blockish-ix-timing-row__item">
+												<span>{__('Delay', 'blockish')}</span>
+												<span className="blockish-ix-timing-row__field">
+													<input
+														className="blockish-ix-num"
+														type="number"
+														min={0}
+														max={5}
+														step={0.05}
+														aria-label={__('Delay', 'blockish')}
+														value={delaySec}
+														onChange={(event) => {
+															const next = Number(event.target.value);
+															updatePresetOptions({
+																delay: Math.max(
+																	0,
+																	Number.isFinite(next) ? next : 0
+																),
+															});
+														}}
+													/>
+													<span className="blockish-ix-prop-row__unit">s</span>
+												</span>
+											</label>
+											<div className="blockish-ix-timing-row__ease">
+												<SelectControl
+													label={__('Ease', 'blockish')}
+													value={cssEaseToGsap(presetOptions.easing)}
+													options={EASING_OPTIONS}
+													onChange={(easing) =>
+														updatePresetOptions({ easing })
+													}
+												/>
+											</div>
+										</div>
+									)}
+								</div>
+							</div>,
+							{
+								action,
+								presetOptions,
+								updateAction,
+								updatePresetOptions,
+								replacePresetOptions,
+								when,
+							}
+						)}
 						{(when.event === 'inView' || when.source === 'listen') && (
 							<ToggleControl
 								label={__('Only run once', 'blockish')}
@@ -340,40 +493,107 @@ export default function InteractionForm({
 								onChange={(once) => updatePresetOptions({ once })}
 							/>
 						)}
+						{when.event === 'inView' && (
+							<label className="blockish-ix-timing-row__item">
+								<span>{__('Stagger', 'blockish')}</span>
+								<input
+									className="blockish-ix-num"
+									type="number"
+									min={0}
+									max={1}
+									step={0.05}
+									aria-label={__('Stagger children', 'blockish')}
+									value={staggerSec}
+									onChange={(event) => {
+										const next = Number(event.target.value);
+										updatePresetOptions({
+											stagger: Math.max(
+												0,
+												Number.isFinite(next) ? next : 0
+											),
+										});
+									}}
+								/>
+								<span className="blockish-ix-prop-row__unit">s</span>
+							</label>
+						)}
+					</div>
+				)}
+
+				{actionGroup === 'visibility' && (
+					<div className="blockish-ix-card__fields">
+						<p className="blockish-ix-field-label">
+							{__('Visibility', 'blockish')}
+						</p>
+						<div className="blockish-ix-choice-cards" role="radiogroup">
+							{VISIBILITY_MODES.map((mode) => {
+								const selected = (action.type || 'toggle') === mode.value;
+								return (
+									<button
+										key={mode.value}
+										type="button"
+										role="radio"
+										aria-checked={selected}
+										className={`blockish-ix-choice-card${
+											selected ? ' is-selected' : ''
+										}`}
+										onClick={() => updateAction({ type: mode.value })}
+									>
+										<span className="blockish-ix-choice-card__label">
+											{mode.label}
+										</span>
+									</button>
+								);
+							})}
+						</div>
+						<p className="blockish-interaction-form__hint">
+							{__(
+								'Click toggles. Hover shows while the pointer is over it.',
+								'blockish'
+							)}
+						</p>
+					</div>
+				)}
+
+				{action.type === 'toggleClass' && (
+					<div className="blockish-ix-card__fields">
+						<TextControl
+							label={__('Class name', 'blockish')}
+							help={__(
+								'Without the dot. Hover adds it and removes it on leave; click toggles.',
+								'blockish'
+							)}
+							placeholder={__('e.g. is-active', 'blockish')}
+							value={String(action.className || '').replace(/^\./, '')}
+							onChange={(className) =>
+								updateAction({
+									className: String(className || '')
+										.replace(/^\./, '')
+										.trim(),
+								})
+							}
+						/>
 					</div>
 				)}
 
 				{action.type === 'emit' && (
 					<div className="blockish-ix-card__fields">
+						<p className="blockish-interaction-form__hint">
+							{__(
+								'Use this when this block should do nothing except broadcast a name. For click → animate → then the next block, keep Play an animation and open “Tell another interaction” below.',
+								'blockish'
+							)}
+						</p>
 						<TextControl
-							label={__('Signal name', 'blockish')}
+							label={__('Name to broadcast', 'blockish')}
 							help={__(
-								'Other blocks can wait for this exact name.',
+								'On the other block: How it starts → Wait for a name → this exact name.',
 								'blockish'
 							)}
 							placeholder={__('e.g. open-menu', 'blockish')}
 							value={action.eventName || ''}
 							onChange={(eventName) => updateAction({ eventName })}
 						/>
-						{BlockishSelect ? (
-							<BlockishSelect
-								label={__('This signal means…', 'blockish')}
-								value={selectedEmitPhase}
-								options={PHASE_OPTIONS}
-								isClearable={false}
-								onChange={(val) =>
-									updateAction({ phase: parseSelectValue(val) || 'start' })
-								}
-								{...selectPortalProps}
-							/>
-						) : (
-							<SelectControl
-								label={__('This signal means…', 'blockish')}
-								value={action.phase || 'start'}
-								options={PHASE_OPTIONS}
-								onChange={(phase) => updateAction({ phase })}
-							/>
-						)}
 					</div>
 				)}
 
@@ -381,29 +601,139 @@ export default function InteractionForm({
 					<div className="blockish-ix-card__fields">
 						<p className="blockish-interaction-form__hint">
 							{__(
-								'For developers. Your code receives event and blockElement.',
+								'Runs as a function (event, blockElement). blockElement is this block, or the Inner target match if you set one in step 1.',
 								'blockish'
 							)}
 						</p>
-						{BlockishCodeEditor ? (
-							<BlockishCodeEditor
-								label={__('JavaScript', 'blockish')}
-								value={(action.callbacks && action.callbacks[0]) || ''}
-								onChange={(code) => updateAction({ callbacks: [code] })}
+						<div
+							className={`blockish-ix-js-editor${
+								isBlankCustomJs(action.callbacks?.[0])
+									? ' is-empty'
+									: ''
+							}`}
+						>
+							{isBlankCustomJs(action.callbacks?.[0]) && (
+								<pre
+									className="blockish-ix-js-editor__placeholder"
+									aria-hidden="true"
+								>
+									{CUSTOM_JS_PLACEHOLDER}
+								</pre>
+							)}
+							{BlockishCodeEditor ? (
+								<BlockishCodeEditor
+									label={__('JavaScript', 'blockish')}
+									value={
+										isBlankCustomJs(action.callbacks?.[0])
+											? ''
+											: action.callbacks[0]
+									}
+									onChange={(code) =>
+										updateAction({
+											callbacks: [
+												isBlankCustomJs(code) ? '' : code,
+											],
+										})
+									}
+									help={__(
+										'Inner target uses a Class Manager class, e.g. .hero-image — that node is blockElement.',
+										'blockish'
+									)}
+								/>
+							) : (
+								<textarea
+									className="blockish-interaction-form__textarea"
+									rows={8}
+									placeholder={CUSTOM_JS_PLACEHOLDER}
+									value={
+										isBlankCustomJs(action.callbacks?.[0])
+											? ''
+											: action.callbacks[0]
+									}
+									onChange={(e) =>
+										updateAction({
+											callbacks: [
+												isBlankCustomJs(e.target.value)
+													? ''
+													: e.target.value,
+											],
+										})
+									}
+								/>
+							)}
+						</div>
+					</div>
+				)}
+
+				{action.type !== 'emit' && (
+					<div className="blockish-ix-card__fields">
+						{showApplyTo ? (
+							<TextControl
+								label={__('Play this on a different block', 'blockish')}
+								help={__(
+									'Empty = this block. Class Manager class on the other block, e.g. .hero-card',
+									'blockish'
+								)}
+								placeholder={__('e.g. .hero-card', 'blockish')}
+								value={action.applyTo || ''}
+								onChange={(applyTo) => updateAction({ applyTo })}
 							/>
 						) : (
-							<textarea
-								className="blockish-interaction-form__textarea"
-								rows={8}
-								value={(action.callbacks && action.callbacks[0]) || ''}
-								onChange={(e) =>
-									updateAction({ callbacks: [e.target.value] })
-								}
-							/>
+							<button
+								type="button"
+								className="blockish-ix-link-btn"
+								onClick={() => setShowApplyTo(true)}
+							>
+								{__('Play this on a different block…', 'blockish')}
+							</button>
+						)}
+						{showNotify ? (
+							<>
+								<TextControl
+									label={__('Tell another interaction', 'blockish')}
+									help={__(
+										'Broadcast this name when the action runs. On the other block: How it starts → Wait for a name → same name.',
+										'blockish'
+									)}
+									placeholder={__('e.g. hero-moved', 'blockish')}
+									value={action.eventName || ''}
+									onChange={(eventName) => updateAction({ eventName })}
+								/>
+								{!!(action.eventName || '').trim() && (
+									<SelectControl
+										label={__('Broadcast', 'blockish')}
+										value={action.phase || 'end'}
+										options={PHASE_OPTIONS}
+										onChange={(phase) => updateAction({ phase })}
+									/>
+								)}
+							</>
+						) : (
+							<button
+								type="button"
+								className="blockish-ix-link-btn"
+								onClick={() => setShowNotify(true)}
+							>
+								{__('Then tell another interaction to run…', 'blockish')}
+							</button>
 						)}
 					</div>
 				)}
 			</section>
+
+			{canPreview ? (
+				<div className="blockish-ix-preview-row">
+					<Button variant="secondary" onClick={onPreview}>
+						{__('Preview on this block', 'blockish')}
+					</Button>
+					<p className="blockish-ix-preview-row__hint">
+						{__(
+							'This is only a preview on the selected block. Scroll and pin animations are not shown here — view the front end for those.',
+							'blockish'
+						)}
+					</p>
+				</div>
+			) : null}
 
 			<p className="blockish-ix-pro-note">
 				{__(
