@@ -280,12 +280,11 @@ export default function ExtensionCard({ extension, isSaving, onToggle, onOpenSet
 							style={{ padding: '8px 24px' }}
 							onClick={() => {
 								setIsPremiumModalOpen(false);
-								if (onNavigate) {
-									onNavigate('addons');
-								}
+								const proUrl = window.blockishDashboardData?.links?.pricing || 'https://blockish.wowdevs.com/pricing/';
+								window.open(proUrl, '_blank');
 							}}
 						>
-							{__('Get Addon', 'blockish')}
+							{__('Get Pro', 'blockish')}
 						</Button>
 					</Flex>
 				</VStack>

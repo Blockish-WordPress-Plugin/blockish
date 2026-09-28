@@ -11,7 +11,6 @@ return array(
     'Automattic\\Jetpack\\Autoloader\\AutoloadProcessor' => $vendorDir . '/automattic/jetpack-autoloader/src/AutoloadProcessor.php',
     'Automattic\\Jetpack\\Autoloader\\CustomAutoloaderPlugin' => $vendorDir . '/automattic/jetpack-autoloader/src/CustomAutoloaderPlugin.php',
     'Automattic\\Jetpack\\Autoloader\\ManifestGenerator' => $vendorDir . '/automattic/jetpack-autoloader/src/ManifestGenerator.php',
-    'Blockish\\Config\\AddonsList' => $baseDir . '/includes/Config/AddonsList.php',
     'Blockish\\Config\\BlocksList' => $baseDir . '/includes/Config/BlocksList.php',
     'Blockish\\Config\\ConfigList' => $baseDir . '/includes/Config/ConfigList.php',
     'Blockish\\Config\\ExtensionList' => $baseDir . '/includes/Config/ExtensionList.php',

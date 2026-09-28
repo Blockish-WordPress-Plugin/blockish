@@ -38,10 +38,6 @@ return array(
 		'version' => '5.0.20',
 		'path'    => $vendorDir . '/automattic/jetpack-autoloader/src/ManifestGenerator.php'
 	),
-	'Blockish\\Config\\AddonsList' => array(
-		'version' => 'dev-main',
-		'path'    => $baseDir . '/includes/Config/AddonsList.php'
-	),
 	'Blockish\\Config\\BlocksList' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Config/BlocksList.php'

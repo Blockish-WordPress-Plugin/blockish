@@ -5,7 +5,6 @@ import ExtensionsPage from './extensions-page';
 import PlaceholderSection from './placeholder-section';
 import SettingsPage from './settings-page';
 import IntegrationsPage from './integrations-page';
-import AddonsPage from './addons-page';
 import McpConfigPage from './mcp-config-page';
 
 import { applyFilters } from '@wordpress/hooks';
@@ -61,10 +60,6 @@ export default function ContentArea({
 
 	if (activeMenu === 'integrations') {
 		return <IntegrationsPage />;
-	}
-
-	if (activeMenu === 'addons') {
-		return <AddonsPage blocks={data?.blocks} extensions={data?.extensions} />;
 	}
 
 	if (activeMenu === 'mcp-config') {

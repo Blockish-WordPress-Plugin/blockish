@@ -570,3 +570,20 @@ export const htmlChild = (
 		}
 	/>
 );
+
+export const queryBuilder = <BlockishIcon icon="database" />;
+export const loop = <BlockishIcon icon="list-view" />;
+export const pagination = <BlockishIcon icon="ellipsis" />;
+export const form = <BlockishIcon icon="feedback" />;
+export const text = <BlockishIcon icon="edit" />;
+export const email = <BlockishIcon icon="email" />;
+export const number = <BlockishIcon icon="editor-ol" />;
+export const textarea = <BlockishIcon icon="editor-paragraph" />;
+export const consent = <BlockishIcon icon="yes" />;
+export const select = <BlockishIcon icon="arrow-down-alt2" />;
+export const radio = <BlockishIcon icon="marker" />;
+export const checkbox = <BlockishIcon icon="yes-alt" />;
+export const phone = <BlockishIcon icon="phone" />;
+export const date = <BlockishIcon icon="calendar-alt" />;
+export const file = <BlockishIcon icon="upload" />;
+export const submit = <BlockishIcon icon="button" />;

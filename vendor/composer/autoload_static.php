@@ -55,7 +55,6 @@ class ComposerStaticInit5a0f551b1813cddc2ea500c265a7dbf0
         'Automattic\\Jetpack\\Autoloader\\AutoloadProcessor' => __DIR__ . '/..' . '/automattic/jetpack-autoloader/src/AutoloadProcessor.php',
         'Automattic\\Jetpack\\Autoloader\\CustomAutoloaderPlugin' => __DIR__ . '/..' . '/automattic/jetpack-autoloader/src/CustomAutoloaderPlugin.php',
         'Automattic\\Jetpack\\Autoloader\\ManifestGenerator' => __DIR__ . '/..' . '/automattic/jetpack-autoloader/src/ManifestGenerator.php',
-        'Blockish\\Config\\AddonsList' => __DIR__ . '/../..' . '/includes/Config/AddonsList.php',
         'Blockish\\Config\\BlocksList' => __DIR__ . '/../..' . '/includes/Config/BlocksList.php',
         'Blockish\\Config\\ConfigList' => __DIR__ . '/../..' . '/includes/Config/ConfigList.php',
         'Blockish\\Config\\ExtensionList' => __DIR__ . '/../..' . '/includes/Config/ExtensionList.php',

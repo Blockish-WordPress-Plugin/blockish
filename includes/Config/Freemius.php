@@ -38,8 +38,7 @@ class Freemius {
 
 			// Strip Freemius Plugins-row links before add-ons boot (they fire on this action).
 			$this->hide_plugins_row_links( $this->sdk );
-			add_action( 'blockish-forms/freemius/loaded', array( $this, 'hide_plugins_row_links' ) );
-			add_action( 'blockish-dynamicity/freemius/loaded', array( $this, 'hide_plugins_row_links' ) );
+			add_action( 'blockish-pro/freemius/loaded', array( $this, 'hide_plugins_row_links' ) );
 
 			do_action( 'blockish/freemius/loaded', $this->sdk );
 		}
@@ -243,21 +242,14 @@ class Freemius {
 		}
 
 		// Prevent Freemius from bloating the front-end with database queries.
-		// We only load the SDK where it's actually needed (admin, ajax, cron, REST, CLI, or webhooks).
-		//
-		// CRITICAL: REST_REQUEST is defined late (after parse_request). Plugin bootstrap
-		// runs earlier, so URI / rest_route detection is required — otherwise add-ons that
-		// gate on Freemius never register CPT REST routes and editor saves fail with
-		// "No route was found matching the URL and request method."
+		// We only load the SDK where it's actually needed (admin, ajax, REST, or webhooks).
 		$is_admin   = is_admin();
 		$is_ajax    = wp_doing_ajax();
-		$is_cron    = wp_doing_cron();
-		$is_cli     = defined( 'WP_CLI' ) && WP_CLI;
 		$is_rest    = $this->is_rest_request_early();
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Freemius webhook/callback detection only.
 		$is_webhook = isset( $_REQUEST['fs_action'] ) || isset( $_REQUEST['freemius'] );
 
-		if ( ! $is_admin && ! $is_ajax && ! $is_cron && ! $is_cli && ! $is_rest && ! $is_webhook ) {
+		if ( ! $is_admin && ! $is_ajax && ! $is_rest && ! $is_webhook ) {
 			return false;
 		}
 
@@ -295,6 +287,134 @@ class Freemius {
 					'addons'      => false,
 				),
 			)
+		);
+	}
+
+	/**
+	 * Check whether Blockish Pro is installed and active.
+	 *
+	 * @return bool
+	 */
+	public function is_pro_installed() {
+		return class_exists( 'Blockish_Pro' );
+	}
+
+	/**
+	 * Check whether local/dev environment bypasses license gating.
+	 *
+	 * @return bool
+	 */
+	public function is_local_license_bypass() {
+		if ( function_exists( 'wp_get_environment_type' ) && in_array( wp_get_environment_type(), array( 'local', 'development' ), true ) ) {
+			return true;
+		}
+
+		$host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+		if ( preg_match( '/\.(local|localhost|test)$/i', $host ) || $host === 'localhost' || $host === '127.0.0.1' ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Retrieve real Freemius license metadata for Blockish Pro.
+	 *
+	 * @return array
+	 */
+	public function get_pro_license_meta() {
+		$meta = array(
+			'is_active'  => false,
+			'fs_ready'   => false,
+			'masked_key' => '',
+			'plan_title' => '',
+		);
+
+		if ( ! function_exists( 'blockish_pro_fs' ) ) {
+			return $meta;
+		}
+
+		$sdk = blockish_pro_fs();
+		if ( ! is_object( $sdk ) ) {
+			return $meta;
+		}
+
+		$meta['fs_ready'] = true;
+		if ( method_exists( $sdk, 'can_use_premium_code' ) && $sdk->can_use_premium_code() ) {
+			$meta['is_active'] = true;
+		}
+
+		if ( method_exists( $sdk, '_get_license' ) ) {
+			$license = $sdk->_get_license();
+			if ( is_object( $license ) && ! empty( $license->secret_key ) ) {
+				$secret = (string) $license->secret_key;
+				$length = strlen( $secret );
+				$meta['masked_key'] = $length <= 9
+					? str_repeat( '•', max( 0, $length ) )
+					: substr( $secret, 0, 6 ) . str_repeat( '•', $length - 9 ) . substr( $secret, -3 );
+			}
+		}
+
+		if ( method_exists( $sdk, 'get_plan_title' ) ) {
+			$plan_title = trim( (string) $sdk->get_plan_title() );
+			if ( '' !== $plan_title && 'PLAN_TITLE' !== strtoupper( $plan_title ) ) {
+				$meta['plan_title'] = $plan_title;
+			}
+		}
+
+		if ( ! $meta['is_active'] ) {
+			$meta['masked_key'] = '';
+			$meta['plan_title'] = '';
+		}
+
+		return $meta;
+	}
+
+	/**
+	 * Check whether Blockish Pro is licensed (or local dev bypass is active).
+	 *
+	 * @return bool
+	 */
+	public function is_pro_licensed() {
+		return $this->get_pro_license_meta()['is_active'] || $this->is_local_license_bypass();
+	}
+
+	/**
+	 * Check whether Blockish Pro features are available (installed & licensed).
+	 *
+	 * @return bool
+	 */
+	public function is_pro_available() {
+		return $this->is_pro_installed() && $this->is_pro_licensed();
+	}
+
+	/**
+	 * Check whether Blockish Pro has a real active Freemius license (no dev bypass, used by cloud templates).
+	 *
+	 * @return bool
+	 */
+	public function has_active_pro_license() {
+		return ! empty( $this->get_pro_license_meta()['is_active'] );
+	}
+
+	/**
+	 * Get structured Pro status data.
+	 *
+	 * @return array
+	 */
+	public function get_pro_data() {
+		$installed = $this->is_pro_installed();
+		$license   = $this->get_pro_license_meta();
+		$licensed  = $license['is_active'] || $this->is_local_license_bypass();
+
+		return array(
+			'name'                 => __( 'Blockish Pro', 'blockish' ),
+			'description'          => __( 'Unlock Form Builder, Query Loop, Dynamic Data, GSAP Animations, and advanced display conditions.', 'blockish' ),
+			'is_installed'         => $installed,
+			'is_licensed'          => $licensed,
+			'is_available'         => $installed && $licensed,
+			'supports_license_key' => true,
+			'license'              => $license,
 		);
 	}
 }
