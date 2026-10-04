@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { EXTENSION_CONTROL_MAP, EXTENSION_FILTERS, getExtensionCategoryKey } from '../utils';
 import ExtensionCard from './extension-card';
-import { getExtensionSettingsComponent } from './settings';
+import { getCustomExtensionSettings, getExtensionSettingsComponent } from './settings';
 
 function humanizeSlug(slug) {
 	return (slug || '')
@@ -67,7 +67,7 @@ export default function ExtensionsPage({
 				description: isUnavailable
 					? __('Classic themes only. Block themes use the Site Editor.', 'blockish')
 					: (item?.description || __('Extension module', 'blockish')),
-				hasSpecialControls: Boolean(EXTENSION_CONTROL_MAP[slug]) || slug === 'class-manager',
+				hasSpecialControls: Boolean(EXTENSION_CONTROL_MAP[slug] || getCustomExtensionSettings(slug)),
 				sourceName: item?.addon_name || item?.source_name || 'Blockish',
 			};
 		});
@@ -104,6 +104,7 @@ export default function ExtensionsPage({
 	const SettingsComponent = selectedExtensionSlug
 		? getExtensionSettingsComponent(selectedExtensionSlug)
 		: null;
+	const hasCustomSettings = Boolean(selectedExtensionSlug && getCustomExtensionSettings(selectedExtensionSlug));
 
 	const updateExtensionControl = (slug, key, value) => {
 		setExtensionSettings((prev) => ({
@@ -207,11 +208,15 @@ export default function ExtensionsPage({
 				</section>
 			)}
 
-			{SettingsComponent && selectedExtensionSlug === 'class-manager' && (
-				<SettingsComponent isOpen onRequestClose={() => setSelectedExtensionSlug(null)} />
+			{SettingsComponent && hasCustomSettings && (
+				<SettingsComponent
+					isOpen
+					extension={selectedExtension}
+					onRequestClose={() => setSelectedExtensionSlug(null)}
+				/>
 			)}
 
-			{SettingsComponent && selectedExtensionSlug !== 'class-manager' && selectedSchema && (
+			{SettingsComponent && !hasCustomSettings && selectedSchema && (
 				<SettingsComponent
 					slug={selectedExtensionSlug}
 					schema={selectedSchema}
