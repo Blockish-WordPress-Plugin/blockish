@@ -1,7 +1,7 @@
 import { useState } from '@wordpress/element';
-import Sidebar from '../components/Sidebar';
-import LibraryList from '../components/LibraryList';
-import CreateFlow from '../components/CreateFlow';
+import Sidebar from '../components/sidebar';
+import LibraryList from '../components/library-list';
+import CreateFlow from '../components/create-flow';
 import {
 	getItemEditUrl,
 	getStoredLibraryFilter,

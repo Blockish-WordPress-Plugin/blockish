@@ -78,6 +78,7 @@ class ComposerStaticInit5a0f551b1813cddc2ea500c265a7dbf0
         'Blockish\\Extensions\\ClassUsage' => __DIR__ . '/../..' . '/includes/Extensions/ClassUsage.php',
         'Blockish\\Extensions\\ExtensionsLoader' => __DIR__ . '/../..' . '/includes/Extensions/ExtensionsLoader.php',
         'Blockish\\Extensions\\Interaction' => __DIR__ . '/../..' . '/includes/Extensions/Interaction.php',
+        'Blockish\\Extensions\\InteractionMotion' => __DIR__ . '/../..' . '/includes/Extensions/InteractionMotion.php',
         'Blockish\\Extensions\\ThemeBuilder' => __DIR__ . '/../..' . '/includes/Extensions/ThemeBuilder.php',
         'Blockish\\Extensions\\Visibility' => __DIR__ . '/../..' . '/includes/Extensions/Visibility.php',
         'Blockish\\Mcp\\Abilities\\BlockDocs\\Callbacks' => __DIR__ . '/../..' . '/includes/Mcp/Abilities/BlockDocs/Callbacks.php',

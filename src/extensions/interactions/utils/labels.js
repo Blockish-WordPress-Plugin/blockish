@@ -1,3 +1,4 @@
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { PRESETS } from './constants';
 import { normalizeInteraction } from './compile';
@@ -37,8 +38,15 @@ export function summarizeInteraction(raw) {
 	if (action.type === 'emit') {
 		actionLabel = `${__('Triggers', 'blockish')} “${action.eventName || '?'}” (${phaseLabel(action.phase)})`;
 	} else if (action.type === 'preset') {
-		const preset = PRESETS.find((p) => p.id === action.preset);
+		const preset = applyFilters('blockish.interactions.presets', PRESETS).find(
+			(p) => p.id === action.preset
+		);
 		actionLabel = preset?.label || __('Animation', 'blockish');
+	} else if (action.type === 'scrollTo') {
+		const target = String(action.scrollTarget || '').trim();
+		actionLabel = target
+			? `${__('Scroll to', 'blockish')} ${target}`
+			: __('Scroll to top', 'blockish');
 	} else if (action.type === 'toggleClass') {
 		const cls = String(action.className || '')
 			.replace(/^\./, '')

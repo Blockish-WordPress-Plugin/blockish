@@ -34,6 +34,7 @@ return array(
     'Blockish\\Extensions\\ClassUsage' => $baseDir . '/includes/Extensions/ClassUsage.php',
     'Blockish\\Extensions\\ExtensionsLoader' => $baseDir . '/includes/Extensions/ExtensionsLoader.php',
     'Blockish\\Extensions\\Interaction' => $baseDir . '/includes/Extensions/Interaction.php',
+    'Blockish\\Extensions\\InteractionMotion' => $baseDir . '/includes/Extensions/InteractionMotion.php',
     'Blockish\\Extensions\\ThemeBuilder' => $baseDir . '/includes/Extensions/ThemeBuilder.php',
     'Blockish\\Extensions\\Visibility' => $baseDir . '/includes/Extensions/Visibility.php',
     'Blockish\\Mcp\\Abilities\\BlockDocs\\Callbacks' => $baseDir . '/includes/Mcp/Abilities/BlockDocs/Callbacks.php',

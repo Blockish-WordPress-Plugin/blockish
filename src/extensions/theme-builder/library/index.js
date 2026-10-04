@@ -1,6 +1,6 @@
 import { createRoot } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
-import App from './App';
+import App from './app';
 
 const LIBRARY_ROOT_CLASS = 'blockish-tb-library-root';
 const LIBRARY_APP_CLASS = 'blockish-tb-library-app';

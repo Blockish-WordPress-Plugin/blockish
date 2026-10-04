@@ -58,6 +58,27 @@ Class Manager is for **visual CSS**. Block **attributes** own structure / layout
 
 ---
 
+## 2c. Known traps — check before you write
+
+A class can look right on the frontend and break in the editor (or the reverse). These are the recurring ones.
+
+| Trap | Symptom | Write this instead |
+|---|---|---|
+| **Positioned blocks in the editor.** The editor wraps every block with `.block-editor-block-list__layout .block-editor-block-list__block { position: relative }` (two classes — beats a single class). | Decorative / overlay blocks (orbs, badges, background layers) sit in the flow in the editor, pushing siblings sideways or cutting content. Frontend looks fine. | `position: absolute !important;` (same for `fixed` / `sticky`). Offsets (`top`, `left`, `inset`) then work in both. |
+| **`box-sizing` differs between editor and frontend.** Many themes set `border-box` on the frontend; the editor canvas keeps `content-box`. | A block with `max-width` + padding is wider in the editor (e.g. 1000px → 1082px). | Add `box-sizing: border-box;` to any class that combines `max-width`/`width` with padding or border. |
+| **Custom SVG in `blockish/icon` is rendered at 24×24.** The block forces `width`/`height` attributes, so `height: auto` keeps a square ratio. | A wide SVG scaled to full width becomes as tall as it is wide. | `.my-svg svg { width: 100% !important; height: auto !important; aspect-ratio: <viewBox width> / <viewBox height> !important; }` |
+| **Theme block gap between stacked sections.** Block themes add `margin-block-start` (e.g. `1.2rem`) between top-level blocks in post content. | Thin strips of page background between full-bleed sections that should touch. | On edge-to-edge section classes add `margin-top: 0 !important;`. |
+| **Single-side margin expanded to all four sides.** `margin-top: 90px` is stored as `margin: 90px 0 0 0`. | A centered shell (`align-custom-width` + `max-width`) loses its `auto` side margins and sticks to the left. | On centered blocks write the full shorthand with auto sides: `margin: 90px auto 0;`. |
+| **Multi-value properties collapsed by the converter.** e.g. `background-size: 64px 64px` is stored as `64px`. | Repeating grids / patterns show one line instead of a grid. | Add `!important` to keep the raw value (stored as-is in customCss). |
+| **`background` shorthand resets `background-clip`.** The converter may emit `background-clip` before the `background` shorthand. | Gradient text shows as a solid gradient box. | Always include `-webkit-background-clip: text;` alongside `background-clip: text; color: transparent;` — it is kept as a later rule and wins. |
+| **Gradient text + SplitText (Advanced Interactions).** Split targets wrap text in `.blockish-split-word` / `.blockish-split-char` elements. | Gradient words render as overlapping glyphs or lose the gradient while animating. | Repeat the gradient rule on the split element: `.my-title .accent .blockish-split-word { …same gradient + clip… }`. |
+
+**Verify the write:** `manage-class` returns the stored `css`. Compare it with what you sent — if any value changed (collapsed shorthand, dropped value, reordered `background`), resend that property with `!important`.
+
+**Verify both surfaces:** after staging, check the **editor canvas** as well as the frontend. Editor-only breakage (see the first trap) never shows in a frontend screenshot.
+
+---
+
 ## 3. Write one stylesheet (root + hover + descendants)
 
 ```css

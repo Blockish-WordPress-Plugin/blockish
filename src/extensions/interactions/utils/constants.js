@@ -11,7 +11,7 @@ export const PRESETS = [
 	{ id: 'fadeLeft', label: __('Slide from right', 'blockish'), hint: __('Moves in from the right', 'blockish') },
 	{ id: 'fadeRight', label: __('Slide from left', 'blockish'), hint: __('Moves in from the left', 'blockish') },
 	{ id: 'zoomIn', label: __('Zoom in', 'blockish'), hint: __('Scales up into place', 'blockish') },
-	{ id: 'custom', label: __('Custom', 'blockish'), hint: __('Add only the properties you need', 'blockish') },
+	{ id: 'custom', label: __('Custom', 'blockish'), hint: __('Fine-tune the animation yourself', 'blockish') },
 ];
 
 export const EASING_OPTIONS = [
@@ -72,6 +72,11 @@ export const ACTION_TYPES = [
 		value: 'toggleClass',
 		label: __('Toggle CSS class', 'blockish'),
 		description: __('Add or remove a CSS class', 'blockish'),
+	},
+	{
+		value: 'scrollTo',
+		label: __('Scroll to section', 'blockish'),
+		description: __('Smoothly scroll the page to a section', 'blockish'),
 	},
 	{
 		value: 'emit',

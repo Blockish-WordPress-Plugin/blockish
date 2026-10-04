@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { Button, TabPanel, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 import BlockishSelect from '../../../components/select';
-import GlobalInteractionsPanel from './GlobalInteractionsPanel';
-import PageInteractionsPanel from './PageInteractionsPanel';
-import InteractionsFooter from './InteractionsFooter';
+import GlobalInteractionsPanel from './global-interactions-panel';
+import PageInteractionsPanel from './page-interactions-panel';
+import InteractionsFooter from './interactions-footer';
 import { createEmptyInteraction } from '../utils/constants';
 import { compileList, normalizeInteraction } from '../utils/compile';
 import { collectEventNames } from '../utils/labels';
@@ -354,11 +355,23 @@ export default function GlobalInteractionsBuilder({ onClose }) {
 											setDraft={setDraft}
 											knownEventNames={knownEventNames}
 										/>
+										{!editing &&
+											applyFilters(
+												'blockish.interactions.scopeSettings',
+												null,
+												{
+													scope: 'page',
+													postType,
+													postId,
+													isCurrentPage: !selectedPageOption,
+												}
+											)}
 									</div>
 								);
 							}
 
 							return (
+								<>
 								<GlobalInteractionsPanel
 									items={globalItems}
 									onEdit={(item) => {
@@ -374,6 +387,11 @@ export default function GlobalInteractionsBuilder({ onClose }) {
 									knownEventNames={knownEventNames}
 									loading={globalLoading || globalSaving}
 								/>
+								{!editing &&
+									applyFilters('blockish.interactions.scopeSettings', null, {
+										scope: 'global',
+									})}
+								</>
 							);
 						}}
 					</TabPanel>

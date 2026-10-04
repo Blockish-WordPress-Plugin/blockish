@@ -59,7 +59,7 @@ class Config
 								'action' => [
 									'type'       => 'object',
 									'properties' => [
-										'type'          => [ 'type' => 'string', 'enum' => [ 'preset', 'show', 'hide', 'toggle', 'toggleClass', 'emit', 'custom' ] ],
+										'type'          => [ 'type' => 'string', 'enum' => [ 'preset', 'show', 'hide', 'toggle', 'toggleClass', 'scrollTo', 'emit', 'custom' ] ],
 										'preset'        => [ 'type' => 'string' ],
 										'presetOptions' => [ 'type' => 'object' ],
 										'motion'        => [
@@ -70,6 +70,9 @@ class Config
 										'eventName'     => [ 'type' => 'string', 'description' => 'Signal name. For type emit: the signal to send. For other types: optional then-signal after this action (sequence).' ],
 										'phase'         => [ 'type' => 'string', 'description' => 'emit: signal phase tag. Other types: send then-signal when this starts or finishes (default end).' ],
 										'className'     => [ 'type' => 'string' ],
+										'scrollTarget'  => [ 'type' => 'string', 'description' => 'scrollTo: CSS selector to scroll to (e.g. #pricing). Empty = page top.' ],
+										'scrollOffset'  => [ 'type' => 'integer', 'description' => 'scrollTo: stop this many px above the target.' ],
+										'scrollDuration' => [ 'type' => 'number', 'description' => 'scrollTo: seconds (default 1.2).' ],
 										'callbacks'     => [
 											'type'  => 'array',
 											'items' => [ 'type' => 'string' ],

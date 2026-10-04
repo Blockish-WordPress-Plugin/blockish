@@ -130,6 +130,10 @@ return array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Extensions/Interaction.php'
 	),
+	'Blockish\\Extensions\\InteractionMotion' => array(
+		'version' => 'dev-main',
+		'path'    => $baseDir . '/includes/Extensions/InteractionMotion.php'
+	),
 	'Blockish\\Extensions\\ThemeBuilder' => array(
 		'version' => 'dev-main',
 		'path'    => $baseDir . '/includes/Extensions/ThemeBuilder.php'

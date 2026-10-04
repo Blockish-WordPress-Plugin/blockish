@@ -1,7 +1,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { group as groupIcon } from '@wordpress/icons';
-import InteractionsBuilder from './components/InteractionsBuilder';
+import InteractionsBuilder from './components/interactions-builder';
 
 function InteractionsSettingsWrapper({ onClose }) {
     return (

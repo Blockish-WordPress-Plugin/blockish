@@ -9,8 +9,38 @@ export function findEditorBlockElement(clientId) {
 	return from(document) || from(iframe?.contentDocument);
 }
 
+const PREVIEW_HOLD_MS = 600;
+// Running preset preview per block, so a new click first restores the old one.
+const activePreviews = new WeakMap();
+const PREVIEW_CLASSES = ['blockish-ix-prep', 'blockish-ix-run', 'blockish-ix-pin'];
+
 /**
- * Play the draft once on the selected block. Visibility / class revert after a beat.
+ * Inline styles of each element, its parent and all descendants, before a preview.
+ */
+function snapshotStyles(elements) {
+	const nodes = new Set();
+	elements.forEach((el) => {
+		[el, el.parentElement, ...el.querySelectorAll('*')].forEach((node) => {
+			if (node) nodes.add(node);
+		});
+	});
+	return [...nodes].map((node) => [node, node.getAttribute('style')]);
+}
+
+function restoreStyles(snapshot) {
+	snapshot.forEach(([node, style]) => {
+		if (style === null) {
+			node.removeAttribute('style');
+		} else {
+			node.setAttribute('style', style);
+		}
+		node.classList?.remove(...PREVIEW_CLASSES);
+		delete node.dataset?.blockishIxPlay;
+	});
+}
+
+/**
+ * Play the draft once on the selected block, then restore it to its original state.
  */
 export function previewInteraction(draft, clientId) {
 	const root = findEditorBlockElement(clientId);
@@ -22,36 +52,54 @@ export function previewInteraction(draft, clientId) {
 	if (!interaction) return false;
 
 	const type = getActionType(interaction);
-	if (type === 'emit' || type === 'custom') {
+	if (type === 'emit' || type === 'custom' || type === 'scrollTo') {
 		return false;
 	}
 
 	const event = { type: 'preview' };
 	const plays = collectPlayTargets(interaction, root);
 	const targets = plays.length ? plays : [{ el: root, extraDelay: 0 }];
-	targets.forEach(({ el, extraDelay }) => {
-		runAction(interaction, event, el, 'forward', extraDelay);
-	});
 
 	if (type !== 'preset') {
+		targets.forEach(({ el, extraDelay }) => {
+			runAction(interaction, event, el, 'forward', extraDelay);
+		});
 		window.setTimeout(() => {
 			targets.forEach(({ el, extraDelay }) => {
 				runAction(interaction, event, el, 'reverse', extraDelay);
 			});
 		}, 1400);
-	} else if (typeof window !== 'undefined' && window.blockishAnimation) {
-		const tweens = interaction.action?.motion?.tweens || [];
-		const ms = tweens.reduce((sum, tween) => {
-			const duration = Number(tween?.duration) || 0.6;
-			const delay = Number(tween?.delay) || 0;
-			return sum + (duration + delay) * 1000;
-		}, 400);
-		window.setTimeout(() => {
-			targets.forEach(({ el, extraDelay }) => {
-				runAction(interaction, event, el, 'reverse', extraDelay);
-			});
-		}, Math.min(12000, Math.max(800, ms)));
+		return true;
 	}
+
+	// Play once, hold the end frame, then put the block back exactly as it was.
+	activePreviews.get(root)?.();
+	const snapshot = snapshotStyles([root, ...targets.map(({ el }) => el)]);
+	let restored = false;
+	const restore = () => {
+		if (restored) return;
+		restored = true;
+		activePreviews.delete(root);
+		const anim = window.blockishAnimation;
+		targets.forEach(({ el }) => anim?.stop?.(el));
+		restoreStyles(snapshot);
+	};
+
+	activePreviews.set(root, restore);
+
+	let completed = 0;
+	targets.forEach(({ el, extraDelay }) => {
+		runAction(interaction, event, el, 'forward', extraDelay, () => {
+			completed += 1;
+			if (completed === targets.length) {
+				window.setTimeout(restore, PREVIEW_HOLD_MS);
+			}
+		});
+	});
+
+	// Infinite loops never complete; stop them after a short demo.
+	const loops = Number(interaction.action?.motion?.repeat) === -1;
+	window.setTimeout(restore, loops ? 4000 : 12000);
 
 	return true;
 }
