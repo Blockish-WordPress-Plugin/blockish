@@ -28,25 +28,25 @@ export const getPresetAnimate = (presetId) => ({
 });
 
 export const DOM_EVENTS = [
-	{ label: __('Load', 'blockish'), hint: __('When the page loads', 'blockish'), value: 'ready' },
+	{ label: __('Page load', 'blockish'), hint: __('When the page finishes loading', 'blockish'), value: 'ready' },
 	{ label: __('Click', 'blockish'), hint: __('When clicked', 'blockish'), value: 'click' },
-	{ label: __('Hover', 'blockish'), hint: __('When hovered', 'blockish'), value: 'mouseenter' },
-	{ label: __('Focus', 'blockish'), hint: __('When focused', 'blockish'), value: 'focus' },
-	{ label: __('In view', 'blockish'), hint: __('When it scrolls into view', 'blockish'), value: 'inView' },
+	{ label: __('Hover', 'blockish'), hint: __('When hovered with mouse', 'blockish'), value: 'mouseenter' },
+	{ label: __('Focus', 'blockish'), hint: __('When focused by click or tab', 'blockish'), value: 'focus' },
+	{ label: __('Scroll into view', 'blockish'), hint: __('When it scrolls into view', 'blockish'), value: 'inView' },
 	{ label: __('Page scroll', 'blockish'), hint: __('After the page scrolls past a distance', 'blockish'), value: 'scroll' },
-	{ label: __('While scroll', 'blockish'), hint: __('While this block moves through the viewport', 'blockish'), value: 'scrollProgress' },
+	{ label: __('While scrolling', 'blockish'), hint: __('Continuous progress as element scrolls', 'blockish'), value: 'scrollProgress' },
 ];
 
 export const SOURCE_OPTIONS = [
 	{
 		value: 'dom',
-		label: __('Start here', 'blockish'),
-		description: __('Click, hover, load, or scroll on this block', 'blockish'),
+		label: __('User action', 'blockish'),
+		description: __('Click, hover, scroll, or page load on this block', 'blockish'),
 	},
 	{
 		value: 'listen',
-		label: __('Wait for a name', 'blockish'),
-		description: __('Run when another interaction broadcasts that name', 'blockish'),
+		label: __('Listen event', 'blockish'),
+		description: __('Listen for an event triggered by another block', 'blockish'),
 	},
 ];
 
@@ -61,27 +61,27 @@ export const ACTION_TYPES = [
 	{
 		value: 'preset',
 		label: __('Play an animation', 'blockish'),
-		description: __('Move, fade, scale, rotate — fully customizable', 'blockish'),
+		description: __('Move, fade, scale, rotate, 3D, and effects', 'blockish'),
 	},
 	{
 		value: 'visibility',
 		label: __('Show or hide', 'blockish'),
-		description: __('Reveal, hide, or toggle visibility', 'blockish'),
+		description: __('Reveal, hide, or toggle element visibility', 'blockish'),
 	},
 	{
 		value: 'toggleClass',
-		label: __('Toggle a class', 'blockish'),
+		label: __('Toggle CSS class', 'blockish'),
 		description: __('Add or remove a CSS class', 'blockish'),
 	},
 	{
 		value: 'emit',
-		label: __('Name only', 'blockish'),
-		description: __('No animation — just broadcast a name others can wait for', 'blockish'),
+		label: __('Trigger custom event', 'blockish'),
+		description: __('Broadcast an event for other blocks to react to', 'blockish'),
 	},
 	{
 		value: 'custom',
-		label: __('Custom code', 'blockish'),
-		description: __('For advanced JavaScript', 'blockish'),
+		label: __('Custom JavaScript', 'blockish'),
+		description: __('Execute custom JavaScript code', 'blockish'),
 	},
 ];
 
@@ -92,14 +92,14 @@ export const VISIBILITY_MODES = [
 ];
 
 export const PHASE_OPTIONS = [
-	{ label: __('When it finishes', 'blockish'), value: 'end' },
-	{ label: __('When it starts', 'blockish'), value: 'start' },
+	{ label: __('When animation finishes', 'blockish'), value: 'end' },
+	{ label: __('When animation starts', 'blockish'), value: 'start' },
 ];
 
 export const LISTEN_PHASE_OPTIONS = [
-	{ label: __('When that name finishes', 'blockish'), value: 'end' },
-	{ label: __('When that name starts', 'blockish'), value: 'start' },
-	{ label: __('Either', 'blockish'), value: 'any' },
+	{ label: __('When event finishes', 'blockish'), value: 'end' },
+	{ label: __('When event starts', 'blockish'), value: 'start' },
+	{ label: __('On start or finish', 'blockish'), value: 'any' },
 ];
 
 export const CUSTOM_JS_PLACEHOLDER = `// event — the trigger (click, hover, in-view, …)

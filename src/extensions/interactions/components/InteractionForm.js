@@ -155,9 +155,9 @@ export default function InteractionForm({
 		value: name,
 	}));
 	const signalSelectOptions = [
-		{ label: __('Choose a signal…', 'blockish'), value: '' },
+		{ label: __('Choose an event…', 'blockish'), value: '' },
 		...eventNameSuggestions,
-		{ label: __('Type a custom name…', 'blockish'), value: '__custom__' },
+		{ label: __('Type custom event name…', 'blockish'), value: '__custom__' },
 	];
 	const selectedListenPhase =
 		LISTEN_PHASE_OPTIONS.find((o) => o.value === (when.phase || 'start')) || null;
@@ -200,14 +200,17 @@ export default function InteractionForm({
 							{__('When should this run?', 'blockish')}
 						</h3>
 						<p className="blockish-ix-card__subtitle">
-							{__('How this interaction starts — on this block, or when another one broadcasts a name.', 'blockish')}
+							{__(
+								'Choose what starts this interaction — a direct action (click, hover, scroll) or a custom event from another block.',
+								'blockish'
+							)}
 						</p>
 					</div>
 				</header>
 
-				<p className="blockish-ix-field-label">{__('How it starts', 'blockish')}</p>
+				<p className="blockish-ix-field-label">{__('Trigger type', 'blockish')}</p>
 				<ChipGrid
-					name={__('How it starts', 'blockish')}
+					name={__('Trigger type', 'blockish')}
 					items={SOURCE_OPTIONS}
 					value={when.source || 'dom'}
 					columns={2}
@@ -219,7 +222,7 @@ export default function InteractionForm({
 						{eventNameSuggestions.length > 0 ? (
 							BlockishSelect ? (
 								<BlockishSelect
-									label={__('Which signal?', 'blockish')}
+									label={__('Select event', 'blockish')}
 									value={selectedSignal}
 									options={signalSelectOptions}
 									isClearable={false}
@@ -241,7 +244,7 @@ export default function InteractionForm({
 								/>
 							) : (
 								<SelectControl
-									label={__('Which signal?', 'blockish')}
+									label={__('Select event', 'blockish')}
 									value={selectedSignal?.value || ''}
 									options={signalSelectOptions}
 									onChange={(value) => {
@@ -257,9 +260,9 @@ export default function InteractionForm({
 						{(eventNameSuggestions.length === 0 ||
 							!knownEventNames.includes(when.eventName)) && (
 							<TextControl
-								label={__('Signal name', 'blockish')}
+								label={__('Event name', 'blockish')}
 								help={__(
-									'Same name as “Tell another interaction” on the other block. For a sequence, choose when that name finishes.',
+									'Must match the event name broadcast by the other block (e.g. open-menu).',
 									'blockish'
 								)}
 								placeholder={__('e.g. open-menu', 'blockish')}
@@ -269,7 +272,7 @@ export default function InteractionForm({
 						)}
 						{BlockishSelect ? (
 							<BlockishSelect
-								label={__('React when the signal…', 'blockish')}
+								label={__('Trigger timing', 'blockish')}
 								value={selectedListenPhase}
 								options={LISTEN_PHASE_OPTIONS}
 								isClearable={false}
@@ -280,7 +283,7 @@ export default function InteractionForm({
 							/>
 						) : (
 							<SelectControl
-								label={__('React when the signal…', 'blockish')}
+								label={__('Trigger timing', 'blockish')}
 								value={when.phase || 'start'}
 								options={LISTEN_PHASE_OPTIONS}
 								onChange={(phase) => updateWhen({ phase })}
@@ -318,16 +321,16 @@ export default function InteractionForm({
 								className="blockish-ix-link-btn"
 								onClick={() => setShowAdvanced(true)}
 							>
-								{__('Click a child inside this block…', 'blockish')}
+								{__('+ Use custom selector…', 'blockish')}
 							</button>
 						) : (
 							<TextControl
-								label={__('Click / hover this child (optional)', 'blockish')}
+								label={__('Custom selector (optional)', 'blockish')}
 								help={__(
-									'Leave empty to use the whole block. Does not change where the animation plays.',
+									'Leave empty to trigger on this block wrapper. Enter any CSS selector (e.g. .btn, img, .card-title) to trigger only on that element.',
 									'blockish'
 								)}
-								placeholder={__('e.g. .hero-image', 'blockish')}
+								placeholder={__('e.g. .btn, img, .card-title', 'blockish')}
 								value={when.selector || ''}
 								onChange={(selector) => updateWhen({ selector })}
 							/>
@@ -580,14 +583,14 @@ export default function InteractionForm({
 					<div className="blockish-ix-card__fields">
 						<p className="blockish-interaction-form__hint">
 							{__(
-								'Use this when this block should do nothing except broadcast a name. For click → animate → then the next block, keep Play an animation and open “Tell another interaction” below.',
+								'Broadcast a custom event for other blocks to listen to without animating this block. To animate first and then trigger another block, select "Play an animation" and open “Trigger another event on completion” below.',
 								'blockish'
 							)}
 						</p>
 						<TextControl
-							label={__('Name to broadcast', 'blockish')}
+							label={__('Event name to broadcast', 'blockish')}
 							help={__(
-								'On the other block: How it starts → Wait for a name → this exact name.',
+								'Other blocks can listen for this exact event name in: Trigger type → Listen event.',
 								'blockish'
 							)}
 							placeholder={__('e.g. open-menu', 'blockish')}
@@ -690,9 +693,9 @@ export default function InteractionForm({
 						{showNotify ? (
 							<>
 								<TextControl
-									label={__('Tell another interaction', 'blockish')}
+									label={__('Trigger another event', 'blockish')}
 									help={__(
-										'Broadcast this name when the action runs. On the other block: How it starts → Wait for a name → same name.',
+										'Broadcast this event name when this interaction runs so other blocks can react.',
 										'blockish'
 									)}
 									placeholder={__('e.g. hero-moved', 'blockish')}
@@ -701,7 +704,7 @@ export default function InteractionForm({
 								/>
 								{!!(action.eventName || '').trim() && (
 									<SelectControl
-										label={__('Broadcast', 'blockish')}
+										label={__('When to trigger', 'blockish')}
 										value={action.phase || 'end'}
 										options={PHASE_OPTIONS}
 										onChange={(phase) => updateAction({ phase })}
@@ -714,7 +717,7 @@ export default function InteractionForm({
 								className="blockish-ix-link-btn"
 								onClick={() => setShowNotify(true)}
 							>
-								{__('Then tell another interaction to run…', 'blockish')}
+								{__('+ Trigger another event on completion…', 'blockish')}
 							</button>
 						)}
 					</div>
@@ -735,12 +738,14 @@ export default function InteractionForm({
 				</div>
 			) : null}
 
-			<p className="blockish-ix-pro-note">
-				{__(
-					'Need timeline animations? A visual Animation Builder addon is coming soon.',
-					'blockish'
-				)}
-			</p>
+			{!window?.blockishAnimation && (
+				<p className="blockish-ix-pro-note">
+					{__(
+						'Need advanced multi-step GSAP timelines? Upgrade to Blockish Pro.',
+						'blockish'
+					)}
+				</p>
+			)}
 		</div>
 	);
 }

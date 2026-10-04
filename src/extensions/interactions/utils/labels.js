@@ -3,21 +3,21 @@ import { PRESETS } from './constants';
 import { normalizeInteraction } from './compile';
 
 const eventLabels = {
-	ready: __('On page load', 'blockish'),
-	init: __('On page load', 'blockish'),
+	ready: __('Page load', 'blockish'),
+	init: __('Page load', 'blockish'),
 	click: __('On click', 'blockish'),
 	mouseenter: __('On hover', 'blockish'),
 	focus: __('On focus', 'blockish'),
-	inView: __('When visible', 'blockish'),
-	scroll: __('After scroll', 'blockish'),
+	inView: __('Scroll into view', 'blockish'),
+	scroll: __('Page scroll', 'blockish'),
 	scrollProgress: __('While scrolling', 'blockish'),
-	listen: __('Waits for a name', 'blockish'),
+	listen: __('Listen event', 'blockish'),
 };
 
 const phaseLabel = (phase) => {
-	if (phase === 'end') return __('finishes', 'blockish');
-	if (phase === 'any') return __('starts or finishes', 'blockish');
-	return __('starts', 'blockish');
+	if (phase === 'end') return __('on finish', 'blockish');
+	if (phase === 'any') return __('on start or finish', 'blockish');
+	return __('on start', 'blockish');
 };
 
 export function summarizeInteraction(raw) {
@@ -28,14 +28,14 @@ export function summarizeInteraction(raw) {
 	let whenLabel = '';
 
 	if (when.source === 'listen') {
-		whenLabel = `${__('Waits for', 'blockish')} “${when.eventName || '?'}” (${phaseLabel(when.phase)})`;
+		whenLabel = `${__('Listens for', 'blockish')} “${when.eventName || '?'}” (${phaseLabel(when.phase)})`;
 	} else {
 		whenLabel = eventLabels[when.event] || when.event || __('Trigger', 'blockish');
 	}
 
 	let actionLabel = '';
 	if (action.type === 'emit') {
-		actionLabel = `${__('Sends', 'blockish')} “${action.eventName || '?'}” (${phaseLabel(action.phase)})`;
+		actionLabel = `${__('Triggers', 'blockish')} “${action.eventName || '?'}” (${phaseLabel(action.phase)})`;
 	} else if (action.type === 'preset') {
 		const preset = PRESETS.find((p) => p.id === action.preset);
 		actionLabel = preset?.label || __('Animation', 'blockish');
