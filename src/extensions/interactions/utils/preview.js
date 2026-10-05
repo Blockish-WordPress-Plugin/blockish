@@ -35,7 +35,6 @@ function restoreStyles(snapshot) {
 			node.setAttribute('style', style);
 		}
 		node.classList?.remove(...PREVIEW_CLASSES);
-		delete node.dataset?.blockishIxPlay;
 	});
 }
 

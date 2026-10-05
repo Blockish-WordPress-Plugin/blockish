@@ -222,10 +222,11 @@ const presetTransition = (duration, easing) => {
 const getAnimationEngine = () =>
 	typeof window !== 'undefined' ? window.blockishAnimation : null;
 
-export const isPresetForward = (el) => {
+// Per interaction: a block can run several (e.g. two click toggles).
+export const isPresetForward = (el, interaction) => {
 	const anim = getAnimationEngine();
 	if (anim?.isForward) {
-		return !!anim.isForward(el);
+		return !!anim.isForward(el, interaction);
 	}
 	return !!(el && el.classList && el.classList.contains('blockish-ix-run'));
 };
@@ -395,7 +396,7 @@ export const runAction = (
 	if (type === 'preset') {
 		let dir = direction;
 		if (dir === 'toggle') {
-			dir = isPresetForward(blockElement) ? 'reverse' : 'forward';
+			dir = isPresetForward(blockElement, interaction) ? 'reverse' : 'forward';
 		}
 		if (dir === 'reverse') {
 			reversePreset(blockElement, interaction);
