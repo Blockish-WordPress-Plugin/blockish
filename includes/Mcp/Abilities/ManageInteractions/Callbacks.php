@@ -153,7 +153,7 @@ class Callbacks
 			$out['actionType'] = self::sanitize_action_type( (string) $item['actionType'] );
 		}
 		if ( isset( $item['preset'] ) ) {
-			$out['preset'] = self::sanitize_preset_id( (string) $item['preset'] );
+			$out['preset'] = \Blockish\Extensions\InteractionMotion::sanitize_preset_id( (string) $item['preset'] );
 		}
 		if ( isset( $item['listenEventName'] ) ) {
 			$out['listenEventName'] = sanitize_text_field( (string) $item['listenEventName'] );
@@ -168,7 +168,7 @@ class Callbacks
 			$out['emitPhase'] = sanitize_key( (string) $item['emitPhase'] );
 		}
 		if ( isset( $item['presetOptions'] ) && is_array( $item['presetOptions'] ) ) {
-			$preset = isset( $item['preset'] ) ? self::sanitize_preset_id( (string) $item['preset'] ) : 'fadeUp';
+			$preset = isset( $item['preset'] ) ? \Blockish\Extensions\InteractionMotion::sanitize_preset_id( (string) $item['preset'] ) : 'fadeUp';
 			$out['presetOptions'] = self::sanitize_preset_options( $item['presetOptions'], $preset );
 		}
 		if ( isset( $item['className'] ) ) {
@@ -199,7 +199,7 @@ class Callbacks
 		}
 		if ( isset( $item['action'] ) && is_array( $item['action'] ) ) {
 			$action      = $item['action'];
-			$preset      = isset( $action['preset'] ) ? self::sanitize_preset_id( (string) $action['preset'] ) : 'fadeUp';
+			$preset      = isset( $action['preset'] ) ? \Blockish\Extensions\InteractionMotion::sanitize_preset_id( (string) $action['preset'] ) : 'fadeUp';
 			$out['action'] = [
 				'type'          => isset( $action['type'] ) ? self::sanitize_action_type( (string) $action['type'] ) : 'custom',
 				'preset'        => $preset,
@@ -207,6 +207,9 @@ class Callbacks
 				'phase'         => isset( $action['phase'] ) ? sanitize_key( (string) $action['phase'] ) : 'start',
 				'className'     => isset( $action['className'] ) ? self::sanitize_class_name( (string) $action['className'] ) : '',
 				'applyTo'       => isset( $action['applyTo'] ) ? sanitize_text_field( (string) $action['applyTo'] ) : '',
+				'scrollTarget'  => isset( $action['scrollTarget'] ) ? sanitize_text_field( (string) $action['scrollTarget'] ) : '',
+				'scrollOffset'  => isset( $action['scrollOffset'] ) ? (int) $action['scrollOffset'] : 0,
+				'scrollDuration' => self::clamp_float( $action['scrollDuration'] ?? 1.2, 0.1, 10 ),
 				'presetOptions' => self::sanitize_preset_options(
 					isset( $action['presetOptions'] ) && is_array( $action['presetOptions'] ) ? $action['presetOptions'] : [],
 					$preset
@@ -224,7 +227,7 @@ class Callbacks
 					)
 					: [],
 			];
-			$motion = self::sanitize_motion( $action['motion'] ?? null );
+			$motion = \Blockish\Extensions\InteractionMotion::sanitize_motion( $action['motion'] ?? null );
 			if ( $motion ) {
 				$out['action']['motion'] = $motion;
 			}
@@ -303,143 +306,10 @@ class Callbacks
 		return $out;
 	}
 
-	/**
-	 * GSAP fromTo-compatible tweens. Extra transform keys pass through if present.
-	 *
-	 * @param mixed $motion Raw motion object.
-	 * @return array|null
-	 */
-	private static function sanitize_motion( $motion ) {
-		if ( ! is_array( $motion ) || empty( $motion['tweens'] ) || ! is_array( $motion['tweens'] ) ) {
-			return null;
-		}
-		$tweens = [];
-		foreach ( array_slice( $motion['tweens'], 0, 12 ) as $tween ) {
-			if ( ! is_array( $tween ) ) {
-				continue;
-			}
-			$clean = [
-				'from'     => self::sanitize_gsap_vars( $tween['from'] ?? [] ),
-				'to'       => self::sanitize_gsap_vars( $tween['to'] ?? [] ),
-				'duration' => self::clamp_float( $tween['duration'] ?? 0.6, 0, 30 ),
-				'delay'    => self::clamp_float( $tween['delay'] ?? 0, 0, 30 ),
-				'ease'     => self::sanitize_ease( $tween['ease'] ?? 'power1.inOut' ),
-			];
-			if ( array_key_exists( 'position', $tween ) ) {
-				if ( is_numeric( $tween['position'] ) ) {
-					$clean['position'] = self::clamp_float( $tween['position'], 0, 60 );
-				} else {
-					$clean['position'] = sanitize_text_field( (string) $tween['position'] );
-				}
-			}
-			$tweens[] = $clean;
-		}
-		if ( ! $tweens ) {
-			return null;
-		}
-		$out = [ 'tweens' => $tweens ];
-		if ( ! empty( $motion['pin'] ) ) {
-			$out['pin'] = true;
-		}
-		$pin_end = self::sanitize_pin_end( $motion['pinEnd'] ?? '' );
-		if ( $pin_end !== '' ) {
-			$out['pinEnd'] = $pin_end;
-		}
-		$pin_start = self::sanitize_pin_start( $motion['pinStart'] ?? '' );
-		if ( $pin_start !== '' ) {
-			$out['pinStart'] = $pin_start;
-		}
-		if ( array_key_exists( 'scrub', $motion ) ) {
-			if ( true === $motion['scrub'] || 'true' === $motion['scrub'] || 'locked' === $motion['scrub'] ) {
-				$out['scrub'] = true;
-			} else {
-				$out['scrub'] = self::clamp_float( $motion['scrub'], 0, 3 );
-			}
-		}
-		if ( isset( $motion['transformOrigin'] ) ) {
-			$origin = self::sanitize_transform_origin( $motion['transformOrigin'] );
-			if ( $origin !== '' ) {
-				$out['transformOrigin'] = $origin;
-			}
-		}
-		return $out;
-	}
 
-	/**
-	 * Pin start: auto (below header), 0 (viewport top), or pixel offset.
-	 */
-	private static function sanitize_pin_start( $raw ): string {
-		$s = strtolower( trim( (string) $raw ) );
-		if ( $s === '' || $s === 'auto' ) {
-			return 'auto';
-		}
-		if ( $s === '0' || $s === 'top' ) {
-			return '0';
-		}
-		if ( is_numeric( $s ) ) {
-			$n = (int) round( (float) $s );
-			return (string) max( 0, min( 400, $n ) );
-		}
-		return '';
-	}
 
-	private static function sanitize_transform_origin( $raw ): string {
-		$s = sanitize_text_field( (string) $raw );
-		if ( $s === '' || strlen( $s ) > 40 ) {
-			return '';
-		}
-		return preg_match( '/^[0-9.%\sleftcenterrighttopbottom-]+$/i', $s ) ? $s : '';
-	}
 
-	/**
-	 * ScrollTrigger end string (pin distance), e.g. +=120% or +=800.
-	 */
-	private static function sanitize_pin_end( $raw ): string {
-		$s = trim( (string) $raw );
-		if ( $s === '' || strlen( $s ) > 32 ) {
-			return '';
-		}
-		return preg_match( '/^[+\-=%\s0-9.a-zA-Z]+$/', $s ) ? $s : '';
-	}
 
-	/**
-	 * @param mixed $vars Raw GSAP vars.
-	 * @return array
-	 */
-	private static function sanitize_gsap_vars( $vars ) {
-		if ( ! is_array( $vars ) ) {
-			return [];
-		}
-		$out    = [];
-		$ranges = [
-			'x'          => [ -2000, 2000 ],
-			'y'          => [ -2000, 2000 ],
-			'z'          => [ -2000, 2000 ],
-			'scale'      => [ 0, 10 ],
-			'scaleX'     => [ 0, 10 ],
-			'scaleY'     => [ 0, 10 ],
-			'rotation'   => [ -720, 720 ],
-			'rotationX'  => [ -720, 720 ],
-			'rotationY'  => [ -720, 720 ],
-			'rotationZ'  => [ -720, 720 ],
-			'skewX'      => [ -180, 180 ],
-			'skewY'      => [ -180, 180 ],
-			'xPercent'   => [ -200, 200 ],
-			'yPercent'   => [ -200, 200 ],
-			'opacity'    => [ 0, 1 ],
-			'autoAlpha'  => [ 0, 1 ],
-		];
-		foreach ( $ranges as $key => $range ) {
-			if ( ! array_key_exists( $key, $vars ) ) {
-				continue;
-			}
-			$out[ $key ] = self::clamp_float( $vars[ $key ], $range[0], $range[1] );
-		}
-		if ( isset( $vars['transformOrigin'] ) ) {
-			$out['transformOrigin'] = sanitize_text_field( (string) $vars['transformOrigin'] );
-		}
-		return $out;
-	}
 
 	private static function sanitize_time_seconds( $value, float $fallback ): float {
 		if ( $value === null || $value === '' ) {
@@ -457,22 +327,10 @@ class Callbacks
 		return max( $min, min( $max, $n ) );
 	}
 
-	private static function sanitize_ease( string $ease ): string {
-		$ease = sanitize_text_field( $ease );
-		if ( strlen( $ease ) <= 80 && preg_match( '/^[a-z0-9._, +\-()]+$/i', $ease ) ) {
-			return $ease;
-		}
-		return 'power1.inOut';
-	}
 
-	private static function sanitize_preset_id( string $preset ): string {
-		$preset = sanitize_text_field( $preset );
-		$allowed = [ 'fadeIn', 'fadeUp', 'fadeDown', 'fadeLeft', 'fadeRight', 'zoomIn', 'custom' ];
-		return in_array( $preset, $allowed, true ) ? $preset : 'fadeUp';
-	}
 
 	private static function sanitize_action_type( string $type ): string {
-		$allowed = [ 'preset', 'emit', 'custom', 'toggleClass', 'show', 'hide', 'toggle' ];
+		$allowed = [ 'preset', 'emit', 'custom', 'toggleClass', 'scrollTo', 'show', 'hide', 'toggle' ];
 		return in_array( $type, $allowed, true ) ? $type : 'custom';
 	}
 

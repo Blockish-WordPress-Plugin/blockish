@@ -2,7 +2,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import InteractionsBuilder from './components/InteractionsBuilder';
+import InteractionsBuilder from './components/interactions-builder';
 import withInteractionsToolbar from './toolbar';
 import './editor.scss';
 import './settings-tab';

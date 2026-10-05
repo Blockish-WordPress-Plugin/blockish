@@ -1,8 +1,8 @@
 import { useEffect } from '@wordpress/element';
 import { createPortal } from '@wordpress/element';
-import Header from './Header';
-import Sidebar from './Sidebar';
-import DesignGrid from './DesignGrid';
+import Header from './header';
+import Sidebar from './sidebar';
+import DesignGrid from './design-grid';
 import { TemplateLibraryProvider } from '../context';
 
 const Modal = ({ isOpen, onClose }) => {

@@ -63,11 +63,22 @@ $blockish-primary: #001feb;
         min-height: 0;
         height: auto;
     }
+
+    // WordPress wraps modal children in a block box; make it fill the modal so
+    // the settings layout (and its footers) stay inside the viewport.
+    .components-modal__children-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
 }
 
 .blockish-settings-layout {
     display: flex;
     flex-direction: row;
+    flex: 1 1 auto;
+    min-height: 0;
     height: 100%;
     background: #f0f0f1;
 }
@@ -166,7 +177,9 @@ $blockish-primary: #001feb;
         }
     }
 
-    .components-tab-panel__tab-content {
+    // Only the settings modal's own tab area — not tab panels nested inside a
+    // settings tab (e.g. Interactions → Pages / Whole site), which scroll themselves.
+    > .components-tab-panel__tab-content {
         flex: 1;
         min-width: 0;
         min-height: 0;

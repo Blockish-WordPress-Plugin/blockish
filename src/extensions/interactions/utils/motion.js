@@ -1,6 +1,6 @@
 /**
  * GSAP-compatible motion payload.
- * CSS runtime plays tweens[0] today. Animation Builder can append tweens
+ * CSS runtime plays tweens[0] today. Advanced Interactions (Pro) can append tweens
  * (same from/to vars GSAP fromTo uses) without a schema break.
  */
 

@@ -3,8 +3,8 @@ import { Modal, Button } from '@wordpress/components';
 import { upload, download } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { SVG, Path } from '@wordpress/primitives';
-import BlockInteractionsPanel from './BlockInteractionsPanel';
-import InteractionsFooter from './InteractionsFooter';
+import BlockInteractionsPanel from './block-interactions-panel';
+import InteractionsFooter from './interactions-footer';
 import { createEmptyInteraction } from '../utils/constants';
 import { compileList, normalizeInteraction } from '../utils/compile';
 import { collectEventNames } from '../utils/labels';
@@ -182,17 +182,23 @@ export default function BlockInteractionsBuilder({
 						onDelete={(id) =>
 							persist(itemsRef.current.filter((i) => i.id !== id))
 						}
+						onPlay={(item) =>
+							previewInteraction(normalizeInteraction(item, 'block'), clientId)
+						}
 						editing={editing}
 						draft={draft}
 						setDraft={setDraft}
 						knownEventNames={knownEventNames}
-						clientId={clientId}
-						onPreview={startPreview}
 					/>
 				</div>
 				<InteractionsFooter
 					editing={editing}
 					draft={draft}
+					onPreview={
+						clientId && !['emit', 'custom', 'scrollTo'].includes(draft?.action?.type)
+							? startPreview
+							: null
+					}
 					onBack={() => setDraft(null)}
 					onSave={saveDraft}
 					onAdd={() => setDraft(createEmptyInteraction('block'))}

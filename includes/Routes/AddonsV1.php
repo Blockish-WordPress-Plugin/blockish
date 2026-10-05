@@ -23,8 +23,7 @@ class AddonsV1 extends WP_REST_Controller {
 	 * @var array<string, string>
 	 */
 	private $helpers = array(
-		'blockish-forms'      => 'blockish_forms_fs',
-		'blockish-dynamicity' => 'blockish_dynamicity_fs',
+		'blockish-pro' => 'blockish_pro_fs',
 	);
 
 	private function __construct() {
@@ -142,7 +141,9 @@ class AddonsV1 extends WP_REST_Controller {
 		return rest_ensure_response(
 			array(
 				'status' => 'success',
-				'addons' => \Blockish\Config\AddonsList::get_instance()->refresh_list(),
+				'addons' => array(
+					'blockish-pro' => \Blockish\Config\Freemius::get_instance()->get_pro_data(),
+				),
 			)
 		);
 	}
@@ -190,7 +191,9 @@ class AddonsV1 extends WP_REST_Controller {
 			array(
 				'status'  => 'success',
 				'message' => __( 'License activated successfully. Reload the page to load premium features.', 'blockish' ),
-				'addons'  => \Blockish\Config\AddonsList::get_instance()->refresh_list(),
+				'addons'  => array(
+					'blockish-pro' => \Blockish\Config\Freemius::get_instance()->get_pro_data(),
+				),
 				'reload'  => true,
 			)
 		);
@@ -204,7 +207,11 @@ class AddonsV1 extends WP_REST_Controller {
 			return $sdk;
 		}
 
-		if ( ! method_exists( $sdk, 'can_use_premium_code' ) || ! $sdk->can_use_premium_code() ) {
+		$has_active     = method_exists( $sdk, 'can_use_premium_code' ) && $sdk->can_use_premium_code();
+		$is_registered  = method_exists( $sdk, 'is_registered' ) && $sdk->is_registered();
+		$has_local_data = $this->has_addon_in_fs_accounts( $slug, $sdk );
+
+		if ( ! $has_active && ! $is_registered && ! $has_local_data ) {
 			return new WP_Error(
 				'blockish_no_active_license',
 				__( 'This site does not have an active license for this add-on.', 'blockish' ),
@@ -212,26 +219,202 @@ class AddonsV1 extends WP_REST_Controller {
 			);
 		}
 
+		// 1. If currently licensed, unlink/deactivate on Freemius servers.
+		if ( $has_active ) {
+			try {
+				$method = new \ReflectionMethod( $sdk, '_deactivate_license' );
+				$method->setAccessible( true );
+				$method->invoke( $sdk, false );
+			} catch ( \Throwable $e ) {
+				// Continue to cleanup.
+			}
+		}
+
+		// 2. Tell Freemius servers to delete the site install if registered.
 		try {
-			$method = new \ReflectionMethod( $sdk, '_deactivate_license' );
-			$method->setAccessible( true );
-			$method->invoke( $sdk, false );
+			if ( method_exists( $sdk, 'get_api_site_scope' ) ) {
+				$api_method = new \ReflectionMethod( $sdk, 'get_api_site_scope' );
+				$api_method->setAccessible( true );
+				$api = $api_method->invoke( $sdk );
+				if ( is_object( $api ) && method_exists( $api, 'call' ) ) {
+					$api->call( '/', 'delete' );
+				}
+			}
 		} catch ( \Throwable $e ) {
-			return new WP_Error(
-				'blockish_license_deactivation_failed',
-				__( 'License deactivation failed.', 'blockish' ),
-				array( 'status' => 500 )
-			);
+			// Remote deletion may fail if already deleted or network is unreachable; proceed with local purge.
+		}
+
+		// 3. Clear scheduled sync crons for this add-on.
+		try {
+			if ( method_exists( $sdk, 'clear_install_sync_cron' ) ) {
+				$sdk->clear_install_sync_cron();
+			}
+			if ( method_exists( $sdk, 'clear_sync_cron' ) ) {
+				$sdk->clear_sync_cron();
+			}
+		} catch ( \Throwable $e ) {
+		}
+
+		// 4. Purge all add-on data (sites, plans, licenses, user-license map, updates) from fs_accounts.
+		$this->purge_addon_from_fs_accounts( $slug, $sdk );
+
+		// 5. Reset in-memory properties on the SDK instance.
+		try {
+			$ref = new \ReflectionClass( $sdk );
+			foreach ( array( '_site', '_license', '_licenses', '_plans' ) as $prop_name ) {
+				if ( $ref->hasProperty( $prop_name ) ) {
+					$prop = $ref->getProperty( $prop_name );
+					$prop->setAccessible( true );
+					$prop->setValue( $sdk, false );
+				}
+			}
+		} catch ( \Throwable $e ) {
 		}
 
 		return rest_ensure_response(
 			array(
 				'status'  => 'success',
-				'message' => __( 'License deactivated.', 'blockish' ),
-				'addons'  => \Blockish\Config\AddonsList::get_instance()->refresh_list(),
+				'message' => __( 'License deactivated and removed from this site.', 'blockish' ),
+				'addons'  => array(
+					'blockish-pro' => \Blockish\Config\Freemius::get_instance()->get_pro_data(),
+				),
 				'reload'  => true,
 			)
 		);
+	}
+
+	/**
+	 * Determine if fs_accounts contains any stored data for the given add-on.
+	 *
+	 * @param string    $slug Add-on slug.
+	 * @param \Freemius $sdk  Freemius SDK instance.
+	 * @return bool
+	 */
+	private function has_addon_in_fs_accounts( $slug, $sdk ) {
+		$accounts = get_option( 'fs_accounts' );
+		if ( ! is_array( $accounts ) ) {
+			return false;
+		}
+
+		if ( ! empty( $accounts['sites'][ $slug ] ) || ! empty( $accounts['plans'][ $slug ] ) ) {
+			return true;
+		}
+
+		$module_ids = $this->get_addon_module_ids( $slug, $sdk );
+		foreach ( $module_ids as $mid ) {
+			if ( ! empty( $accounts['all_licenses'][ $mid ] ) || ! empty( $accounts['user_id_license_ids_map'][ $mid ] ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get possible module/product IDs for an add-on (int and string variants).
+	 *
+	 * @param string    $slug Add-on slug.
+	 * @param \Freemius $sdk  Freemius SDK instance.
+	 * @return array<int|string>
+	 */
+	private function get_addon_module_ids( $slug, $sdk ) {
+		$ids = array();
+		if ( is_object( $sdk ) && method_exists( $sdk, 'get_id' ) ) {
+			$id = $sdk->get_id();
+			if ( ! empty( $id ) ) {
+				$ids[] = $id;
+				$ids[] = (string) $id;
+				$ids[] = (int) $id;
+			}
+		}
+
+		$pro_id = \Blockish\Config\Freemius::PRODUCT_ID;
+		$ids[]  = $pro_id;
+		$ids[]  = (string) $pro_id;
+		$ids[]  = (int) $pro_id;
+
+		return array_values( array_unique( $ids ) );
+	}
+
+	/**
+	 * Completely purge add-on licenses, sites, plans, and maps from fs_accounts.
+	 *
+	 * @param string    $slug Add-on slug.
+	 * @param \Freemius $sdk  Freemius SDK instance.
+	 * @return void
+	 */
+	private function purge_addon_from_fs_accounts( $slug, $sdk ) {
+		$accounts = get_option( 'fs_accounts' );
+		if ( ! is_array( $accounts ) ) {
+			return;
+		}
+
+		$module_ids = $this->get_addon_module_ids( $slug, $sdk );
+
+		// 1. Remove from sites
+		if ( isset( $accounts['sites'][ $slug ] ) ) {
+			unset( $accounts['sites'][ $slug ] );
+		}
+
+		// 2. Remove from plans
+		if ( isset( $accounts['plans'][ $slug ] ) ) {
+			unset( $accounts['plans'][ $slug ] );
+		}
+
+		// 3. Remove from all_licenses
+		if ( isset( $accounts['all_licenses'] ) && is_array( $accounts['all_licenses'] ) ) {
+			foreach ( $module_ids as $mid ) {
+				unset( $accounts['all_licenses'][ $mid ] );
+			}
+		}
+
+		// 4. Remove from user_id_license_ids_map
+		if ( isset( $accounts['user_id_license_ids_map'] ) && is_array( $accounts['user_id_license_ids_map'] ) ) {
+			foreach ( $module_ids as $mid ) {
+				unset( $accounts['user_id_license_ids_map'][ $mid ] );
+			}
+		}
+
+		// 5. Remove from updates
+		if ( isset( $accounts['updates'] ) && is_array( $accounts['updates'] ) ) {
+			foreach ( $module_ids as $mid ) {
+				unset( $accounts['updates'][ $mid ] );
+			}
+		}
+
+		// 6. Remove from admin_notices
+		if ( isset( $accounts['admin_notices'][ $slug ] ) ) {
+			unset( $accounts['admin_notices'][ $slug ] );
+		}
+
+		// 7. Remove from account_addons if present
+		if ( isset( $accounts['account_addons'] ) && is_array( $accounts['account_addons'] ) ) {
+			foreach ( $accounts['account_addons'] as $parent_id => $addon_ids ) {
+				if ( is_array( $addon_ids ) ) {
+					$accounts['account_addons'][ $parent_id ] = array_values(
+						array_filter(
+							$addon_ids,
+							function( $id ) use ( $module_ids ) {
+								return ! in_array( $id, $module_ids, false );
+							}
+						)
+					);
+				}
+			}
+		}
+
+		update_option( 'fs_accounts', $accounts );
+
+		// Reload in-memory FS_Options singleton if loaded.
+		if ( class_exists( '\FS_Options' ) && defined( 'WP_FS__ACCOUNTS_OPTION_NAME' ) ) {
+			$accounts_opt = \FS_Options::instance( WP_FS__ACCOUNTS_OPTION_NAME, true );
+			if ( is_object( $accounts_opt ) && method_exists( $accounts_opt, 'load' ) ) {
+				$accounts_opt->load( true );
+			}
+		}
+
+		// Delete API cache so stale responses are not served.
+		delete_option( 'fs_api_cache' );
 	}
 
 	/**
@@ -330,10 +513,10 @@ class AddonsV1 extends WP_REST_Controller {
 	 * @return \WP_REST_Response|WP_Error
 	 */
 	public function get_checkout_context( WP_REST_Request $request ) {
-		$slug  = $request->get_param( 'slug' );
-		$addons = \Blockish\Config\AddonsList::get_instance()->refresh_list();
+		$slug = $request->get_param( 'slug' );
+		$pro  = \Blockish\Config\Freemius::get_instance()->get_pro_data();
 
-		if ( empty( $addons[ $slug ] ) || ! empty( $addons[ $slug ]['is_bundle'] ) ) {
+		if ( 'blockish-pro' !== $slug ) {
 			return new WP_Error(
 				'blockish_unknown_addon',
 				__( 'Unknown add-on.', 'blockish' ),
@@ -341,12 +524,11 @@ class AddonsV1 extends WP_REST_Controller {
 			);
 		}
 
-		$addon = $addons[ $slug ];
 		$context = array(
 			'status'      => 'success',
-			'plugin_id'   => $addon['freemius_id'] ?? '',
-			'public_key'  => $addon['public_key'] ?? '',
-			'name'        => $addon['name'] ?? $slug,
+			'plugin_id'   => \Blockish\Config\Freemius::PRODUCT_ID,
+			'public_key'  => $pro['public_key'] ?? \Blockish\Config\Freemius::PUBLIC_KEY,
+			'name'        => $pro['name'] ?? 'Blockish Pro',
 			'license_key' => '',
 			'is_upgrade'  => false,
 		);

@@ -1,10 +1,9 @@
-=== Blockish – MCP AI Site Builder for Block Editor ===
+=== Blockish – Gutenberg Blocks, AI Site Builder & Page Builder ===
 Author: wowdevs
 Author URI: https://wowdevs.com/
 Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
-Donate link: https://wowdevs.com/
-Tags: mcp, ai site builder, gutenberg, block editor, class manager
+Tags: gutenberg, blocks, gutenberg blocks, page builder, ai
 Tested up to: 7.1
 Stable tag: 1.3.0
 Requires at least: 6.2
@@ -12,7 +11,7 @@ Requires PHP: 7.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Build sites with AI via MCP (Cursor, Claude). 35+ Gutenberg blocks, Class Manager, and review & Accept in the editor.
+Build responsive websites with 35+ Gutenberg blocks and AI. Complete Gutenberg blocks library, AI site builder & page builder with Class Manager.
 
 == Description ==
 
@@ -47,7 +46,7 @@ Blockish is built so both humans and AI assistants can work in the same Gutenber
 * **AI Preview Queue:** Review staged layouts with live Class Manager CSS, pending count badges, and 1-click Accept or Discard.
 * **Interactions:** Entrance presets, emit/listen signals, custom JS, plus page-level and global libraries.
 * **Visibility:** Hide blocks per device (desktop / tablet / mobile) without custom CSS.
-* **Add-ons hub:** Discover companion products (Forms, Dynamicity) from the Blockish dashboard.
+* **Add-ons hub:** Discover companion products (Blockish Pro) from the Blockish dashboard.
 
 == 35+ AI-Optimized Blocks ==
 
@@ -147,7 +146,7 @@ The Class Manager lets you (and the AI) create, edit, and apply reusable CSS cla
 
 = Is this plugin free? =
 
-Yes. Core Blockish is free on unlimited personal or client sites. Optional add-ons (such as Forms and Dynamicity) add forms and dynamic query/loop features when you need them.
+Yes. Core Blockish is free on unlimited personal or client sites. The optional [Blockish Pro](https://blockish.wowdevs.com/pricing/) provides Form Builder, Query Loop, GSAP Animations, and advanced display conditions when you need them.
 
 == External Services ==
 
@@ -155,7 +154,7 @@ This plugin connects to external services under the conditions described below. 
 
 = 1. Freemius (freemius.com) =
 
-**What it does:** Powers optional product opt-in, licensing for companion add-ons (such as Forms and Dynamicity), software updates, and anonymous usage insights that help improve Blockish. This uses the Freemius WordPress SDK bundled with the plugin.
+**What it does:** Powers optional product opt-in, licensing for companion add-ons (Blockish Pro), software updates, and anonymous usage insights that help improve Blockish. This uses the Freemius WordPress SDK bundled with the plugin.
 
 **When it connects:** **Only if you explicitly opt in** (or activate a license) when Freemius prompts you in wp-admin. Skipping or declining opt-in means no Freemius analytics/licensing traffic for that flow. You can change your opt-in / license status later from the Blockish dashboard (Addons) or Freemius account controls.
 

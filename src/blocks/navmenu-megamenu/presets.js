@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { schemaToMarkup } from '../../extensions/theme-builder/schema/schemaToMarkup';
+import { schemaToMarkup } from '../../extensions/theme-builder/schema/schema-to-markup';
 
 export const MEGAMENU_PRESETS = [
 	{

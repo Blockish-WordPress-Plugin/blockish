@@ -33,7 +33,7 @@ class Config
                     ],
                     'block_schema' => [
                         'type'        => 'array',
-                        'description' => 'Array of block schema nodes ({name, attributes, innerBlocks}) using WordPress CORE blocks only (e.g. core/paragraph, core/heading, core/image, core/list, core/quote) — do not use blockish custom blocks and do not pass hand-written HTML comments. Staged into post_content as blockish/ai-preview for Accept/Discard.',
+                        'description' => 'Array of block schema nodes ({name, attributes, innerBlocks}) using WordPress CORE blocks only (e.g. core/paragraph, core/heading, core/image, core/list, core/quote) — do not use blockish custom blocks and do not pass hand-written HTML comments. Staged into post_content as blockish/ai-preview; once resolved it is live, Accept (finalize) / Discard (roll back) are optional.',
                         'items'       => [
                             'type'       => 'object',
                             'properties' => [

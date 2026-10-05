@@ -50,7 +50,7 @@ class ExtensionsV1 extends WP_REST_Controller {
 	public function get_extensions() {
 		$hardcoded_extensions = \Blockish\Config\ExtensionList::get_instance()->get_list('list');
 		$saved_extensions = $this->get_saved_extensions();
-		$addons = \Blockish\Config\AddonsList::get_instance()->get_list('list');
+		$pro_available = \Blockish\Config\Freemius::get_instance()->is_pro_available();
 
 		foreach ( $hardcoded_extensions as $slug => &$extension ) {
 			// Restore the user's saved status
@@ -66,11 +66,9 @@ class ExtensionsV1 extends WP_REST_Controller {
 				$extension['settings'] = $saved_extensions[ $slug ]['settings'];
 			}
 
-			// Override with locked if required addon is not available (installed & licensed)
-			if ( ! empty( $extension['addon'] ) && isset( $addons[ $extension['addon'] ] ) ) {
-				if ( empty( $addons[ $extension['addon'] ]['is_available'] ) ) {
-					$extension['status'] = 'locked';
-				}
+			// Override with locked if required Pro package is not available (installed & licensed)
+			if ( 'pro' === ( $extension['package'] ?? '' ) && ! $pro_available ) {
+				$extension['status'] = 'locked';
 			}
 
 			if ( 'theme-builder' === $slug ) {

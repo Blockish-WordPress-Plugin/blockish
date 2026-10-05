@@ -70,6 +70,8 @@ class SchemaUtils
     /**
      * Stage AI output as a single dynamic ai-preview block in content.
      * Re-stage keeps previousSchema and only replaces pendingSchema.
+     * The currently rendered blocks are carried over (marked stale) so the live
+     * frontend never goes blank between staging and the next editor resolve.
      * Empty pending clears content.
      */
     public static function build_staged_ai_preview_content( string $existing_content, array $pending_schema ): string {
@@ -81,9 +83,16 @@ class SchemaUtils
 
         $preview = self::find_ai_preview_block( $existing_content );
         if ( $preview ) {
-            $previous = self::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' );
+            $previous     = self::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' );
+            $live_blocks  = $preview['innerBlocks'] ?? [];
+            $live_html    = $preview['innerHTML'] ?? '';
+            $live_content = $preview['innerContent'] ?? [];
         } else {
-            $previous = self::convert_to_js_schema( parse_blocks( $existing_content ) );
+            $parsed       = parse_blocks( $existing_content );
+            $previous     = self::convert_to_js_schema( $parsed );
+            $live_blocks  = array_values( array_filter( $parsed, static fn( $b ) => ! empty( $b['blockName'] ) ) );
+            $live_html    = '';
+            $live_content = array_fill( 0, count( $live_blocks ), null );
         }
 
         $previous_json = wp_json_encode( $previous );
@@ -92,15 +101,21 @@ class SchemaUtils
             return '';
         }
 
+        $attrs = [
+            'previousSchema' => $previous_json,
+            'pendingSchema'  => $pending_json,
+        ];
+        // Children still show the old version; the editor resolve rewrites them and drops this flag.
+        if ( ! empty( $live_blocks ) ) {
+            $attrs['staleChildren'] = true;
+        }
+
         $block = [
             'blockName'    => 'blockish/ai-preview',
-            'attrs'        => [
-                'previousSchema' => $previous_json,
-                'pendingSchema'  => $pending_json,
-            ],
-            'innerBlocks'  => [],
-            'innerHTML'    => '',
-            'innerContent' => [],
+            'attrs'        => $attrs,
+            'innerBlocks'  => $live_blocks,
+            'innerHTML'    => $live_html,
+            'innerContent' => $live_content,
         ];
 
         return serialize_blocks( [ $block ] );
@@ -320,10 +335,12 @@ class SchemaUtils
                 return 'Pattern ref ' . $ref . ' is not a valid wp_block. Create the pattern with blockish/manage-pattern first and use the returned ID.';
             }
 
-            if ( self::content_has_ai_preview( (string) $pattern->post_content ) ) {
+            // A resolved preview already renders; only an unresolved one would print nothing.
+            $preview = self::find_ai_preview_block( (string) $pattern->post_content );
+            if ( $preview && ! \Blockish\Extensions\AiPreview::preview_has_children( $preview ) ) {
                 $edit = get_edit_post_link( $ref, 'raw' );
-                return 'Pattern ' . $ref . ' still has a staged AI preview. Accept it in the editor first'
-                    . ( $edit ? ( ': ' . $edit ) : '.' );
+                return 'Pattern ' . $ref . ' has a staged AI preview that is not resolved yet. Open any editor once so it resolves'
+                    . ( $edit ? ( ' (e.g. ' . $edit . ')' ) : '' ) . ', then retry. Accept is not required.';
             }
 
             $refs[] = $ref;

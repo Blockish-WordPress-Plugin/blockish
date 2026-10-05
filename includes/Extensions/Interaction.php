@@ -25,6 +25,12 @@ class Interaction {
 	const VIEW_SCRIPT_HANDLE = 'blockish-extension-interactions-viewscript';
 	const VIEW_STYLE_HANDLE  = 'blockish-extension-interactions-style';
 
+	/** @var bool A rendered block on this request carries interactionData. */
+	private $has_block_interactions = false;
+
+	/** @var bool Runtime already enqueued for this request. */
+	private $enqueued = false;
+
 	private function __construct() {
 		add_action( 'init', array( $this, 'register_page_meta' ) );
 		add_action( 'init', array( $this, 'register_runtime_hooks' ), 20 );
@@ -35,7 +41,10 @@ class Interaction {
 			return;
 		}
 
+		// Block themes render blocks before wp_head; classic themes render content
+		// later, so check again right before footer scripts print (priority 20).
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_view_assets' ) );
+		add_action( 'wp_footer', array( $this, 'enqueue_view_assets' ), 1 );
 		add_filter( 'render_block', array( $this, 'render_block' ), 10, 2 );
 	}
 
@@ -69,50 +78,49 @@ class Interaction {
 	}
 
 	/**
-	 * Enqueue registered viewScript/style and inject global + page interaction JSON.
+	 * Enqueue the runtime only when this request has interactions
+	 * (block, page or global), and inject the page + global JSON.
 	 */
 	public function enqueue_view_assets() {
-		if ( ! wp_script_is( self::VIEW_SCRIPT_HANDLE, 'registered' ) ) {
+		if ( $this->enqueued || ! wp_script_is( self::VIEW_SCRIPT_HANDLE, 'registered' ) ) {
 			return;
 		}
 
+		$global_interactions = $this->decode_list( get_option( 'blockish_global_interactions', array() ) );
+		$page_interactions   = is_singular()
+			? $this->decode_list( get_post_meta( get_the_ID(), self::PAGE_META_KEY, true ) )
+			: array();
+
+		if ( ! $this->has_block_interactions && empty( $global_interactions ) && empty( $page_interactions ) ) {
+			return;
+		}
+
+		$this->enqueued = true;
 		wp_enqueue_script( self::VIEW_SCRIPT_HANDLE );
 
 		if ( wp_style_is( self::VIEW_STYLE_HANDLE, 'registered' ) ) {
 			wp_enqueue_style( self::VIEW_STYLE_HANDLE );
 		}
 
-		$global_interactions = get_option( 'blockish_global_interactions', array() );
-		if ( is_string( $global_interactions ) ) {
-			$global_interactions_json = $global_interactions;
-		} else {
-			$global_interactions_json = wp_json_encode( $global_interactions );
-		}
-
-		if ( empty( $global_interactions_json ) ) {
-			$global_interactions_json = '[]';
-		}
-
-		$page_interactions_json = '[]';
-		if ( is_singular() ) {
-			$page_interactions = get_post_meta( get_the_ID(), self::PAGE_META_KEY, true );
-			if ( is_array( $page_interactions ) && ! empty( $page_interactions ) ) {
-				$page_interactions_json = wp_json_encode( $page_interactions );
-			} elseif ( is_string( $page_interactions ) && '' !== trim( $page_interactions ) ) {
-				$page_interactions_json = $page_interactions;
-			}
-		}
-
-		if ( empty( $page_interactions_json ) ) {
-			$page_interactions_json = '[]';
-		}
-
 		wp_add_inline_script(
 			self::VIEW_SCRIPT_HANDLE,
-			'window.blockishGlobalInteractions = ' . $global_interactions_json . ';' .
-			'window.blockishPageInteractions = ' . $page_interactions_json . ';',
+			'window.blockishGlobalInteractions = ' . wp_json_encode( $global_interactions ) . ';' .
+			'window.blockishPageInteractions = ' . wp_json_encode( $page_interactions ) . ';',
 			'before'
 		);
+	}
+
+	/**
+	 * Stored interaction lists may be arrays or JSON strings.
+	 *
+	 * @param mixed $value Option / meta value.
+	 * @return array
+	 */
+	private function decode_list( $value ) {
+		if ( is_string( $value ) ) {
+			$value = json_decode( $value, true );
+		}
+		return is_array( $value ) ? array_values( $value ) : array();
 	}
 
 	public function render_block( $block_content, $block ) {
@@ -125,6 +133,8 @@ class Interaction {
 		if ( ! is_array( $interaction_data ) || empty( $interaction_data ) ) {
 			return $block_content;
 		}
+
+		$this->has_block_interactions = true;
 
 		$tag_processor = new \WP_HTML_Tag_Processor( $block_content );
 		if ( ! $tag_processor->next_tag() ) {

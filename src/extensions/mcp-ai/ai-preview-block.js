@@ -26,6 +26,10 @@ registerBlockType( 'blockish/ai-preview', {
 			type: 'string',
 			default: '',
 		},
+		staleChildren: {
+			type: 'boolean',
+			default: false,
+		},
 	},
 	edit: ( props ) => {
 		const {

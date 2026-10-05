@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
-import InteractionList from './InteractionList';
-import InteractionForm from './InteractionForm';
+import InteractionList from './interaction-list';
+import InteractionForm from './interaction-form';
 
 export default function PageInteractionsPanel({
 	items,

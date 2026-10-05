@@ -17,7 +17,10 @@
 		"start": "wp-scripts start",
 		"start-hot": "wp-scripts start --hot",
 		"make-pot": "npx @wp-blocks/make-pot --exclude=node_modules,vendor,src",
-		"publish": "composer install --no-dev --optimize-autoloader && npm run build && npm run make-pot && npm run plugin-zip && composer install"
+		"publish": "composer install --no-dev --optimize-autoloader && npm run build && npm run make-pot && npm run plugin-zip && composer install",
+		"wp-env": "wp-env",
+		"test:e2e": "wp-scripts test-playwright",
+		"test:e2e:debug": "wp-scripts test-playwright --debug"
 	},
 	"files": [
 		"blockish.php",
@@ -29,6 +32,7 @@
 		"assets"
 	],
 	"devDependencies": {
+		"@wordpress/env": "^11.16.0",
 		"@wordpress/scripts": "^32.5.0"
 	},
 	"dependencies": {

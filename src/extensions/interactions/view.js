@@ -99,7 +99,7 @@ import {
 		let goingForward = direction === 'forward';
 		if (direction === 'toggle') {
 			goingForward = getActionType(interaction) === 'preset'
-				? !isPresetForward(blockElement)
+				? !isPresetForward(blockElement, interaction)
 				: true;
 		}
 		if (name && goingForward && whenPhase === 'start' && direction !== 'reverse') {
