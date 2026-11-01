@@ -161,7 +161,17 @@ const Inspector = ( { attributes, advancedControls } ) => {
 									<BlockishControl
 										type="BlockishPanelBody"
 										title={ __( 'Search box', 'blockish' ) }
-										indicatorSlugs={ [ 'searchWidth', 'searchTypography', 'searchColor', 'searchBackground', 'searchBorder', 'searchBorderRadius', 'searchPadding' ] }
+										indicatorSlugs={ [
+											'searchWidth',
+											'searchTypography',
+											'searchColor',
+											'searchIconColor',
+											'searchIconSize',
+											'searchBackground',
+											'searchBorder',
+											'searchBorderRadius',
+											'searchPadding',
+										] }
 									>
 										<BlockishResponsiveControl
 											type="BlockishRangeUnit"
@@ -178,6 +188,17 @@ const Inspector = ( { attributes, advancedControls } ) => {
 											type="BlockishColor"
 											label={ __( 'Text color', 'blockish' ) }
 											slug="searchColor"
+										/>
+										<BlockishControl
+											type="BlockishColor"
+											label={ __( 'Icon color', 'blockish' ) }
+											slug="searchIconColor"
+										/>
+										<BlockishResponsiveControl
+											type="BlockishRangeUnit"
+											label={ __( 'Icon size', 'blockish' ) }
+											slug="searchIconSize"
+											left="60px"
 										/>
 										<BlockishGroupControl
 											type="BlockishBackground"

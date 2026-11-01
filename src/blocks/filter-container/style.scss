@@ -66,8 +66,15 @@
 .blockish-filter-search-icon {
 	position: absolute;
 	left: 14px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 16px;
+	height: 16px;
+	color: inherit;
 	opacity: 0.55;
 	pointer-events: none;
+	flex-shrink: 0;
+	transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .blockish-filter-search {

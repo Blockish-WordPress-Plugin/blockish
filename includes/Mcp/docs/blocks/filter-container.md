@@ -17,6 +17,9 @@ Search and filter container for inner blocks. Visitors filter children using cat
 | `columns` | Object | Responsive column count for grid layout (e.g. `{"desktop": 3, "tablet": 2, "mobile": 1}`). |
 | `itemsGap` | Object | Responsive gap between items. |
 | `controlsAlign` | Object | Alignment of search & buttons header (`flex-start`, `center`, `flex-end`, `space-between`). |
+| `searchColor` | String | Text color for search input, also inherited by the search icon. |
+| `searchIconColor` | String | Dedicated color override for the search box icon. |
+| `searchIconSize` | Object | Responsive size for the search box icon (`{"desktop": "16px"}`). |
 
 #### Tagging Inner Blocks
 
@@ -60,6 +63,7 @@ Target these classes with Class Manager or custom CSS:
 * `.blockish-filter-container` — Root wrapper.
 * `.blockish-filter-controls` — Controls bar holding search and buttons.
 * `.blockish-filter-search` — Search input element.
+* `.blockish-filter-search-icon` — Search box SVG icon.
 * `.blockish-filter-buttons` — Filter button group wrapper.
 * `.blockish-filter-button` — Individual filter buttons.
 * `.blockish-filter-button.is-active` — Currently active filter button.

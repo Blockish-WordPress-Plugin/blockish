@@ -85,7 +85,20 @@
     "searchColor": {
       "type": "string",
       "selectors": {
-        ".{{WRAPPER}} .blockish-filter-search": "color: {{VALUE}};"
+        ".{{WRAPPER}} .blockish-filter-search": "color: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-filter-search-icon": "color: {{VALUE}};"
+      }
+    },
+    "searchIconColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-search-box .blockish-filter-search-icon": "color: {{VALUE}}; opacity: 1;"
+      }
+    },
+    "searchIconSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-search-icon": "width: {{VALUE}}; height: {{VALUE}};"
       }
     },
     "searchBackground": {
