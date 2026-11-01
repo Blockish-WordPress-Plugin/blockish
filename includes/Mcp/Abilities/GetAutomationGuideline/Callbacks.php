@@ -52,8 +52,11 @@ VERIFY LOOP (required)
    for the affected items — do not declare done on a broken layout.
 
 Do not explain resolve internals. Do not push Accept/Discard.
-After verify: call `get-ai-preview-pending`. If count > 0, tell the user how many
-designs are pending and that they should Accept manually in Settings → AI Preview.
+Resolved = live: once the editor resolves a staged design it renders on the
+frontend for every visitor. Accept only finalizes (drops the Discard rollback);
+it is never required to continue to the next section or task.
+After verify: call `get-ai-preview-pending`. If count > 0, tell the user as info
+that they can Accept (finalize) or Discard (roll back) in Settings → AI Preview.
 ';
 
         return [

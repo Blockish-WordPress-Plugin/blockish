@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { __ } from '@wordpress/i18n';
 import { subscribe, useSelect } from '@wordpress/data';
 import { settings } from '@wordpress/icons';
-import Modal from './components/Modal';
+import Modal from './components/modal';
 import './style.scss';
 
 const useToolbarElement = () => {

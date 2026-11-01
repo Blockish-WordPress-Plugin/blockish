@@ -9,3 +9,6 @@
 @forward './partials/overview-video';
 @forward './partials/toast';
 @forward './partials/responsive';
+// Blockish select (exposed to settings modals via window.blockishDashboardComponents).
+@forward '../../components/scss/select';
+@forward './partials/blockish-select';

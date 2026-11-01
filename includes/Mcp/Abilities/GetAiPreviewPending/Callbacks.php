@@ -40,11 +40,11 @@ class Callbacks {
 		);
 
 		if ( $count < 1 ) {
-			$message = 'No AI Preview designs are pending Accept.';
+			$message = 'No AI Preview designs are pending.';
 		} else {
 			$message = sprintf(
 				/* translators: %d: pending count */
-				'%d AI Preview design(s) are still pending. Tell the user to open Settings → AI Preview and Accept them manually (do not Accept via MCP).',
+				'%d AI Preview design(s) are not finalized. Once resolved they are already live on the frontend for all visitors. Tell the user they can Accept (finalize) or Discard (roll back) in Settings → AI Preview whenever they like — Accept is not required to continue. Do not Accept/Discard via MCP.',
 				$count
 			);
 		}

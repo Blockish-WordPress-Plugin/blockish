@@ -20,15 +20,8 @@ export const SIDEBAR_MENUS = [
 	{ key: 'extensions', label: 'Extensions', icon: plugIcon },
 	{ key: 'mcp-config', label: 'MCP Server', icon: zap },
 	{ key: 'settings', label: 'Settings', icon: settingsIcon },
-	// Pinned just above Forms (and before Addons) via orderSidebarMenus.
+	// Pinned just above Forms via orderSidebarMenus.
 	{ key: 'integrations', label: 'Integrations', icon: plugIcon },
-	// Always last — buy add-ons + activate licenses live here (not Plugins row).
-	{
-		key: 'addons',
-		label: 'Addons & License',
-		hint: 'Buy add-ons · Activate keys',
-		icon: packageIcon,
-	},
 ];
 
 export function isThemeBuilderExtensionActive(extensions = {}) {
@@ -78,7 +71,7 @@ export function withThemeBuilderMenu(menus = [], extensions = {}) {
 }
 
 /**
- * Pin Integrations → Forms → Addons at the bottom of the sidebar.
+ * Pin Integrations → Forms at the bottom of the sidebar.
  * Filter-injected menus (e.g. Forms) stay just under Integrations.
  *
  * @param {Array} menus Sidebar menu definitions.
@@ -89,17 +82,15 @@ export function orderSidebarMenus(menus = []) {
 	const take = ( key ) => list.find( ( menu ) => menu?.key === key );
 	const integrations = take( 'integrations' );
 	const forms = take( 'forms' );
-	const addons = take( 'addons' );
 	const rest = list.filter(
 		( menu ) =>
-			! [ 'integrations', 'forms', 'addons' ].includes( menu?.key )
+			! [ 'integrations', 'forms' ].includes( menu?.key )
 	);
 
 	return [
 		...rest,
 		...( integrations ? [ integrations ] : [] ),
 		...( forms ? [ forms ] : [] ),
-		...( addons ? [ addons ] : [] ),
 	];
 }
 

@@ -115,12 +115,11 @@ export default function BlockCard({ block, isSaving, onToggle, onNavigate }) {
 							style={{ padding: '8px 24px' }}
 							onClick={() => {
 								setIsModalOpen(false);
-								if (onNavigate) {
-									onNavigate('addons');
-								}
+								const proUrl = window.blockishDashboardData?.links?.pricing || 'https://blockish.wowdevs.com/pricing/';
+								window.open(proUrl, '_blank');
 							}}
 						>
-							{sprintf(__('Get %s', 'blockish'), block.sourceName || __('Addon', 'blockish'))}
+							{sprintf(__('Get %s', 'blockish'), block.sourceName || __('Pro', 'blockish'))}
 						</Button>
 					</Flex>
 				</VStack>

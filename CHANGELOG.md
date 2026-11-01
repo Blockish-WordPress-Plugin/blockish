@@ -2,6 +2,14 @@
 
 All notable changes to Blockish will be documented in this file.
 
+## [1.4.0] - 2026-11-01
+
+* Added: Filter Container block to search and filter inner blocks using real-time keyword search, category filter buttons, and responsive grid layouts
+* Improved: Interactions engine with smoother toggle animations and conditional asset loading
+* Improved: Site meta description and SEO options in the Blockish dashboard
+* Improved: Dashboard UI and modal dropdown select controls
+* Fixed: Add-on account synchronization handling in settings
+
 ## [1.3.0] - 2026-09-12
 
 * Added: Nav Menu Mega Menu and Nav Menu Submenu blocks with responsive alignment, custom offsets, width controls (navigation, full, custom), and offcanvas accordion sync

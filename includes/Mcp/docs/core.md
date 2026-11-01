@@ -8,7 +8,7 @@ You build a **schema**: a JSON tree of `{ name, attributes, innerBlocks }`.
 - `attributes` — only values that differ from defaults. Omit = default.
 - `innerBlocks` — child schema nodes (only when "Accepts children: yes").
 
-**Never** write block HTML, hand-built markup, or layout CSS into `post_content`. Always stage via `block_schema` (`blockish/ai-preview`). AGENT opens `edit_url` once (prefer parent page; any editor resolves the whole queue) → waitUntil `domcontentloaded` → wait **10–15s** → give the user a frontend view URL. Settings Accept/Discard only when the user asks.
+**Never** write block HTML, hand-built markup, or layout CSS into `post_content`. Always stage via `block_schema` (`blockish/ai-preview`). AGENT opens `edit_url` once (prefer parent page; any editor resolves the whole queue) → waitUntil `domcontentloaded` → wait **10–15s** → give the user a frontend view URL. Once resolved, the design is live for every visitor; Settings Accept (finalize) / Discard (roll back) is optional and only when the user asks — never required to continue.
 
 ### Block selection — dedicated blocks first
 

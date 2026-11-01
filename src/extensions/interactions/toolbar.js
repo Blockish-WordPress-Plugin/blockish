@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { BlockControls } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarButton, Icon } from '@wordpress/components';
 import { SVG, Path } from '@wordpress/primitives';
-import InteractionsBuilder from './components/InteractionsBuilder';
+import InteractionsBuilder from './components/interactions-builder';
 
 const interactionsIcon = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

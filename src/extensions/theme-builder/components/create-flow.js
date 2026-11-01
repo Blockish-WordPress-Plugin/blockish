@@ -14,7 +14,7 @@ import {
 	showOnLabel,
 	suggestPartName,
 	takenShowOnSummary,
-} from '../utils/partConditions';
+} from '../utils/part-conditions';
 import {
 	Button,
 	Modal,

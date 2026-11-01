@@ -1,0 +1,261 @@
+// Defaults stay neutral so they fit light and dark themes; every value is
+// adjustable in the Style tab. Controls get a fixed comfortable size instead
+// of inheriting large theme body text.
+
+.blockish-filter-container {
+	display: flex;
+	flex-direction: column;
+	row-gap: 28px;
+}
+
+.blockish-filter-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px 16px;
+}
+
+.blockish-filter-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.blockish-filter-button {
+	box-sizing: border-box;
+	display: inline-flex;
+	align-items: center;
+	min-height: 40px;
+	padding: 8px 16px;
+	border: 1px solid rgba(127, 127, 127, 0.3);
+	border-radius: 999px;
+	background: transparent;
+	color: inherit;
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 500;
+	line-height: 1.2;
+	cursor: pointer;
+	user-select: none;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+	&:hover {
+		border-color: rgba(127, 127, 127, 0.6);
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentcolor;
+		outline-offset: 2px;
+	}
+
+	&.is-active {
+		border-color: #1e1e1e;
+		background: #1e1e1e;
+		color: #fff;
+	}
+}
+
+.blockish-filter-search-box {
+	position: relative;
+	display: flex;
+	align-items: center;
+	max-width: 100%;
+}
+
+.blockish-filter-search-icon {
+	position: absolute;
+	left: 14px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 16px;
+	height: 16px;
+	color: inherit;
+	opacity: 0.55;
+	pointer-events: none;
+	flex-shrink: 0;
+	transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.blockish-filter-search {
+	width: 240px;
+	max-width: 100%;
+	min-height: 42px;
+	padding: 8px 16px 8px 38px;
+	border: 1px solid rgba(127, 127, 127, 0.3);
+	border-radius: 999px;
+	background: transparent;
+	color: inherit;
+	font-family: inherit;
+	font-size: 15px;
+	line-height: 1.2;
+	box-sizing: border-box;
+	transition: border-color 0.2s ease;
+
+	&::placeholder {
+		color: inherit;
+		opacity: 0.55;
+	}
+
+	&:focus {
+		border-color: currentcolor;
+		outline: none;
+	}
+}
+
+.blockish-filter-items {
+
+	&.is-layout-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 20px;
+	}
+
+	&.is-layout-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+}
+
+@media (max-width: 1024px) {
+
+	.blockish-filter-items.is-layout-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 640px) {
+
+	.blockish-filter-items.is-layout-grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.blockish-filter-search-box,
+	.blockish-filter-search {
+		width: 100%;
+	}
+}
+
+// Starter cards from the default template; keep, restyle or remove the
+// classes. Each card sets its own text color so it stays readable on any theme.
+.blockish-filter-container .blockish-filter-card.blockish-container {
+	--blockish-card-bg: #f1effb;
+	--blockish-card-ink: #3b2f8f;
+	box-sizing: border-box;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 28px;
+	border: 0;
+	border-radius: 20px;
+	background: var(--blockish-card-bg);
+	color: #1e1e1e;
+	transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+
+	> * {
+		margin: 0;
+	}
+
+	&:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.25);
+	}
+
+	&.is-tone-violet {
+		--blockish-card-bg: #efebff;
+		--blockish-card-ink: #4c3bc4;
+	}
+
+	&.is-tone-mint {
+		--blockish-card-bg: #dff6ee;
+		--blockish-card-ink: #0f6b52;
+	}
+
+	&.is-tone-peach {
+		--blockish-card-bg: #ffeadb;
+		--blockish-card-ink: #a3471b;
+	}
+
+	&.is-tone-sky {
+		--blockish-card-bg: #e2efff;
+		--blockish-card-ink: #1d4f9a;
+	}
+
+	&.is-tone-rose {
+		--blockish-card-bg: #ffe6ee;
+		--blockish-card-ink: #a12a55;
+	}
+
+	&.is-tone-lemon {
+		--blockish-card-bg: #fff4cf;
+		--blockish-card-ink: #7a5a00;
+	}
+}
+
+// Beats theme heading/text colors (dark themes) but not colors set on a block.
+.blockish-filter-card :is(h1, h2, h3, h4, h5, h6, p) {
+	color: inherit;
+}
+
+.blockish-filter-container .blockish-filter-card-label {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.7);
+	color: var(--blockish-card-ink, inherit);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	line-height: 1.4;
+	text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.blockish-filter-container .blockish-filter-card.blockish-container:hover {
+		transform: none;
+	}
+}
+
+.blockish-filter-hidden {
+	display: none !important;
+}
+
+.blockish-filter-empty {
+	margin: 0;
+	padding: 32px 0;
+	text-align: center;
+	opacity: 0.7;
+}
+
+.blockish-filter-status {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+
+	.blockish-filter-in {
+		animation: blockish-filter-in 0.3s ease both;
+	}
+}
+
+@keyframes blockish-filter-in {
+
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}

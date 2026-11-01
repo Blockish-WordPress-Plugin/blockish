@@ -281,7 +281,8 @@ Prefer structured presets. Legacy `{ event, selector, callbacks }` still works a
 | `action.applyTo` | Optional — where the action runs (any page selector). Empty = this block |
 | `action.eventName` | `emit` = the signal. Other types = optional **then-signal** for sequences |
 | `action.phase` | `emit`: signal tag. Other types: send then-signal when this `start`s or `end`s (default `end`) |
-| `action.type` | `"preset"` \| `"show"` \| `"hide"` \| `"toggle"` \| `"toggleClass"` \| `"emit"` \| `"custom"` |
+| `action.type` | `"preset"` \| `"show"` \| `"hide"` \| `"toggle"` \| `"toggleClass"` \| `"scrollTo"` \| `"emit"` \| `"custom"` |
+| `action.scrollTarget` / `scrollOffset` / `scrollDuration` | For `scrollTo`: CSS selector to glide to (empty = page top), px stop above it, seconds (default 1.2). Use with a `click` trigger, e.g. on a button linking to `#section` — the link jump is replaced by a smooth scroll. |
 | `action.preset` | Seeds motion: `"fadeIn"` `"fadeUp"` `"fadeDown"` `"fadeLeft"` `"fadeRight"` `"zoomIn"` `"custom"` |
 | `action.motion.tweens` | Canonical animation. One CSS tween: `from`/`to` with used keys only (`x`, `y`, `scale`, `rotation`, `opacity`), `duration`/`delay` in **seconds**, `ease`. Play `tweens[0]` only. |
 | `action.className` | For `toggleClass` — class without the dot |

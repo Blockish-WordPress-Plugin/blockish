@@ -68,6 +68,9 @@ export function normalizeInteraction(raw, scope = 'block') {
 			phase: raw.action?.phase || raw.emitPhase || 'end',
 			applyTo: raw.action?.applyTo ?? raw.applyTo ?? '',
 			className: raw.action?.className ?? raw.className ?? '',
+			scrollTarget: raw.action?.scrollTarget ?? '',
+			scrollOffset: Number(raw.action?.scrollOffset) || 0,
+			scrollDuration: Number(raw.action?.scrollDuration) || 1.2,
 			callbacks: Array.isArray(raw.action?.callbacks)
 				? raw.action.callbacks
 				: Array.isArray(raw.callbacks)

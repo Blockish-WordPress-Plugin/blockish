@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
-import InteractionList from './InteractionList';
-import InteractionForm from './InteractionForm';
+import InteractionList from './interaction-list';
+import InteractionForm from './interaction-form';
 
 /**
  * Global-only list/form body. Shell (modal/tabs/footer) stays in InteractionsBuilder.

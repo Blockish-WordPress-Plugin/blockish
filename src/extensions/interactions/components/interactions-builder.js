@@ -1,5 +1,5 @@
-import BlockInteractionsBuilder from './BlockInteractionsBuilder';
-import GlobalInteractionsBuilder from './GlobalInteractionsBuilder';
+import BlockInteractionsBuilder from './block-interactions-builder';
+import GlobalInteractionsBuilder from './global-interactions-builder';
 
 /**
  * Thin entry: block modal vs Settings (global/page).

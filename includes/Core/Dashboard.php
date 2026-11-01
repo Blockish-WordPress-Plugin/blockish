@@ -127,12 +127,13 @@ class Dashboard {
                             'roadmap'       => 'https://blockish.wowdevs.com/roadmap/',
                             'support'       => 'https://blockish.wowdevs.com/contact/',
                             'changelog'     => 'https://wordpress.org/plugins/blockish/#developers',
+                            'pricing'       => 'https://blockish.wowdevs.com/pricing/',
                             // Swap this id/URL when the product overview video changes.
                             'overviewVideo' => 'https://www.youtube.com/watch?v=3q0V4Vru0o0',
                             'connectVideo'  => 'https://www.youtube.com/watch?v=dVPnrbbFujo',
                         ),
                     ),
-                    'addonsList'        => \Blockish\Config\AddonsList::get_instance()->get_list(),
+                    'pro'               => \Blockish\Config\Freemius::get_instance()->get_pro_data(),
                     'isBlockTheme'      => function_exists( 'wp_is_block_theme' ) && wp_is_block_theme(),
                 )
             ) . ';',

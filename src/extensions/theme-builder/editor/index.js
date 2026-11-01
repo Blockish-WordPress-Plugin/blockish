@@ -23,7 +23,7 @@ import domReady from '@wordpress/dom-ready';
 import { Button, Modal } from '@wordpress/components';
 import { backup } from '@wordpress/icons';
 import { getSchemaForSlug } from '../schema';
-import { schemaToBlocks } from '../schema/schemaToMarkup';
+import { schemaToBlocks } from '../schema/schema-to-markup';
 import {
 	conditionsFromShowOn,
 	firstAvailableShowOn,
@@ -35,7 +35,7 @@ import {
 	showOnFromConditions,
 	showOnLabel,
 	takenShowOnSummary,
-} from '../utils/partConditions';
+} from '../utils/part-conditions';
 
 const POST_TYPE = window.blockishThemeBuilder?.postType || 'blockish_tb';
 

@@ -29,3 +29,6 @@ node_modules/
 .env
 blockish
 .DS_Store
+
+# E2E test output
+artifacts

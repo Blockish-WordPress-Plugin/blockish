@@ -1,8 +1,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem, Icon } from '@wordpress/components';
 import { moreVertical, pencil, trash, layout } from '@wordpress/icons';
-import ItemPreview from './ItemPreview';
-import { showOnFromConditions, showOnLabel } from '../utils/partConditions';
+import ItemPreview from './item-preview';
+import { showOnFromConditions, showOnLabel } from '../utils/part-conditions';
 
 function getMeta( item, key ) {
 	return item?.meta?.[ key ] ?? '';

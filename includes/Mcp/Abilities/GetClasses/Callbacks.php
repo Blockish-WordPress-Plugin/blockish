@@ -14,7 +14,7 @@ class Callbacks
      * (parent root + children rewritten as .slug:hover / .slug h2 / …).
      * Child posts exist for the Class Manager UI but are hidden from AI.
      */
-    public static function get_classes( $input ): array
+    public static function get_classes( $input ): object
     {
         $include_usage = is_array( $input ) && ! empty( $input['include_usage'] );
         $usage_report  = $include_usage ? ClassUsage::report() : null;
@@ -50,7 +50,7 @@ class Callbacks
             $result[ $post->ID ] = $item;
         }
 
-        return $result;
+        return (object) $result;
     }
 
     /**

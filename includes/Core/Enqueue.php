@@ -123,13 +123,8 @@ class Enqueue {
         $library_url = BLOCKISH_TEMPLATE_LIBRARY_URL;
         $library_token = BLOCKISH_TEMPLATE_LIBRARY_TOKEN;
 
-        $forms_installed      = class_exists( 'Blockish_Forms' );
-        $dynamicity_installed = class_exists( 'Blockish_Dynamicity' );
-        $addons               = \Blockish\Config\AddonsList::get_instance()->refresh_list();
-
-        // Template library insert uses real Freemius state (not local feature bypass).
-        $forms_licensed      = ! empty( $addons['blockish-forms']['license']['is_active'] );
-        $dynamicity_licensed = ! empty( $addons['blockish-dynamicity']['license']['is_active'] );
+        $pro_installed = \Blockish\Config\Freemius::get_instance()->is_pro_installed();
+        $pro_licensed  = \Blockish\Config\Freemius::get_instance()->has_active_pro_license();
 
         wp_localize_script(
             'blockish-template-library',
@@ -137,20 +132,13 @@ class Enqueue {
             array(
                 'token'     => $library_token,
                 'url'       => rtrim( $library_url, '/' ),
-                'addonsUrl' => admin_url( 'admin.php?page=blockish-dashboard&route=addons' ),
+                'addonsUrl' => admin_url( 'admin.php?page=blockish-dashboard' ),
                 'packages'  => array(
-                    'forms' => array(
-                        'label'            => __( 'Forms', 'blockish' ),
-                        'aliases'          => array( 'forms', 'blockish-forms', 'blockish forms' ),
-                        'installed'        => $forms_installed,
-                        'licensed'         => $forms_licensed,
-                        'requires_license' => true,
-                    ),
-                    'dynamicity' => array(
-                        'label'            => __( 'Dynamicity', 'blockish' ),
-                        'aliases'          => array( 'dynamicity', 'blockish-dynamicity', 'blockish dynamicity' ),
-                        'installed'        => $dynamicity_installed,
-                        'licensed'         => $dynamicity_licensed,
+                    'pro' => array(
+                        'label'            => __( 'Pro', 'blockish' ),
+                        'aliases'          => array( 'pro', 'blockish-pro', 'forms', 'dynamicity', 'animation' ),
+                        'installed'        => $pro_installed,
+                        'licensed'         => $pro_licensed,
                         'requires_license' => true,
                     ),
                 ),

@@ -12,7 +12,7 @@ Wide mega dropdown under a menu item. Embeds a synced **`blockish_megamenu` CPT*
 > - Edge-to-edge band → `"full"`.
 > - Tiny single-column link list that should match the item → `"navigation"` only.
 >
-> **Nested pending (forms/patterns parity):** Pattern / form / mega CPT pending stays in Settings until Accept/Discard on **that** item — Accept on a parent page does **not** cascade. Opening any editor auto-writes FE children for unresolved queue items without unwrapping.
+> **Nested pending (forms/patterns parity):** Pattern / form / mega CPT pending stays listed in Settings until Accept/Discard on **that** item — Accept on a parent page does **not** cascade. Opening any editor auto-writes FE children for unresolved queue items without unwrapping, so they are already live; Accept is optional finalization.
 >
 > **Offcanvas:** Synced copy becomes accordion-like tree; mega panel is desktop/navmenu positioning — keep mega content usable when mirrored, or rely on sync only for simple structures.
 
@@ -59,7 +59,7 @@ Style mega **content** on the CPT blocks / Class Manager — not inventing wrapp
 #### Workflow for AI
 
 1. `manage-post` create `post_type: "blockish_megamenu"`, `post_title`, `block_schema` (e.g. multi-column `blockish/container`).
-2. Accept CPT in editor if staged; note returned `post_id`.
+2. Resolve the CPT (open any editor once) if staged; note returned `post_id`. Accept is not required.
 3. On the header/page nav item, nest with **`widthMode` matched to the CPT** (wide layouts → `custom` + `customWidth`, never bare defaults):
 
 ```json

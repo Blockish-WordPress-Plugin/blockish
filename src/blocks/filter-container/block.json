@@ -1,0 +1,223 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/filter-container",
+  "version": "1.0.0",
+  "title": "Filter Container",
+  "category": "blockish-framework",
+  "description": "Search and filter the blocks inside it. Give any inner block filter terms; visitors filter them with a search box and term buttons.",
+  "keywords": [
+    "filter",
+    "search",
+    "portfolio",
+    "faq"
+  ],
+  "attributes": {
+    "showSearch": {
+      "type": "boolean",
+      "default": true
+    },
+    "searchPlaceholder": {
+      "type": "string",
+      "default": "Search…"
+    },
+    "searchInText": {
+      "type": "boolean",
+      "default": false
+    },
+    "showFilters": {
+      "type": "boolean",
+      "default": true
+    },
+    "allLabel": {
+      "type": "string",
+      "default": "All"
+    },
+    "filterMode": {
+      "type": "string",
+      "default": "single"
+    },
+    "emptyMessage": {
+      "type": "string",
+      "default": "No results found."
+    },
+    "itemsLayout": {
+      "type": "string",
+      "default": "grid"
+    },
+    "columns": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-items.is-layout-grid": "grid-template-columns: repeat({{VALUE}}, minmax(0, 1fr));"
+      }
+    },
+    "itemsGap": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-items": "gap: {{VALUE}};"
+      }
+    },
+    "controlsAlign": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-controls": "justify-content: {{VALUE}};"
+      }
+    },
+    "controlsSpacing": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}}": "row-gap: {{VALUE}};"
+      }
+    },
+    "searchWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-search": "width: {{VALUE}};"
+      }
+    },
+    "searchTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-filter-search"
+      }
+    },
+    "searchColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-search": "color: {{VALUE}};",
+        ".{{WRAPPER}} .blockish-filter-search-icon": "color: {{VALUE}};"
+      }
+    },
+    "searchIconColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-search-box .blockish-filter-search-icon": "color: {{VALUE}}; opacity: 1;"
+      }
+    },
+    "searchIconSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-search-icon": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    },
+    "searchBackground": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-filter-search"
+      }
+    },
+    "searchBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-filter-search"
+      }
+    },
+    "searchBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-search": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "searchPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-search": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "buttonsGap": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-buttons": "gap: {{VALUE}};"
+      }
+    },
+    "buttonTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-filter-button"
+      }
+    },
+    "buttonColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-button": "color: {{VALUE}};"
+      }
+    },
+    "buttonBackground": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-filter-button"
+      }
+    },
+    "buttonBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-filter-button"
+      }
+    },
+    "buttonColorActive": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-button.is-active": "color: {{VALUE}};"
+      }
+    },
+    "buttonBackgroundActive": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-filter-button.is-active"
+      }
+    },
+    "buttonBorderActive": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-filter-button.is-active"
+      }
+    },
+    "buttonBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-button": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "buttonPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-button": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "emptyColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-filter-empty": "color: {{VALUE}};"
+      }
+    },
+    "emptyTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-filter-empty"
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./view.js",
+  "render": "file:./render.php"
+}

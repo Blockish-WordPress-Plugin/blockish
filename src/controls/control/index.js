@@ -25,7 +25,12 @@ const BlockishControl = ({ type = "TextControl", slug, label = "", value: userDe
         return null;
     }
 
-    const controlValue = userDefinedValue || value || '';
+    // Keep real falsy values like 0; only empty means "fall back".
+    const isEmpty = (v) => v === undefined || v === null || v === '';
+    let controlValue = isEmpty(value) ? '' : value;
+    if (!isEmpty(userDefinedValue)) {
+        controlValue = userDefinedValue;
+    }
 
     const handleChange = (value) => {
         if(userDefinedOnChange) {

@@ -222,10 +222,11 @@ const presetTransition = (duration, easing) => {
 const getAnimationEngine = () =>
 	typeof window !== 'undefined' ? window.blockishAnimation : null;
 
-export const isPresetForward = (el) => {
+// Per interaction: a block can run several (e.g. two click toggles).
+export const isPresetForward = (el, interaction) => {
 	const anim = getAnimationEngine();
 	if (anim?.isForward) {
-		return !!anim.isForward(el);
+		return !!anim.isForward(el, interaction);
 	}
 	return !!(el && el.classList && el.classList.contains('blockish-ix-run'));
 };
@@ -346,6 +347,37 @@ const applyClass = (el, className, direction) => {
 /**
  * @param {'forward'|'reverse'|'toggle'} direction
  */
+/**
+ * Smooth-scroll to action.scrollTarget (CSS selector; empty = page top).
+ * Uses the GSAP engine when it provides scrollTo, else native smooth scroll.
+ */
+const scrollToTarget = (interaction, event) => {
+	const action = interaction.action || {};
+	const selector = String(action.scrollTarget || '').trim();
+	let target = null;
+	if (selector) {
+		try {
+			target = document.querySelector(selector);
+		} catch (e) {
+			return;
+		}
+		if (!target) return;
+	}
+	// Stop an in-page link from jumping before the smooth scroll runs.
+	if (event?.type === 'click' && typeof event.preventDefault === 'function') {
+		event.preventDefault();
+	}
+	const offset = Number(action.scrollOffset) || 0;
+	const duration = Number(action.scrollDuration) || 1.2;
+	if (getAnimationEngine()?.scrollTo?.(target, { offset, duration })) {
+		return;
+	}
+	const top = target
+		? target.getBoundingClientRect().top + window.scrollY - offset
+		: 0;
+	window.scrollTo({ top, behavior: 'smooth' });
+};
+
 export const runAction = (
 	interaction,
 	event,
@@ -364,7 +396,7 @@ export const runAction = (
 	if (type === 'preset') {
 		let dir = direction;
 		if (dir === 'toggle') {
-			dir = isPresetForward(blockElement) ? 'reverse' : 'forward';
+			dir = isPresetForward(blockElement, interaction) ? 'reverse' : 'forward';
 		}
 		if (dir === 'reverse') {
 			reversePreset(blockElement, interaction);
@@ -377,6 +409,12 @@ export const runAction = (
 
 	if (type === 'emit') {
 		return 'emit';
+	}
+
+	if (type === 'scrollTo') {
+		scrollToTarget(interaction, event);
+		done();
+		return;
 	}
 
 	if (type === 'toggleClass') {

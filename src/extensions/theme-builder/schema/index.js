@@ -3,12 +3,12 @@
  *
  * Loop templates: Blog Home design (post 4288) — see loopTemplates.js.
  */
-import { schemaToMarkup } from './schemaToMarkup';
+import { schemaToMarkup } from './schema-to-markup';
 import { wrapChrome } from './fragments';
 import {
 	getLoopMainBlocks,
 	isLoopTemplateSlug,
-} from './loopTemplates';
+} from './loop-templates';
 
 import pageMain from './templates/page.main.json';
 import pageNoTitleMain from './templates/page-no-title.main.json';
@@ -136,7 +136,7 @@ export function getInitialContent( kind, slug ) {
 	return schemaToMarkup( getSchemaForSlug( kind, slug ) );
 }
 
-export { schemaToMarkup, schemaToBlocks } from './schemaToMarkup';
+export { schemaToMarkup, schemaToBlocks } from './schema-to-markup';
 export {
 	wrapChrome,
 	createQueryLoop,
@@ -149,7 +149,7 @@ export {
 	SEARCH_LOOP_SLUGS,
 	isLoopTemplateSlug,
 	getLoopMainBlocks,
-} from './loopTemplates';
+} from './loop-templates';
 export {
 	isWooCommerceSchemaSlug,
 	isWooCommerceTemplateSlug,

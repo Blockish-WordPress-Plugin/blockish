@@ -164,21 +164,14 @@ class Callbacks
     {
         $package_name = (string) ( $design['package_name'] ?? '' );
         $raw          = strtolower( sanitize_title( $package_name ) );
-        $addons       = \Blockish\Config\AddonsList::get_instance();
+        $freemius     = \Blockish\Config\Freemius::get_instance();
 
-        $addon_slug = '';
-        if ( in_array( $raw, array( 'dynamicity', 'blockish-dynamicity', 'blockishdynamicity' ), true ) ) {
-            $addon_slug = 'blockish-dynamicity';
-        } elseif ( in_array( $raw, array( 'forms', 'blockish-forms', 'blockishforms' ), true ) ) {
-            $addon_slug = 'blockish-forms';
+        if ( in_array( $raw, array( 'pro', 'blockish-pro', 'dynamicity', 'blockish-dynamicity', 'forms', 'blockish-forms' ), true ) ) {
+            return $freemius->has_active_pro_license() ? '' : 'blockish-pro';
         }
 
-        if ( $addon_slug ) {
-            return $addons->has_active_freemius_license( $addon_slug ) ? '' : $addon_slug;
-        }
-
-        if ( ! empty( $design['dependencies']['forms'] ) && ! $addons->has_active_freemius_license( 'blockish-forms' ) ) {
-            return 'blockish-forms';
+        if ( ! empty( $design['dependencies']['forms'] ) && ! $freemius->has_active_pro_license() ) {
+            return 'blockish-pro';
         }
 
         if ( empty( $package_name ) || in_array( $raw, array( 'blockish', 'core', 'free' ), true ) ) {

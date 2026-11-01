@@ -245,26 +245,16 @@ class LicenseNotice {
 	 * @return array<int, array{slug:string,name:string}>
 	 */
 	public function get_unlicensed_installed_addons() {
-		$addons = \Blockish\Config\AddonsList::get_instance()->refresh_list();
-		$needs  = array();
-
-		foreach ( $addons as $slug => $addon ) {
-			if ( ! empty( $addon['is_bundle'] ) ) {
-				continue;
-			}
-			if ( empty( $addon['is_installed'] ) || empty( $addon['supports_license_key'] ) ) {
-				continue;
-			}
-			$license_active = ! empty( $addon['license']['is_active'] );
-			if ( $license_active ) {
-				continue;
-			}
-			$needs[] = array(
-				'slug' => $slug,
-				'name' => isset( $addon['name'] ) ? (string) $addon['name'] : $slug,
-			);
+		$freemius = \Blockish\Config\Freemius::get_instance();
+		if ( ! $freemius->is_pro_installed() || $freemius->has_active_pro_license() ) {
+			return array();
 		}
 
-		return $needs;
+		return array(
+			array(
+				'slug' => 'blockish-pro',
+				'name' => __( 'Blockish Pro', 'blockish' ),
+			),
+		);
 	}
 }

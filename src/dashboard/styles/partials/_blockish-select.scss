@@ -1,0 +1,17 @@
+// WP admin's generic input sizing inflates react-select's inner input
+// differently per screen. Reset it and give the control the height it has
+// in the editor sidebar, so the dashboard select looks the same.
+.blockish-select__input-container input.blockish-select__input {
+	min-height: 0 !important;
+	height: auto !important;
+	line-height: inherit !important;
+}
+
+.blockish-select__control {
+	min-height: 42px !important;
+}
+
+// Menus portaled to <body> (inside modals) must sit above the modal (z-index 100000).
+.blockish-select__menu-portal {
+	z-index: 1000001 !important;
+}

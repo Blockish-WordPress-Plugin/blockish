@@ -1,9 +1,16 @@
 import { __ } from '@wordpress/i18n';
 import { Button, Icon } from '@wordpress/components';
-import { trash, pencil } from '@wordpress/icons';
+import { trash, pencil, play } from '@wordpress/icons';
 import { summarizeInteraction } from '../utils/labels';
+import { normalizeInteraction } from '../utils/compile';
 
-export default function InteractionList({ items, onEdit, onDelete, emptyText }) {
+export default function InteractionList({
+	items,
+	onEdit,
+	onDelete,
+	onPlay,
+	emptyText,
+}) {
 	if (!items?.length) {
 		return (
 			<div className="blockish-interactions-empty">
@@ -34,6 +41,17 @@ export default function InteractionList({ items, onEdit, onDelete, emptyText }) 
 							</span>
 						</div>
 						<div className="blockish-interactions-list__actions">
+							{onPlay &&
+							!['emit', 'custom', 'scrollTo'].includes(
+								normalizeInteraction(item, 'block')?.action?.type
+							) ? (
+								<Button
+									icon={<Icon icon={play} />}
+									size="small"
+									label={__('Play on this block', 'blockish')}
+									onClick={() => onPlay(item)}
+								/>
+							) : null}
 							<Button
 								icon={<Icon icon={pencil} />}
 								size="small"

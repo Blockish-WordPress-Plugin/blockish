@@ -14,7 +14,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { layout, settings, arrowUp, arrowDown } from '@wordpress/icons';
-import ItemCard from './ItemCard';
+import ItemCard from './item-card';
 import { getItemEditUrl, navigateToUrl } from '../library/navigation';
 
 const DEFAULT_VIEW = {

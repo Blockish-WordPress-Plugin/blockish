@@ -49,6 +49,10 @@ class AiPreview {
 						'type'    => 'string',
 						'default' => '',
 					),
+					'staleChildren'  => array(
+						'type'    => 'boolean',
+						'default' => false,
+					),
 				),
 				'supports'        => array(
 					'inserter' => false,
@@ -126,7 +130,7 @@ class AiPreview {
 				'edit_url'   => self::edit_url( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
 				'rest_id'    => self::rest_id( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
 				'rest_route' => self::rest_route( $id, $type, (string) ( $row['post_name'] ?? '' ) ),
-				'resolved'   => self::preview_has_children( $preview ),
+				'resolved'   => self::preview_is_resolved( $preview ),
 			);
 		}
 
@@ -143,6 +147,15 @@ class AiPreview {
 			return false;
 		}
 		return ! empty( $preview['innerBlocks'] );
+	}
+
+	/**
+	 * Resolved = children written for the current pendingSchema (not carried-over stale ones).
+	 *
+	 * @param array|null $preview Parsed block from find_ai_preview_block.
+	 */
+	public static function preview_is_resolved( ?array $preview ): bool {
+		return self::preview_has_children( $preview ) && empty( $preview['attrs']['staleChildren'] );
 	}
 
 	public static function get_item( int $post_id ): ?array {
@@ -164,7 +177,7 @@ class AiPreview {
 			'id'             => $post_id,
 			'pendingSchema'  => $pending,
 			'previousSchema' => \Blockish\Mcp\SchemaUtils::decode_schema_attr( $preview['attrs']['previousSchema'] ?? '' ),
-			'resolved'       => self::preview_has_children( $preview ),
+			'resolved'       => self::preview_is_resolved( $preview ),
 			'rest_id'        => self::rest_id( $post_id, $post_type, $post_name ),
 			'rest_route'     => self::rest_route( $post_id, $post_type, $post_name ),
 		);

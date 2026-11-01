@@ -25,7 +25,6 @@ export default function DashboardSidebar( { activeMenu, onMenuClick, extensions 
 				aria-label={ __( 'Blockish dashboard', 'blockish' ) }
 			>
 				{ menus.map( ( menu ) => {
-					const isAddons = menu.key === 'addons';
 					const isActive = menu.key === activeMenu;
 
 					return (
@@ -36,7 +35,6 @@ export default function DashboardSidebar( { activeMenu, onMenuClick, extensions 
 								'blockish-sidebar-nav-item',
 								isActive ? 'is-active' : '',
 								menu.hint ? 'has-hint' : '',
-								isAddons ? 'is-addons' : '',
 							]
 								.filter( Boolean )
 								.join( ' ' ) }

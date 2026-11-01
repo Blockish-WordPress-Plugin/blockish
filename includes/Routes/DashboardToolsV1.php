@@ -662,7 +662,7 @@ class DashboardToolsV1 extends WP_REST_Controller {
 			$out['actionType'] = $this->sanitize_interaction_action_type( (string) $item['actionType'] );
 		}
 		if ( isset( $item['preset'] ) ) {
-			$out['preset'] = $this->sanitize_interaction_preset_id( (string) $item['preset'] );
+			$out['preset'] = \Blockish\Extensions\InteractionMotion::sanitize_preset_id( (string) $item['preset'] );
 		}
 		if ( isset( $item['listenEventName'] ) ) {
 			$out['listenEventName'] = sanitize_text_field( (string) $item['listenEventName'] );
@@ -677,7 +677,7 @@ class DashboardToolsV1 extends WP_REST_Controller {
 			$out['emitPhase'] = sanitize_key( (string) $item['emitPhase'] );
 		}
 		if ( isset( $item['presetOptions'] ) && is_array( $item['presetOptions'] ) ) {
-			$preset = isset( $item['preset'] ) ? $this->sanitize_interaction_preset_id( (string) $item['preset'] ) : 'fadeUp';
+			$preset = isset( $item['preset'] ) ? \Blockish\Extensions\InteractionMotion::sanitize_preset_id( (string) $item['preset'] ) : 'fadeUp';
 			$out['presetOptions'] = $this->sanitize_interaction_preset_options( $item['presetOptions'], $preset );
 		}
 		if ( isset( $item['className'] ) ) {
@@ -708,7 +708,7 @@ class DashboardToolsV1 extends WP_REST_Controller {
 		}
 		if ( isset( $item['action'] ) && is_array( $item['action'] ) ) {
 			$action = $item['action'];
-			$preset = isset( $action['preset'] ) ? $this->sanitize_interaction_preset_id( (string) $action['preset'] ) : 'fadeUp';
+			$preset = isset( $action['preset'] ) ? \Blockish\Extensions\InteractionMotion::sanitize_preset_id( (string) $action['preset'] ) : 'fadeUp';
 			$out['action'] = array(
 				'type'          => isset( $action['type'] ) ? $this->sanitize_interaction_action_type( (string) $action['type'] ) : 'custom',
 				'preset'        => $preset,
@@ -716,6 +716,9 @@ class DashboardToolsV1 extends WP_REST_Controller {
 				'phase'         => isset( $action['phase'] ) ? sanitize_key( (string) $action['phase'] ) : 'start',
 				'className'     => isset( $action['className'] ) ? $this->sanitize_interaction_class_name( (string) $action['className'] ) : '',
 				'applyTo'       => isset( $action['applyTo'] ) ? sanitize_text_field( (string) $action['applyTo'] ) : '',
+				'scrollTarget'  => isset( $action['scrollTarget'] ) ? sanitize_text_field( (string) $action['scrollTarget'] ) : '',
+				'scrollOffset'  => isset( $action['scrollOffset'] ) ? (int) $action['scrollOffset'] : 0,
+				'scrollDuration' => isset( $action['scrollDuration'] ) ? max( 0.1, min( 10, (float) $action['scrollDuration'] ) ) : 1.2,
 				'presetOptions' => $this->sanitize_interaction_preset_options(
 					isset( $action['presetOptions'] ) && is_array( $action['presetOptions'] ) ? $action['presetOptions'] : array(),
 					$preset
@@ -733,7 +736,7 @@ class DashboardToolsV1 extends WP_REST_Controller {
 					)
 					: array(),
 			);
-			$motion = $this->sanitize_interaction_motion( isset( $action['motion'] ) ? $action['motion'] : null );
+			$motion = \Blockish\Extensions\InteractionMotion::sanitize_motion( isset( $action['motion'] ) ? $action['motion'] : null );
 			if ( $motion ) {
 				$out['action']['motion'] = $motion;
 			}
@@ -811,154 +814,10 @@ class DashboardToolsV1 extends WP_REST_Controller {
 		return $out;
 	}
 
-	/**
-	 * GSAP fromTo-compatible tweens. Extra transform keys pass through if present.
-	 *
-	 * @param mixed $motion Raw motion object.
-	 * @return array|null
-	 */
-	private function sanitize_interaction_motion( $motion ) {
-		if ( ! is_array( $motion ) || empty( $motion['tweens'] ) || ! is_array( $motion['tweens'] ) ) {
-			return null;
-		}
-		$tweens = array();
-		foreach ( array_slice( $motion['tweens'], 0, 12 ) as $tween ) {
-			if ( ! is_array( $tween ) ) {
-				continue;
-			}
-			$clean = array(
-				'from'     => $this->sanitize_interaction_gsap_vars( isset( $tween['from'] ) ? $tween['from'] : array() ),
-				'to'       => $this->sanitize_interaction_gsap_vars( isset( $tween['to'] ) ? $tween['to'] : array() ),
-				'duration' => $this->clamp_interaction_float( isset( $tween['duration'] ) ? $tween['duration'] : 0.6, 0, 30 ),
-				'delay'    => $this->clamp_interaction_float( isset( $tween['delay'] ) ? $tween['delay'] : 0, 0, 30 ),
-				'ease'     => $this->sanitize_interaction_ease( isset( $tween['ease'] ) ? $tween['ease'] : 'power1.inOut' ),
-			);
-			if ( array_key_exists( 'position', $tween ) ) {
-				if ( is_numeric( $tween['position'] ) ) {
-					$clean['position'] = $this->clamp_interaction_float( $tween['position'], 0, 60 );
-				} else {
-					$clean['position'] = sanitize_text_field( (string) $tween['position'] );
-				}
-			}
-			$tweens[] = $clean;
-		}
-		if ( ! $tweens ) {
-			return null;
-		}
-		$out = array( 'tweens' => $tweens );
-		if ( ! empty( $motion['pin'] ) ) {
-			$out['pin'] = true;
-		}
-		$pin_end = $this->sanitize_interaction_pin_end( isset( $motion['pinEnd'] ) ? $motion['pinEnd'] : '' );
-		if ( $pin_end !== '' ) {
-			$out['pinEnd'] = $pin_end;
-		}
-		$pin_start = $this->sanitize_interaction_pin_start( isset( $motion['pinStart'] ) ? $motion['pinStart'] : '' );
-		if ( $pin_start !== '' ) {
-			$out['pinStart'] = $pin_start;
-		}
-		if ( array_key_exists( 'scrub', $motion ) ) {
-			$scrub = $motion['scrub'];
-			if ( true === $scrub || 'true' === $scrub || 'locked' === $scrub ) {
-				$out['scrub'] = true;
-			} else {
-				$out['scrub'] = $this->clamp_interaction_float( $scrub, 0, 3 );
-			}
-		}
-		if ( isset( $motion['transformOrigin'] ) ) {
-			$origin = $this->sanitize_interaction_transform_origin( $motion['transformOrigin'] );
-			if ( $origin !== '' ) {
-				$out['transformOrigin'] = $origin;
-			}
-		}
-		return $out;
-	}
 
-	/**
-	 * Pin start: auto, 0, or pixel offset.
-	 *
-	 * @param mixed $raw Raw pinStart.
-	 * @return string
-	 */
-	private function sanitize_interaction_pin_start( $raw ) {
-		$s = strtolower( trim( (string) $raw ) );
-		if ( '' === $s || 'auto' === $s ) {
-			return 'auto';
-		}
-		if ( '0' === $s || 'top' === $s ) {
-			return '0';
-		}
-		if ( is_numeric( $s ) ) {
-			$n = (int) round( (float) $s );
-			return (string) max( 0, min( 400, $n ) );
-		}
-		return '';
-	}
 
-	/**
-	 * @param mixed $raw Raw transformOrigin.
-	 * @return string
-	 */
-	private function sanitize_interaction_transform_origin( $raw ) {
-		$s = sanitize_text_field( (string) $raw );
-		if ( '' === $s || strlen( $s ) > 40 ) {
-			return '';
-		}
-		return preg_match( '/^[0-9.%\sleftcenterrighttopbottom-]+$/i', $s ) ? $s : '';
-	}
 
-	/**
-	 * ScrollTrigger end string (pin distance).
-	 *
-	 * @param mixed $raw Raw pinEnd.
-	 * @return string
-	 */
-	private function sanitize_interaction_pin_end( $raw ) {
-		$s = trim( (string) $raw );
-		if ( '' === $s || strlen( $s ) > 32 ) {
-			return '';
-		}
-		return preg_match( '/^[+\-=%\s0-9.a-zA-Z]+$/', $s ) ? $s : '';
-	}
 
-	/**
-	 * @param mixed $vars Raw GSAP vars.
-	 * @return array
-	 */
-	private function sanitize_interaction_gsap_vars( $vars ) {
-		if ( ! is_array( $vars ) ) {
-			return array();
-		}
-		$out    = array();
-		$ranges = array(
-			'x'         => array( -2000, 2000 ),
-			'y'         => array( -2000, 2000 ),
-			'z'         => array( -2000, 2000 ),
-			'scale'     => array( 0, 10 ),
-			'scaleX'    => array( 0, 10 ),
-			'scaleY'    => array( 0, 10 ),
-			'rotation'  => array( -720, 720 ),
-			'rotationX' => array( -720, 720 ),
-			'rotationY' => array( -720, 720 ),
-			'rotationZ' => array( -720, 720 ),
-			'skewX'     => array( -180, 180 ),
-			'skewY'     => array( -180, 180 ),
-			'xPercent'  => array( -200, 200 ),
-			'yPercent'  => array( -200, 200 ),
-			'opacity'   => array( 0, 1 ),
-			'autoAlpha' => array( 0, 1 ),
-		);
-		foreach ( $ranges as $key => $range ) {
-			if ( ! array_key_exists( $key, $vars ) ) {
-				continue;
-			}
-			$out[ $key ] = $this->clamp_interaction_float( $vars[ $key ], $range[0], $range[1] );
-		}
-		if ( isset( $vars['transformOrigin'] ) ) {
-			$out['transformOrigin'] = sanitize_text_field( (string) $vars['transformOrigin'] );
-		}
-		return $out;
-	}
 
 	private function sanitize_interaction_time_seconds( $value, $fallback ) {
 		if ( null === $value || '' === $value ) {
@@ -976,28 +835,10 @@ class DashboardToolsV1 extends WP_REST_Controller {
 		return max( $min, min( $max, $n ) );
 	}
 
-	private function sanitize_interaction_ease( $ease ) {
-		$ease = sanitize_text_field( (string) $ease );
-		if ( strlen( $ease ) <= 80 && preg_match( '/^[a-z0-9._, +\-()]+$/i', $ease ) ) {
-			return $ease;
-		}
-		return 'power1.inOut';
-	}
 
-	/**
-	 * Preset ids stay camelCase for CSS classes (fadeUp). sanitize_key would break them.
-	 *
-	 * @param string $preset Raw preset id.
-	 * @return string
-	 */
-	private function sanitize_interaction_preset_id( $preset ) {
-		$preset  = sanitize_text_field( (string) $preset );
-		$allowed = array( 'fadeIn', 'fadeUp', 'fadeDown', 'fadeLeft', 'fadeRight', 'zoomIn', 'custom' );
-		return in_array( $preset, $allowed, true ) ? $preset : 'fadeUp';
-	}
 
 	private function sanitize_interaction_action_type( $type ) {
-		$allowed = array( 'preset', 'emit', 'custom', 'toggleClass', 'show', 'hide', 'toggle' );
+		$allowed = array( 'preset', 'emit', 'custom', 'toggleClass', 'scrollTo', 'show', 'hide', 'toggle' );
 		$type    = (string) $type;
 		return in_array( $type, $allowed, true ) ? $type : 'custom';
 	}

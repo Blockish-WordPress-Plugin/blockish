@@ -6,6 +6,7 @@ export default function InteractionsFooter({
 	editing,
 	draft,
 	onBack,
+	onPreview,
 	onSave,
 	onAdd,
 	onDone,
@@ -15,6 +16,18 @@ export default function InteractionsFooter({
 }) {
 	return (
 		<footer className="blockish-interactions-modal__footer">
+			{editing && onPreview ? (
+				<Button
+					variant="tertiary"
+					onClick={onPreview}
+					title={__(
+						'Plays on the selected block. Scroll and pin animations only run on the front end.',
+						'blockish'
+					)}
+				>
+					{__('Preview', 'blockish')}
+				</Button>
+			) : null}
 			<div className="blockish-interactions-modal__footer-spacer" />
 			{editing ? (
 				<>

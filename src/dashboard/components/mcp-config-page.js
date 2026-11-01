@@ -168,6 +168,8 @@ export default function McpConfigPage() {
 					{ label: 'Claude Code', value: 'claude-code' },
 					{ label: 'Cursor', value: 'cursor' },
 					{ label: 'Codex', value: 'codex' },
+					{ label: 'Command Code', value: 'command-code' },
+					{ label: 'OpenCode (Nemotron 3 Ultra, Big Pickle)', value: 'opencode' },
 					{ label: 'Cline (VS Code)', value: 'cline' },
 					{ label: 'Devin (Windsurf)', value: 'devin' },
 					{ label: 'Antigravity', value: 'antigravity' },
