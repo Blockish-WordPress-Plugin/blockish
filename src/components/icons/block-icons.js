@@ -244,6 +244,7 @@ export const database = (
 );
 
 export const accordion = <BlockishIcon icon="menu-alt3" />;
+export const filterContainer = <BlockishIcon icon="filter" />;
 export const accordionItem = <BlockishIcon icon="excerpt-view" />;
 export const button = <BlockishIcon icon="button" />;
 export const googleMap = <BlockishIcon icon="location-alt" />;

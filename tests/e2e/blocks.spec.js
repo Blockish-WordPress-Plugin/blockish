@@ -66,7 +66,9 @@ test.describe( 'All Blockish blocks', () => {
 		expect( response.status() ).toBe( 200 );
 		const html = await page.content();
 		expect.soft( html.match( PHP_ERROR )?.[ 0 ] ?? null, 'PHP error on the front end' ).toBeNull();
-		await page.waitForLoadState( 'networkidle' );
+		// Not "networkidle": embeds (video, maps) can keep connections open.
+		await page.waitForLoadState( 'load' );
+		await page.waitForTimeout( 1500 );
 		expect.soft( jsErrors, 'JS errors on the front end' ).toEqual( [] );
 	} );
 } );

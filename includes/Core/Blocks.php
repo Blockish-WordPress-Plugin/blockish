@@ -15,6 +15,39 @@ class Blocks
         add_action('init', [$this, 'register_blocks']);
         add_filter('block_type_metadata', [$this, 'setup_block_metadata'], 10);
         add_filter('block_categories_all', [$this, 'add_block_category'], 10, 2);
+        add_filter('render_block', [$this, 'add_filter_terms'], 10, 2);
+    }
+
+    /**
+     * Blocks inside a Filter Container carry their filter terms for its
+     * front-end script (static and server-rendered blocks alike).
+     */
+    public function add_filter_terms($block_content, $block)
+    {
+        if ('' === $block_content || empty($block['blockName']) || !str_starts_with($block['blockName'], 'blockish')) {
+            return $block_content;
+        }
+
+        $values = array();
+        foreach (array('filterTerms' => 'data-blockish-filter-terms', 'searchKeywords' => 'data-blockish-search-keywords') as $key => $attribute) {
+            $value = $block['attrs'][$key] ?? '';
+            if (is_string($value) && '' !== trim($value)) {
+                $values[$attribute] = sanitize_text_field($value);
+            }
+        }
+        if (!$values) {
+            return $block_content;
+        }
+
+        $tags = new \WP_HTML_Tag_Processor($block_content);
+        if (!$tags->next_tag()) {
+            return $block_content;
+        }
+        foreach ($values as $attribute => $value) {
+            $tags->set_attribute($attribute, $value);
+        }
+
+        return $tags->get_updated_html();
     }
 
     public function register_blocks()

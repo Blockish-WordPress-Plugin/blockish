@@ -4,6 +4,12 @@
     "blockClass": {
       "type": "string"
     },
+    "filterTerms": {
+      "type": "string"
+    },
+    "searchKeywords": {
+      "type": "string"
+    },
     "themeOverrideLevel": {
       "type": "string",
       "default": "inherit"

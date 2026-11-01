@@ -1,0 +1,37 @@
+.blockish-filter-container .blockish-filter-search {
+	pointer-events: none;
+}
+
+.blockish-filter-container .blockish-filter-button {
+	box-sizing: border-box;
+	display: inline-flex;
+	align-items: center;
+	cursor: default;
+}
+
+.blockish-filter-editor-hint {
+	align-self: center;
+	font-size: 13px;
+	opacity: 0.6;
+}
+
+.blockish-filter-suggestions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.blockish-filter-suggestion {
+	padding: 4px 10px;
+	border: 1px solid #ddd;
+	border-radius: 999px;
+	background: #fff;
+	font-size: 12px;
+	cursor: pointer;
+
+	&:hover {
+		border-color: var(--wp-admin-theme-color, #3858e9);
+		color: var(--wp-admin-theme-color, #3858e9);
+	}
+}

@@ -5,7 +5,14 @@
  */
 const baseConfig = require( '@wordpress/scripts/config/playwright.config.js' );
 
-module.exports = {
+const config = {
 	...baseConfig,
 	testDir: './tests/e2e',
 };
+
+if ( process.env.WP_BASE_URL ) {
+	delete config.webServer;
+}
+
+module.exports = config;
+

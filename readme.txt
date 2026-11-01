@@ -5,7 +5,7 @@ Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
 Tags: gutenberg, blocks, gutenberg blocks, page builder, ai
 Tested up to: 7.1
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -55,6 +55,8 @@ Built for AI-assisted design — and fully usable for manual site building:
 = Layout & Custom HTML =
 
 * **Container** — Flexible section wrapper with background, spacing, flexbox/grid, and layout controls.
+
+* **Filter Container** — Search and filter inner blocks with real-time term buttons and search input.
 
 * **HTML Wrapper** — Dynamic HTML wrapper container with custom tag selection, InnerBlocks, and key-value attributes.
 
@@ -176,6 +178,16 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.4.0 =
+
+* Added: Filter Container block with real-time keyword search, category filter buttons, responsive grid column layouts, empty state messages, and nested card filtering
+* Added: Filter terms (`filterTerms`) and search keywords (`searchKeywords`) attributes across Blockish blocks for Filter Container integration
+* Added: Automated Playwright end-to-end (E2E) test suite covering all 35+ core blocks, Class Manager, Dashboard, Filter Container, Interactions, and Visibility
+* Improved: Interactions engine with per-interaction toggle direction, shared motion sanitizer, and usage-based conditional runtime asset loading
+* Improved: Dashboard extension settings filter (`blockish.dashboard.extensionSettings`) and modernized Select UI for dashboard modals
+* Improved: Global meta description SEO output and dashboard settings
+* Fixed: Add-on account synchronization and cleanup handling in REST API, ensuring strict type safety and code quality standards
 
 = 1.3.0 =
 

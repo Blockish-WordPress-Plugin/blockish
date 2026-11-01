@@ -226,7 +226,7 @@ class AddonsV1 extends WP_REST_Controller {
 				$method->setAccessible( true );
 				$method->invoke( $sdk, false );
 			} catch ( \Throwable $e ) {
-				// Continue to cleanup.
+				unset( $e ); // Silently continue to cleanup.
 			}
 		}
 
@@ -241,7 +241,7 @@ class AddonsV1 extends WP_REST_Controller {
 				}
 			}
 		} catch ( \Throwable $e ) {
-			// Remote deletion may fail if already deleted or network is unreachable; proceed with local purge.
+			unset( $e ); // Remote deletion may fail if already deleted or network is unreachable; proceed with local purge.
 		}
 
 		// 3. Clear scheduled sync crons for this add-on.
@@ -253,6 +253,7 @@ class AddonsV1 extends WP_REST_Controller {
 				$sdk->clear_sync_cron();
 			}
 		} catch ( \Throwable $e ) {
+			unset( $e ); // Cron clearing failed or not scheduled; ignore.
 		}
 
 		// 4. Purge all add-on data (sites, plans, licenses, user-license map, updates) from fs_accounts.
@@ -269,6 +270,7 @@ class AddonsV1 extends WP_REST_Controller {
 				}
 			}
 		} catch ( \Throwable $e ) {
+			unset( $e ); // In-memory reset failed; ignore.
 		}
 
 		return rest_ensure_response(
@@ -395,7 +397,7 @@ class AddonsV1 extends WP_REST_Controller {
 						array_filter(
 							$addon_ids,
 							function( $id ) use ( $module_ids ) {
-								return ! in_array( $id, $module_ids, false );
+								return ! in_array( $id, $module_ids, true );
 							}
 						)
 					);

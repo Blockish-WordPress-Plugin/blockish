@@ -181,7 +181,7 @@ class BlocksList extends ConfigList {
             ),
             'counter' => array(
                 'name'    => __('Counter', 'blockish'),
-                'description' => __('An animated number that counts up to a target value on scroll. Supports a prefix, suffix, thousand separator, and a title label positioned above or below the number. Use for statistics sections — e.g. "500+ clients", "99% uptime", "$2M raised".', 'blockish'),
+                'description' => __('An animated number that counts up to a target value on scroll. Supports a prefix, suffix, thousand separator, and a title label positioned above or below the number. Use for statistics sections — e.g. "500+ clients", "99 percent uptime", "$2M raised".', 'blockish'),
                 'package' => 'free',
                 'status'  => 'active',
             ),
@@ -213,6 +213,12 @@ class BlocksList extends ConfigList {
             'accordion' => array(
                 'name'    => __('Accordion', 'blockish'),
                 'description' => __('A collapsible accordion that can allow one or multiple items open at once. Supports FAQ structured data markup for SEO. Use for FAQs, product specs, or any expandable Q&A content. Contains accordion-item child blocks.', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
+            'filter-container' => array(
+                'name'    => __('Filter Container', 'blockish'),
+                'description' => __('Lets visitors search and filter the blocks inside it. Give any inner block comma-separated filter terms (filterTerms attribute); the container shows a search box and one button per term. Use for portfolios, FAQs, team members or resource lists on a single page.', 'blockish'),
                 'package' => 'free',
                 'status'  => 'active',
             ),
