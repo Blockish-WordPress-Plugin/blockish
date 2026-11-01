@@ -38,7 +38,7 @@ Default (empty attributes):
         <path d="M11 11l3.5 3.5"></path>
       </svg>
       <input type="search" class="blockish-filter-search" placeholder="Search…" aria-label="Search…" />
-    </div>
+    </div> +
   </div>
   <div class="blockish-filter-items is-layout-grid">
     <!-- innerBlocks -->
