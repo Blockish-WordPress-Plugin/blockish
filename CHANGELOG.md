@@ -4,13 +4,11 @@ All notable changes to Blockish will be documented in this file.
 
 ## [1.4.0] - 2026-11-01
 
-* Added: Filter Container block with real-time keyword search, category filter buttons, responsive grid column layouts, empty state messages, and nested card filtering
-* Added: Filter terms (`filterTerms`) and search keywords (`searchKeywords`) attributes across Blockish blocks for Filter Container integration
-* Added: Automated Playwright end-to-end (E2E) test suite covering all 35+ core blocks, Class Manager, Dashboard, Filter Container, Interactions, and Visibility
-* Improved: Interactions engine with per-interaction toggle direction, shared motion sanitizer, and usage-based conditional runtime asset loading
-* Improved: Dashboard extension settings filter (`blockish.dashboard.extensionSettings`) and modernized Select UI for dashboard modals
-* Improved: Global meta description SEO output and dashboard settings
-* Fixed: Add-on account synchronization and cleanup handling in REST API, ensuring strict type safety and code quality standards
+* Added: Filter Container block to search and filter inner blocks using real-time keyword search, category filter buttons, and responsive grid layouts
+* Improved: Interactions engine with smoother toggle animations and conditional asset loading
+* Improved: Site meta description and SEO options in the Blockish dashboard
+* Improved: Dashboard UI and modal dropdown select controls
+* Fixed: Add-on account synchronization handling in settings
 
 ## [1.3.0] - 2026-09-12
 
