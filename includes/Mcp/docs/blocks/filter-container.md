@@ -13,13 +13,8 @@ Search and filter container for inner blocks. Visitors filter children using cat
 | `allLabel` | String | `"All"` (default). Label for the reset / view-all button. |
 | `filterMode` | String | `"single"` (default). Currently supports single-term active selection. |
 | `emptyMessage` | String | `"No results found."` (default). Text shown when no items match the filter or search. |
-| `itemsLayout` | String | `"grid"` (default). Layout wrapper for items (`is-layout-grid`). |
-| `columns` | Object | Responsive column count for grid layout (e.g. `{"desktop": 3, "tablet": 2, "mobile": 1}`). |
-| `itemsGap` | Object | Responsive gap between items. |
-| `controlsAlign` | Object | Alignment of search & buttons header (`flex-start`, `center`, `flex-end`, `space-between`). |
-| `searchColor` | String | Text color for search input, also inherited by the search icon. |
-| `searchIconColor` | String | Dedicated color override for the search box icon. |
-| `searchIconSize` | Object | Responsive size for the search box icon (`{"desktop": "16px"}`). |
+| `itemsLayout` | String | `"grid"` (default) or `"stack"`. Layout wrapper for items. |
+| `anchor` / `align` | Scalar | `"align"`: `"wide"` \| `"full"`. |
 
 #### Tagging Inner Blocks
 
@@ -56,6 +51,17 @@ As a dynamic block (`render.php`), only the inner blocks are stored in the post 
   <p class="blockish-filter-status" aria-live="polite"></p>
 </div>
 ```
+
+#### Style with convert-css / Class Manager
+
+Style with Class Manager or `convert-css` against semantic classes:
+- Controls bar alignment & gap → `{{ROOT}} .blockish-filter-controls { justify-content: …; gap: …; margin-bottom: …; }`
+- Search input → `{{ROOT}} .blockish-filter-search { color: …; background: …; border: …; border-radius: …; padding: …; }`
+- Search icon → `{{ROOT}} .blockish-filter-search-icon { color: …; width: …; height: …; }`
+- Filter buttons → `{{ROOT}} .blockish-filter-button { color: …; background: …; border-radius: …; }`
+- Active filter button → `{{ROOT}} .blockish-filter-button.is-active { color: …; background: …; }`
+- Items layout → `{{ROOT}} .blockish-filter-items.is-layout-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }`
+- Empty message → `{{ROOT}} .blockish-filter-empty { color: …; font-size: …; }`
 
 #### Styling Selectors
 
