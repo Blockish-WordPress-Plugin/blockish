@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class Converter {
 
-	private const SUPPORTED = 'blockish/global, every installed blockish/* block, blockish-dynamicity/*, and blockish-forms/*';
+	private const SUPPORTED = 'blockish/global, every installed blockish/* block, blockish-pro/*, blockish-dynamicity/*, and blockish-forms/*';
 
 	/**
 	 * @param array{css?: string, attributes?: array, root_selector?: string} $input

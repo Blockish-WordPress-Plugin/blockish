@@ -35,8 +35,10 @@ class Callbacks
         foreach ( $requested_blocks as $block_name ) {
             // Addon packages append their own docs via blockish_mcp_block_docs.
             if (
-                'blockish-forms' === $block_name
+                'blockish-pro' === $block_name
+                || 'blockish-forms' === $block_name
                 || 'blockish-dynamicity' === $block_name
+                || str_starts_with( $block_name, 'blockish-pro/' )
                 || str_starts_with( $block_name, 'blockish-forms/' )
                 || str_starts_with( $block_name, 'blockish-dynamicity/' )
             ) {

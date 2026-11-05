@@ -13,6 +13,7 @@ class Callbacks
     ];
 
     const PRO_ACTIVATE_ONLY = [
+        'blockish-pro',
         'blockish-forms',
         'blockish-dynamicity',
     ];
@@ -20,6 +21,7 @@ class Callbacks
     const ABILITY_SHIFT_SLUGS = [
         'advanced-custom-fields',
         'woocommerce',
+        'blockish-pro',
         'blockish-forms',
         'blockish-dynamicity',
     ];
@@ -50,6 +52,13 @@ class Callbacks
                 'type'             => 'plugin',
                 'install_from_org' => true,
                 'note'             => 'Shop. After install or activate, the user must restart their AI app for woocommerce-* tools.',
+            ],
+            [
+                'slug'             => 'blockish-pro',
+                'name'             => 'Blockish Pro',
+                'type'             => 'plugin',
+                'install_from_org' => false,
+                'note'             => 'Pro. Activate only if already installed. Do not install from WordPress.org.',
             ],
             [
                 'slug'             => 'blockish-forms',
@@ -710,6 +719,11 @@ class Callbacks
                 'After restart, WooCommerce MCP tools (woocommerce-*) will be available on this server if WooCommerce registered them.',
             ];
         }
+        if ('blockish-pro' === $slug) {
+            return [
+                'After restart, use Blockish Pro tools and blocks (Form Builder, Query Loop, Dynamic Data, GSAP animations).',
+            ];
+        }
         if ('blockish-forms' === $slug) {
             return [
                 'After restart, use blockish-forms tools. Never put field blocks on a page — create a blockish_form post and embed blockish-forms/form.',
@@ -790,6 +804,8 @@ class Callbacks
             'advanced-custom-field' => 'advanced-custom-fields',
             'woo'              => 'woocommerce',
             'woo-commerce'     => 'woocommerce',
+            'pro'              => 'blockish-pro',
+            'blockish-pro'     => 'blockish-pro',
             'forms'            => 'blockish-forms',
             'blockish-form'    => 'blockish-forms',
             'dynamicity'       => 'blockish-dynamicity',

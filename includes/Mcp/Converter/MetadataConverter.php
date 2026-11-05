@@ -27,7 +27,10 @@ class MetadataConverter {
 		$roots                          = array();
 		$slug                           = null;
 
-		if ( str_starts_with( $block_name, 'blockish-dynamicity/' ) ) {
+		if ( str_starts_with( $block_name, 'blockish-pro/' ) ) {
+			$slug  = substr( $block_name, strlen( 'blockish-pro/' ) );
+			$roots = array( dirname( __DIR__, 4 ) . '/blockish-pro/src/blocks/' );
+		} elseif ( str_starts_with( $block_name, 'blockish-dynamicity/' ) ) {
 			$slug  = substr( $block_name, strlen( 'blockish-dynamicity/' ) );
 			$roots = array( dirname( __DIR__, 4 ) . '/blockish-dynamicity/src/blocks/' );
 		} elseif ( str_starts_with( $block_name, 'blockish-forms/' ) ) {
@@ -37,6 +40,7 @@ class MetadataConverter {
 			$slug  = substr( $block_name, strlen( 'blockish/' ) );
 			$roots = array(
 				dirname( __DIR__, 3 ) . '/src/blocks/',
+				dirname( __DIR__, 4 ) . '/blockish-pro/src/blocks/',
 				dirname( __DIR__, 4 ) . '/blockish-dynamicity/src/blocks/',
 				dirname( __DIR__, 4 ) . '/blockish-forms/src/blocks/',
 			);
@@ -337,7 +341,7 @@ class MetadataConverter {
 				$property = strtolower( (string) $property );
 
 				if (
-					'blockish-dynamicity/loop' === $block_name
+					( 'blockish-pro/loop' === $block_name || 'blockish-dynamicity/loop' === $block_name )
 					&& 'grid-template-columns' === $property
 					&& self::is_loop_wrapper_selector( $rule_selector, $root )
 					&& self::apply_loop_grid_template_columns( $attributes, (string) $value, $device )

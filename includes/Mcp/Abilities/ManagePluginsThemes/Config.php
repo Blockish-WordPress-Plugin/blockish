@@ -12,7 +12,7 @@ class Config
     {
         return [
             'label'               => __('Manage Plugins & Themes', 'blockish'),
-            'description'         => __('Install, activate, deactivate, switch, or update WordPress.org plugins and themes. Never use WP-CLI, zip URLs, GitHub, or the filesystem. Never uninstall or delete. Ask the user in chat first, then pass confirm:true. Slug must be the exact wordpress.org directory slug. Promoted: ACF `advanced-custom-fields` (install+activate), WooCommerce `woocommerce` (install+activate), Blockish Forms `blockish-forms` (Pro — activate only if already installed), Blockish Dynamicity `blockish-dynamicity` (Pro — activate only). After install or activate of those four, you MUST tell the user to fully restart the AI software they are using (Cursor, Claude Desktop, ChatGPT, etc.) or reconnect Blockish MCP — new abilities will not appear in this session. Cannot deactivate Blockish core (`blockish`). Cannot deactivate themes (switch instead). Update only when the user explicitly asked to update.', 'blockish'),
+            'description'         => __('Install, activate, deactivate, switch, or update WordPress.org plugins and themes. Never use WP-CLI, zip URLs, GitHub, or the filesystem. Never uninstall or delete. Ask the user in chat first, then pass confirm:true. Slug must be the exact wordpress.org directory slug. Promoted: ACF `advanced-custom-fields` (install+activate), WooCommerce `woocommerce` (install+activate), Blockish Pro `blockish-pro` (Pro — activate only if already installed). After install or activate of those, you MUST tell the user to fully restart the AI software they are using (Cursor, Claude Desktop, ChatGPT, etc.) or reconnect Blockish MCP — new abilities will not appear in this session. Cannot deactivate Blockish core (`blockish`). Cannot deactivate themes (switch instead). Update only when the user explicitly asked to update.', 'blockish'),
             'category'            => 'blockish',
             'input_schema'        => [
                 'type'       => 'object',
@@ -66,7 +66,7 @@ class Config
             'permission_callback' => fn() => current_user_can('activate_plugins') || current_user_can('switch_themes'),
             'meta'                => [
                 'mcp'         => ['public' => true],
-                'usage_notes' => 'Never WP-CLI / zip / files. Exact .org slug. confirm:true after chat permission. Promoted: advanced-custom-fields, woocommerce (install+activate); blockish-forms, blockish-dynamicity (Pro, activate only). After those four, tell the user to fully restart their AI app. No delete. No deactivate of blockish. No theme deactivate — switch. Update only on explicit user request.',
+                'usage_notes' => 'Never WP-CLI / zip / files. Exact .org slug. confirm:true after chat permission. Promoted: advanced-custom-fields, woocommerce (install+activate); blockish-pro (Pro, activate only). After those, tell the user to fully restart their AI app. No delete. No deactivate of blockish. No theme deactivate — switch. Update only on explicit user request.',
             ],
         ];
     }
