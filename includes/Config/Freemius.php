@@ -29,7 +29,8 @@ class Freemius {
 	 * Initialize the Freemius integration.
 	 */
 	protected function __construct() {
-		$this->sdk = $this->initialize();
+		static::$instance = $this;
+		$this->sdk        = $this->initialize();
 
 		if ( $this->sdk ) {
 			$this->configure_parent_redirects( $this->sdk );
@@ -224,14 +225,15 @@ class Freemius {
 		}
 
 		// Prevent Freemius from bloating the front-end with database queries.
-		// We only load the SDK where it's actually needed (admin, ajax, REST, or webhooks).
+		// We only load the SDK where it's actually needed (admin, ajax, REST, webhooks, or CLI).
 		$is_admin   = is_admin();
 		$is_ajax    = wp_doing_ajax();
 		$is_rest    = $this->is_rest_request_early();
+		$is_cli     = defined( 'WP_CLI' ) && WP_CLI;
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Freemius webhook/callback detection only.
 		$is_webhook = isset( $_REQUEST['fs_action'] ) || isset( $_REQUEST['freemius'] );
 
-		if ( ! $is_admin && ! $is_ajax && ! $is_rest && ! $is_webhook ) {
+		if ( ! $is_admin && ! $is_ajax && ! $is_rest && ! $is_webhook && ! $is_cli ) {
 			return false;
 		}
 

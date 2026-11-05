@@ -66,9 +66,14 @@ class Loader
         }
 
         if ( ! empty( $tools ) ) {
-            $config['tools']              = $tools;
-            $config['server_name']        = $config['server_name'] ?? 'Blockish MCP Server';
-            $config['server_description'] = 'Blockish MCP — each ability is exposed as a direct tool.';
+            $config['tools'] = $tools;
+
+            $site_name = get_bloginfo( 'name' );
+            $host      = wp_parse_url( home_url(), PHP_URL_HOST );
+            $label     = $site_name ? ( $host ? sprintf( '%s (%s)', $site_name, $host ) : $site_name ) : ( $host ?: 'Local' );
+
+            $config['server_name']        = $config['server_name'] ?? sprintf( 'Blockish - %s', $label );
+            $config['server_description'] = sprintf( 'Blockish MCP for %s — each ability is exposed as a direct tool.', $label );
         }
 
         return $config;
