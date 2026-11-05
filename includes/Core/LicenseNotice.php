@@ -204,7 +204,7 @@ class LicenseNotice {
 			? $names[0]
 			: implode( ' & ', $names );
 
-		$addons_url  = admin_url( 'admin.php?page=' . Dashboard::PAGE_SLUG . '&route=addons' );
+		$addons_url  = admin_url( 'admin.php?page=' . Dashboard::PAGE_SLUG . '&route=license' );
 		$dismiss_url = wp_nonce_url(
 			add_query_arg( 'blockish_dismiss_license_notice', '1' ),
 			'blockish_dismiss_license_notice'

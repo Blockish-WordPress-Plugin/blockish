@@ -3,6 +3,7 @@ import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { layout } from '@wordpress/icons';
 import {
 	blocks as blocksIcon,
+	keyIcon,
 	layoutDashboard,
 	packageIcon,
 	plugIcon,
@@ -20,8 +21,8 @@ export const SIDEBAR_MENUS = [
 	{ key: 'extensions', label: 'Extensions', icon: plugIcon },
 	{ key: 'mcp-config', label: 'MCP Server', icon: zap },
 	{ key: 'settings', label: 'Settings', icon: settingsIcon },
-	// Pinned just above Forms via orderSidebarMenus.
 	{ key: 'integrations', label: 'Integrations', icon: plugIcon },
+	{ key: 'license', label: 'License', icon: keyIcon },
 ];
 
 export function isThemeBuilderExtensionActive(extensions = {}) {
@@ -82,15 +83,17 @@ export function orderSidebarMenus(menus = []) {
 	const take = ( key ) => list.find( ( menu ) => menu?.key === key );
 	const integrations = take( 'integrations' );
 	const forms = take( 'forms' );
+	const license = take( 'license' );
 	const rest = list.filter(
 		( menu ) =>
-			! [ 'integrations', 'forms' ].includes( menu?.key )
+			! [ 'integrations', 'forms', 'license' ].includes( menu?.key )
 	);
 
 	return [
 		...rest,
 		...( integrations ? [ integrations ] : [] ),
 		...( forms ? [ forms ] : [] ),
+		...( license ? [ license ] : [] ),
 	];
 }
 
@@ -121,6 +124,9 @@ export const EXTENSION_CONTROL_MAP = {
 };
 
 export function isValidMenu(menuKey, extensions = {}) {
+	if (menuKey === 'addons' || menuKey === 'license') {
+		return true;
+	}
 	return getSidebarMenus(extensions).some((menu) => menu.key === menuKey);
 }
 

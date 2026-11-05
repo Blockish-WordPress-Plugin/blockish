@@ -528,8 +528,8 @@ class AddonsV1 extends WP_REST_Controller {
 
 		$context = array(
 			'status'      => 'success',
-			'plugin_id'   => \Blockish\Config\Freemius::PRODUCT_ID,
-			'public_key'  => $pro['public_key'] ?? \Blockish\Config\Freemius::PUBLIC_KEY,
+			'plugin_id'   => '40382',
+			'public_key'  => $pro['public_key'] ?? 'pk_844c5e5f9d06b95ab047217ee6d31',
 			'name'        => $pro['name'] ?? 'Blockish Pro',
 			'license_key' => '',
 			'is_upgrade'  => false,

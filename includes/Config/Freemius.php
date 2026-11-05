@@ -60,33 +60,15 @@ class Freemius {
 	}
 
 	/**
-	 * Hide Freemius connect / pending-opt-in sticky notices on wp-admin.
+	 * Suppress all Freemius admin notices on wp-admin.
+	 * Licensing UX lives in Blockish Dashboard and LicenseNotice banner — no Freemius nags or duplicate notices.
 	 *
 	 * @param bool  $show Whether to show the notice.
 	 * @param array $msg  Notice payload from Freemius.
 	 * @return bool
 	 */
 	public function filter_show_admin_notice( $show, $msg ) {
-		if ( ! is_array( $msg ) ) {
-			return $show;
-		}
-
-		$id = isset( $msg['id'] ) ? (string) $msg['id'] : '';
-		if ( in_array( $id, array( 'activation_pending', 'connect_account' ), true ) ) {
-			return false;
-		}
-
-		$message = isset( $msg['message'] ) ? wp_strip_all_tags( (string) $msg['message'] ) : '';
-		if (
-			false !== stripos( $message, 'one step away' ) ||
-			false !== stripos( $message, 'Activation Now' ) ||
-			false !== stripos( $message, 'confirmation email' ) ||
-			false !== stripos( $message, 'complete the opt-in' )
-		) {
-			return false;
-		}
-
-		return $show;
+		return false;
 	}
 
 	/**
@@ -415,6 +397,61 @@ class Freemius {
 			'is_available'         => $installed && $licensed,
 			'supports_license_key' => true,
 			'license'              => $license,
+			'freemius_id'          => '40382',
+			'public_key'           => 'pk_844c5e5f9d06b95ab047217ee6d31',
+			'plans'                => array(
+				array(
+					'id'          => '58654',
+					'key'         => 'personal',
+					'title'       => __( 'Personal', 'blockish' ),
+					'tagline'     => __( 'Single Site License', 'blockish' ),
+					'description' => __( 'Perfect for solo creators, bloggers, and single site owners.', 'blockish' ),
+					'licenses'    => 1,
+					'pricing'     => array(
+						'monthly'  => 3.99,
+						'annual'   => 24.99,
+						'lifetime' => 59.99,
+					),
+					'features'    => array(
+						__( '1 Site License', 'blockish' ),
+						__( 'Visual Form Builder & 12 Field Blocks', 'blockish' ),
+						__( 'Visual Query Builder & Post Loop', 'blockish' ),
+						__( 'Pagination Block (AJAX & Standard)', 'blockish' ),
+						__( 'Dynamic Data Engine (ACF, Pods, Meta)', 'blockish' ),
+						__( 'Display Conditions & Visibility Rules', 'blockish' ),
+						__( 'Advanced GSAP ScrollTrigger Animations', 'blockish' ),
+						__( 'Interactive Custom Cursor Effects', 'blockish' ),
+						__( 'Full AI MCP Assistant Integration', 'blockish' ),
+						__( '1 Year Automatic Updates & Support', 'blockish' ),
+					),
+				),
+				array(
+					'id'          => '58656',
+					'key'         => 'agency',
+					'title'       => __( 'Agency', 'blockish' ),
+					'tagline'     => __( 'Unlimited Sites License', 'blockish' ),
+					'description' => __( 'Ideal for agencies, freelancers, and multiple client projects.', 'blockish' ),
+					'licenses'    => null, // Unlimited
+					'featured'    => true,
+					'pricing'     => array(
+						'monthly'  => 9.99,
+						'annual'   => 79.99,
+						'lifetime' => 149.99,
+					),
+					'features'    => array(
+						__( 'Unlimited Sites License', 'blockish' ),
+						__( 'Visual Form Builder & 12 Field Blocks', 'blockish' ),
+						__( 'Visual Query Builder & Post Loop', 'blockish' ),
+						__( 'Pagination Block (AJAX & Standard)', 'blockish' ),
+						__( 'Dynamic Data Engine (ACF, Pods, Meta)', 'blockish' ),
+						__( 'Display Conditions & Visibility Rules', 'blockish' ),
+						__( 'Advanced GSAP ScrollTrigger Animations', 'blockish' ),
+						__( 'Interactive Custom Cursor Effects', 'blockish' ),
+						__( 'Full AI MCP Assistant Integration', 'blockish' ),
+						__( 'Priority VIP Support & Updates', 'blockish' ),
+					),
+				),
+			),
 		);
 	}
 }

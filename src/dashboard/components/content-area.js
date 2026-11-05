@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import DashboardHome from './dashboard-home';
 import BlocksPage from './blocks-page';
 import ExtensionsPage from './extensions-page';
+import LicensePage from './license-page';
 import PlaceholderSection from './placeholder-section';
 import SettingsPage from './settings-page';
 import IntegrationsPage from './integrations-page';
@@ -66,10 +67,14 @@ export default function ContentArea({
 		return <McpConfigPage />;
 	}
 
+	if (activeMenu === 'license' || activeMenu === 'addons') {
+		return <LicensePage />;
+	}
+
 	return (
 		<PlaceholderSection
-			title={__('License', 'blockish')}
-			description={__('Manage your license key and update eligibility.', 'blockish')}
+			title={__('Section', 'blockish')}
+			description={__('This section is not configured.', 'blockish')}
 		/>
 	);
 }

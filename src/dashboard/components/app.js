@@ -62,7 +62,8 @@ export default function App() {
 	}, [isLoading]);
 
 	useEffect(() => {
-		const routeMenu = location?.params?.route;
+		const rawRoute = location?.params?.route;
+		const routeMenu = rawRoute === 'addons' ? 'license' : rawRoute;
 		if (!routeMenu) {
 			return;
 		}
