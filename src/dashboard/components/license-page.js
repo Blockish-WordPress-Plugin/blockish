@@ -411,61 +411,178 @@ export default function LicensePage() {
 					</CardBody>
 				</Card>
 			) : (
-				<Card className="blockish-block-card">
-					<CardBody>
-						<VStack spacing={4}>
-							<div>
-								<Heading level={3} style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>
-									{__('Activate License Key', 'blockish')}
-								</Heading>
-								<Text className="blockish-text-muted">
-									{__(
-										'Already purchased Blockish Pro? Enter your license key below to activate all Pro features on this site.',
-										'blockish'
-									)}
-								</Text>
-							</div>
+				<div
+					style={{
+						background: '#ffffff',
+						border: '1px solid #e2e8f0',
+						borderRadius: '16px',
+						padding: '28px 32px',
+						boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+					}}
+				>
+					<div style={{ maxWidth: '680px' }}>
+						<div style={{ marginBottom: '18px' }}>
+							<h3
+								style={{
+									margin: '0 0 6px 0',
+									fontSize: '18px',
+									fontWeight: 700,
+									color: '#0f172a',
+									letterSpacing: '-0.01em',
+								}}
+							>
+								{__('Activate License Key', 'blockish')}
+							</h3>
+							<p
+								style={{
+									margin: 0,
+									fontSize: '14px',
+									color: '#64748b',
+									lineHeight: 1.5,
+								}}
+							>
+								{__(
+									'Already purchased Blockish Pro? Enter your license key below to activate all Pro features on this site.',
+									'blockish'
+								)}
+							</p>
+						</div>
 
-							<form onSubmit={handleActivate} style={{ width: '100%' }}>
-								<HStack alignment="bottom" spacing={3} wrap>
-									<FlexItem style={{ flex: '1 1 320px' }}>
-										<TextControl
-											label={__('License Key', 'blockish')}
-											placeholder={__('Enter your license key (e.g. 656e01fa…)', 'blockish')}
-											value={licenseKey}
-											onChange={setLicenseKey}
-											disabled={isActivating}
-											hideLabelFromVision={false}
-										/>
-									</FlexItem>
-									<FlexItem>
-										<Button
-											variant="primary"
-											type="submit"
-											disabled={isActivating || !licenseKey.trim()}
-											style={{ minHeight: '36px' }}
-										>
-											{isActivating ? <Spinner /> : __('Activate License', 'blockish')}
-										</Button>
-									</FlexItem>
-								</HStack>
-							</form>
+						<form onSubmit={handleActivate} style={{ width: '100%' }}>
+							<label
+								htmlFor="blockish-license-key-input"
+								style={{
+									display: 'block',
+									fontSize: '12px',
+									fontWeight: 600,
+									color: '#475569',
+									textTransform: 'uppercase',
+									letterSpacing: '0.04em',
+									marginBottom: '8px',
+								}}
+							>
+								{__('License Key', 'blockish')}
+							</label>
 
-							<HStack justify="flex-start">
-								<button
-									type="button"
-									className="blockish-license-recover-link"
-									onClick={() => {
-										setRecoverNotice(null);
-										setIsRecoverOpen(true);
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									gap: '10px',
+									width: '100%',
+								}}
+							>
+								<div
+									style={{
+										position: 'relative',
+										flex: 1,
+										display: 'flex',
+										alignItems: 'center',
 									}}
 								>
-									{__('Lost your license key? Click here to recover.', 'blockish')}
+									<span
+										style={{
+											position: 'absolute',
+											left: '14px',
+											color: '#94a3b8',
+											display: 'inline-flex',
+											alignItems: 'center',
+											pointerEvents: 'none',
+										}}
+									>
+										<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+											<path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5L13 7l-1.5-1.5L9 8l-2-2-4 4a5.66 5.66 0 0 0 8 8l2-2 1.5 1.5L16 16l1.5-1.5L19 16l2-2-3.5-3.5" />
+											<circle cx="7.5" cy="15.5" r="1.5" />
+										</svg>
+									</span>
+									<input
+										id="blockish-license-key-input"
+										type="text"
+										value={licenseKey}
+										onChange={(e) => setLicenseKey(e.target.value)}
+										disabled={isActivating}
+										placeholder={__('Enter your license key (e.g. 656e01fa…)', 'blockish')}
+										style={{
+											width: '100%',
+											height: '46px',
+											paddingLeft: '40px',
+											paddingRight: '14px',
+											fontSize: '14px',
+											fontFamily: 'inherit',
+											color: '#0f172a',
+											background: '#ffffff',
+											border: '1px solid #cbd5e1',
+											borderRadius: '10px',
+											boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+											outline: 'none',
+											transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+										}}
+										onFocus={(e) => {
+											e.target.style.borderColor = '#2563eb';
+											e.target.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.12)';
+										}}
+										onBlur={(e) => {
+											e.target.style.borderColor = '#cbd5e1';
+											e.target.style.boxShadow = '0 1px 2px rgba(0,0,0,0.04)';
+										}}
+									/>
+								</div>
+
+								<button
+									type="submit"
+									disabled={isActivating || !licenseKey.trim()}
+									style={{
+										height: '46px',
+										padding: '0 24px',
+										fontSize: '14px',
+										fontWeight: 600,
+										borderRadius: '10px',
+										border: 'none',
+										background: isActivating || !licenseKey.trim() ? '#94a3b8' : '#2563eb',
+										color: '#ffffff',
+										cursor: isActivating || !licenseKey.trim() ? 'not-allowed' : 'pointer',
+										display: 'inline-flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										gap: '8px',
+										whiteSpace: 'nowrap',
+										boxShadow: isActivating || !licenseKey.trim() ? 'none' : '0 2px 8px rgba(37, 99, 235, 0.25)',
+										transition: 'background-color 0.15s ease',
+									}}
+								>
+									{isActivating ? <Spinner /> : __('Activate License', 'blockish')}
 								</button>
-							</HStack>
-						</VStack>
-					</CardBody>
-				</Card>
+							</div>
+						</form>
+
+						<div style={{ marginTop: '14px' }}>
+							<span style={{ fontSize: '13px', color: '#64748b' }}>
+								{__('Lost your license key?', 'blockish')}{' '}
+							</span>
+							<button
+								type="button"
+								onClick={() => {
+									setRecoverNotice(null);
+									setIsRecoverOpen(true);
+								}}
+								style={{
+									background: 'none',
+									border: 'none',
+									padding: 0,
+									margin: 0,
+									color: '#2563eb',
+									fontSize: '13px',
+									fontWeight: 600,
+									cursor: 'pointer',
+									textDecoration: 'underline',
+									textUnderlineOffset: '2px',
+								}}
+							>
+								{__('Click here to recover', 'blockish')}
+							</button>
+						</div>
+					</div>
+				</div>
 			)}
 
 			{/* Pricing / Packages Section */}
