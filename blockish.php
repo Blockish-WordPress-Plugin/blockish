@@ -5,7 +5,7 @@
  * Description:       Build responsive websites with 35+ Gutenberg blocks and AI. Complete Gutenberg blocks library, AI site builder & page builder with Class Manager.
  * Requires at least: 6.2
  * Requires PHP:      7.4
- * Version:           1.4.0
+ * Version:           1.4.1
  * Author:            wowdevs
  * Author URI:        https://wowdevs.com
  * Plugin URI:        https://blockish.wowdevs.com/
@@ -55,7 +55,7 @@ final class Blockish
      *
      * @var string
      */
-    const VERSION = '1.4.0';
+    const VERSION = '1.4.1';
 
     /**
      * Holds the instance of this class.
