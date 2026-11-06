@@ -185,7 +185,7 @@ export default function LicensePage() {
 		const productId = String(proData?.freemius_id || '40382');
 		const planId = String(plan.id || (plan.key === 'agency' ? '77652' : '77651'));
 		const publicKey = proData?.public_key || 'pk_844c5e5f9d06b95ab047217ee6d31';
-		const logoImage = window.blockishDashboardData?.logoUrl || undefined;
+		const logoImage = window.blockishDashboardData?.logoUrl || 'https://blockish.wowdevs.com/wp-content/plugins/blockish/assets/logo.png';
 
 		let licKey = '';
 
@@ -246,6 +246,8 @@ export default function LicensePage() {
 			}, 1500);
 		};
 
+		const isTrialEligible = billingCycle !== 'lifetime';
+
 		const FS = window.FS;
 		if (FS && FS.Checkout) {
 			try {
@@ -256,6 +258,7 @@ export default function LicensePage() {
 						plan_id: planId,
 						public_key: publicKey,
 						image: logoImage,
+						trial: isTrialEligible,
 					});
 				} else if (typeof FS.Checkout.configure === 'function') {
 					handler = FS.Checkout.configure({
@@ -263,6 +266,7 @@ export default function LicensePage() {
 						plan_id: planId,
 						public_key: publicKey,
 						image: logoImage,
+						trial: isTrialEligible,
 					});
 				}
 
@@ -271,6 +275,7 @@ export default function LicensePage() {
 						name: 'Blockish Pro',
 						licenses: plan.licenses || undefined,
 						cycle: billingCycle,
+						trial: isTrialEligible,
 						purchaseCompleted: (response) => {
 							onPurchaseSuccess(response);
 						},
@@ -702,8 +707,10 @@ export default function LicensePage() {
 											__('Current Plan', 'blockish')
 										) : isLicensed ? (
 											sprintf(__('Upgrade to %s', 'blockish'), plan.title)
-										) : (
+										) : billingCycle === 'lifetime' ? (
 											sprintf(__('Get %s', 'blockish'), plan.title)
+										) : (
+											sprintf(__('Start 30-Day Free Trial', 'blockish'))
 										)}
 									</button>
 								</div>

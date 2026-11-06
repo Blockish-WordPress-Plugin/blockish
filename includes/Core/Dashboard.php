@@ -116,7 +116,7 @@ class Dashboard {
                     'nonce'             => wp_create_nonce( 'wp_rest' ),
                     'siteUrl'           => admin_url(),
                     'siteName'          => get_bloginfo( 'name' ),
-                    'logoUrl'           => BLOCKISH_URL . 'assets/logo.png',
+                    'logoUrl'           => 'https://blockish.wowdevs.com/wp-content/plugins/blockish/assets/logo.png',
                     'currentUser'       => wp_get_current_user()->user_login,
                     'userEmail'         => wp_get_current_user()->user_email,
                     'plugin'            => array(
