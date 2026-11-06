@@ -5,7 +5,7 @@ Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
 Tags: gutenberg, blocks, gutenberg blocks, page builder, ai
 Tested up to: 7.1
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -178,6 +178,16 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.4.1 =
+
+* Added: Dedicated License page under Blockish dashboard for companion Pro add-on management and plan activation
+* Added: Integrated Freemius Checkout v1 flow with automatic license key detection and activation
+* Added: Free trial support for subscription plans directly from dashboard checkout
+* Improved: MCP connection CLI commands include site-specific custom server name for easy multi-site management
+* Improved: Dynamic MCP server metadata based on active site name and host
+* Improved: License activation UI typography, key formatting, input grouping, and recovery modal
+* Fixed: Recover email input prefilling with local admin address
 
 = 1.4.0 =
 
