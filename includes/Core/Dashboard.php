@@ -115,6 +115,7 @@ class Dashboard {
                     'themeBuilderApiPath' => '/blockish/v1/theme-builder',
                     'nonce'             => wp_create_nonce( 'wp_rest' ),
                     'siteUrl'           => admin_url(),
+                    'siteName'          => get_bloginfo( 'name' ),
                     'currentUser'       => wp_get_current_user()->user_login,
                     'userEmail'         => wp_get_current_user()->user_email,
                     'plugin'            => array(

@@ -27,6 +27,8 @@ export default function McpConfigPage() {
 	const adminUrl = window.blockishDashboardData?.siteUrl || window.location.origin;
 	const siteUrl = adminUrl.replace(/\/wp-admin\/$/, '');
 	const currentUser = window.blockishDashboardData?.currentUser || '';
+	const siteName = window.blockishDashboardData?.siteName || '';
+	const serverName = siteName ? `Blockish (${siteName})` : 'Blockish';
 
 	const handleNext = () => setStep((s) => s + 1);
 	const handleBack = () => setStep((s) => s - 1);
@@ -82,8 +84,9 @@ export default function McpConfigPage() {
 		const safeUrl = siteUrl.replace(/"/g, '\\"');
 		const safeUser = currentUser.replace(/"/g, '\\"');
 		const safePass = appPassword.replace(/"/g, '\\"');
+		const safeName = serverName.replace(/"/g, '\\"');
 
-		const baseCmd = `npx blockish-mcp-cli@latest -t ${aiClient} -s "${safeUrl}" -u "${safeUser}" -p "${safePass}" -f`;
+		const baseCmd = `npx blockish-mcp-cli@latest -t ${aiClient} -s "${safeUrl}" -u "${safeUser}" -p "${safePass}" -n "${safeName}" -f`;
 
 		if (hasNode === 'yes') {
 			return baseCmd;
