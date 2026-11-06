@@ -43,9 +43,7 @@ export default function LicensePage() {
 
 	// Recover modal state
 	const [isRecoverOpen, setIsRecoverOpen] = useState(false);
-	const [recoverEmail, setRecoverEmail] = useState(
-		() => window.blockishDashboardData?.userEmail || ''
-	);
+	const [recoverEmail, setRecoverEmail] = useState('');
 	const [recoverNotice, setRecoverNotice] = useState(null);
 	const [isResending, setIsResending] = useState(false);
 
