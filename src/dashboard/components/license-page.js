@@ -55,7 +55,7 @@ export default function LicensePage() {
 		}
 		return [
 			{
-				id: '58654',
+				id: '77651',
 				key: 'personal',
 				title: __('Personal', 'blockish'),
 				tagline: __('Single Site License', 'blockish'),
@@ -68,18 +68,15 @@ export default function LicensePage() {
 				},
 				features: [
 					__('1 Site License', 'blockish'),
-					__('Visual Form Builder & 12 Field Blocks', 'blockish'),
 					__('Visual Query Builder & Post Loop', 'blockish'),
-					__('Dynamic Data & Custom Fields (ACF, Meta)', 'blockish'),
-					__('Display Conditions & Visibility Rules', 'blockish'),
-					__('Advanced GSAP ScrollTrigger Animations', 'blockish'),
-					__('Interactive Custom Cursor Effects', 'blockish'),
-					__('Full AI MCP Assistant Integration', 'blockish'),
-					__('1 Year Automatic Updates & Support', 'blockish'),
+					__('Complete Form Builder (12+ Fields & Entries)', 'blockish'),
+					__('Advanced Interactions (GSAP)', 'blockish'),
+					__('Interactive Cursor Effects', 'blockish'),
+					__('Smart Display Conditions', 'blockish'),
 				],
 			},
 			{
-				id: '58656',
+				id: '77652',
 				key: 'agency',
 				title: __('Agency', 'blockish'),
 				tagline: __('Unlimited Sites License', 'blockish'),
@@ -93,15 +90,11 @@ export default function LicensePage() {
 				},
 				features: [
 					__('Unlimited Sites License', 'blockish'),
-					__('Visual Form Builder & 12 Field Blocks', 'blockish'),
 					__('Visual Query Builder & Post Loop', 'blockish'),
-					__('Dynamic Data & Custom Fields (ACF, Meta)', 'blockish'),
-					__('Display Conditions & Visibility Rules', 'blockish'),
-					__('Advanced GSAP ScrollTrigger Animations', 'blockish'),
-					__('Interactive Custom Cursor Effects', 'blockish'),
-					__('Full AI MCP Assistant Integration', 'blockish'),
-					__('Priority VIP Support & Updates', 'blockish'),
-					__('Unlimited Client Projects', 'blockish'),
+					__('Complete Form Builder (12+ Fields & Entries)', 'blockish'),
+					__('Advanced Interactions (GSAP)', 'blockish'),
+					__('Interactive Cursor Effects', 'blockish'),
+					__('Smart Display Conditions', 'blockish'),
 				],
 			},
 		];
@@ -190,7 +183,7 @@ export default function LicensePage() {
 		setCheckoutBusy(plan.key);
 
 		const productId = String(proData?.freemius_id || '40382');
-		const planId = String(plan.id || '77651');
+		const planId = String(plan.id || (plan.key === 'agency' ? '77652' : '77651'));
 		const publicKey = proData?.public_key || 'pk_844c5e5f9d06b95ab047217ee6d31';
 		const logoImage = window.blockishDashboardData?.logoUrl || undefined;
 
