@@ -403,7 +403,7 @@ class Freemius {
 			'public_key'           => 'pk_844c5e5f9d06b95ab047217ee6d31',
 			'plans'                => array(
 				array(
-					'id'          => '58654',
+					'id'          => '77651',
 					'key'         => 'personal',
 					'title'       => __( 'Personal', 'blockish' ),
 					'tagline'     => __( 'Single Site License', 'blockish' ),

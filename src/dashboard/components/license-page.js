@@ -189,13 +189,12 @@ export default function LicensePage() {
 	const handleBuyOrUpgrade = async (plan) => {
 		setCheckoutBusy(plan.key);
 
-		let checkoutOptions = {
-			plugin_id: proData?.freemius_id || 40382,
-			public_key: proData?.public_key || 'pk_844c5e5f9d06b95ab047217ee6d31',
-			name: 'Blockish Pro',
-			plan_id: String(plan.id),
-			cycle: billingCycle,
-		};
+		const productId = String(proData?.freemius_id || '40382');
+		const planId = String(plan.id || '77651');
+		const publicKey = proData?.public_key || 'pk_844c5e5f9d06b95ab047217ee6d31';
+		const logoImage = window.blockishDashboardData?.logoUrl || undefined;
+
+		let licKey = '';
 
 		try {
 			const context = await apiFetch({
@@ -203,38 +202,98 @@ export default function LicensePage() {
 				method: 'GET',
 			});
 
-			if (context?.plugin_id) checkoutOptions.plugin_id = context.plugin_id;
-			if (context?.public_key) checkoutOptions.public_key = context.public_key;
-			if (context?.name) checkoutOptions.name = context.name;
-			if (context?.license_key) checkoutOptions.license_key = context.license_key;
+			if (context?.license_key) licKey = context.license_key;
 		} catch (err) {
 			// Fallback to defaults
 		} finally {
 			setCheckoutBusy(null);
 		}
 
-		if (window.FS?.Checkout?.configure) {
-			const { name, license_key: licKey, ...config } = checkoutOptions;
-			const handler = window.FS.Checkout.configure(config);
-			handler.open({
-				name,
-				licenses: plan.licenses,
-				cycle: billingCycle,
-				purchaseCompleted: () => {
+		const onPurchaseSuccess = async (response) => {
+			const receivedKey = response?.license?.key || licKey;
+			if (receivedKey) {
+				setNotice({
+					type: 'success',
+					message: __('Payment confirmed! Activating your Blockish Pro license…', 'blockish'),
+				});
+
+				try {
+					await apiFetch({
+						path: `${addonsApiPath}/license/activate`,
+						method: 'POST',
+						data: {
+							slug: 'blockish-pro',
+							license_key: receivedKey,
+						},
+					});
+
 					setNotice({
 						type: 'success',
-						message: licKey
-							? __('Plan upgraded successfully! Reloading…', 'blockish')
-							: __('Purchase complete! Please paste your license key if it did not sync automatically.', 'blockish'),
+						message: __('License activated successfully! Reloading…', 'blockish'),
 					});
-					window.setTimeout(() => {
-						window.location.reload();
-					}, 1500);
-				},
-			});
-		} else {
-			window.open('https://blockish.wowdevs.com/pricing/', '_blank');
+				} catch (err) {
+					setNotice({
+						type: 'success',
+						message: sprintf(
+							/* translators: %s: license key */
+							__('Purchase completed! Your license key is %s. Please activate it below.', 'blockish'),
+							receivedKey
+						),
+					});
+				}
+			} else {
+				setNotice({
+					type: 'success',
+					message: __('Purchase complete! Reloading…', 'blockish'),
+				});
+			}
+
+			window.setTimeout(() => {
+				window.location.reload();
+			}, 1500);
+		};
+
+		const FS = window.FS;
+		if (FS && FS.Checkout) {
+			try {
+				let handler;
+				if (typeof FS.Checkout === 'function') {
+					handler = new FS.Checkout({
+						product_id: productId,
+						plan_id: planId,
+						public_key: publicKey,
+						image: logoImage,
+					});
+				} else if (typeof FS.Checkout.configure === 'function') {
+					handler = FS.Checkout.configure({
+						plugin_id: productId,
+						plan_id: planId,
+						public_key: publicKey,
+						image: logoImage,
+					});
+				}
+
+				if (handler && typeof handler.open === 'function') {
+					handler.open({
+						name: 'Blockish Pro',
+						licenses: plan.licenses || undefined,
+						cycle: billingCycle,
+						purchaseCompleted: (response) => {
+							onPurchaseSuccess(response);
+						},
+						success: (response) => {
+							onPurchaseSuccess(response);
+						},
+					});
+					return;
+				}
+			} catch (checkoutErr) {
+				console.error('Freemius checkout error:', checkoutErr);
+			}
 		}
+
+		// Fallback to website pricing
+		window.open('https://blockish.wowdevs.com/pricing/', '_blank');
 	};
 
 	const handleResend = async (e) => {

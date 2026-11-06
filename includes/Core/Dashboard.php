@@ -97,7 +97,7 @@ class Dashboard {
 
         wp_enqueue_script(
             'freemius-checkout',
-            'https://checkout.freemius.com/checkout.min.js',
+            'https://checkout.freemius.com/js/v1/',
             array(),
             BLOCKISH_VERSION,
             true
@@ -116,6 +116,7 @@ class Dashboard {
                     'nonce'             => wp_create_nonce( 'wp_rest' ),
                     'siteUrl'           => admin_url(),
                     'siteName'          => get_bloginfo( 'name' ),
+                    'logoUrl'           => BLOCKISH_URL . 'assets/logo.png',
                     'currentUser'       => wp_get_current_user()->user_login,
                     'userEmail'         => wp_get_current_user()->user_email,
                     'plugin'            => array(
