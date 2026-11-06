@@ -430,42 +430,77 @@ export default function LicensePage() {
 								display: 'inline-flex',
 								background: '#f1f5f9',
 								padding: '4px',
-								borderRadius: '8px',
+								borderRadius: '10px',
+								border: '1px solid #e2e8f0',
 								gap: '4px',
 							}}
 						>
-							<Button
-								size="small"
-								variant={billingCycle === 'annual' ? 'primary' : 'tertiary'}
+							<button
+								type="button"
 								onClick={() => setBillingCycle('annual')}
+								style={{
+									padding: '6px 14px',
+									fontSize: '13px',
+									fontWeight: 600,
+									borderRadius: '7px',
+									border: 'none',
+									cursor: 'pointer',
+									background: billingCycle === 'annual' ? '#ffffff' : 'transparent',
+									color: billingCycle === 'annual' ? '#0f172a' : '#64748b',
+									boxShadow: billingCycle === 'annual' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+									transition: 'all 0.15s ease',
+								}}
 							>
 								{__('Annual (Save ~45%)', 'blockish')}
-							</Button>
-							<Button
-								size="small"
-								variant={billingCycle === 'monthly' ? 'primary' : 'tertiary'}
+							</button>
+							<button
+								type="button"
 								onClick={() => setBillingCycle('monthly')}
+								style={{
+									padding: '6px 14px',
+									fontSize: '13px',
+									fontWeight: 600,
+									borderRadius: '7px',
+									border: 'none',
+									cursor: 'pointer',
+									background: billingCycle === 'monthly' ? '#ffffff' : 'transparent',
+									color: billingCycle === 'monthly' ? '#0f172a' : '#64748b',
+									boxShadow: billingCycle === 'monthly' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+									transition: 'all 0.15s ease',
+								}}
 							>
 								{__('Monthly', 'blockish')}
-							</Button>
-							<Button
-								size="small"
-								variant={billingCycle === 'lifetime' ? 'primary' : 'tertiary'}
+							</button>
+							<button
+								type="button"
 								onClick={() => setBillingCycle('lifetime')}
+								style={{
+									padding: '6px 14px',
+									fontSize: '13px',
+									fontWeight: 600,
+									borderRadius: '7px',
+									border: 'none',
+									cursor: 'pointer',
+									background: billingCycle === 'lifetime' ? '#ffffff' : 'transparent',
+									color: billingCycle === 'lifetime' ? '#0f172a' : '#64748b',
+									boxShadow: billingCycle === 'lifetime' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+									transition: 'all 0.15s ease',
+								}}
 							>
 								{__('Lifetime (Best Value)', 'blockish')}
-							</Button>
+							</button>
 						</div>
 					</FlexItem>
 				</Flex>
 
 				{/* 2 Packages Grid: Personal & Agency */}
 				<div
-					className="blockish-block-grid"
+					className="blockish-pricing-grid"
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
 						gap: '24px',
+						alignItems: 'stretch',
 					}}
 				>
 					{plans.map((plan) => {
@@ -478,94 +513,149 @@ export default function LicensePage() {
 						const isBusy = checkoutBusy === plan.key;
 
 						return (
-							<Card
+							<div
 								key={plan.key}
-								className={`blockish-block-card blockish-addon-card ${isFeatured ? 'is-bundle' : ''}`}
+								className={`blockish-plan-card ${isFeatured ? 'is-featured' : ''}`}
 								style={{
 									position: 'relative',
-									border: isFeatured ? '2px solid #3b82f6' : '1px solid #e2e8f0',
-									borderRadius: '12px',
-									boxShadow: isFeatured ? '0 10px 25px -5px rgba(59, 130, 246, 0.15)' : 'none',
+									display: 'flex',
+									flexDirection: 'column',
+									background: '#ffffff',
+									border: isFeatured ? '2px solid #2563eb' : '1px solid #e2e8f0',
+									borderRadius: '16px',
+									boxShadow: isFeatured ? '0 10px 25px -4px rgba(37, 99, 235, 0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
+									padding: '32px 28px',
 								}}
 							>
 								{isFeatured && (
-									<div className="blockish-addon-ribbon">
+									<div
+										style={{
+											position: 'absolute',
+											top: '-12px',
+											right: '24px',
+											background: '#2563eb',
+											color: '#ffffff',
+											fontSize: '11px',
+											fontWeight: 700,
+											letterSpacing: '0.06em',
+											textTransform: 'uppercase',
+											padding: '4px 14px',
+											borderRadius: '999px',
+											boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
+										}}
+									>
 										{__('Most Popular', 'blockish')}
 									</div>
 								)}
 
-								<CardBody style={{ padding: '32px 24px 24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-									<VStack spacing={4} style={{ flex: 1 }}>
-										<div>
-											<Heading level={3} style={{ margin: 0, fontSize: '22px', fontWeight: 700 }}>
-												{plan.title}
-											</Heading>
-											<Text style={{ fontSize: '13px', fontWeight: 600, color: '#3b82f6', marginTop: '2px' }}>
-												{plan.tagline}
-											</Text>
-											<Text className="blockish-text-muted" style={{ marginTop: '8px', fontSize: '14px' }}>
-												{plan.description}
-											</Text>
-										</div>
+								<div style={{ marginBottom: '20px' }}>
+									<h3 style={{ margin: '0 0 6px 0', fontSize: '24px', fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>
+										{plan.title}
+									</h3>
+									<div style={{ fontSize: '13px', fontWeight: 600, color: isFeatured ? '#2563eb' : '#0284c7', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
+										{plan.tagline}
+									</div>
+									<p style={{ margin: 0, fontSize: '14px', color: '#64748b', lineHeight: 1.5 }}>
+										{plan.description}
+									</p>
+								</div>
 
-										{/* Price display */}
-										<div style={{ margin: '8px 0', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-											<div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-												<span style={{ fontSize: '36px', fontWeight: 800, color: '#0f172a' }}>
-													{price}
+								{/* Price display */}
+								<div style={{ paddingBottom: '20px', marginBottom: '24px', borderBottom: '1px solid #f1f5f9' }}>
+									<div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+										<span style={{ fontSize: '42px', fontWeight: 800, color: '#0f172a', lineHeight: 1, letterSpacing: '-0.03em' }}>
+											{price}
+										</span>
+										<span style={{ fontSize: '15px', fontWeight: 500, color: '#64748b' }}>
+											{getCycleSuffix()}
+										</span>
+									</div>
+									{billingCycle === 'annual' && (
+										<div style={{ fontSize: '12px', color: '#16a34a', fontWeight: 600, marginTop: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+											<span>●</span> {__('Billed annually · Cancel anytime', 'blockish')}
+										</div>
+									)}
+									{billingCycle === 'monthly' && (
+										<div style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, marginTop: '8px' }}>
+											{__('Billed monthly · Cancel anytime', 'blockish')}
+										</div>
+									)}
+									{billingCycle === 'lifetime' && (
+										<div style={{ fontSize: '12px', color: '#2563eb', fontWeight: 600, marginTop: '8px' }}>
+											{__('One-time payment · Lifetime access', 'blockish')}
+										</div>
+									)}
+								</div>
+
+								{/* Feature Checklist */}
+								<div style={{ flex: 1, marginBottom: '28px' }}>
+									<ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+										{plan.features.map((feature, idx) => (
+											<li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+												<span
+													style={{
+														display: 'inline-flex',
+														alignItems: 'center',
+														justifyContent: 'center',
+														width: '20px',
+														height: '20px',
+														borderRadius: '50%',
+														background: '#ecfdf5',
+														color: '#059669',
+														flexShrink: 0,
+														marginTop: '1px',
+													}}
+													aria-hidden="true"
+												>
+													<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+													</svg>
 												</span>
-												<span style={{ fontSize: '14px', fontWeight: 500, color: '#64748b' }}>
-													{getCycleSuffix()}
+												<span style={{ fontSize: '14px', color: '#334155', lineHeight: 1.45, fontWeight: 500 }}>
+													{feature}
 												</span>
-											</div>
-											{billingCycle === 'annual' && (
-												<Text style={{ fontSize: '12px', color: '#16a34a', fontWeight: 600, marginTop: '4px' }}>
-													{__('Billed annually · Cancel anytime', 'blockish')}
-												</Text>
-											)}
-										</div>
+											</li>
+										))}
+									</ul>
+								</div>
 
-										{/* Feature Checklist */}
-										<ul className="blockish-addon-features" style={{ margin: 0, padding: 0 }}>
-											{plan.features.map((feature, idx) => (
-												<li key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-													<CheckIcon />
-													<span style={{ fontSize: '14px', color: '#334155' }}>
-														{feature}
-													</span>
-												</li>
-											))}
-										</ul>
-
-										{/* CTA Button */}
-										<div style={{ marginTop: 'auto', paddingTop: '16px' }}>
-											<Button
-												variant={isFeatured ? 'primary' : 'secondary'}
-												style={{
-													width: '100%',
-													justifyContent: 'center',
-													minHeight: '44px',
-													fontSize: '15px',
-													fontWeight: 600,
-													borderRadius: '8px',
-												}}
-												disabled={isBusy || isCurrent}
-												onClick={() => handleBuyOrUpgrade(plan)}
-											>
-												{isBusy ? (
-													<Spinner />
-												) : isCurrent ? (
-													__('Current Plan', 'blockish')
-												) : isLicensed ? (
-													sprintf(__('Upgrade to %s', 'blockish'), plan.title)
-												) : (
-													sprintf(__('Get %s', 'blockish'), plan.title)
-												)}
-											</Button>
-										</div>
-									</VStack>
-								</CardBody>
-							</Card>
+								{/* CTA Button */}
+								<div style={{ marginTop: 'auto' }}>
+									<button
+										type="button"
+										disabled={isBusy || isCurrent}
+										onClick={() => handleBuyOrUpgrade(plan)}
+										style={{
+											width: '100%',
+											minHeight: '46px',
+											padding: '12px 20px',
+											fontSize: '15px',
+											fontWeight: 600,
+											borderRadius: '10px',
+											border: isFeatured ? 'none' : '1px solid #cbd5e1',
+											cursor: isBusy || isCurrent ? 'default' : 'pointer',
+											background: isFeatured ? '#2563eb' : '#ffffff',
+											color: isFeatured ? '#ffffff' : '#0f172a',
+											boxShadow: isFeatured ? '0 4px 12px rgba(37, 99, 235, 0.25)' : '0 1px 2px rgba(0,0,0,0.05)',
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											gap: '8px',
+											transition: 'all 0.15s ease',
+										}}
+									>
+										{isBusy ? (
+											<Spinner />
+										) : isCurrent ? (
+											__('Current Plan', 'blockish')
+										) : isLicensed ? (
+											sprintf(__('Upgrade to %s', 'blockish'), plan.title)
+										) : (
+											sprintf(__('Get %s', 'blockish'), plan.title)
+										)}
+									</button>
+								</div>
+							</div>
 						);
 					})}
 				</div>
