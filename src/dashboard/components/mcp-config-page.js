@@ -28,7 +28,9 @@ export default function McpConfigPage() {
 	const siteUrl = adminUrl.replace(/\/wp-admin\/$/, '');
 	const currentUser = window.blockishDashboardData?.currentUser || '';
 	const siteName = window.blockishDashboardData?.siteName || '';
-	const serverName = siteName ? `Blockish (${siteName})` : 'Blockish';
+	const serverName = siteName
+		? siteName.toLowerCase().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'blockish'
+		: 'blockish';
 
 	const handleNext = () => setStep((s) => s + 1);
 	const handleBack = () => setStep((s) => s - 1);
@@ -190,7 +192,7 @@ export default function McpConfigPage() {
 				<Text className="blockish-text-muted">
 					{__('For security, your AI client connects using a dedicated Application Password instead of your main password.', 'blockish')}
 				</Text>
-				
+
 				{appPassword ? (
 					<VStack spacing={2}>
 						<TextControl
@@ -220,7 +222,7 @@ export default function McpConfigPage() {
 					</VStack>
 				)}
 			</VStack>
-			
+
 			<Flex justify="flex-start" gap={3} style={{ marginTop: '16px' }}>
 				<Button variant="secondary" onClick={handleBack}>{__('Back', 'blockish')}</Button>
 				<Button variant="primary" onClick={handleNext} disabled={!appPassword}>
@@ -240,19 +242,19 @@ export default function McpConfigPage() {
 					{__('You are ready!', 'blockish')}
 				</Heading>
 			</Flex>
-			
+
 			<Text>
 				{__('We have generated a custom one-liner just for you. Open your computer\'s Terminal application and paste this exact command:', 'blockish')}
 			</Text>
 
 			<div style={{ position: 'relative' }}>
-				<div style={{ 
-					background: '#1e1e1e', 
-					color: '#d4d4d4', 
-					padding: '24px', 
+				<div style={{
+					background: '#1e1e1e',
+					color: '#d4d4d4',
+					padding: '24px',
 					paddingRight: '80px',
-					borderRadius: '8px', 
-					fontFamily: 'monospace', 
+					borderRadius: '8px',
+					fontFamily: 'monospace',
 					fontSize: '14px',
 					lineHeight: '1.5',
 					overflowX: 'auto',

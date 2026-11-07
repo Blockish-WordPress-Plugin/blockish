@@ -5,7 +5,7 @@ Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
 Tags: gutenberg, blocks, gutenberg blocks, page builder, ai
 Tested up to: 7.1
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -178,6 +178,11 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.4.2 =
+
+* Fixed: MCP server name sanitization in dashboard connect wizard to prevent special characters, parentheses, and spaces across AI client configurations
+* Improved: Terminal one-liner command generation for MCP setup
 
 = 1.4.1 =
 
