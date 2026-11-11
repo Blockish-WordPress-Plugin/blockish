@@ -210,24 +210,5 @@ Terms of Service: https://freemius.com/terms/
 * Improved: Dashboard UI and modal dropdown select controls
 * Fixed: Add-on account synchronization handling in settings
 
-= 1.3.0 =
-
-* Added: Nav Menu Mega Menu and Nav Menu Submenu blocks with responsive alignment, custom offsets, width controls (navigation, full, custom), and offcanvas accordion sync
-* Added: Mega Menus management tab in Blockish Settings with live template previews, search, and direct edit shortcuts
-* Added: Countdown block with multiple layouts (boxes, inline, stacked, circular ring, and flip-digit clock) and dynamic date binding support
-* Added: HTML Wrapper and HTML Child dynamic blocks for custom HTML tag structures and key-value attributes
-* Added: Core Interactions CSS motion player and visual builder UI supporting scroll, scrub, and toggle triggers
-* Added: Real-time AI preview pending count badge in the admin toolbar and GetAiPreviewPending MCP ability
-* Improved: AI Preview resolution pipeline with live Class Manager CSS rendering in Settings preview cards
-* Improved: MCP developer documentation and schema definitions for navigation and interactions
-
-= 1.2.9 =
-
-* Improved: PHPCS/WPCS configuration — focus on security and compatibility checks; skip formatting-only sniffs
-* Fixed: PHP 7.4 compatibility in MCP Json Helper (removed union return type)
-* Fixed: Prepared SQL, exception escaping, and empty-code hygiene across MCP callbacks and AI Preview
-* Fixed: Magic Login redirect encoding (no double urlencode; `add_query_arg` handles encoding)
-* Improved: Media upload cleanup uses `wp_delete_file()`; stricter base64 decode for MCP uploads
-
 [See full changelog history in CHANGELOG.md](https://github.com/Blockish-WordPress-Plugin/blockish/blob/main/CHANGELOG.md)
 
