@@ -5,7 +5,7 @@ Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
 Tags: gutenberg, blocks, gutenberg blocks, page builder, ai
 Tested up to: 7.1
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -91,6 +91,8 @@ Built for AI-assisted design — and fully usable for manual site building:
 = Interactive =
 
 * **Accordion** — Collapsible content sections for FAQs, features, and more.
+
+* **Modal** — Accessible popup dialog with customizable trigger button or external selector, animations, backdrop/Esc close, and inner blocks.
 
 * **Tab** — Tabbed content panels for organizing information.
 
@@ -178,6 +180,12 @@ Terms of Service: https://freemius.com/terms/
 7. Class Manager Extension Panel
 
 == Changelog ==
+
+= 1.4.3 =
+
+* Added: Modal block with customizable trigger button or external CSS selector, header/close controls, animations, keyboard Esc & backdrop close, scroll lock, editor overlay preview, and full InnerBlocks support
+* Added: MCP block reference docs (`includes/Mcp/docs/blocks/modal.md`) and Designer Workflow guidance for Pro Site Audit & Optimize when Blockish Pro is active
+* Fixed: Duplicate Dynamic Data toolbar icon on supported blocks when Blockish Pro is active
 
 = 1.4.2 =
 

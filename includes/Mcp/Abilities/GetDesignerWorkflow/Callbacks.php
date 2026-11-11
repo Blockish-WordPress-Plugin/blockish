@@ -41,6 +41,10 @@ class Callbacks
 
         $workflow[] = '6c. Headers / nav: Prefer `blockish/navigation` → `navmenu` + `offcanvas` (`syncWithMenu: true`, empty offcanvas children; prefer `hamburgerAlign:"right"` + `offcanvasSide:"right"`). Dropdowns: nest `navmenu-submenu` (link lists) or `navmenu-megamenu` under one `navmenu-item` — never both. Mega: `manage-post` `post_type:"blockish_megamenu"` then embed with numeric `megamenuId` and **always set `widthMode`** — multi-column/featured megas need `widthMode:"custom"` + `customWidth` (≈900–1200px) + centered align; never leave default `navigation` on a wide mega (narrow squash). Header layout trap: logo | flex:1 centered nav | CTA puts the hamburger mid-bar when CTA hides — at breakpoint set nav `flex:0; margin-left:auto; justify-content:flex-end` (and hide empty actions). Nested mega pending auto-resolves like patterns/forms. Read get-block-docs for those slugs before staging.';
 
+        if ( $pro_active ) {
+            $workflow[] = '6d. Site Audit & Optimize (Pro): To inspect or fix site SEO, Speed, or Accessibility, run `blockish-pro/site-audit` first, fix via `blockish-pro/site-optimize` (use `dry_run: true` before DB/media edits) or `manage-post`/`manage-class` per `fix_with` hints, then re-run `blockish-pro/site-audit` to update the Dashboard report.';
+        }
+
         $workflow = array_merge( $workflow, self::template_workflow_steps() );
 
         $repo    = 'https://github.com/Blockish-WordPress-Plugin/blockish';

@@ -1,0 +1,200 @@
+body.blockish-modal-scroll-locked {
+	overflow: hidden;
+}
+
+.blockish-modal {
+	&,
+	&:hover {
+		transform: none !important;
+	}
+
+	.blockish-modal-trigger-wrap {
+		display: flex;
+		width: 100%;
+	}
+
+	&.trigger-align-left .blockish-modal-trigger-wrap {
+		justify-content: flex-start;
+	}
+
+	&.trigger-align-center .blockish-modal-trigger-wrap {
+		justify-content: center;
+	}
+
+	&.trigger-align-right .blockish-modal-trigger-wrap {
+		justify-content: flex-end;
+	}
+
+	&.trigger-align-full .blockish-modal-trigger {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.blockish-modal-trigger {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 12px 24px;
+		border: 1px solid transparent;
+		border-radius: 8px;
+		background-color: #111827;
+		color: #ffffff;
+		font-size: 15px;
+		font-weight: 500;
+		line-height: 1.4;
+		cursor: pointer;
+		transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+		&:hover {
+			background-color: #1f2937;
+		}
+	}
+
+	.blockish-modal-trigger-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 1;
+
+		svg {
+			display: block;
+			width: 1em;
+			height: 1em;
+		}
+	}
+
+	.blockish-modal-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 99999;
+		display: flex;
+		padding: 20px;
+		justify-content: center;
+		align-items: center;
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		transition: opacity 0.25s ease, visibility 0.25s ease;
+
+		&[hidden] {
+			display: none;
+		}
+	}
+
+	&.modal-pos-top .blockish-modal-backdrop {
+		align-items: flex-start;
+		padding-top: 48px;
+	}
+
+	&.modal-pos-bottom .blockish-modal-backdrop {
+		align-items: flex-end;
+		padding-bottom: 48px;
+	}
+
+	.blockish-modal-overlay {
+		position: fixed;
+		inset: 0;
+		background-color: rgba(15, 23, 42, 0.55);
+	}
+
+	.blockish-modal-dialog {
+		position: relative;
+		z-index: 1;
+		width: 560px;
+		max-width: calc(100vw - 32px);
+		max-height: calc(100vh - 48px);
+		background-color: #ffffff;
+		border-radius: 12px;
+		box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.25);
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+	}
+
+	&.modal-anim-scale .blockish-modal-dialog {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+
+	&.modal-anim-fade .blockish-modal-dialog {
+		opacity: 0;
+		transform: none;
+	}
+
+	&.modal-anim-slideUp .blockish-modal-dialog {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+
+	&.modal-anim-slideDown .blockish-modal-dialog {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+
+	&.is-open .blockish-modal-backdrop {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	&.is-open .blockish-modal-dialog {
+		opacity: 1;
+		transform: none;
+	}
+
+	.blockish-modal-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 18px 24px;
+		border-bottom: 1px solid #e5e7eb;
+	}
+
+	.blockish-modal-title {
+		margin: 0;
+		font-size: 18px;
+		font-weight: 600;
+		line-height: 1.35;
+		color: #111827;
+	}
+
+	.blockish-modal-close {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 34px;
+		height: 34px;
+		padding: 0;
+		border: 0;
+		border-radius: 8px;
+		background-color: transparent;
+		color: #4b5563;
+		font-size: 22px;
+		line-height: 1;
+		cursor: pointer;
+		flex-shrink: 0;
+		transition: background-color 0.15s ease, color 0.15s ease;
+
+		&:hover {
+			background-color: #f3f4f6;
+			color: #111827;
+		}
+	}
+
+	.blockish-modal-body {
+		padding: 24px;
+		overflow-y: auto;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.blockish-modal .blockish-modal-backdrop,
+	.blockish-modal .blockish-modal-dialog {
+		transition: none !important;
+		transform: none !important;
+	}
+}
+

@@ -222,6 +222,12 @@ class BlocksList extends ConfigList {
                 'package' => 'free',
                 'status'  => 'active',
             ),
+            'modal' => array(
+                'name'    => __('Modal', 'blockish'),
+                'description' => __('Accessible popup modal dialog with a customizable trigger button (or external CSS selector), optional header/close button, animations (scale, fade, slideUp, slideDown), Esc/backdrop close, scroll lock, and inner Gutenberg blocks.', 'blockish'),
+                'package' => 'free',
+                'status'  => 'active',
+            ),
             'accordion-item' => array(
                 'name'    => __('Accordion Item', 'blockish'),
                 'description' => __('A single collapsible panel inside an Accordion block. Has a title, a default-open option, and customizable expand/collapse icons. The content area accepts any inner blocks. Must be placed inside an Accordion block.', 'blockish'),
