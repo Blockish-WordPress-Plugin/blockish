@@ -245,6 +245,17 @@ export const database = (
 
 export const accordion = <BlockishIcon icon="menu-alt3" />;
 export const filterContainer = <BlockishIcon icon="filter" />;
+export const modal = (
+	<BlockishIcon
+		icon={
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+				<rect x="3" y="4" width="18" height="16" rx="2.5" />
+				<path d="M3 9h18" />
+				<path d="M17.5 6.5l-1 1m0-1l1 1" />
+			</svg>
+		}
+	/>
+);
 export const accordionItem = <BlockishIcon icon="excerpt-view" />;
 export const button = <BlockishIcon icon="button" />;
 export const googleMap = <BlockishIcon icon="location-alt" />;

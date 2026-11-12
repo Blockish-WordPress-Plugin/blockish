@@ -5,7 +5,7 @@ Plugin URI: https://blockish.wowdevs.com/
 Contributors: bdkoder, mizan42047
 Tags: gutenberg, blocks, gutenberg blocks, page builder, ai
 Tested up to: 7.1
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 Requires at least: 6.2
 Requires PHP: 7.4
 License: GPL-2.0-or-later
@@ -91,6 +91,8 @@ Built for AI-assisted design — and fully usable for manual site building:
 = Interactive =
 
 * **Accordion** — Collapsible content sections for FAQs, features, and more.
+
+* **Modal** — Accessible popup dialog with customizable trigger button or external selector, animations, backdrop/Esc close, and inner blocks.
 
 * **Tab** — Tabbed content panels for organizing information.
 
@@ -179,6 +181,12 @@ Terms of Service: https://freemius.com/terms/
 
 == Changelog ==
 
+= 1.4.3 =
+
+* Added: Modal block with customizable trigger button or external CSS selector, header/close controls, animations, keyboard Esc & backdrop close, scroll lock, editor overlay preview, and full InnerBlocks support
+* Added: MCP block reference docs (`includes/Mcp/docs/blocks/modal.md`) and Designer Workflow guidance for Pro Site Audit & Optimize when Blockish Pro is active
+* Fixed: Duplicate Dynamic Data toolbar icon on supported blocks when Blockish Pro is active
+
 = 1.4.2 =
 
 * Fixed: MCP server name sanitization in dashboard connect wizard to prevent special characters, parentheses, and spaces across AI client configurations
@@ -201,25 +209,6 @@ Terms of Service: https://freemius.com/terms/
 * Improved: Site meta description and SEO options in the Blockish dashboard
 * Improved: Dashboard UI and modal dropdown select controls
 * Fixed: Add-on account synchronization handling in settings
-
-= 1.3.0 =
-
-* Added: Nav Menu Mega Menu and Nav Menu Submenu blocks with responsive alignment, custom offsets, width controls (navigation, full, custom), and offcanvas accordion sync
-* Added: Mega Menus management tab in Blockish Settings with live template previews, search, and direct edit shortcuts
-* Added: Countdown block with multiple layouts (boxes, inline, stacked, circular ring, and flip-digit clock) and dynamic date binding support
-* Added: HTML Wrapper and HTML Child dynamic blocks for custom HTML tag structures and key-value attributes
-* Added: Core Interactions CSS motion player and visual builder UI supporting scroll, scrub, and toggle triggers
-* Added: Real-time AI preview pending count badge in the admin toolbar and GetAiPreviewPending MCP ability
-* Improved: AI Preview resolution pipeline with live Class Manager CSS rendering in Settings preview cards
-* Improved: MCP developer documentation and schema definitions for navigation and interactions
-
-= 1.2.9 =
-
-* Improved: PHPCS/WPCS configuration — focus on security and compatibility checks; skip formatting-only sniffs
-* Fixed: PHP 7.4 compatibility in MCP Json Helper (removed union return type)
-* Fixed: Prepared SQL, exception escaping, and empty-code hygiene across MCP callbacks and AI Preview
-* Fixed: Magic Login redirect encoding (no double urlencode; `add_query_arg` handles encoding)
-* Improved: Media upload cleanup uses `wp_delete_file()`; stricter base64 decode for MCP uploads
 
 [See full changelog history in CHANGELOG.md](https://github.com/Blockish-WordPress-Plugin/blockish/blob/main/CHANGELOG.md)
 

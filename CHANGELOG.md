@@ -2,6 +2,27 @@
 
 All notable changes to Blockish will be documented in this file.
 
+## [1.4.3] - 2026-11-11
+
+* Added: Modal block with customizable trigger button or external CSS selector, header/close controls, animations, keyboard Esc & backdrop close, scroll lock, editor overlay preview, and full InnerBlocks support
+* Added: MCP block reference docs (`includes/Mcp/docs/blocks/modal.md`) and Designer Workflow guidance for Pro Site Audit & Optimize when Blockish Pro is active
+* Fixed: Duplicate Dynamic Data toolbar icon on supported blocks when Blockish Pro is active
+
+## [1.4.2] - 2026-11-07
+
+* Fixed: MCP server name sanitization in dashboard connect wizard to prevent special characters, parentheses, and spaces across AI client configurations
+* Improved: Terminal one-liner command generation for MCP setup
+
+## [1.4.1] - 2026-11-06
+
+* Added: Dedicated License page under Blockish dashboard for companion Pro add-on management and plan activation
+* Added: Integrated Freemius Checkout v1 flow with automatic license key detection and activation
+* Added: Free trial support for subscription plans directly from dashboard checkout
+* Improved: MCP connection CLI commands include site-specific custom server name for easy multi-site management
+* Improved: Dynamic MCP server metadata based on active site name and host
+* Improved: License activation UI typography, key formatting, input grouping, and recovery modal
+* Fixed: Recover email input prefilling with local admin address
+
 ## [1.4.0] - 2026-11-01
 
 * Added: Filter Container block to search and filter inner blocks using real-time keyword search, category filter buttons, and responsive grid layouts

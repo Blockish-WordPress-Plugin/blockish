@@ -21,17 +21,17 @@ const SUPPORTED_BLOCKS = [
 ];
 
 export default function DynamicityMarketing({ name }) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     // Only show for supported blocks
     if (!SUPPORTED_BLOCKS.includes(name)) {
         return null;
     }
 
-    // Reliably check if Dynamicity is active by checking if one of its core blocks is registered
-    if (getBlockType('blockish-dynamicity/query-builder')) {
+    // Hide marketing button when Blockish Pro Dynamic Data is active.
+    if (window.blockishDynamicitySettings || getBlockType('blockish-pro/query-builder')) {
         return null;
     }
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
     
     // Use the exact same icon from the blockish global icons (fallback to custom SVG if missing)
     const { database } = window?.blockish?.components?.blockIcons || {};

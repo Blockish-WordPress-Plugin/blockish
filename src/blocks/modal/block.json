@@ -1,0 +1,251 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "blockish/modal",
+  "version": "1.0.0",
+  "title": "Modal",
+  "category": "blockish-framework",
+  "description": "Accessible popup modal dialog with customizable trigger button (or external CSS selector), optional header/close button, animations, keyboard Esc/focus trap, and nested Gutenberg blocks.",
+  "keywords": [
+    "modal",
+    "popup",
+    "dialog",
+    "lightbox",
+    "overlay"
+  ],
+  "attributes": {
+    "showTrigger": {
+      "type": "boolean",
+      "default": true
+    },
+    "triggerText": {
+      "type": "string",
+      "default": "Open Modal"
+    },
+    "triggerIcon": {
+      "type": "object"
+    },
+    "triggerIconPosition": {
+      "type": "string",
+      "default": "left"
+    },
+    "triggerAlign": {
+      "type": "string",
+      "default": "left"
+    },
+    "triggerSelector": {
+      "type": "string",
+      "default": ""
+    },
+    "showHeader": {
+      "type": "boolean",
+      "default": true
+    },
+    "modalTitle": {
+      "type": "string",
+      "default": "Modal Title"
+    },
+    "showCloseButton": {
+      "type": "boolean",
+      "default": true
+    },
+    "modalPosition": {
+      "type": "string",
+      "default": "center"
+    },
+    "modalAnimation": {
+      "type": "string",
+      "default": "scale"
+    },
+    "closeOnOverlay": {
+      "type": "boolean",
+      "default": true
+    },
+    "closeOnEsc": {
+      "type": "boolean",
+      "default": true
+    },
+    "lockScroll": {
+      "type": "boolean",
+      "default": true
+    },
+    "triggerTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-modal-trigger"
+      }
+    },
+    "triggerColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-trigger": "color: {{VALUE}};"
+      }
+    },
+    "triggerColorHover": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-trigger:hover": "color: {{VALUE}};"
+      }
+    },
+    "triggerBackground": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-modal-trigger"
+      }
+    },
+    "triggerBackgroundHover": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-modal-trigger:hover"
+      }
+    },
+    "triggerBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-modal-trigger"
+      }
+    },
+    "triggerBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-trigger": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "triggerPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-trigger": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "triggerGap": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-trigger": "gap: {{VALUE}};"
+      }
+    },
+    "modalWidth": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-dialog": "width: {{VALUE}}; max-width: calc(100vw - 32px);"
+      }
+    },
+    "modalMaxHeight": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-dialog": "max-height: {{VALUE}};"
+      }
+    },
+    "modalBackground": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-modal-dialog"
+      }
+    },
+    "modalBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-modal-dialog"
+      }
+    },
+    "modalBorderRadius": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-dialog": "border-radius: {{TOP_LEFT}} {{TOP_RIGHT}} {{BOTTOM_RIGHT}} {{BOTTOM_LEFT}};"
+      }
+    },
+    "modalBoxShadow": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBoxShadow",
+        "selector": ".{{WRAPPER}} .blockish-modal-dialog"
+      }
+    },
+    "modalPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-body": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "overlayColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-overlay": "background-color: {{VALUE}};"
+      }
+    },
+    "headerTitleColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-title": "color: {{VALUE}};"
+      }
+    },
+    "headerTitleTypography": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishTypography",
+        "selector": ".{{WRAPPER}} .blockish-modal-title"
+      }
+    },
+    "headerPadding": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-header": "padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};"
+      }
+    },
+    "headerBorder": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBorder",
+        "selector": ".{{WRAPPER}} .blockish-modal-header"
+      }
+    },
+    "closeColor": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-close": "color: {{VALUE}};"
+      }
+    },
+    "closeColorHover": {
+      "type": "string",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-close:hover": "color: {{VALUE}};"
+      }
+    },
+    "closeBackground": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-modal-close"
+      }
+    },
+    "closeBackgroundHover": {
+      "type": "string",
+      "groupSelector": {
+        "type": "BlockishBackground",
+        "selector": ".{{WRAPPER}} .blockish-modal-close:hover"
+      }
+    },
+    "closeSize": {
+      "type": "object",
+      "selectors": {
+        ".{{WRAPPER}} .blockish-modal-close": "width: {{VALUE}}; height: {{VALUE}};"
+      }
+    }
+  },
+  "supports": {
+    "html": true,
+    "anchor": true
+  },
+  "textdomain": "blockish",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "file:./view.js",
+  "render": "file:./render.php"
+}
+
